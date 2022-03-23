@@ -1,0 +1,191 @@
+#+TITLE:       Cole's Emacs Config: Serial Number 004: Documentation
+#+AUTHOR:      Cole Brown
+#+EMAIL:       code@brown.dev
+#+DATE:        [2022-03-23]
+#+STARTUP:     nofold
+
+
+# NOTE: Break stuff off into subfiles when this gets unweildy, put links in here.
+#  - I.E. make this the actual index.
+
+* History by Serial Number:
+** 000 - The Lost
+
+Started using Emacs at an internship in college; couldn't take home my Emacs config.
+
+
+** 001 - The Before Times
+
+Long ago, before the era of packages...
+  - cole-brown/emacs
+
+Not much custom code.
+
+
+** 002 - Emacs 26
+
+Plain old vanilla Emacs
+  - cole-brown/.emacs.d
+  - With packages.
+  - With my first good bit of custom elisp.
+  - With an overly complex init/config/etc set-up.
+  - First that could be paired with secret config outside of itself.
+
+
+** 003 - Emacs 27 with Doom
+
+Doom Emacs
+  - https://github.com/cole-brown/.config-doom
+  - Embraced the doominess.
+  - =init.el= / =config.el= became part of the parlance for my stuff, not just modules.
+  - Also paired with secret config outside of itself.
+  - Major Points:
+    1. Started as Doom Emacs on Windows 10.
+    2. Attempted Doom Emacs on Ubuntu on WSL on Windows 10, didn't work well.
+    3. Got a Linux laptop for work, so changed to primarily Doom Emacs on Ubuntu 20.04 (for work), with a Doom Emacs on Windows 10 (for home).
+  - See org notes:
+    - lily.d/taskspace/work/2021-02-05_1_emacs-27-on-windows.notes.org
+
+
+Doom's shortcomings:
+  1. It changed things I didn't want changed sometimes.
+     - When I would update Doom to get one thing fix, some other package would change.
+     - When I installed Doom on another computer/vm, it would have different things working/broken.
+  2. It broke my expectations of how stuff worked.
+     - I couldn't use ~use-package~ how I wanted because Doom would have all of its Doomification in its ~use-package~ ~:config~ block, which would run after my ~:init~, ~:custom~, or ~:hook~...
+  3. modules
+     - When you added a module, and it did not work, it was a chore to figure out why sometimes.
+     - Not the greatest documentation of what you installed or how to use it.
+     - Ended up with I've no idea how many packages installed and I've no idea how many of those I was actually using.
+     - Was difficult to wrap my head around how it was all supposed to just work, the first custom module I made.
+  4. Random small things that weren't how I remember Emacs acting and weren't how I wanted Emacs to act.
+     - Beginning & end of line functions with wrapped lines in, say, org-mode... couldn't go to actual beginning of the line, you'd only be allowed to go to the beginning of the visual line. But up/down lines would move up/down logical lines, so it could be a chore to just get to the start of the actual physical line if in a block of long lines.
+  5. Random small things changing between Doom versions.
+     - Examples:
+       - Org used to alternate "-" and "+" between list indent levels automatically and then suddenly it didn't.
+       - Org on one system puts a new list entry on the next line, but a different system with a newer Doom put a new list entry after a blank line.
+  6. Not so great for "I need to tweak everything just a little".
+
+
+Doom's nice features:
+  1. "+" prefix for elisp files that are just optional features.
+  2. modules
+     - Combined with the terseness of the ~doom!~ function call in =~/.doom.d/init.el=, pretty easy to get an overview of your set-up.
+     - When you added a module, and it Just Worked™, it was nice.
+     - Great for adding more and more and more custom code to your Emacs config.
+  3. Leader keybind.
+  4. Encouraging me to start learning Vim-style modal editing.
+  5. Great out-of-the-box settings.
+
+
+** 004 - Emacs 27
+
+Back to plain old vanilla Emacs.
+  - Transitioning with Chemacs2 so I can run Doom Emacs and this new Emacs config, depending on Emacs input params.
+  - See org notes:
+    - lily.d/taskspace/work/2022-03-21_0_emacs-27-dedoomify.notes.org
+
+Mainly, I wanted:
+  1. To know what I have in my config.
+  2. To have more understanding of/control over keybinds.
+  3. To be able to have a config that works on all my home & work computers/vms/toasters.
+     - With OS differences/changes.
+     - With different packages installed/loaded per system.
+     - With various secrets defined or not per system.
+
+     For example:
+       - Recently wanted to throw a quick Emacs with my keybinds and C# mode together for editting C# code in a Win10 VM at work.
+
+     Ran into these issues:
+       - My "optional" secrets had become required to successfully start emacs, open files without errors.
+       - Win10 makes Emacs slow.
+         - Being the guest VM w/ limited resources makes Win10 slow.
+           - C# Mode in Emacs has some bugs that makes it slow right now [2022-03-23]...
+             - So, molasses.
+
+     No way to fix those issues in a way that could be committed back to the main branch; they changed what was installed & configured.
+
+* ├TODO───┤ Reqirement: Optional Secrets
+
+If I make secrets config go last, will it help enforce its optionalness?
+
+I should probably also make a macro for "after secrets loaded, if this var/func is defined, try this code - catch errors".
+  - Maybe even define the var/func empty in main init so its never non-existant?
+
+** Make secrets last
+
+Run all of init.
+  - (Then run all of secrets init?)
+
+Then run all of config.
+  - (Then run all of secrets config?)
+
+Then run finalize?
+
+** Make secrets helper macro
+
+"after secrets loaded, if this var/func is defined, try this code - catch errors"
+  - Maybe even define the var/func empty in main init so its never non-existant?
+
+** Make secrets feature flag or something?
+
+For "if this machine has secrets in general"?
+  - Actually think I have a function that does that so eh.
+
+
+* Requirement: Enable/Disable big chunks per system
+
+Examples:
+  1. Strip down to bare minimum for a VM.
+  2. Make a terminal-only version for a server.
+
+Previously, tried to fit all per-system stuff into one place.
+  - e.g. the secrets.
+
+But if we're doing optional-to-the-max secrets, and also this...
+
+Probably requires that we have per-system config in this repo, then per-system secrets elsewhere.
+
+* Requirement: Keybinds, Evil, Evil-Collection
+
+** Use Evil
+** Use Evil Collection
+** Probably also steal some of Doom's keybinds
+** [SOONER] Get ~general~ sexprs of my ~:input/keyboard~ keybinds
+** [LATER] Port my ~:input/keyboard~ work out so I can have my evil bastardization keybinds
+
+
+* File Tree
+
+Not sure what just plain old Emacs 27 does as far as the actual =~/.config/emacs= folder goes.
+  - With Doom & Chemacs2 running, only (extra) thing there looks like =var/=?
+  - But I remember back in the day all sorts of shit clogging up the =.emacs.d= directory...
+  - So have everything in subdirs except for =early-init.el= and =init.el=.
+
+Doom's Tree:
+tree -d -L 2
+.
+├── bin
+├── core
+│   ├── autoload
+│   ├── cli
+│   ├── templates
+│   └── test
+├── docs
+├── modules
+│   ├── app
+│   ├── checkers
+│   ├── completion
+│   ├── config
+│   ├── editor
+│   ├── emacs
+│   ├── email
+│   ├── input
+│   ├── lang
+│   ├── os
+│   ├── term
+│   ├── tools
+│   └── ui
+└── test
+
+
