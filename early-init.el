@@ -5,128 +5,155 @@
 
 
 ;;------------------------------------------------------------------------------
-;; [Speed]: Garbage Collection
+;; Init Constants & Variables
 ;;------------------------------------------------------------------------------
 
-;; A big contributor to startup times is garbage collection. We up the gc
-;; threshold to temporarily prevent it from running, then reset it later by
-;; enabling `gcmh-mode'. Not resetting it will cause stuttering/freezes.
-;; See GCMH: https://github.com/emacsmirror/gcmh
-(setq gc-cons-threshold most-positive-fixnum)
+(defconst init:path:boot (expand-file-name "core/boot/" user-emacs-directory)
+  "Absolute path to the \"core/boot\" subdirectory.")
 
 
-;;------------------------------------------------------------------------------
-;; [Init]: Packages
-;;------------------------------------------------------------------------------
+(defconst init:rx:filename
+  (rx string-start
+      (one-or-more printing) ".el"
+      string-end)
+  "Base filename must match to be loaded by `init:load:files:ordered'.")
 
-;; In Emacs 27+, package initialization occurs before `user-init-file' is
-;; loaded, but after `early-init-file'. So if we want to handle package init
-;; ourselves, set this:
-;; (setq package-enable-at-startup nil)
+
+(defvar init:status nil
+  "Alist of init sequence keyword to status.")
 
 
 ;;------------------------------------------------------------------------------
-;; [Speed]: Interactive vs Non-interactive
+;; Init Loading Helpers
+;;------------------------------------------------------------------------------
+;; Some "load from 'core/boot' helper functions and related variables/constants.
+
+(defun init:status:set (step status)
+  "Set STATUS of init STEP.
+
+STATUS should be, at minimum, boolean.
+
+STEP is the \"core/boot\" subdirectory path string:
+  - \"[...]/core/boot/20-init/99-finalize\" -> \"20-init/99-finalize\""
+  (if (null init:status)
+      (setq init:status (list (cons step status)))
+    (setf (alist-get step init:status nil nil #'string=) status)))
+;; (setq init:status nil)
+;; init:status
+;; (init:status:set "01-test/11-foo" t)
+;; (init:status:set "01-test/11-foo" :success)
+;; (init:status:set "01-test/12-bar" :partial-success)
+;; init:status
+;; (init:status:set "01-test/13-qux" nil)
+
+
+(defun init:status:get (step)
+  "Get status of init STEP string.
+
+`nil' is considered a failure state as it is the return when the sequence
+keyword doesn't appear in `init:status'.
+
+Init steps are \"core/boot\" subdirectory path strings:
+  - \"[...]/core/boot/20-init/99-finalize\" -> \"20-init/99-finalize\""
+  (alist-get step init:status nil nil #'string=))
+;; init:status
+;; (init:status:get "01-test/11-foo")
+;; (init:status:get "01-test/12-bar")
+;; (init:status:get "01-test/13-qux")
+;; (init:status:get "01-test/14-dne")
+;; (init:status:get "98-dne/99-done")
+
+
+(defun init:load:ordered:files (path)
+  "Load files in PATH directory in alphanumeric order."
+  ;; Ensure absolute path...
+  (let ((path (expand-file-name path))
+        (overall-result :init) ;; Start as something non-nil.
+        file-result)
+    (if (not (file-directory-p path))
+        ;;------------------------------
+        ;; Error: Invalid Input
+        ;;------------------------------
+        (error "[ERROR] init:load:ordered:files: PATH is not a directory?: %S" path)
+
+      ;;------------------------------
+      ;; Load All Children
+      ;;------------------------------
+      ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Contents-of-Directories.html
+      ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/File-Attributes.html#Definition-of-file_002dattributes
+
+      ;; Get all the ".el" files, sorted.
+      (dolist (filename (directory-files path :absolute-paths init:rx:filename))
+        ;; Skip additional loads once something fails.
+        (when overall-result
+          (let ((loadname (expand-file-name (file-name-sans-extension filename) path)))
+            (condition-case err
+                ;; Load, dropping the extension so it can choose ".elc" if appropriate.
+                (progn
+                  (setq file-result (load loadname))
+                  (setq overall-result (and overall-result file-result)))
+            ;; Say what failed in case the failure didn't say.
+            (error
+             (error "[ERROR] init:load:ordered:files: Error loading '%s': %S %S"
+                    loadname
+                    ;; error symbol: `error', `user-error', etc.
+                    (car err)
+                    ;; Always a nice string, even for errors without messages.
+                    ;;   e.g. `arith-error' -> "Arithmetic error"
+                    (error-message-string err)))))))
+
+      ;;------------------------------
+      ;; Post-Loading
+      ;;------------------------------
+      ;; Could put a message here if we want to be chatty?
+
+      ;; Make sure we return the summarized result.
+      overall-result)))
+
+
+(defun init:load:ordered:dirs (path dir)
+  "Call `init:load:ordered:files' for each directory of PATH + DIR in order.
+
+NOTE: Loads files of PATH + DIR first, then loads each immediate subdir's."
+  ;; Ensure absolute path...
+  (let ((root (expand-file-name dir path))
+        (overall-result :init)) ;; Start as something non-nil.
+
+    ;; NOTE: We're trusting in `init:load:ordered:files' to do nice error messages for us.
+
+    ;;------------------------------
+    ;; 1) Load our own files.
+    ;;------------------------------
+    (setq overall-result (and overall-result
+                              (init:load:ordered:files root)))
+
+    ;;------------------------------
+    ;; 2) Load subdirs.
+    ;;------------------------------
+    (unless overall-result ;; Unless loading files failed...
+      (dolist (child (directory-files-and-attributes root :absolute-paths))
+        (let* ((child:path  (car child))
+               (child:attrs (cdr child)))
+          ;; `t' is the attr type for directories. Ignore all the other file types.
+          (when (and overall-result
+                     (eq (file-attribute-type child:attrs) t))
+            (setq overall-result (and overall-result
+                                      (init:load:ordered:files child:path))))
+          )))
+
+    ;; Return summarized result.
+    overall-result))
+
+
+(defun init:load (step)
+  "Load `init:path:boot' + STEP files & dirs, save result to `init:status'."
+  (let ((result (init:load:ordered:dirs init:path:boot step)))
+    (init:status:set step result)
+    result))
+
+
+;;------------------------------------------------------------------------------
+;; Load Early-Init Files
 ;;------------------------------------------------------------------------------
 
-;; TODO: Safe to do this or not? We're not pre-compiling everything like Doom is.
-;;
-;; ;; In noninteractive sessions, prioritize non-byte-compiled source files to
-;; ;; prevent the use of stale byte-code. Otherwise, it saves us a little IO time
-;; ;; to skip the mtime checks on every *.elc file.
-;; (setq load-prefer-newer noninteractive)
-
-(unless (or (daemonp)
-            noninteractive
-            init-file-debug)
-  (let ((old-file-name-handler-alist file-name-handler-alist))
-    ;; `file-name-handler-alist' is consulted on each `require', `load' and
-    ;; various path/io functions. You get a minor speed up by unsetting this.
-    ;; Some warning, however: this could cause problems on builds of Emacs where
-    ;; its site lisp files aren't byte-compiled and we're forced to load the
-    ;; *.el.gz files (e.g. on Alpine).
-    (setq-default file-name-handler-alist nil)
-
-    ;; ...but restore `file-name-handler-alist' later, because it is needed for
-    ;; handling encrypted or compressed files, among other things.
-    (defun init:file-handler-alist:reset/hook ()
-      "Merge original `file-handler-alist' with any additions during Emacs start-up."
-      (setq file-name-handler-alist
-            ;; Merge instead of overwrite because there may have bene changes to
-            ;; `file-name-handler-alist' since startup we want to preserve.
-            (delete-dups (append file-name-handler-alist
-                                 old-file-name-handler-alist))))
-    (add-hook 'emacs-startup-hook #'init:file-handler-alist:reset/hook 101))
-
-  ;; Premature redisplays can substantially affect startup times and produce
-  ;; ugly flashes of unstyled Emacs.
-  (setq-default inhibit-redisplay t
-                inhibit-message t)
-  (defun init:inhibit-display:reset/hook ()
-    "Re-enable display, messages."
-    (setq-default inhibit-redisplay nil
-                  inhibit-message nil)
-    (redisplay))
-  (add-hook 'window-setup-hook #'init:inhibit-display:reset/hook)
-
-  ;; Site files tend to use `load-file', which emits "Loading X..." messages in
-  ;; the echo area, which in turn triggers a redisplay. Redisplays can have a
-  ;; substantial effect on startup times and in this case happens so early that
-  ;; Emacs may flash white while starting up.
-  (define-advice load-file (:override (file) silence)
-    (load file nil 'nomessage))
-
-  ;; Undo our `load-file' advice above, to limit the scope of any edge cases it
-  ;; may introduce down the road.
-  (define-advice startup--load-user-init-file (:before (&rest _) init-doom)
-    (advice-remove #'load-file #'load-file@silence)))
-
-
-;;------------------------------------------------------------------------------
-;; Bootstrap
-;;------------------------------------------------------------------------------
-
-;; Contrary to what many Emacs users have in their configs, you don't need
-;; more than this to make UTF-8 the default coding system:
-(set-language-environment "UTF-8")
-
-;; set-language-enviornment sets default-input-method, which is unwanted
-(setq default-input-method nil)
-
-;; Ensure the rest of Emacs init is running out of this file's directory
-(setq user-emacs-directory (file-name-directory load-file-name))
-
-;;------------------------------
-;; Pre-init core functionality.
-;;------------------------------
-;; TODO: Delete or implement my version of:
-;; ;; Load the heart of Emacs
-;; (load (concat user-emacs-directory "core/core") nil 'nomessage)
-;;
-;; TODO: If we don't implement any early-init "core", we'll need a flag to sanity
-;; check this has loaded.
-;;
-;; TODO: Put this in above "core" if implemented.
-;;------------------------------
-;; Versioning & Early-Init Flag
-;;------------------------------
-;; "init.el" will check that version exists as a check that early-init happened.
-(defconst int<spy>:emacs:version
-  '(:major 4
-    :minor 0
-    ;; Can be ISO-8601 or RFC-3339 date or datetime.
-    ;; Will get smashed down to just digits.
-    :revision "2022-03-23")
-  "Plist version data for this Emacs config.")
-
-(defun int<spy>:emacs:version ()
-  "Create SemVer string from version plist."
-  (format "%d.%d.%s"
-          (plist-get int<spy>:emacs:version :major)
-          (plist-get int<spy>:emacs:version :minor)
-          (replace-regexp-in-string (rx (not digit))
-                                    ""
-                                    (plist-get int<spy>:emacs:version :revision))))
-
-(defconst spy:emacs:version (int<spy>:emacs:version)
-  "Semantic Version string of this Emacs config.")
+(init:load "10-early")
