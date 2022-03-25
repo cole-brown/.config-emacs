@@ -20,7 +20,7 @@
 ;; If either check fails, error out of init.
 (unless (or (fboundp 'init:status:get)
             (functionp 'init:status:get))
-  (error "[ERROR] 'init.el': 'early-init.el' did not run? `init:status:get' function is not defined."))
+  (error "[ERROR] 'init.el': 'early-init.el' did not run? `init:status:get' function is not defined"))
 
 (unless (init:status:get "00-early")
   (error "[ERROR] 'init.el': 'early-init.el' failed 'core/boot' init. `init:status' for '00-early' is: %S"
@@ -63,4 +63,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-;; TODO: provide imp symbol
+(imp:provide :dot-emacs 'init)

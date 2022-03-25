@@ -21,13 +21,19 @@
 ;; Notes (DELETE ME)
 ;;------------------------------------------------------------------------------
 
-
 ;; TODO: Basically this order:
 ;; TODO:   1. init this
 ;; TODO:   2. for each module, init it
-;; TODO:   3. for each DOOMDIR, init it
+;; TODO:   3. for each DOOMDIR, optionally load "init.el".
 ;; TODO:      - What is DOOMDIR? "init dir"? How is it different from a module?
+;; TODO:        - Ah. for secrets etc. So... "SYSTEMDIR", "SECRETDIR", etc.
+;; TODO:          1. System-specific
+;; TODO:          2. work domain stuff
+;; TODO:          3. secrets
+;; TODO:          4. etc
+;;
 ;; TODO: Same for config.
+;;
 ;; TODO: Finalize does not do all that - just hooks and stuff.
 
 
