@@ -109,5 +109,4 @@
 ;; Not strictly necessary to provide to emacs, since provide and require both
 ;; provide to emacs as well, but does help when requiring via Emacs.
 (imp:provide:with-emacs :imp)
-
 ;;; imp/init.el ends here
