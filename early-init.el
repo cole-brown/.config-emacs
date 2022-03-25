@@ -19,8 +19,12 @@
 ;; Init Constants & Variables
 ;;------------------------------------------------------------------------------
 
-(defconst init:path:boot (expand-file-name "core/boot/" user-emacs-directory)
+(defconst init:path:core/boot (expand-file-name "core/boot/" user-emacs-directory)
   "Absolute path to the \"core/boot\" subdirectory.")
+
+
+(defconst init:path:core/modules (expand-file-name "core/modules/" user-emacs-directory)
+  "Absolute path to the \"core/modules\" subdirectory.")
 
 
 (defconst init:rx:filename
@@ -156,10 +160,10 @@ NOTE: Loads files of PATH + DIR first, then loads each immediate subdir's."
 
 
 (defun init:load (caller step)
-  "Load `init:path:boot' + STEP files & dirs, save result to `init:status'.
+  "Load `init:path:core/boot' + STEP files & dirs, save result to `init:status'.
 
 If loading isn't successful, signal an error using CALLER (e.g. \"init.el\") in error string."
-  (let ((result (init:load:ordered:dirs init:path:boot step)))
+  (let ((result (init:load:ordered:dirs init:path:core/boot step)))
     (init:status:set step result)
     (unless result
       (error "[ERROR] init:load:with-error: '%s' failed loading '%s' files. `init:status': %S"

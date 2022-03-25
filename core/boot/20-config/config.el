@@ -1,4 +1,4 @@
-;;; 00-bootstrap.el --- Super early stuff requried for "all" of init. -*- lexical-binding: t; -*-
+;;; 00-config.el --- Configure packages & stuff -*- lexical-binding: t; -*-
 ;;
 ;; Author: Cole Brown <code@brown.dev>
 ;; URL:    https://github.com/cole-brown/.config-emacs
@@ -12,13 +12,11 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Bootstrap
+;; Configure?
 ;;------------------------------------------------------------------------------
-
-;; TODO: load imp & other early/required-for-everything packages/modules
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-;; TODO: provide imp symbol
+(imp:provide :dot-emacs 'core 'boot '20-config 'config)

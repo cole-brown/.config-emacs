@@ -1,4 +1,4 @@
-;;; 00-config.el --- Configure packages & stuff -*- lexical-binding: t; -*-
+;;; 00-finalize.el --- Final touches -*- lexical-binding: t; -*-
 ;;
 ;; Author: Cole Brown <code@brown.dev>
 ;; URL:    https://github.com/cole-brown/.config-emacs
@@ -12,11 +12,11 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Configure?
+;; Finalize.
 ;;------------------------------------------------------------------------------
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-;; TODO: provide imp symbol
+(imp:provide :dot-emacs 'core 'boot '99-finalize 'finalize)
