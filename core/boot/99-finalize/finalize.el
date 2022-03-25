@@ -15,6 +15,9 @@
 ;; Finalize.
 ;;------------------------------------------------------------------------------
 
+;; TODO: a random koan
+(message "Now witness the firepower of this full armed and operational operating system.")
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.
