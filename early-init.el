@@ -1,7 +1,18 @@
-;;; early-init.el -*- lexical-binding: t; -*-
-
+;;; early-init.el --- Early Init. -*- lexical-binding: t; -*-
+;;
+;; Author: Cole Brown <code@brown.dev>
+;; URL:    https://github.com/cole-brown/.config-emacs
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
 ;; Emacs 27.1 introduced early-init.el, which is run before init.el, before
 ;; package and UI initialization happens, and before site files are loaded.
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------
@@ -138,17 +149,23 @@ NOTE: Loads files of PATH + DIR first, then loads each immediate subdir's."
           (when (and overall-result
                      (eq (file-attribute-type child:attrs) t))
             (setq overall-result (and overall-result
-                                      (init:load:ordered:files child:path))))
-          )))
+                                      (init:load:ordered:files child:path)))))))
 
     ;; Return summarized result.
     overall-result))
 
 
-(defun init:load (step)
-  "Load `init:path:boot' + STEP files & dirs, save result to `init:status'."
+(defun init:load (caller step)
+  "Load `init:path:boot' + STEP files & dirs, save result to `init:status'.
+
+If loading isn't successful, signal an error using CALLER (e.g. \"init.el\") in error string."
   (let ((result (init:load:ordered:dirs init:path:boot step)))
     (init:status:set step result)
+    (unless result
+      (error "[ERROR] init:load:with-error: '%s' failed loading '%s' files. `init:status': %S"
+             caller
+             step
+             result))
     result))
 
 
@@ -156,4 +173,4 @@ NOTE: Loads files of PATH + DIR first, then loads each immediate subdir's."
 ;; Load Early-Init Files
 ;;------------------------------------------------------------------------------
 
-(init:load "00-early")
+(init:load "early-init.el" "00-early")
