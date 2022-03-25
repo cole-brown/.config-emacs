@@ -156,4 +156,4 @@ NOTE: Loads files of PATH + DIR first, then loads each immediate subdir's."
 ;; Load Early-Init Files
 ;;------------------------------------------------------------------------------
 
-(init:load "10-early")
+(init:load "00-early")
