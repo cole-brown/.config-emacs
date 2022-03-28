@@ -28,36 +28,37 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Load Init Directories in Order
+;; Load Ordered Init Directories
 ;;------------------------------------------------------------------------------
+
 
 ;; This was done in "early-init.el":
 ;;   (init:load "early-init.el" "00-early")
 ;; Now we need to load the rest:
-
-;;------------------------------
-;; Init
-;;------------------------------
-;; All the "must happen so Emacs can be set-up" stuff.
-;;   - Load & set-up packages that must go early, like:
-;;     - `imp' - file loading library
-;;     - `no-littering' - direct other Emacs packages to not litter the `user-emacs-directory'.
-;;     - etc
-(init:load "init.el" "10-init")
-
-
-;;------------------------------
-;; Config
-;;------------------------------
-;; Standard Emacs set-up.
-(init:load "init.el" "20-config")
+(let ((caller "init.el"))
+  ;;------------------------------
+  ;; Init
+  ;;------------------------------
+  ;; All the "must happen so Emacs can be set-up" stuff.
+  ;;   - Load & set-up packages that must go early, like:
+  ;;     - `imp' - file loading library
+  ;;     - `no-littering' - direct other Emacs packages to not litter the `user-emacs-directory'.
+  ;;     - etc
+  (init:load caller "10-init")
 
 
-;;------------------------------
-;; Finalize
-;;------------------------------
-;; Last chance to do things.
-(init:load "init.el" "99-finalize")
+  ;;------------------------------
+  ;; Config
+  ;;------------------------------
+  ;; Standard Emacs set-up.
+  (init:load caller "20-config")
+
+
+  ;;------------------------------
+  ;; Finalize
+  ;;------------------------------
+  ;; Last chance to do things.
+  (init:load caller "99-finalize"))
 
 
 ;;------------------------------------------------------------------------------

@@ -18,6 +18,9 @@
 ;;------------------------------------------------------------------------------
 ;; Init Constants & Variables
 ;;------------------------------------------------------------------------------
+;; We already called the core "core", so... The next layer is "mantle", I guess?
+;; And a third layer would be called "crust"?
+
 
 (defconst init:path:core/boot (expand-file-name "core/boot/" user-emacs-directory)
   "Absolute path to the \"core/boot\" subdirectory.")
@@ -25,6 +28,31 @@
 
 (defconst init:path:core/modules (expand-file-name "core/modules/" user-emacs-directory)
   "Absolute path to the \"core/modules\" subdirectory.")
+
+
+(defconst init:filenames:mantle
+  '(:init   "init.el"
+    :config "config.el")
+  "Names of files to look for in `init:paths:mantle' for loading.")
+
+
+(defvar init:features:mantle nil
+  "List of `imp' feature lists to load after their core counterpart.
+
+An element in the list would be either 1) just the keyword,
+or 2) a specific sub-feature.
+  1) '(:path)
+  2) '(:path regex)
+
+Each path in the list will optionally load a file (if it is present) during a
+specific part of init:
+  1) \"init.el\"
+     - Just after core's init is finished, and before config.
+  2) \"config.el\"
+     - Just after core's config is finished, before completing start-up.
+
+Paths should be absolute directory paths. \"init.el\" and \"config.el\" will be
+appended to them for looking for the proper file to load.")
 
 
 (defconst init:rx:filename
@@ -171,6 +199,38 @@ If loading isn't successful, signal an error using CALLER (e.g. \"init.el\") in 
              step
              result))
     result))
+
+
+(defun init:feature:mantle:add (caller &rest feature)
+  "Add `imp' FEATURE to mantle init/config load sequence.
+
+FEATURE should already have an `imp' root.
+
+CALLER should be string of function or file name which called this."
+  ;;------------------------------
+  ;; Error Checks
+  ;;------------------------------
+  ;; TODO: is there an `imp' function to use for validation instead?
+  (cond ((null feature)
+         (error "[ERROR] init:feature:mantle:add: %s: FEATURE cannot be nil, got: %S"
+                caller
+                feature))
+
+        ((not (keywordp (nth 0 feature)))
+         (error "[ERROR] init:feature:mantle:add: %s: FEATURE must start with a keyword! Got: %S"
+                caller
+                (nth 0 feature)))
+
+        ((not (seq-every-p #'symbolp feature))
+         (error "[ERROR] init:feature:mantle:add: %s: FEATURE must only be keywords/symbols! Got: %S"
+                caller
+                feature))
+
+        ;;------------------------------
+        ;; Valid; add to list.
+        ;;------------------------------
+        (t
+         (push feature init:features:mantle))))
 
 
 ;;------------------------------------------------------------------------------
