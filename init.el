@@ -13,15 +13,19 @@
 ;;------------------------------------------------------------------------------
 ;; Sanity Check: Has "early-init" run?
 ;;------------------------------------------------------------------------------
-;; Two checks:
-;;   1) Do we have our `init` functions?
-;;   2) Do we have a successful status for early-init?
-;;
-;; If either check fails, error out of init.
+;; If a check fails, error out of init.
+
+;; 1) Does Emacs pass the minimum version check?
+(unless (version< emacs-version "28.0") ;; Emacs should be 28.1 or newer.
+  (error "[ERROR] 'init.el': Failed 'core/boot' init. Emacs should be version 28.1 or newer, running Emacs %S"
+         emacs-version))
+
+;; 2) Do we have our `init` functions?
 (unless (or (fboundp 'init:status:get)
             (functionp 'init:status:get))
   (error "[ERROR] 'init.el': 'early-init.el' did not run? `init:status:get' function is not defined"))
 
+;; 3) Do we have a successful status for early-init?
 (unless (init:status:get "00-early")
   (error "[ERROR] 'init.el': 'early-init.el' failed 'core/boot' init. `init:status' for '00-early' is: %S"
          (init:status:get "00-early")))

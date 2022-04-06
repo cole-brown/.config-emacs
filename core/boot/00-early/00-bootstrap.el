@@ -1,4 +1,4 @@
-;;; core/boot/10-early/10-bootstrap/00.el -*- lexical-binding: t; -*-
+;;; core/boot/00-early/00-bootstrap.el -*- lexical-binding: t; -*-
 
 ;;------------------------------------------------------------------------------
 ;; Bootstrap
