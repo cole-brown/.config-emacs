@@ -101,3 +101,8 @@
 ;; Ensure the rest of Emacs init is running out of this file's directory.
 ;; Chemacs2 or something could have handed off to us.
 (setq user-emacs-directory (file-name-directory load-file-name))
+
+
+;;------------------------------------------------------------------------------
+;; The End
+;;------------------------------------------------------------------------------

@@ -36,6 +36,15 @@
 ;; Can always override on a per-package basis.
 ;; (customize-set-variable 'use-package-always-ensure t)
 
+;;---
+;; Use-Package & Debugging
+;;---
+
+(setq use-package-compute-statistics    init:debug?
+      use-package-verbose               init:debug?
+      use-package-minimum-reported-time (if init:debug? 0 0.1)
+      use-package-expand-minimally      doom-interactive-p)
+
 
 ;;------------------------------
 ;; `imp'
