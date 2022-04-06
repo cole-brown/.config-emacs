@@ -11,8 +11,12 @@
     :minor 0
     ;; Can be ISO-8601 or RFC-3339 date or datetime.
     ;; Will get smashed down to just digits.
-    :revision "2022-03-23")
+    :revision "2022-04-06"
+    ;; (spy:datetime/string.get 'iso-8601 'short)
+    ;; (spy:datetime/string.get 'yyyymmdd)
+    )
   "Plist version data for this Emacs config.")
+
 
 (defun int<spy>:emacs:version ()
   "Create SemVer string from version plist."
@@ -22,6 +26,7 @@
           (replace-regexp-in-string (rx (not digit))
                                     ""
                                     (plist-get int<spy>:emacs:version :revision))))
+
 
 (defconst spy:emacs:version (int<spy>:emacs:version)
   "Semantic Version string of this Emacs config.")
