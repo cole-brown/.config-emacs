@@ -30,8 +30,8 @@
 ;;   - "init.el" will be checked for after core init is run.
 ;;   - "config.el" will be checked for after core config is run.
 ;;
-;; (init:feature:mantle:add "core/10-init/20-load.el" :foo)
-;; (init:feature:mantle:add "core/10-init/20-load.el" :zort narf)
+;; (innit:feature:mantle:add "core/10-init/20-load.el" :foo)
+;; (innit:feature:mantle:add "core/10-init/20-load.el" :zort narf)
 
 
 ;;------------------------------------------------------------------------------

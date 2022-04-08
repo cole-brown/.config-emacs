@@ -49,37 +49,37 @@
 
     ;; ...but restore `file-name-handler-alist' later, because it is needed for
     ;; handling encrypted or compressed files, among other things.
-    (defun init:file-handler-alist:reset/hook ()
+    (defun innit:file-handler-alist:reset/hook ()
       "Merge original `file-handler-alist' with any additions during Emacs start-up."
       (setq file-name-handler-alist
             ;; Merge instead of overwrite because there may have bene changes to
             ;; `file-name-handler-alist' since startup we want to preserve.
             (delete-dups (append file-name-handler-alist
                                  old-file-name-handler-alist))))
-    (add-hook 'emacs-startup-hook #'init:file-handler-alist:reset/hook 101))
+    (add-hook 'emacs-startup-hook #'innit:file-handler-alist:reset/hook 101))
 
   ;; Premature redisplays can substantially affect startup times and produce
   ;; ugly flashes of unstyled Emacs.
   (setq-default inhibit-redisplay t
                 inhibit-message t)
-  (defun init:inhibit-display:reset/hook ()
+  (defun innit:inhibit-display:reset/hook ()
     "Re-enable display, messages."
     (setq-default inhibit-redisplay nil
                   inhibit-message nil)
     (redisplay))
-  (add-hook 'window-setup-hook #'init:inhibit-display:reset/hook)
+  (add-hook 'window-setup-hook #'innit:inhibit-display:reset/hook)
 
   ;; Site files tend to use `load-file', which emits "Loading X..." messages in
   ;; the echo area, which in turn triggers a redisplay. Redisplays can have a
   ;; substantial effect on startup times and in this case happens so early that
   ;; Emacs may flash white while starting up.
-  (define-advice load-file (:override (file) silence)
+  (define-advice load-file (:override (file) innit-mute)
     (load file nil 'nomessage))
 
   ;; Undo our `load-file' advice above, to limit the scope of any edge cases it
   ;; may introduce down the road.
-  (define-advice startup--load-user-init-file (:before (&rest _) init-doom)
-    (advice-remove #'load-file #'load-file@silence)))
+  (define-advice startup--load-user-init-file (:before (&rest _) innit-unmute)
+    (advice-remove #'load-file #'load-file@innit-mute)))
 
 
 ;;------------------------------

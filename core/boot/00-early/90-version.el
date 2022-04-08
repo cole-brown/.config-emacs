@@ -6,7 +6,7 @@
 ;;------------------------------------------------------------------------------
 
 ;; "init.el" will check that version exists as a check that early-init happened.
-(defconst int<spy>:emacs:version
+(defconst int<innit>:emacs:version
   '(:major 4
     :minor 0
     ;; Can be ISO-8601 or RFC-3339 date or datetime.
@@ -18,15 +18,15 @@
   "Plist version data for this Emacs config.")
 
 
-(defun int<spy>:emacs:version ()
+(defun int<innit>:emacs:version ()
   "Create SemVer string from version plist."
   (format "%d.%d.%s"
-          (plist-get int<spy>:emacs:version :major)
-          (plist-get int<spy>:emacs:version :minor)
+          (plist-get int<innit>:emacs:version :major)
+          (plist-get int<innit>:emacs:version :minor)
           (replace-regexp-in-string (rx (not digit))
                                     ""
-                                    (plist-get int<spy>:emacs:version :revision))))
+                                    (plist-get int<innit>:emacs:version :revision))))
 
 
-(defconst spy:emacs:version (int<spy>:emacs:version)
+(defconst innit:emacs:version (int<innit>:emacs:version)
   "Semantic Version string of this Emacs config.")

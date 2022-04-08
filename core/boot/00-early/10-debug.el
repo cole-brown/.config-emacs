@@ -15,10 +15,10 @@
 ;; Debug Variables
 ;;------------------------------------------------------------------------------
 
-(defvar init:debug? (or (getenv-internal "DEBUG") init-file-debug)
+(defvar innit:debug? (or (getenv-internal "DEBUG") init-file-debug)
   "If non-nil, flags the init as debugging / debug mode.
 
-Use `init:debug:toggle' to toggle it. The '--debug-init' flag and setting the
+Use `innit:debug:toggle' to toggle it. The '--debug-init' flag and setting the
 DEBUG envvar will enable this at startup.")
 
 
@@ -26,24 +26,24 @@ DEBUG envvar will enable this at startup.")
 ;; Debug Functions
 ;;------------------------------------------------------------------------------
 
-(defun init:debug:set (enable)
-  "Set `init:debug?' to ENABLE flag & ensure Emacs debug flags match.
+(defun innit:debug:set (enable)
+  "Set `innit:debug?' to ENABLE flag & ensure Emacs debug flags match.
 
 ENABLE should be nil/non-nil. Sets Emacs variables `init-file-debug' and
-`debug-on-error' to match boolean state of `init:debug?'.
+`debug-on-error' to match boolean state of `innit:debug?'.
 
 NOTE: If it needs to get any more fancy, consider a minor mode like
 `doom-debug-mode'."
   ;; Set our flag to exactly whatever enable is.
-  (setq init:debug? enable)
+  (setq innit:debug? enable)
   ;; Set Emacs' flags to just t/nil.
   (setq debug-on-error  (not (null enable))
         init-file-debug debug-on-error))
 
 
-(defun init:debug:toggle ()
-  "Toggle `init:debug?' flag & ensure Emacs debug flags match."
-  (init:debug:set (not init:debug?)))
+(defun innit:debug:toggle ()
+  "Toggle `innit:debug?' flag & ensure Emacs debug flags match."
+  (innit:debug:set (not innit:debug?)))
 
 
 ;;------------------------------------------------------------------------------

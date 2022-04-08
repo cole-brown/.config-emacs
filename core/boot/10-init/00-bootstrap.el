@@ -40,16 +40,16 @@
 ;; Use-Package & Debugging
 ;;---
 
-(setq use-package-compute-statistics    init:debug?
-      use-package-verbose               init:debug?
-      use-package-minimum-reported-time (if init:debug? 0 0.1)
+(setq use-package-compute-statistics    innit:debug?
+      use-package-verbose               innit:debug?
+      use-package-minimum-reported-time (if innit:debug? 0 0.1)
       use-package-expand-minimally      doom-interactive-p)
 
 
 ;;------------------------------
 ;; `imp'
 ;;------------------------------
-(load (expand-file-name "imp/init.el" init:path:core/modules))
+(load (expand-file-name "imp/init.el" innit:path:core/modules))
 
 ;; From here on, `imp' should be used instead of `load', `require', etc.
 

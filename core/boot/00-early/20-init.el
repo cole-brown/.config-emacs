@@ -12,13 +12,15 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Debug Variables
+;; Init Variables
 ;;------------------------------------------------------------------------------
 
-(defconst init:interactive? (not noninteractive)
+(defconst innit:interactive? (not noninteractive)
   "If non-nil, Emacs is in interactive mode.")
 
 
+(defvar innit:time nil
+  "The time it took, in seconds, for Emacs & `innit' to finish set-up.")
 ;;------------------------------------------------------------------------------
 ;; The End
 ;;------------------------------------------------------------------------------

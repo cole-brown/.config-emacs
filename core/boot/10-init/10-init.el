@@ -16,7 +16,7 @@
 ;;------------------------------------------------------------------------------
 ;; `imp' is now loaded, so we can set ourselves up to use it.
 
-(imp:path:root :core    init:path:core/boot)
+(imp:path:root :core    innit:path:core/boot)
 (imp:path:root :modules (imp:path:join user-emacs-directory "modules"))
 
 
@@ -29,9 +29,9 @@
 ;;------------------------------------------------------------------------------
 ;; Create a group for any custom variables that will be created?
 
-(defgroup init nil
+(defgroup innit nil
   "An Emacs framework for running similar inits on one or more systems."
-  :prefix "init:"
+  :prefix "innit:"
   :group 'tools
   :link '(url-link "https://github.com/cole-brown/.config-emacs"))
 
@@ -40,7 +40,7 @@
 ;; Initialize!
 ;;------------------------------------------------------------------------------
 
-;; (imp:load :feature  '(:dot-emacs init systems)
+;; (imp:load :feature  '(:dot-emacs innit systems)
 ;;           :path     (imp:path:current:dir/relative :dot-emacs)
 ;;           :filename "systems")
 
