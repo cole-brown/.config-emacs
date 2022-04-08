@@ -15,7 +15,7 @@
 ;; Debug Variables
 ;;------------------------------------------------------------------------------
 
-(defvar innit:debug? (or (getenv-internal "DEBUG") init-file-debug)
+(defvar innit:debug? nil
   "If non-nil, flags the init as debugging / debug mode.
 
 Use `innit:debug:toggle' to toggle it. The '--debug-init' flag and setting the
@@ -44,6 +44,57 @@ NOTE: If it needs to get any more fancy, consider a minor mode like
 (defun innit:debug:toggle ()
   "Toggle `innit:debug?' flag & ensure Emacs debug flags match."
   (innit:debug:set (not innit:debug?)))
+
+
+;;------------------------------------------------------------------------------
+;; Set-Up
+;;------------------------------------------------------------------------------
+
+;; Set our debug variable (`innit:debug?') and Emacs' variables based on inputs.
+(cond
+ ;;---
+ ;; Environment Variable: DEBUG
+ ;;---
+ ((and (getenv-internal "DEBUG")
+       (not init-file-debug)
+       (not debug-on-error))
+  (setq innit:debug? (getenv-internal "DEBUG"))
+
+  ;; Also cascade into Emacs?
+  (setq init-file-debug t
+        debug-on-error t)
+
+  ;; TODO: `innit' function for init/debug messages, etc?
+  (message "innit: '%s': Enable `innit:debug?' from environment variable DEBUG: %S"
+           ;; TODO: `innit' function for relative path of filename for init/debug messages?
+           "core/00-early/10-debug.el"
+           innit:debug?))
+
+ ;;---
+ ;; CLI Flag: "--debug-init"
+ ;;---
+ (init-file-debug
+  (setq innit:debug? init-file-debug)
+
+  ;; TODO: `innit' function for init/debug messages, etc?
+  (message "innit: '%s': Enable `innit:debug?' from '--debug-init' CLI flag: %S"
+           ;; TODO: `innit' function for relative path of filename for init/debug messages?
+           "core/00-early/10-debug.el"
+           innit:debug?))
+
+ ;;---
+ ;; Interactive Flag?
+ ;;---
+ ;; How did you get this set and not `init-file-debug'? Debugging some small
+ ;; piece of init, maybe?
+ (debug-on-error
+  (setq innit:debug? debug-on-error
+
+  ;; TODO: `innit' function for init/debug messages, etc?
+  (message "innit: '%s': Enable `innit:debug?' from `debug-on-error' variable: %S"
+           ;; TODO: `innit' function for relative path of filename for init/debug messages?
+           "core/00-early/10-debug.el"
+           innit:debug?))))
 
 
 ;;------------------------------------------------------------------------------
