@@ -26,6 +26,21 @@ DEBUG envvar will enable this at startup.")
 ;; Debug Functions
 ;;------------------------------------------------------------------------------
 
+(defun innit:debug? (&optional any)
+  "Return non-nil if debugging.
+
+If ANY is nil (default), just return value of `innit:debug?' variable.
+If ANY is non-nil, return non-nil if any of these are non-nil:
+  1) `innit:debug?' variable
+  2) `debug-on-error' variable
+  3) `init-file-debug' variable"
+  (if any
+      (or innit:debug?
+          debug-on-error
+          init-file-debug)
+    innit:debug?))
+
+
 (defun innit:debug:set (enable)
   "Set `innit:debug?' to ENABLE flag & ensure Emacs debug flags match.
 
