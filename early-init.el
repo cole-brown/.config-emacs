@@ -15,13 +15,34 @@
 ;;; Code:
 
 
+;; TODO: an output debug thing that isn't an hack.
+(defun innit:debug:hack (msg &rest args)
+  "MSG ARGS."
+  (let ((buffer (get-buffer-create "innit")))
+    (with-current-buffer buffer
+      (let ((buffer:end (point-max)))
+        (goto-char buffer:end)
+        (unless (= (point-min) buffer:end)
+          (insert "\n"))
+        (insert (format msg args))))
+    ;; Show buffer?
+    (pop-to-buffer buffer)))
+
+(innit:debug:hack "[innit] early-init.el: hello?")
+
+
 ;;------------------------------------------------------------------------------
 ;; Settings & Overrides
 ;;------------------------------------------------------------------------------
 
 ;; Load these settings first so they can override any `defvar' and be prepared
 ;; for wherever they're needed in the init sequence.
-(load (expand-file-name "settings.el") 'noerror)
+(let ((settings:path (expand-file-name "settings.el" user-emacs-directory)))
+  ;; Don't want to error if file isn't there, but do want to error if loading the
+  ;; file causes an error, so check if it exists first.
+  (when (file-exists-p settings:path)
+    ;; Now let `load' error if it wants - can't error on non-existant optional file anymore.
+    (load (expand-file-name "settings.el" user-emacs-directory))))
 
 
 ;;------------------------------------------------------------------------------
@@ -80,6 +101,11 @@ appended to them for looking for the proper file to load.")
 ;;------------------------------------------------------------------------------
 ;; Some "load from 'core/boot' helper functions and related variables/constants.
 
+
+;;------------------------------
+;; `innit:status' getter/setter
+;;------------------------------
+
 (defun innit:status:set (step status)
   "Set STATUS of innit STEP.
 
@@ -102,7 +128,7 @@ STEP is the \"core/boot\" subdirectory path string:
 (defun innit:status:get (step)
   "Get status of innit STEP string.
 
-`nil' is considered a failure state as it is the return when the sequence
+nil is considered a failure state as it is the return when the sequence
 keyword doesn't appear in `innit:status'.
 
 Innit steps are \"core/boot\" subdirectory path strings:
@@ -115,6 +141,10 @@ Innit steps are \"core/boot\" subdirectory path strings:
 ;; (innit:status:get "01-test/14-dne")
 ;; (innit:status:get "98-dne/99-done")
 
+
+;;------------------------------
+;; Ordered Loading (by file/dir name)
+;;------------------------------
 
 (defun innit:load:ordered:files (path)
   "Load files in PATH directory in alphanumeric order."
@@ -247,3 +277,9 @@ CALLER should be string of function or file name which called this."
 ;;------------------------------------------------------------------------------
 
 (innit:load "early-init.el" "00-early")
+
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
+;; TODO: Provide anything? Push to some list or whatever that can be added to imp after the fact?

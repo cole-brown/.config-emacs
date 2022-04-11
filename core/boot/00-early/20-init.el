@@ -46,8 +46,8 @@
   "Valid verbosity tags.
 
 1) keywords: specific verbosity tag
-2) t:        enable all verbosity tags
-3) nil:      none/disabled")
+2) `t':      enable all verbosity tags
+3) `nil':    none/disabled")
 
 
 (defvar innit:verbosity (if (innit:debug?)
@@ -71,7 +71,7 @@ Default to no messages (nil).")
 (defvar innit:display:load-file nil
   "Allow `load-file' to output its message(s) during init?
 
-Default to no (nil).")
+Default to no (`nil').")
 
 
 ;;------------------------------------------------------------------------------
@@ -192,15 +192,6 @@ If string?, return the message as a string instead of displaying it."
 
 ;; set-language-enviornment sets default-input-method, which is unwanted
 (setq default-input-method nil)
-
-
-;;------------------------------
-;; `user-emacs-directory'
-;;------------------------------
-
-;; Ensure the rest of Emacs init is running out of this file's directory.
-;; Chemacs2 or something could have handed off to us.
-(setq user-emacs-directory (file-name-directory load-file-name))
 
 
 ;;------------------------------------------------------------------------------
