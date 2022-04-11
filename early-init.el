@@ -16,6 +16,15 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Settings & Overrides
+;;------------------------------------------------------------------------------
+
+;; Load these settings first so they can override any `defvar' and be prepared
+;; for wherever they're needed in the init sequence.
+(load (expand-file-name "settings.el") 'noerror)
+
+
+;;------------------------------------------------------------------------------
 ;; Init Constants & Variables
 ;;------------------------------------------------------------------------------
 ;; We already called the core "core", so... The next layer is "mantle", I guess?
