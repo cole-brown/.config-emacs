@@ -34,10 +34,7 @@
 ;;------------------------------------------------------------------------------
 
 (imp:path:root :alist
-               (imp:path:join doom-private-dir
-                              "modules"
-                              "emacs"
-                              "alist")
+               (imp:path:current:dir)
                "init.el")
 
 

@@ -21,10 +21,7 @@
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
 (imp:path:root :str
-               (imp:path:join doom-private-dir
-                              "modules"
-                              "emacs"
-                              "str")
+               (imp:path:current:dir)
                "init.el")
 
 
