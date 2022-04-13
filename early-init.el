@@ -32,17 +32,28 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Path Functions
+;;------------------------------------------------------------------------------
+;; Want to be able to use these nicer path funcs from the get-go.
+;;   - They are under the prefixes:
+;;     - `path:'
+;;     - `files:'
+
+(load (expand-file-name "core/modules/emacs/path/init" user-emacs-directory))
+
+
+;;------------------------------------------------------------------------------
 ;; Settings & Overrides
 ;;------------------------------------------------------------------------------
 
 ;; Load these settings first so they can override any `defvar' and be prepared
 ;; for wherever they're needed in the init sequence.
-(let ((settings:path (expand-file-name "settings.el" user-emacs-directory)))
+(let ((settings:path (path:join user-emacs-directory "settings.el")))
   ;; Don't want to error if file isn't there, but do want to error if loading the
   ;; file causes an error, so check if it exists first.
   (when (file-exists-p settings:path)
     ;; Now let `load' error if it wants - can't error on non-existant optional file anymore.
-    (load (expand-file-name "settings.el" user-emacs-directory))))
+    (load (path:join user-emacs-directory "settings"))))
 
 
 ;;------------------------------------------------------------------------------
@@ -51,12 +62,11 @@
 ;; We already called the core "core", so... The next layer is "mantle", I guess?
 ;; And a third layer would be called "crust"?
 
-
-(defconst innit:path:core/boot (expand-file-name "core/boot/" user-emacs-directory)
+(defconst innit:path:core/boot (path:join user-emacs-directory "core/boot/")
   "Absolute path to the \"core/boot\" subdirectory.")
 
 
-(defconst innit:path:core/modules (expand-file-name "core/modules/" user-emacs-directory)
+(defconst innit:path:core/modules (path:join user-emacs-directory "core/modules/")
   "Absolute path to the \"core/modules\" subdirectory.")
 
 
@@ -149,10 +159,10 @@ Innit steps are \"core/boot\" subdirectory path strings:
 (defun innit:load:ordered:files (path)
   "Load files in PATH directory in alphanumeric order."
   ;; Ensure absolute path...
-  (let ((path (expand-file-name path))
+  (let ((path (path:canonicalize:absolute path))
         (overall-result :init) ;; Start as something non-nil.
         file-result)
-    (if (not (file-directory-p path))
+    (if (not (path:exists? path :dir))
         ;;------------------------------
         ;; Error: Invalid Input
         ;;------------------------------
@@ -165,10 +175,10 @@ Innit steps are \"core/boot\" subdirectory path strings:
       ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/File-Attributes.html#Definition-of-file_002dattributes
 
       ;; Get all the ".el" files, sorted.
-      (dolist (filename (directory-files path :absolute-paths innit:rx:filename))
+      (dolist (filename (directory-files path :absolute-paths innit:rx:filename)) ;; TODO-PATH: A `path' function here?
         ;; Skip additional loads once something fails.
         (when overall-result
-          (let ((loadname (expand-file-name (file-name-sans-extension filename) path)))
+          (let ((loadname (path:name:base path filename)))
             (condition-case err
                 ;; Load, dropping the extension so it can choose ".elc" if appropriate.
                 (progn
@@ -198,7 +208,7 @@ Innit steps are \"core/boot\" subdirectory path strings:
 
 NOTE: Loads files of PATH + DIR first, then loads each immediate subdir's."
   ;; Ensure absolute path...
-  (let ((root (expand-file-name dir path))
+  (let ((root (path:name:dir path dir))
         (overall-result :init)) ;; Start as something non-nil.
 
     ;; NOTE: We're trusting in `innit:load:ordered:files' to do nice error messages for us.
@@ -213,11 +223,13 @@ NOTE: Loads files of PATH + DIR first, then loads each immediate subdir's."
     ;; 2) Load subdirs.
     ;;------------------------------
     (unless overall-result ;; Unless loading files failed...
+      ;; TODO-PATH: Do I want this as a path function?..
       (dolist (child (directory-files-and-attributes root :absolute-paths))
         (let* ((child:path  (car child))
                (child:attrs (cdr child)))
           ;; `t' is the attr type for directories. Ignore all the other file types.
           (when (and overall-result
+                     ;; TODO-PATH: ...would also need this then.
                      (eq (file-attribute-type child:attrs) t))
             (setq overall-result (and overall-result
                                       (innit:load:ordered:files child:path)))))))

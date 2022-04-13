@@ -99,9 +99,9 @@ IGNORE can be:
 ;; Doesn't care about "." or "..":
 ;; (files:ignore? "~/mnt/d/somewhere/." (list (files:ignore/string ".git" :children)))
 ;; Not a regex, but still works:
-;; (files:ignore? "d:/home/work/.doom.d/modules/spy/buffer/init.el" (list "init.el"))
+;; (files:ignore? "d:/somewhere/modules/spy/buffer/init.el" (list "init.el"))
 ;; "Regex" version of above:
-;; (files:ignore? "d:/home/work/.doom.d/modules/spy/buffer/init.el" (list (files:ignore/string "init.el")))
+;; (files:ignore? "d:/somewhere/modules/spy/buffer/init.el" (list (files:ignore/string "init.el")))
 ;; (files:ignore? "~/mnt/d/somewhere/init.el" (list (files:ignore/string "init.el")))
 
 

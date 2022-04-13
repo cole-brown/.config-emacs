@@ -43,15 +43,16 @@
 (setq use-package-compute-statistics    innit:debug?
       use-package-verbose               innit:debug?
       use-package-minimum-reported-time (if innit:debug? 0 0.1)
-      use-package-expand-minimally      doom-interactive-p)
+      use-package-expand-minimally      innit:interactive?)
 
 
 ;;------------------------------
 ;; `imp'
 ;;------------------------------
-(load (expand-file-name "imp/init.el" innit:path:core/modules))
+(load (path:join innit:path:core/modules "imp/init.el"))
 
 ;; From here on, `imp' should be used instead of `load', `require', etc.
+;; And `use-package' should be used for any packages.
 
 
 ;;------------------------------

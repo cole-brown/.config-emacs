@@ -492,7 +492,6 @@ names can be used as well as strings."
 ;; Split
 ;;------------------------------------------------------------------------------
 
-
 (defvar int<path>:separators:rx (rx-to-string '(one-or-more (or ?/ ?\\)) ;; '(or ?/ ?\\)
                                               :no-group)
   "Separators for Windows and Linux paths.")
@@ -593,10 +592,10 @@ Returned PLIST will have these keys (if their values are non-nil).
 ;; Split on Dir Separators
 ;;------------------------------
 
-(defun path:split (&rest path-segments)
-  "Splits all PATH strings by directory separators, returns one list."
+(defun path:split (&rest segment)
+  "Split all SEGMENT strings by directory separators, return one list."
   ;; `path:segments' will do the heavy lifting.
-  (let ((segments (apply #'path:segments path-segments)))
+  (let ((segments (apply #'path:segments segment)))
     ;; Now just convert the plist into a list, and drop any nulls.
     (-keep #'int<path>:filter:strings:keep
            (-flatten (list
@@ -605,6 +604,29 @@ Returned PLIST will have these keys (if their values are non-nil).
                       (plist-get segments :parents)
                       (plist-get segments :name))))))
 ;; (path:split "/foo/bar" "/baz")
+
+
+;;------------------------------------------------------------------------------
+;; Names
+;;------------------------------------------------------------------------------
+
+(defun path:name:base (path &rest segment)
+  "Join PATH & any SEGMENTs, then remove any file extensions/suffixes.
+
+Example:
+  (path:name:dir \"/foo\" \"bar.baz\")
+    -> \"/foo/bar\""
+  (file-name-sans-extension (path:join path segment)))
+
+
+(defun path:name:dir (path &rest segment)
+  "Join PATH & any SEGMENTs, then ensure it is a directory path.
+
+Example:
+  (path:name:dir \"/foo\" \"bar.baz\")
+    -> \"/foo/bar.baz/\""
+  (file-name-sans-extension (path:join path segment)))
+
 
 
 ;;------------------------------------------------------------------------------
