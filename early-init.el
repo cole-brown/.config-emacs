@@ -32,14 +32,17 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Path Functions
+;; Modules Required for Init
 ;;------------------------------------------------------------------------------
-;; Want to be able to use these nicer path funcs from the get-go.
-;;   - They are under the prefixes:
-;;     - `path:'
-;;     - `files:'
 
-(load (expand-file-name "core/modules/emacs/path/init" user-emacs-directory))
+(let ((path-core-modules (expand-file-name "core/modules/" user-emacs-directory)))
+  ;; Order matters here. These build on each other.
+  (load (expand-file-name "emacs/imp/init" path-core-modules))
+  (load (expand-file-name "emacs/str/init" path-core-modules))
+  (load (expand-file-name "emacs/alist/init" path-core-modules))
+  (load (expand-file-name "emacs/path/init" path-core-modules))
+  ;; TODO: (load (expand-file-name "emacs/innit/init" path-core-modules))
+  )
 
 
 ;;------------------------------------------------------------------------------
