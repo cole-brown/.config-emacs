@@ -373,7 +373,6 @@ KWARGS should be a plist. All default to `t':
     ;;---
     (int<imp>:debug func.name "->result: %S" result)
     result))
-;; (int<imp>:path:root/valid? "manual:test" "d:/home/spydez/.doom.d/modules/emacs/imp/")
 
 
 ;;------------------------------------------------------------------------------
@@ -417,7 +416,7 @@ KWARGS should be a plist. All default to `t':
         (setq name (replace-regexp-in-string regex replacement name))))))
 ;;   (int<imp>:path:normalize:string :imp)
 ;; Should lose both slashes and ~:
-;;   (int<imp>:path:normalize:string "~/doom.d/")
+;;   (int<imp>:path:normalize:string "~/emacs.d/")
 ;; Should remain the same:
 ;;   (int<imp>:path:normalize:string "config")
 ;; Test func name -> valid path:
@@ -795,17 +794,17 @@ Returns normalized path."
                               (file-name-sans-extension path)
                             path))))))
 ;; Just Normalize:
-;;   (int<imp>:path:normalize "/home/work/.config/doom/modules/emacs/imp/test/loading" "dont-load")
-;;   (int<imp>:path:normalize "/home/work/.config/doom/modules/emacs/imp/test/loading" "dont-load.el")
+;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load")
+;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load.el")
 ;;   (int<imp>:path:normalize "loading" "dont-load.el")
 ;; Normalize w/o extension:
-;;   (int<imp>:path:normalize "/home/work/.config/doom/modules/emacs/imp/test/loading" "dont-load.el" nil t)
-;;   (int<imp>:path:normalize "/home/work/.config/doom/modules/emacs/imp/test/loading" "dont-load" nil t)
+;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load.el" nil t)
+;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load" nil t)
 ;; Error:
-;;   (int<imp>:path:normalize "/home/work/.config/doom/modules/emacs/imp/test/loading" "dont-load" :file)
+;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load" :file)
 ;; Ok:
-;;   (int<imp>:path:normalize "/home/work/.config/doom/modules/emacs/imp/test/loading" "dont-load" :file:load)
-;;   (int<imp>:path:normalize "/home/work/.config/doom/modules/emacs/imp/test/loading" "dont-load.el" :file:load)
+;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load" :file:load)
+;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load.el" :file:load)
 
 
 ;;------------------------------------------------------------------------------
@@ -853,7 +852,6 @@ PATH:FILE:FEATURES is nil or a minimal file with a call to `imp:feature:at'.
                      path:file:init
                      path:file:features)
                imp:path:roots))))
-;; (imp:path:root :test "~/.doom.d")
 
 
 ;;------------------------------------------------------------------------------

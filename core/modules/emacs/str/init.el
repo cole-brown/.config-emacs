@@ -1,14 +1,9 @@
-;;; emacs/str/init.el --- Init for string helpers doom module. -*- lexical-binding: t; -*-
+;;; emacs/str/init.el --- String Helpers -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2021  Cole Brown
-;; Author: Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created: 2021-09-10
-;; Modified: 2021-09-10
-;; Version: 0.1
-;; Keywords:
-;; Homepage: https://github.com/cole-brown/.config-doom
-;; Package-Requires: ((emacs "27.1"))
+;; Created:    2021-09-10
+;; Modified:   2022-04-13
 ;;
 ;;; Commentary:
 ;;

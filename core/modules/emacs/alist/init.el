@@ -1,21 +1,13 @@
-;;; init.el --- Init for :emacs/alist doom module. -*- lexical-binding: t; -*-
+;;; init.el --- Alist Helpers -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2020 Cole Brown
-;;
-;; Author:           Cole Brown <http://github/cole-brown>
-;; Maintainer:       Cole Brown <code@brown.dev>
-;; Created:          2021-12-15
-;; Modified:         2021-12-15
-;; Version:          0.0.1
-;; Keywords:         lisp
-;; Homepage:         https://github.com/cole-brown/.config-doom
-;; Package-Requires: ((emacs "27.1"))
-;;
-;; This file is not part of GNU Emacs.
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2021-12-15
+;; Modified:   2022-04-13
 ;;
 ;;; Commentary:
 ;;
-;; Initialize the ':emacs/alist' module.
+;; Helpful alist functions.
 ;;
 ;;; Code:
 

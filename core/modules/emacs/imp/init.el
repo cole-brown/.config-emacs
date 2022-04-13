@@ -1,12 +1,13 @@
 ;;; imp/init.el --- Structured IMPort/export of elisp features  -*- lexical-binding: t; -*-
-
-;; Author: Cole Brown <code@brown.dev>
-;; Created: 2021-05-07
-;; Keywords: languages, lisp
-;; Version: 1.0.20211228
-;; URL: https://github.com/cole-brown/.config-doom
+;;
+;; Author:           Cole Brown <http://github/cole-brown>
+;; Maintainer:       Cole Brown <code@brown.dev>
+;; Created:          2021-05-07
+;; Modified:         2022-04-13
+;; Version:          1.1.20220413
+;; URL:              https://github.com/cole-brown/.config-emacs
 ;; Package-Requires: ((emacs "27.1"))
-
+;;
 ;;; Commentary:
 ;;------------------------------------------------------------------------------
 ;; Usage
@@ -24,7 +25,7 @@
 ;; Provide
 ;; -------
 ;; (imp:provide <symbol/keyword0> ...)            ; Provide via imp only.
-;; (imp:provide:with-emacs <symbol/keyword0> ...) ; Provide via imp and emacs.
+;; (imp:provide:with-emacs <symbol/keyword0> ...) ; Provide via imp and Emacs.
 ;;------------------------------
 ;;
 ;;------------------------------

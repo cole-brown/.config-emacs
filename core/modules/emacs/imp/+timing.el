@@ -454,17 +454,6 @@ Returns result of evaluating BODY."
 
      ;; Timings disabled: Just run body.
      ,@body))
-;; (imp:timing :test "+timing.el" ".config/doom/modules/emacs/imp" (message "Time!"))
-;; (let ((imp:timing:enabled? nil))
-;;   (imp:timing:launch)
-;;   (imp:timing :test "+timing.el" ".config/doom/modules/emacs/imp"
-;;               (imp:timing :test/foo "+foo.el" ".config/doom/modules/emacs/imp"
-;;                           (message "Double Time!"))))
-;; (let ((imp:timing:enabled? t))
-;;   (imp:timing:launch)
-;;   (imp:timing :test "+timing.el" ".config/doom/modules/emacs/imp"
-;;               (imp:timing :test/foo "+foo.el" ".config/doom/modules/emacs/imp"
-;;                           (message "Double Time!"))))
 
 
 ;;------------------------------------------------------------------------------

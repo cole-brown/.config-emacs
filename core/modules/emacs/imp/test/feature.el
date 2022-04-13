@@ -204,7 +204,9 @@ Returns the root path to FEATURE:BASE.
 
 Example:
   (test<imp/feature/at>:init
+    \"example-test-name\"
     :feature
+    \"/path/to/imp/test/features/\"
     (list (list :feature
                 \"init.el\")
           (list '(:feature path)
@@ -214,7 +216,7 @@ Example:
                 \"multiple/base.el\"
                 \"multiple/subdir/init.el\"
                 \"multiple/subdir/multiple.el\")))
-    -> \"~/.config/doom/modules/emacs/imp/test/features/feature\""
+    -> \"/path/to/imp/test/features/feature\""
   (let ((func.name "test<imp/feature/at>:init"))
     ;;------------------------------
     ;; Sanity Check Params.

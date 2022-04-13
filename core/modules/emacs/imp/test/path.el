@@ -549,8 +549,8 @@ to paths properly."
                      (int<imp>:path:normalize:string :imp)))
 
     ;; Should lose ~ and convert both slashes to hyphens:
-    (should (string= "-doom.d-"
-                     (int<imp>:path:normalize:string "~/doom.d/")))
+    (should (string= "-jeff.d-"
+                     (int<imp>:path:normalize:string "~/jeff.d/")))
 
     ;; Should remain the same:
     (should (string= "config"
@@ -594,8 +594,8 @@ to paths properly."
                          (nth i output)))))
 
     ;; Should lose both slashes and ~:
-    (let* ((expected '("-doom.d-"))
-           (input    '("~/doom.d/"))
+    (let* ((expected '("-jeff.d-"))
+           (input    '("~/jeff.d/"))
            (output   (int<imp>:path:normalize:list input)))
       (should expected)
       (should input)
