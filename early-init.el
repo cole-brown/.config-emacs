@@ -176,9 +176,9 @@ Innit steps are \"core/boot\" subdirectory path strings:
                   (setq overall-result (and overall-result file-result)))
             ;; Say what failed in case the failure didn't say.
             (error
-             (error "[ERROR] innit:load:ordered:files: Error loading '%s': %S %S"
+             (error "[ERROR] innit:load:ordered:files: Encountered error while loading '%s': %S %S"
                     loadname
-                    ;; error symbol: `error', `user-error', etc.
+                    ;; error symbol: `error', `user-error', `arith-error', etc.
                     (car err)
                     ;; Always a nice string, even for errors without messages.
                     ;;   e.g. `arith-error' -> "Arithmetic error"
