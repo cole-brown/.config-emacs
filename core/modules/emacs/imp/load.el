@@ -279,11 +279,13 @@ Returns a plist:
         in:feature
         in:error
         in:skip
+        in:optional
         ;; Output default values:
         out:path
         out:feature
-        (out:error t)
-        (out:skip  t))
+        (out:error    t)
+        (out:skip     t)
+        (out:optional nil))
 
     (int<imp>:debug caller
                     '("inputs:\n"
@@ -368,7 +370,9 @@ Returns a plist:
               ((eq key :error)
                (setq in:error value))
               ((eq key :skip)
-               (setq in:skip value)))))
+               (setq in:skip value))
+              ((eq key :optional)
+               (setq in:optional value)))))
 
     ;;------------------------------
     ;; Check for required inputs.
@@ -405,7 +409,7 @@ Returns a plist:
 
     ;; Normalize FEATURE to a list.
     (setq out:feature (int<imp>:feature:normalize in:feature))
-    (int<imp>:debug caller "out:feature: %S" out:feature)
+    (int<imp>:debug caller "out:feature:  %S" out:feature)
 
     ;;---
     ;; Process PATH & FILENAME into single output path.
@@ -442,7 +446,7 @@ Returns a plist:
     ;; 2) Finalize output path, using PATH if FILENAME is a relative path.
     ;;---
     (setq out:path (expand-file-name in:filename in:path))
-    (int<imp>:debug caller "out:path:    %S" out:path)
+    (int<imp>:debug caller "out:path:     %S" out:path)
 
     ;;---
     ;; ERROR
@@ -452,11 +456,11 @@ Returns a plist:
     ;;   - So we need to know if that key was encountered.
     (if (not (memq :error keys:parsed))
         ;; Not encountered; leave as the default.
-        (int<imp>:debug caller "out:error:   %S (default)" out:error)
+        (int<imp>:debug caller "out:error:    %S (default)" out:error)
 
       ;; Parsed explicitly - set exactly.
       (setq out:error (not (null in:error)))
-      (int<imp>:debug caller "out:error:   %S (parsed)" out:error))
+      (int<imp>:debug caller "out:error:    %S (parsed)" out:error))
 
     ;;---
     ;; SKIP
@@ -466,11 +470,25 @@ Returns a plist:
     ;;   - So we need to know if that key was encountered.
     (if (not (memq :skip keys:parsed))
         ;; Not encountered; leave as the default.
-        (int<imp>:debug caller "out:skip:    %S (default)" out:skip)
+        (int<imp>:debug caller "out:skip:     %S (default)" out:skip)
 
       ;; Parsed explicitly - set exactly.
       (setq out:skip (not (null in:skip)))
-      (int<imp>:debug caller "out:skip:    %S (parsed)" out:skip))
+      (int<imp>:debug caller "out:skip:     %S (parsed)" out:skip))
+
+    ;;---
+    ;; OPTIONAL
+    ;;---
+    ;; It just needs to be nil or not.
+    ;; NOTE: Make sure to use existing `out:optional' as default value if no in:optional!
+    ;;   - So we need to know if that key was encountered.
+    (if (not (memq :optional keys:parsed))
+        ;; Not encountered; leave as the default.
+        (int<imp>:debug caller "out:optional: %S (default)" out:optional)
+
+      ;; Parsed explicitly - set exactly.
+      (setq out:optional (not (null in:optional)))
+      (int<imp>:debug caller "out:optional: %S (parsed)" out:optional))
 
     ;;------------------------------
     ;; Return:
@@ -478,7 +496,8 @@ Returns a plist:
     (list :path     out:path
           :feature  out:feature
           :error    out:error
-          :skip     out:skip)))
+          :skip     out:skip
+          :optional out:optional)))
 ;; (let ((load-args-plist '(:feature (:foo bar)
 ;;                          :path "init.el"
 ;;                          ;; :path
