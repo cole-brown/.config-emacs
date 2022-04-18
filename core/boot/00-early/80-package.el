@@ -30,7 +30,25 @@
 ;;------------------------------
 ;; Modify `package' path: want a top-level dir that can hold the "elpa"
 ;; `package' dir, any local packages, `straight.el' repos, etc...
-;; (customize-set-variable 'package-user-dir (path:join user-emacs-directory
-;;                                                      "packages"
-;;                                                      "elpa"))
 
+(defconst innit:path:packages (path:join user-emacs-directory "packages")
+  "Top-level directory for packages. ELPA, others will have subdirectories.")
+
+
+(defcustom innit:path:packages:elpa (path:join innit:path:packages "elpa")
+  "Directory for ELPA/packages.el packages."
+  :group 'innit:group
+  :type 'string)
+
+
+;; Can add more for e.g. straight.el, git subtrees, git submodules... whatever.
+;; (defcustom innit:path:packages:manual (path:join innit:path:packages "manual")
+;;   "Directory for ELPA/packages.el packages."
+;;   :group 'innit:group
+;;   :type 'string)
+
+
+;;---
+;; Set ELPA path.
+;;---
+(customize-set-variable 'package-user-dir innit:path:packages:elpa)
