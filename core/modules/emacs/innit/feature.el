@@ -146,6 +146,77 @@ Returns non-nil if MODULE has FEATURE flag, nil if not."
 
 
 ;;------------------------------------------------------------------------------
+;; Set Feature Flags
+;;------------------------------------------------------------------------------
+
+(defmacro innit:features (module &rest feature)
+  "Set FEATURE flag(s) for MODULE.
+
+MODULE should be a keyword.
+
+FEATURE should be one or more symbol names that start with a \"+\" or \"-\"
+sign.
+
+Example:
+  (innit:features :numbers +random -negative)
+    -> This sets feature flags for the `:numbers' module/package/whatever to:
+       - Include optional `random' numbers feature.
+       - Exclude optional `negative' numbers feature."
+  ;;------------------------------
+  ;; Error checks...
+  ;;------------------------------
+  (unless (keywordp module)
+    (error "innit:features: MODULE must be a keyword, got: %S"
+           module))
+
+  (unless feature
+    (error "innit:features: `%S' must have one or more features to add/remove, got: %S"
+           module
+           feature))
+
+  ;;------------------------------
+  ;; Process features (w/ error checks)...
+  ;;------------------------------
+  `(let* ((macro<innit>:module            ,module)
+          (macro<innit>:features:add      ',feature)
+          (macro<innit>:features:existing (alist:keyword:get/value macro<innit>:module innit:feature:flags))
+          (macro<innit>:features:update   macro<innit>:features:existing))
+     ;; First check all input features against existing and error if any cannot be added.
+     ;; Then we can do the actual updated as all-or-nothing.
+     (dolist (macro<innit>:feature macro<innit>:features:add)
+       (if (int<innit>:feature:exists? macro<innit>:module
+                                       macro<innit>:feature)
+           ;; Feature is invalid; error out now.
+           (error "innit:features: `%S' is already flagged for feature matching `%S'. Existing features: %S"
+                  macro<innit>:module
+                  macro<innit>:feature
+                  (alist:keyword:get/value macro<innit>:module innit:feature:flags))
+
+         ;; Feature is valid; add to the update list.
+         (push macro<innit>:feature macro<innit>:features:update)))
+
+     ;;------------------------------
+     ;; Add features.
+     ;;------------------------------
+     ;; Replace existing feature list with the new, updated list.
+     (alist:keyword:update macro<innit>:module
+                           macro<innit>:features:update
+                           innit:feature:flags)
+
+     ;;------------------------------
+     ;; Return full feature list for module.
+     ;;------------------------------
+     macro<innit>:features:update))
+;; innit:feature:flags
+;; ;; OK:
+;; (innit:features :foo +bar)
+;; ;; Fail - already has +bar can't add -bar:
+;; (innit:features :foo -bar)
+;; ;; OK: multiple features
+;; (innit:features :foo -baz +qux +quux)
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide:with-emacs :innit 'feature)
