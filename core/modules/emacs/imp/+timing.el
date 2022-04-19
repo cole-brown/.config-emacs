@@ -32,9 +32,8 @@
   :risky t)
 
 
-;; NOTE: Doom Emacs only, protected by `fboundp' check for the `featurep!' macro.
-(defconst imp:timing:feature? (when (fboundp 'featurep!)
-                                (featurep! +timing))
+;; NOTE: Doom Emacs can add the feature flag `+timing' to "doom/init.el".
+(defconst imp:timing:feature? (imp:flag? :imp +timing)
   "Cache of our feature flag.")
 
 

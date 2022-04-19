@@ -71,6 +71,7 @@ If MSG is non-nil, it is output just before the status but in the same
                         status
                         "\n")
              ;; NOTE: Doom Emacs only, protected by `fboundp' check for the `featurep!' macro.
+             ;; "debug.el" is loaded before "flag.el" so can't use `imp:flag?' here.
              (if (and (fboundp 'featurep!)
                       (featurep! +debug))
                  "[FEATURE]"
@@ -99,6 +100,7 @@ Flags:
   (cond
    ;; NOTE: Doom Emacs only, protected by `fboundp' check for the `featurep!' macro.
    ;; The `+debug' flag in the `doom!' macro in user's "<doom-dir>/init.el".
+   ;; "debug.el" is loaded before "flag.el" so can't use `imp:flag?' here.
    ((and (fboundp 'featurep!)
          (featurep! +debug))
     t)

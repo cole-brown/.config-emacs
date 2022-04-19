@@ -111,9 +111,9 @@ Errors if either flag match naming requirements."
 ;; Check for Flag Flags
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:flag:exists? (module flag)
-  "Check if MODULE has FLAG flagged either way already.
-MODULE should be a keyword.
+(defun int<imp>:flag:exists? (feature flag)
+  "Check if FEATURE has FLAG flagged either way already.
+FEATURE should be a keyword.
 
 FLAG should be a symbol name that starts with a \"+\" or \"-\" sign.
 
@@ -121,25 +121,25 @@ Examples:
   (imp:flag? :numbers +random)
   (imp:flag? :numbers -negative)
 
-Returns non-nil if MODULE has +/- FLAG flag already, nil if not.
+Returns non-nil if FEATURE has +/- FLAG flag already, nil if not.
 Specifically, returns result of:
   (int<imp>:flag:compare FLAG existing-flag-matched)"
-  (let ((module-flags (int<imp>:alist:get/value module int<imp>:feature:flags))
+  (let ((feature-flags (int<imp>:alist:get/value feature int<imp>:feature:flags))
         found?)
     ;; Search for the flag flag.
-    (while (and module-flags
+    (while (and feature-flags
                 (not found?))
       (setq found? (int<imp>:flag:compare flag
-                                          (pop module-flags))))
+                                          (pop feature-flags))))
     ;; Return result of search.
     found?))
 ;; (setq int<imp>:feature:flags '((:foo . (+bar))))
 ;; (int<imp>:flag:exists? :foo '+bar)
 
 
-(defmacro imp:flag? (module flag)
-  "Check if MODULE has FLAG flagged.
-MODULE should be a keyword.
+(defmacro imp:flag? (feature flag)
+  "Check if FEATURE has FLAG flagged.
+FEATURE should be a keyword.
 
 FLAG should be a symbol name that starts with a \"+\" or \"-\" sign.
 
@@ -147,9 +147,14 @@ Examples:
   (imp:flag? :numbers +random)
   (imp:flag? :numbers -negative)
 
-Returns non-nil if MODULE has FLAG flag, nil if not."
+Checks:
+  - imp feature flags
+  - Doom Emacs module flags, if applicable.
+    - For Doom, FEATURE is ignored and this just becomes `(featurep! FLAG)'.
+
+Returns non-nil if FEATURE has FLAG flag, nil if not."
   ;; And with true to avoid "void function" error.
-  (or (and (memq flag (int<imp>:alist:get/value module int<imp>:feature:flags))
+  (or (and (memq flag (int<imp>:alist:get/value feature int<imp>:feature:flags))
            t)
       ;; Doom macro `featurep!' exists and Doom feature flag exists?
       (and (fboundp #'featurep!)
@@ -162,48 +167,48 @@ Returns non-nil if MODULE has FLAG flag, nil if not."
 ;; Set Flag Flags
 ;;------------------------------------------------------------------------------
 
-(defmacro imp:flags (module &rest flag)
-  "Set FLAG flag(s) for MODULE.
+(defmacro imp:flags (feature &rest flag)
+  "Set FLAG flag(s) for FEATURE.
 
-MODULE should be a keyword.
+FEATURE should be a keyword.
 
 FLAG should be one or more symbol names that start with a \"+\" or \"-\"
 sign.
 
 Example:
   (imp:flags :numbers +random -negative)
-    -> This sets flag flags for the `:numbers' module/package/whatever to:
+    -> This sets flag flags for the `:numbers' feature/package/whatever to:
        - Include optional `random' numbers flag.
        - Exclude optional `negative' numbers flag."
   ;;------------------------------
   ;; Error checks...
   ;;------------------------------
-  (unless (keywordp module)
-    (error "imp:flags: MODULE must be a keyword, got: %S"
-           module))
+  (unless (keywordp feature)
+    (error "imp:flags: FEATURE must be a keyword, got: %S"
+           feature))
 
   (unless flag
     (error "imp:flags: `%S' must have one or more flags to add/remove, got: %S"
-           module
+           feature
            flag))
 
   ;;------------------------------
   ;; Process flags (w/ error checks)...
   ;;------------------------------
-  `(let* ((macro<imp>:module            ,module)
+  `(let* ((macro<imp>:feature        ,feature)
           (macro<imp>:flags:add      ',flag)
-          (macro<imp>:flags:existing (int<imp>:alist:get/value macro<imp>:module int<imp>:feature:flags))
+          (macro<imp>:flags:existing (int<imp>:alist:get/value macro<imp>:feature int<imp>:feature:flags))
           (macro<imp>:flags:update   macro<imp>:flags:existing))
      ;; First check all input flags against existing and error if any cannot be added.
      ;; Then we can do the actual updated as all-or-nothing.
      (dolist (macro<imp>:flag macro<imp>:flags:add)
-       (if (int<imp>:flag:exists? macro<imp>:module
+       (if (int<imp>:flag:exists? macro<imp>:feature
                                   macro<imp>:flag)
            ;; Flag is invalid; error out now.
            (error "imp:flags: `%S' is already flagged for flag matching `%S'. Existing flags: %S"
-                  macro<imp>:module
+                  macro<imp>:feature
                   macro<imp>:flag
-                  (int<imp>:alist:get/value macro<imp>:module int<imp>:feature:flags))
+                  (int<imp>:alist:get/value macro<imp>:feature int<imp>:feature:flags))
 
          ;; Flag is valid; add to the update list.
          (push macro<imp>:flag macro<imp>:flags:update)))
@@ -212,12 +217,12 @@ Example:
      ;; Add flags.
      ;;------------------------------
      ;; Replace existing flag list with the new, updated list.
-     (int<imp>:alist:update macro<imp>:module
+     (int<imp>:alist:update macro<imp>:feature
                             macro<imp>:flags:update
                             int<imp>:feature:flags)
 
      ;;------------------------------
-     ;; Return full flag list for module.
+     ;; Return full flag list for feature.
      ;;------------------------------
      macro<imp>:flags:update))
 ;; int<imp>:feature:flags

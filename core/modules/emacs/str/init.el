@@ -15,6 +15,7 @@
 ;;------------------------------------------------------------------------------
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
+
 (imp:path:root :str
                (imp:path:current:dir)
                "init.el")
@@ -23,7 +24,6 @@
 ;;------------------------------------------------------------------------------
 ;; Set up custom vars.
 ;;------------------------------------------------------------------------------
-
 
 (defgroup str:group nil
   "String manipulation functions."
@@ -45,16 +45,16 @@
           :filename "hash")
 
 ;; Requires 'normalize', 'regex', and 'string'.
-(unless (featurep! -case)
+(unless (imp:flag? :str -case)
   (imp:load :feature  '(:str +case)
             :filename "+case")
 
-  (unless (featurep! -hydra)
+  (unless (imp:flag? :str -hydra)
     (imp:load :feature  '(:str +hydra +case)
               :filename "+case-hydra")))
 
 ;; Requires 'string'.
-(unless (featurep! -random)
+(unless (imp:flag? :str -random)
   (imp:load :feature  '(:str +random)
             :filename "+random"))
 
