@@ -58,7 +58,7 @@
                    ((stringp (car-safe current-load-list))
                     (car current-load-list))
                    (buffer-file-name)
-                   ((error "Cannot get this file-path"))))))
+                   ((error "Cannot find filepath for filename '%s'"))))))
           nil
           'nomessage)))
 
