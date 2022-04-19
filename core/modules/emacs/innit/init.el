@@ -36,8 +36,8 @@
 ;; Load files.
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:innit feature)
-          :filename "feature")
+;; (imp:load :feature  '(:innit feature)
+;;           :filename "feature")
 
 
 ;;------------------------------------------------------------------------------
