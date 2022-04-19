@@ -52,12 +52,12 @@
 
 ;; Load these settings first so they can override any `defvar' and be prepared
 ;; for wherever they're needed in the init sequence.
-(let ((settings:path (path:join user-emacs-directory "settings.el")))
-  ;; Don't want to error if file isn't there, but do want to error if loading the
-  ;; file causes an error, so check if it exists first.
-  (when (file-exists-p settings:path)
-    ;; Now let `load' error if it wants - can't error on non-existant optional file anymore.
-    (load (path:join user-emacs-directory "settings"))))
+(imp:path:root :settings user-emacs-directory)
+;; Don't want to error if file isn't there, but do want to error if loading the
+;; file causes an error, so `:optional t` should be perfect.
+(imp:load :feature  '(:settings)
+          :optional t
+          :filename "settings")
 
 
 ;;------------------------------------------------------------------------------
