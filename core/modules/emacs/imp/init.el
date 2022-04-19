@@ -87,6 +87,7 @@
 (int<imp>:init:load "alist")
 (int<imp>:init:load "tree")
 (int<imp>:init:load "path")
+(int<imp>:init:load "+flag") ;; Currently optional but always loaded. Could make fully optional or required.
 (int<imp>:init:load "+timing") ;; Optional, but always load it - it'll time or not time based on settings.
 (int<imp>:init:load "provide")
 (int<imp>:init:load "load")
@@ -98,9 +99,10 @@
 ;; Initialization
 ;;------------------------------------------------------------------------------
 
-;; Path is needed earlier than provide, so now that everything is ready, let
-;; 'path.el' provide itself and do other set-up.
+;; These are needed earlier than provide, so now that everything is ready, let
+;; them provide their feature and do other set-up.
 (int<imp>:path:init)
+(int<imp>:flag:init)
 (int<imp>:load:init)
 
 

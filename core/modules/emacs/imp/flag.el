@@ -1,41 +1,51 @@
-;;; feature.el --- Innit Feature Flags -*- lexical-binding: t; -*-
-;;
-;; Author:     Cole Brown <http://github/cole-brown>
-;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-04-14
-;; Modified:   2022-04-14
-;; URL:        https://github.com/cole-brown/.config-emacs
-;;
-;; These are not the GNU Emacs droids you're looking for.
-;; We can go about our business.
-;; Move along.
-;;
-;;; Commentary:
-;;
-;;  Set & get Feature Flags during initialization.
-;;
-;;; Code:
+;;; emacs/imp/flag.el --- Imp Feature Flags -*- lexical-binding: t; -*-
+
+;;                                 ──────────                                 ;;
+;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
+;; ║                               Imp Flags                                ║ ;;
+;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
+;;                                   ──────                                   ;;
+;;                           Daemonic Vexillology?                            ;;
+;;                                 ──────────                                 ;;
+
+
+;; TODO: Unit tests for this file's functions!
 
 
 ;;------------------------------------------------------------------------------
 ;; Variables
 ;;------------------------------------------------------------------------------
 
-(defvar innit:feature:flags nil
-  "Alist of feature to flags (including \"+\" or \"-\" signs).")
+(defvar int<imp>:feature:flags nil
+  "Alist of imp feature to flags.
+
+The imp feature should be a normalized list (via `int<imp>:flag:normalize'):
+  (int<imp>:flag:normalize :foo \"bar\" 'baz)
+    -> '(:foo bar baz)
+  '(:str)
+  etc.
+
+The flags should be a list of symbols starting with \"+\" or \"-\" signs:
+  '(+qux -quux)
+  '(+random)
+  etc.
+
+These are not (currently?) used or enforced by imp. They are only intended for
+the use of imp features to enable/disable bits of themselves during their
+initialization.")
 
 
 ;;------------------------------------------------------------------------------
 ;; Flags
 ;;------------------------------------------------------------------------------
 
-(defun int<innit>:feature:split (feature)
-  "Splits FEATURE into +/- sign and feature name.
+(defun int<imp>:flag:split (flag)
+  "Splits FLAG into +/- sign and flag name.
 
 Errors if no +/- sign present.
 
 Returns keyword cons: (sign-keyword . name-keyword)"
-  (let ((name (symbol-name feature))
+  (let ((name (symbol-name flag))
         (regex (rx string-start
                    (group
                     (or "+" "-"))
@@ -44,28 +54,28 @@ Returns keyword cons: (sign-keyword . name-keyword)"
                    string-end)))
 
     (cond ((not (string-match regex name))
-           (error "%s: FEATURE doesn't conform to requirements! Regex '%s' didn't match FEATURE '%s'"
-                  "int<innit>:feature:split"
+           (error "%s: FLAG doesn't conform to requirements! Regex '%s' didn't match FLAG '%s'"
+                  "int<imp>:flag:split"
                   regex
                   name))
 
           ((string-match-p (rx string-start (or "+" "-")) (match-string 2 name))
-           (error "%s: FEATURE '%s' doesn't conform to requirements! Name must not start with '+' or '-'! Got: '%s'"
-                  "int<innit>:feature:split"
+           (error "%s: FLAG '%s' doesn't conform to requirements! Name must not start with '+' or '-'! Got: '%s'"
+                  "int<imp>:flag:split"
                   name
                   (match-string 2 name)))
 
-          ;; Ok; return the split symbol and feature name as keywords:
+          ;; Ok; return the split symbol and flag name as keywords:
           (t
            (cons (intern (concat ":" (match-string 1 name)))
                  (intern (concat ":" (match-string 2 name))))))))
-;; (int<innit>:feature:split '+foo)
-;; (int<innit>:feature:split '-foo)
-;; (int<innit>:feature:split '-+foo)
+;; (int<imp>:flag:split '+foo)
+;; (int<imp>:flag:split '-foo)
+;; (int<imp>:flag:split '-+foo)
 
 
-(defun int<innit>:feature:compare (feature-a feature-b)
-  "Compare FEATURE-A against FEATURE-B.
+(defun int<imp>:flag:compare (flag-a flag-b)
+  "Compare FLAG-A against FLAG-B.
 
 Returns nil if they are unrelated.
 Returns non-nil if they are related.
@@ -73,11 +83,11 @@ Returns non-nil if they are related.
   - Returns +1 if A > B: +foo -foo
   - Returns -1 if A < B: -foo +foo
 
-Errors if either feature match naming requirements."
-  (let* ((split-a (int<innit>:feature:split feature-a))
+Errors if either flag match naming requirements."
+  (let* ((split-a (int<imp>:flag:split flag-a))
          (sign-a (car split-a))
          (name-a (cdr split-a))
-         (split-b (int<innit>:feature:split feature-b))
+         (split-b (int<imp>:flag:split flag-b))
          (sign-b (car split-b))
          (name-b (cdr split-b)))
     ;; Unrelated?
@@ -91,132 +101,143 @@ Errors if either feature match naming requirements."
            1)
           (t
            -1))))
-;; (int<innit>:feature:compare '+foo '+bar)
-;; (int<innit>:feature:compare '+foo '+foo)
-;; (int<innit>:feature:compare '+foo '-foo)
-;; (int<innit>:feature:compare '-foo '+foo)
+;; (int<imp>:flag:compare '+foo '+bar)
+;; (int<imp>:flag:compare '+foo '+foo)
+;; (int<imp>:flag:compare '+foo '-foo)
+;; (int<imp>:flag:compare '-foo '+foo)
 
 
 ;;------------------------------------------------------------------------------
-;; Check for Feature Flags
+;; Check for Flag Flags
 ;;------------------------------------------------------------------------------
 
-(defun int<innit>:feature:exists? (module feature)
-  "Check if MODULE has FEATURE flagged either way already.
+(defun int<imp>:flag:exists? (module flag)
+  "Check if MODULE has FLAG flagged either way already.
 MODULE should be a keyword.
 
-FEATURE should be a symbol name that starts with a \"+\" or \"-\" sign.
+FLAG should be a symbol name that starts with a \"+\" or \"-\" sign.
 
 Examples:
-  (innit:feature? :numbers +random)
-  (innit:feature? :numbers -negative)
+  (imp:flag? :numbers +random)
+  (imp:flag? :numbers -negative)
 
-Returns non-nil if MODULE has +/- FEATURE flag already, nil if not.
+Returns non-nil if MODULE has +/- FLAG flag already, nil if not.
 Specifically, returns result of:
-  (int<innit>:feature:compare FEATURE existing-feature-matched)"
-  (let ((module-features (alist:keyword:get/value module innit:feature:flags))
+  (int<imp>:flag:compare FLAG existing-flag-matched)"
+  (let ((module-flags (int<imp>:alist:get/value module int<imp>:feature:flags))
         found?)
-    ;; Search for the feature flag.
-    (while (and module-features
+    ;; Search for the flag flag.
+    (while (and module-flags
                 (not found?))
-      (setq found? (int<innit>:feature:compare feature
-                                               (pop module-features))))
+      (setq found? (int<imp>:flag:compare flag
+                                          (pop module-flags))))
     ;; Return result of search.
     found?))
-;; (setq innit:feature:flags '((:foo . (+bar))))
-;; (int<innit>:feature:exists? :foo '+bar)
+;; (setq int<imp>:feature:flags '((:foo . (+bar))))
+;; (int<imp>:flag:exists? :foo '+bar)
 
 
-(defmacro innit:feature? (module feature)
-  "Check if MODULE has FEATURE flagged.
+(defmacro imp:flag? (module flag)
+  "Check if MODULE has FLAG flagged.
 MODULE should be a keyword.
 
-FEATURE should be a symbol name that starts with a \"+\" or \"-\" sign.
+FLAG should be a symbol name that starts with a \"+\" or \"-\" sign.
 
 Examples:
-  (innit:feature? :numbers +random)
-  (innit:feature? :numbers -negative)
+  (imp:flag? :numbers +random)
+  (imp:flag? :numbers -negative)
 
-Returns non-nil if MODULE has FEATURE flag, nil if not."
+Returns non-nil if MODULE has FLAG flag, nil if not."
   ;; And with true to avoid "void function" error.
-  (and (memq feature (alist:keyword:get/value module innit:feature:flags))
-       t))
-;; (setq innit:feature:flags '((:foo . (+bar))))
-;; (innit:feature? :foo +bar)
+  (or (and (memq flag (int<imp>:alist:get/value module int<imp>:feature:flags))
+           t)
+      ;; Doom macro `featurep!' exists and Doom feature flag exists?
+      (and (fboundp #'featurep!)
+           (featurep! flag))))
+;; (setq int<imp>:feature:flags '((:foo . (+bar))))
+;; (imp:flag? :foo +bar)
 
 
 ;;------------------------------------------------------------------------------
-;; Set Feature Flags
+;; Set Flag Flags
 ;;------------------------------------------------------------------------------
 
-(defmacro innit:features (module &rest feature)
-  "Set FEATURE flag(s) for MODULE.
+(defmacro imp:flags (module &rest flag)
+  "Set FLAG flag(s) for MODULE.
 
 MODULE should be a keyword.
 
-FEATURE should be one or more symbol names that start with a \"+\" or \"-\"
+FLAG should be one or more symbol names that start with a \"+\" or \"-\"
 sign.
 
 Example:
-  (innit:features :numbers +random -negative)
-    -> This sets feature flags for the `:numbers' module/package/whatever to:
-       - Include optional `random' numbers feature.
-       - Exclude optional `negative' numbers feature."
+  (imp:flags :numbers +random -negative)
+    -> This sets flag flags for the `:numbers' module/package/whatever to:
+       - Include optional `random' numbers flag.
+       - Exclude optional `negative' numbers flag."
   ;;------------------------------
   ;; Error checks...
   ;;------------------------------
   (unless (keywordp module)
-    (error "innit:features: MODULE must be a keyword, got: %S"
+    (error "imp:flags: MODULE must be a keyword, got: %S"
            module))
 
-  (unless feature
-    (error "innit:features: `%S' must have one or more features to add/remove, got: %S"
+  (unless flag
+    (error "imp:flags: `%S' must have one or more flags to add/remove, got: %S"
            module
-           feature))
+           flag))
 
   ;;------------------------------
-  ;; Process features (w/ error checks)...
+  ;; Process flags (w/ error checks)...
   ;;------------------------------
-  `(let* ((macro<innit>:module            ,module)
-          (macro<innit>:features:add      ',feature)
-          (macro<innit>:features:existing (alist:keyword:get/value macro<innit>:module innit:feature:flags))
-          (macro<innit>:features:update   macro<innit>:features:existing))
-     ;; First check all input features against existing and error if any cannot be added.
+  `(let* ((macro<imp>:module            ,module)
+          (macro<imp>:flags:add      ',flag)
+          (macro<imp>:flags:existing (int<imp>:alist:get/value macro<imp>:module int<imp>:feature:flags))
+          (macro<imp>:flags:update   macro<imp>:flags:existing))
+     ;; First check all input flags against existing and error if any cannot be added.
      ;; Then we can do the actual updated as all-or-nothing.
-     (dolist (macro<innit>:feature macro<innit>:features:add)
-       (if (int<innit>:feature:exists? macro<innit>:module
-                                       macro<innit>:feature)
-           ;; Feature is invalid; error out now.
-           (error "innit:features: `%S' is already flagged for feature matching `%S'. Existing features: %S"
-                  macro<innit>:module
-                  macro<innit>:feature
-                  (alist:keyword:get/value macro<innit>:module innit:feature:flags))
+     (dolist (macro<imp>:flag macro<imp>:flags:add)
+       (if (int<imp>:flag:exists? macro<imp>:module
+                                  macro<imp>:flag)
+           ;; Flag is invalid; error out now.
+           (error "imp:flags: `%S' is already flagged for flag matching `%S'. Existing flags: %S"
+                  macro<imp>:module
+                  macro<imp>:flag
+                  (int<imp>:alist:get/value macro<imp>:module int<imp>:feature:flags))
 
-         ;; Feature is valid; add to the update list.
-         (push macro<innit>:feature macro<innit>:features:update)))
-
-     ;;------------------------------
-     ;; Add features.
-     ;;------------------------------
-     ;; Replace existing feature list with the new, updated list.
-     (alist:keyword:update macro<innit>:module
-                           macro<innit>:features:update
-                           innit:feature:flags)
+         ;; Flag is valid; add to the update list.
+         (push macro<imp>:flag macro<imp>:flags:update)))
 
      ;;------------------------------
-     ;; Return full feature list for module.
+     ;; Add flags.
      ;;------------------------------
-     macro<innit>:features:update))
-;; innit:feature:flags
+     ;; Replace existing flag list with the new, updated list.
+     (int<imp>:alist:update macro<imp>:module
+                            macro<imp>:flags:update
+                            int<imp>:feature:flags)
+
+     ;;------------------------------
+     ;; Return full flag list for module.
+     ;;------------------------------
+     macro<imp>:flags:update))
+;; int<imp>:feature:flags
 ;; ;; OK:
-;; (innit:features :foo +bar)
+;; (imp:flags :foo +bar)
 ;; ;; Fail - already has +bar can't add -bar:
-;; (innit:features :foo -bar)
-;; ;; OK: multiple features
-;; (innit:features :foo -baz +qux +quux)
+;; (imp:flags :foo -bar)
+;; ;; OK: multiple flags
+;; (imp:flags :foo -baz +qux +quux)
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide:with-emacs :innit 'feature)
+
+(defun int<imp>:flag:init ()
+  "Provide the imp:flag feature."
+  (imp:provide:with-emacs :imp 'flag))
+
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------

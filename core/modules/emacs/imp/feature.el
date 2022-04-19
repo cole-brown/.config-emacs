@@ -1,4 +1,4 @@
-;;; emacs/imp/utils.el -*- lexical-binding: t; -*-
+;;; emacs/imp/feature.el -*- lexical-binding: t; -*-
 
 
 ;;                                 ──────────                                 ;;
@@ -532,3 +532,8 @@ For example:
                                int<imp>:features:locate:equal)
         features:at
       nil)))
+
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
