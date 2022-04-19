@@ -38,11 +38,12 @@
 (let ((path-core-modules (expand-file-name "core/modules/" user-emacs-directory)))
   ;; Order matters here. These build on each other.
   (load (expand-file-name "emacs/imp/init" path-core-modules))
+  ;; TODO: Make timing optional. Don't enable here, and let it be set or not in "settings.el"?
+  (customize-set-variable 'imp:timing:enabled? t)
   (load (expand-file-name "emacs/str/init" path-core-modules))
   (load (expand-file-name "emacs/alist/init" path-core-modules))
   (load (expand-file-name "emacs/path/init" path-core-modules))
-  ;; TODO: (load (expand-file-name "emacs/innit/init" path-core-modules))
-  )
+  (load (expand-file-name "emacs/innit/init" path-core-modules)))
 
 
 ;;------------------------------------------------------------------------------
