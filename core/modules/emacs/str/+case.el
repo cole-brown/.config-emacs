@@ -2,7 +2,6 @@
 
 
 (require 'rx)
-(require 'dash)
 (imp:require :str 'normalize)
 (imp:require :str 'string)
 (imp:require :str 'regex)
@@ -107,7 +106,7 @@ SEPARATORS should be:
    ;; List of all strings: create a regex `any' out of it.
    ((and (listp separators)
          (> (length separators) 0) ;; `-all?' just always returns `t' for empty lists/nil.
-         (-all? #'stringp separators))
+         (seq-every-p #'stringp separators))
     (cons 'any separators))
 
    ;; List of not-all-strings: assume it's a list for `rx'.
@@ -261,18 +260,16 @@ If any of these are set, they override VAR.CASE's plist values of the same key."
   (declare (pure t)
            (side-effect-free t)
            (doc-string 3))
-  ;; Get optional overrides...
-  (-let* (((&plist :rx.compiler :rx.id :separators :docstr) plist/override)
-          ;; Set up values to use based on overrides, VAR.CASE values, and defaults.
-          (rx.compiler (or rx.compiler
-                           (int<str>:case:property.get var.case :rx.compiler)
-                           #'int<str>:case:rx:compile.words))
-          (rx.id (or rx.id
-                     (int<str>:case:property.get var.case :rx.id)))
-          (separators (or separators
+  ;; Set up values to use based on overrides, VAR.CASE values, or defaults.
+  (let* ((rx.compiler (or (plist-get plist/override :rx.compiler)
+                          (int<str>:case:property.get var.case :rx.compiler)
+                          #'int<str>:case:rx:compile.words))
+         (rx.id       (or (plist-get plist/override :rx.id)
+                          (int<str>:case:property.get var.case :rx.id)))
+         (separators  (or (plist-get plist/override :separators)
                           (int<str>:case:property.get var.case :separators)))
-          (docstr (or docstr
-                      (int<str>:case:property.get var.case :docstr))))
+         (docstr      (or (plist-get plist/override :docstr)
+                          (int<str>:case:property.get var.case :docstr))))
     ;; Create the regex.
     (funcall rx.compiler
              rx.id
@@ -285,13 +282,27 @@ If any of these are set, they override VAR.CASE's plist values of the same key."
 ;;------------------------------
 
 (defun int<str>:case:property.get (rx-plist property)
-  "Get PROPERTY (`:rx.id', `:separators', `:rx.full') from a `int<str>:case:___' const."
+  "Get PROPERTY from an RX-PLIST.
+
+RX-PLIST should be an `int<str>:case:___' const.
+
+PROPERTY should be:
+  - `:rx.id'
+  - `:separators'
+  - `:rx.full'"
   (declare (pure t) (side-effect-free t))
   (plist-get rx-plist property))
 
 
 (defun int<str>:case:property.set (rx-plist property value)
-  "Sets PROPERTY (`:rx.id', `:separators', `:rx.full') in a `int<str>:case:___' const."
+  "Set PROPERTY in an RX-PLIST.
+
+RX-PLIST should be an `int<str>:case:___' const.
+
+PROPERTY should be:
+  - `:rx.id'
+  - `:separators'
+  - `:rx.full'"
   (plist-put rx-plist property value))
 
 
@@ -1320,7 +1331,7 @@ integers/marker according to CASES keywords."
     (setq cases (mapcar #'str:normalize:name->keyword
                         (str:split " " cases)))
     ;; Check that they're all valid.
-    (unless (-all? #'int<str>:case:validate/case cases)
+    (unless (seq-every-p #'int<str>:case:validate/case cases)
       (error "Not all cases are valid! See `str:cases:rx/types.all' for valids. cases: %S" cases)))
 
   ;; Run the conversion(s) on the region.
