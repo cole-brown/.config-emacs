@@ -36,8 +36,16 @@
 ;; Load files.
 ;;------------------------------------------------------------------------------
 
-;; (imp:load :feature  '(:innit feature)
-;;           :filename "feature")
+;; (imp:timing
+;;     :innit
+;;     "init.el"
+;;     (imp:path:current:dir)
+;;
+;;   (imp:load :feature  '(:innit feature-name)
+;;             :filename "feature-name")
+;;
+;;   ;; End load timing.
+;;   )
 
 
 ;;------------------------------------------------------------------------------

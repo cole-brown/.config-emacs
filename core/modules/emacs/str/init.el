@@ -35,28 +35,36 @@
 ;; Load files.
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:str normalize)
-          :filename "normalize")
-(imp:load :feature  '(:str regex)
-          :filename "regex")
-(imp:load :feature  '(:str string)
-          :filename "string")
-(imp:load :feature  '(:str hash)
-          :filename "hash")
+(imp:timing
+    :str
+    "init.el"
+    (imp:path:current:dir)
 
-;; Requires 'normalize', 'regex', and 'string'.
-(unless (imp:flag? :str -case)
-  (imp:load :feature  '(:str +case)
-            :filename "+case")
+  (imp:load :feature  '(:str normalize)
+            :filename "normalize")
+  (imp:load :feature  '(:str regex)
+            :filename "regex")
+  (imp:load :feature  '(:str string)
+            :filename "string")
+  (imp:load :feature  '(:str hash)
+            :filename "hash")
 
-  (unless (imp:flag? :str -hydra)
-    (imp:load :feature  '(:str +hydra +case)
-              :filename "+case-hydra")))
+  ;; Requires 'normalize', 'regex', and 'string'.
+  (unless (imp:flag? :str -case)
+    (imp:load :feature  '(:str +case)
+              :filename "+case")
 
-;; Requires 'string'.
-(unless (imp:flag? :str -random)
-  (imp:load :feature  '(:str +random)
-            :filename "+random"))
+    (unless (imp:flag? :str -hydra)
+      (imp:load :feature  '(:str +hydra +case)
+                :filename "+case-hydra")))
+
+  ;; Requires 'string'.
+  (unless (imp:flag? :str -random)
+    (imp:load :feature  '(:str +random)
+              :filename "+random"))
+
+  ;; End load timing.
+  )
 
 
 ;;------------------------------------------------------------------------------

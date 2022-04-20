@@ -29,13 +29,22 @@
 ;; Load Files
 ;;------------------------------------------------------------------------------
 
-;; Always load.
-(imp:load :feature  '(:path path)
-          :filename "path")
-(imp:load :feature  '(:path files)
-          :filename "files")
-(imp:load :feature  '(:path regex)
-          :filename "regex")
+(imp:timing
+    :str
+    "init.el"
+    (imp:path:current:dir)
+
+
+  ;; Always load.
+  (imp:load :feature  '(:path path)
+            :filename "path")
+  (imp:load :feature  '(:path files)
+            :filename "files")
+  (imp:load :feature  '(:path regex)
+            :filename "regex")
+
+  ;; End load timing.
+  )
 
 
 ;;------------------------------------------------------------------------------

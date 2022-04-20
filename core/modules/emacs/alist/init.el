@@ -33,26 +33,34 @@
 ;;------------------------------------------------------------------------------
 ;; Load Files
 ;;------------------------------------------------------------------------------
-(imp:load :feature  '(:alist internal)
-          :filename "internal")
+(imp:timing
+    :alist
+    "init.el"
+    (imp:path:current:dir)
 
-;;---
-;; General/Generic Alist Functionality
-;;---
-(imp:load :feature  '(:alist type types)
-          :filename "type/types") ;; 'generic.el' needs these functions/vars.
-(imp:load :feature  '(:alist generic)
-          :filename "generic")
+  (imp:load :feature  '(:alist internal)
+            :filename "internal")
 
-;;---
-;; Typed Alists
-;;---
-(imp:load :feature  '(:alist type default)
-          :filename "type/default")
-(imp:load :feature  '(:alist type keyword)
-          :filename "type/keyword")
-(imp:load :feature  '(:alist type string)
-          :filename "type/string")
+  ;;---
+  ;; General/Generic Alist Functionality
+  ;;---
+  (imp:load :feature  '(:alist type types)
+            :filename "type/types") ;; 'generic.el' needs these functions/vars.
+  (imp:load :feature  '(:alist generic)
+            :filename "generic")
+
+  ;;---
+  ;; Typed Alists
+  ;;---
+  (imp:load :feature  '(:alist type default)
+            :filename "type/default")
+  (imp:load :feature  '(:alist type keyword)
+            :filename "type/keyword")
+  (imp:load :feature  '(:alist type string)
+            :filename "type/string")
+
+  ;; End load timing.
+  )
 
 
 ;;------------------------------------------------------------------------------
