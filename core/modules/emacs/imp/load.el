@@ -9,6 +9,9 @@
 ;;                                 ──────────                                 ;;
 
 
+;; Special thanks to Doom's `load!' macro, which this was originally based off of.
+
+
 ;;------------------------------------------------------------------------------
 ;; Internal Load Functions
 ;;------------------------------------------------------------------------------
@@ -512,7 +515,7 @@ Returns a plist:
 ;;                        load-args-plist))
 
 
-;; Based off of Doom's `load!' macro.
+;; TODO: add optional `:after' that will delay the whole file load until after the prereqs are met via `imp:eval:after'?
 (defmacro imp:load (&rest load-args-plist)
   "Load a file relative to the current executing file (`load-file-name').
 

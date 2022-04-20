@@ -18,15 +18,6 @@
 (defun imp:require (&rest feature)
   "Ensures file(s) for FEATURE:BASE keyword & FEATURE symbols are provided.
 
-Examples:
-  (imp:root :mis \"path/to/mis\")
-
-  To require/load \"mis/code/comment.el[c]\":
-    (imp:require :mis 'code 'comment)
-
-  To require/load \"mis/code/*.el[c]\":
-    (imp:require :mis 'code)
-
 Returns non-nil on success."
   (let ((feature:normal (int<imp>:feature:normalize feature)))
     ;; Already provided?
@@ -61,6 +52,16 @@ Returns non-nil on success."
           (t
            nil))))
 ;; (imp:require 'test 'this)
+
+
+;; TODO: I want to have a plist version of `imp:require' that works like `imp:load':
+;;   (imp:require:foo :feature '(foo bar) :error nil ...)
+;; But I don't know what to call it, and I don't think I want to replace
+;; `imp:require' since it's what I want in 99% of the cases.
+;;
+;; So... What is a good name for `imp:require:but-with-a-plist'?
+;;
+;; "eval.el" uses `ignore-error' currently to ignore `imp:require' user-errors.
 
 
 ;;------------------------------------------------------------------------------
