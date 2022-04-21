@@ -31,6 +31,8 @@
 (innit:debug:hack "[innit] early-init.el: hello?")
 
 
+
+
 ;;------------------------------------------------------------------------------
 ;; Modules Required for Init
 ;;------------------------------------------------------------------------------
@@ -47,11 +49,11 @@
       '(:innit early-init modules)
       "early-init.el"
       (imp:path:current:dir)
-    (load (expand-file-name "emacs/str/init" path-core-modules))
+    (load (expand-file-name "emacs/str/init"   path-core-modules))
     (load (expand-file-name "emacs/alist/init" path-core-modules))
-    (load (expand-file-name "emacs/path/init" path-core-modules))
+    (load (expand-file-name "emacs/path/init"  path-core-modules))
+    (load (expand-file-name "output/nub/init"  path-core-modules))
     (load (expand-file-name "emacs/innit/init" path-core-modules))))
-
 
 ;;------------------------------------------------------------------------------
 ;; Settings & Overrides
@@ -65,6 +67,33 @@
 (imp:load :feature  '(:settings)
           :optional t
           :filename "settings")
+
+;;------------------------------------------------------------------------------
+;; Output
+;;------------------------------------------------------------------------------
+
+;; Set up `nub' for use by `innit'.
+(let* (;; TODO: Make this a defcustom so it can be changed in settings.
+       (nub-innit-pop-to-buffer t)
+       ;; TODO: Make this a defcustom too?
+       (nub-innit-buffer-name "ⓘ-innit-ⓘ")
+       ;; TODO: More defcustoms?
+       nub-innit-interactive-debug-tags
+       nub-innit-levels-prefixes
+       nub-innit-levels-enabled
+       (nub-innit-sink-fn (nub:output:sink :innit
+                                           nub-innit-buffer-name
+                                           nub-innit-pop-to-buffer)))
+  (nub:vars:init :innit
+                 nub-innit-interactive-debug-tags ; common debug tags (for interactive toggling auto-complete help)
+                 nub-innit-levels-prefixes ; output message prefixes
+                 nub-innit-levels-enabled  ; default enabled/disabled per output levels
+                 ;; Sinks by Level: Add our sink to all so that they get
+                 ;; collected there as well as output by default funcs.
+                 (list (cons :error (list nub-innit-sink-fn :default))
+                       (cons :warn  (list nub-innit-sink-fn :default))
+                       (cons :info  (list nub-innit-sink-fn :default))
+                       (cons :debug (list nub-innit-sink-fn :default)))))
 
 
 ;;------------------------------------------------------------------------------
