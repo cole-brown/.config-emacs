@@ -231,6 +231,41 @@ signaled."
       nil))))
 
 
+(defmacro nub:output:sink (user buffer-name pop-to-buffer?)
+  "Create & return a nub sink function.
+
+BUFFER-NAME should be a string.
+
+POP-TO-BUFFER? should be nil/non-nil. If non-nil, `pop-to-buffer' will be called
+after every message output to the sink.
+
+Returns a lambda function."
+  (let* ((macro<nub>:user user)
+         (macro<nub>:buffer buffer-name)
+         (macro<nub>:pop?   pop-to-buffer?))
+    `(lambda (msg &rest args)
+       ,(format (mapconcat #'identity
+                           '("Nub output sink function for user `%s'."
+                             ""
+                             "MSG and ARGS are passed to `format' for creating the string to be output.")
+                           "\n")
+                macro<nub>:user)
+       (let ((buffer (get-buffer-create ,macro<nub>:buffer)))
+         (with-current-buffer buffer
+           ;; Go to end of the buffer and add this message to an empty/new line.
+           (let ((buffer:end (point-max)))
+             (goto-char buffer:end)
+             (unless (= (point-min) buffer:end)
+               (insert "\n"))
+             (insert (apply #'format msg args))))
+
+         ;; Show buffer?
+         (when ,macro<nub>:pop?
+           (pop-to-buffer buffer))))))
+;; (funcall (nub:output:sink :test "test-buffer" nil)
+;;          "hello %s" "there")
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------

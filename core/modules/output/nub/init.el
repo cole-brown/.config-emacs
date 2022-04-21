@@ -1,20 +1,15 @@
-;;; init.el --- Init for :output/nub doom module. -*- lexical-binding: t; -*-
-;; Copyright (C) 2020 Cole Brown
+;;; init.el --- Multi-'user' output message helper. -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created: 2021-11-30
-;; Modified: 2021-11-30
-;; Version: 0.0.1
-;; Keywords: lisp
-;; Homepage: https://github.com/cole-brown/.config-doom
-;; Package-Requires: ((emacs "27.1"))
-;;
-;; This file is not part of GNU Emacs.
+;; Created:    2021-11-30
+;; Modified:   2022-04-21
 ;;
 ;;; Commentary:
 ;;
-;; Initialize the ':output/nub' module.
+;; Output messages with output levels and output sinks settings per user.
+;;
+;;
 ;;
 ;;; Code:
 
@@ -32,10 +27,7 @@
 ;;------------------------------------------------------------------------------
 
 (imp:path:root :nub
-               (imp:path:join doom-private-dir
-                              "modules"
-                              "output"
-                              "nub")
+               (imp:path:current:dir)
                "init.el")
 
 
@@ -43,20 +35,27 @@
 ;; Load Files
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:nub internal)
-          :filename "internal")
-(imp:load :feature  '(:nub alist)
-          :filename "alist")
-(imp:load :feature  '(:nub utils)
-          :filename "utils")
-(imp:load :feature  '(:nub variables)
-          :filename "variables")
-(imp:load :feature  '(:nub output)
-          :filename "output")
-(imp:load :feature  '(:nub debug)
-          :filename "debug")
-(imp:load :feature  '(:nub debug format)
-          :filename "debug-format")
+(imp:timing
+    :nub
+    "init.el"
+    (imp:path:current:dir)
+  (imp:load :feature  '(:nub internal)
+            :filename "internal")
+  (imp:load :feature  '(:nub alist)
+            :filename "alist")
+  (imp:load :feature  '(:nub utils)
+            :filename "utils")
+  (imp:load :feature  '(:nub variables)
+            :filename "variables")
+  (imp:load :feature  '(:nub output)
+            :filename "output")
+  (imp:load :feature  '(:nub debug)
+            :filename "debug")
+  (imp:load :feature  '(:nub debug format)
+            :filename "debug-format")
+
+  ;; End load timing.
+  )
 
 
 ;;------------------------------------------------------------------------------

@@ -743,6 +743,7 @@ default user instead."
 ;; Init/Reset all user's vars.
 ;;------------------------------------------------------------------------------
 
+;; TODO: A `nub:register' function? Maybe just rename this?
 (defun nub:vars:init (user &optional list:debug:tags/common alist:prefixes alist:enabled? alist:sinks)
   "Registers USER and sets their default settings for output levels.
 
