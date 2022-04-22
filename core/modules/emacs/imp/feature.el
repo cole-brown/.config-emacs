@@ -286,6 +286,7 @@ Similar output to `int<imp>:feature:normalize:imp->emacs'."
 ;; (int<imp>:feature:normalize:display :imp 'provide)
 ;; (int<imp>:feature:normalize:display :imp)
 ;; (int<imp>:feature:normalize:display '(((:imp))) '((provide)))
+;; (int<imp>:feature:normalize:display "foo/bar/baz.el")
 
 
 ;;------------------------------------------------------------------------------

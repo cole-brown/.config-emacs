@@ -578,7 +578,9 @@ if it exists and not error if it does not exist.
 If SKIP is non-nil:
   - Only loads the file if the FEATURE is not already provided in `imp:features'.
 If SKIP is nil:
-  - Always loads the file."
+  - Always loads the file.
+
+Return nil for failure, non-nil for success."
   (let ((macro:path:current-dir (imp:path:current:dir)))
     `(let* ((macro:func.name "imp:load")
             (macro:parsed (int<imp>:load:parse macro:func.name
@@ -670,9 +672,10 @@ If SKIP is nil:
              macro:path:filename
              macro:path:parent
            ;; Actually do the load.
-           (load macro:path
-                 (not macro:error?)
-                 'nomessage))
+           (setq load-result
+                 (load macro:path
+                       (not macro:error?)
+                       'nomessage)))
 
          ;;---
          ;; Post-Load Sanity Check: (obey ERROR flag though)
