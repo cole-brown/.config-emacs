@@ -117,11 +117,13 @@ ARGS based on current verbosity for the level."
 
 
 (defun int<nub>:output:format (caller user level &rest message-format)
-  "Combines CALLER and USER's MESSAGE-FORMAT into one string for sending to
+  "Format args into a string for formatting user's message with user's args.
+
+Combines CALLER, LEVEL, and USER's MESSAGE-FORMAT into one string for sending to
 the user's output function(s) with MESSAGE-FORMAT's args.
 
-NOTE: Is just for the formatting /message/. Args should be passed to `error', `warn',
-etc. Or, best: use `int<nub>:output' for a higher-level API.
+NOTE: Is just for the formatting /message/. Args should be passed to `error',
+`warn', etc. Or, best: use `int<nub>:output' for a higher-level API.
 
 Proper use:
   (int<nub>:output :error
@@ -142,11 +144,21 @@ Alternative/direct use:
     -> \"[ERROR] 'examples error prefix here': example-function: <...>\""
   (int<nub>:user:exists? "int<nub>:output:format" user :error)
 
-  (apply #'concat
-         (int<nub>:var:prefix user level)
-         caller
-         ": "
-         message-format))
+  (let* ((prefix (concat
+                  (int<nub>:var:prefix user level)
+                  caller
+                  ": "))
+         (indent (make-string (length prefix) ?\s))
+         message)
+    (apply #'concat
+           prefix
+           ;; Replace `:newline' with properly indented newline.
+           (dolist (entry message-format (nreverse message))
+             (cond ((eq :newline entry)
+                    (push "\n" message)
+                    (push indent message))
+                   (t
+                    (push entry message)))))))
 
 
 ;;------------------------------------------------------------------------------
@@ -154,7 +166,9 @@ Alternative/direct use:
 ;;------------------------------------------------------------------------------
 
 (defun nub:output (user level caller formatting &rest args)
-  "Format to standard message output for the USER with CALLER info, then output
+  "Output a message for USER at LEVEL.
+
+Format to standard message output for the USER with CALLER info, then output
 the message with FORMATTING and ARGS to the correct place according to LEVEL's
 current verbosity (e.g. #'error for `:error' verbosity normally).
 
@@ -163,8 +177,9 @@ For valid levels, see `nub:output:levels' keywords.
 Uses FORMATTING string/list-of-strings with `int<nub>:output:format' to create
 the message format, then applies that format plus any ARGS to the `error'
 signaled."
-  ;; Try to be real forgiving about what params are since we're erroring...
-  ;; ...but also try to let them know they did something wrong so it can be fixed.
+  ;; Try to be real forgiving about what params are since we might be handling
+  ;; an error message... but also try to let them know they did something wrong
+  ;; so it can be fixed.
 
   (let ((func.name "nub:output"))
     ;;------------------------------
@@ -202,7 +217,7 @@ signaled."
      ((listp formatting)
       (int<nub>:output:message user
                                level
-                               (apply #'int<nub>:output:format user level caller formatting)
+                               (apply #'int<nub>:output:format caller user level formatting)
                                args))
 
      ((stringp formatting)
@@ -229,6 +244,10 @@ signaled."
       ;; Don't return `int<nub>:output:message' output.
       ;; Unit tests will disable error signaling sometimes so it's best if this returns nil.
       nil))))
+
+
+;; Shorthand.
+(defalias 'nub:out 'nub:output)
 
 
 (defmacro nub:output:sink (user buffer-name pop-to-buffer?)
