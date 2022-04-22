@@ -8,6 +8,39 @@
 
 
 ;;------------------------------------------------------------------------------
+;; File Name
+;;------------------------------------------------------------------------------
+
+(defun file:name (path &rest segment)
+  "Return the file name (with extension) from PATH & SEGMENT(s).
+
+Example:
+  (file:name \"/foo\" \"bar.tar.gz\")
+  (file:name \"/foo/bar.tar.gz\")
+  (file:name \"c:/foo/bar.tar.gz\")
+    -> \"bar.tar.gz\""
+  (file-name-nondirectory (path:join path segment)))
+
+
+(defun file:name:base (path &rest segment)
+  "Return the file name (sans extension) from PATH & SEGMENT(s).
+
+Only removes one extension if there are multiple.
+
+Examples:
+  (file:name \"/foo\" \"bar.baz\")
+  (file:name \"/foo/bar.baz\")
+  (file:name \"c:/foo/bar.baz\")
+    -> \"bar\"
+
+  (file:name \"/foo\" \"bar.tar.gz\")
+  (file:name \"/foo/bar.tar.gz\")
+  (file:name \"c:/foo/bar.tar.gz\")
+    -> \"bar.tar\""
+  (file-name-sans-extension (file:name path segment)))
+
+
+;;------------------------------------------------------------------------------
 ;; Filters / Ignore Regexes
 ;;------------------------------------------------------------------------------
 
