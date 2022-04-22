@@ -79,10 +79,10 @@ NOTE: If it needs to get any more fancy, consider a minor mode like
   (setq init-file-debug t
         debug-on-error t)
 
-  ;; TODO: `innit' function for init/debug messages, etc?
-  (message "innit: '%s': Enable `innit:debug?' from environment variable DEBUG: %S"
-           ;; TODO: `innit' function for relative path of filename for init/debug messages?
-           "core/00-early/10-debug.el"
+  (nub:out :innit
+           :debug
+           (imp:path:current:dir/relative :innit)
+           "Enable `innit:debug?' from environment variable DEBUG: %S"
            innit:debug?))
 
  ;;---
@@ -91,10 +91,10 @@ NOTE: If it needs to get any more fancy, consider a minor mode like
  (init-file-debug
   (setq innit:debug? init-file-debug)
 
-  ;; TODO: `innit' function for init/debug messages, etc?
-  (message "innit: '%s': Enable `innit:debug?' from '--debug-init' CLI flag: %S"
-           ;; TODO: `innit' function for relative path of filename for init/debug messages?
-           "core/00-early/10-debug.el"
+  (nub:out :innit
+           :debug
+           (imp:path:current:dir/relative :innit)
+           "Enable `innit:debug?' from '--debug-init' CLI flag: %S"
            innit:debug?))
 
  ;;---
@@ -103,13 +103,13 @@ NOTE: If it needs to get any more fancy, consider a minor mode like
  ;; How did you get this set and not `init-file-debug'? Debugging some small
  ;; piece of init, maybe?
  (debug-on-error
-  (setq innit:debug? debug-on-error
+  (setq innit:debug? debug-on-error)
 
-  ;; TODO: `innit' function for init/debug messages, etc?
-  (message "innit: '%s': Enable `innit:debug?' from `debug-on-error' variable: %S"
-           ;; TODO: `innit' function for relative path of filename for init/debug messages?
-           "core/00-early/10-debug.el"
-           innit:debug?))))
+  (nub:out :innit
+           :debug
+           (imp:path:current:dir/relative :innit)
+           "Enable `innit:debug?' from `debug-on-error' variable: %S"
+           innit:debug?)))
 
 
 ;;------------------------------------------------------------------------------

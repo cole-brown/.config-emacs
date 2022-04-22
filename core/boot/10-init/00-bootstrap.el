@@ -25,7 +25,13 @@
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-
+(nub:out :innit
+         :debug
+         (imp:file:current)
+         '("load-paths are:"
+           :newline
+           "%S")
+         load-path)
 (require 'use-package)
 
 ;;---

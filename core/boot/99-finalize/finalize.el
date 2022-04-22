@@ -15,11 +15,18 @@
 ;; Finalize.
 ;;------------------------------------------------------------------------------
 
-;; TODO: a random koan
-(message "Now witness the firepower of this full armed and operational operating system.")
+;; TODO: A random koan output by `mis' instead of `nub'.
+(nub:out :innit
+         :debug
+         (imp:file:current)
+         "TODO: a random koan")
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
+(nub:out :innit
+         :debug
+         (imp:file:current)
+         "Boot Loader: 99 Finalize :: Every Has Been Done.")
 (imp:provide :dot-emacs 'core 'boot '99-finalize 'finalize)
