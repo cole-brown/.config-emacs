@@ -505,7 +505,7 @@ a directory path.
 
 
 (defun imp:path:current:file ()
-  "Return the emacs lisp file this macro is called from."
+  "Return the path of the file this function is called from."
   (cond
    ;;------------------------------
    ;; Look for a valid "current file" variable.
@@ -527,8 +527,13 @@ a directory path.
 ;; (imp:path:current:file)
 
 
+(defun imp:file:current ()
+  "Return the filename (no path, just filename) this is called from."
+  (file-name-nondirectory (imp:path:current:file)))
+
+
 (defun imp:path:current:dir ()
-  "Returns the directory of the emacs lisp file this is called from."
+  "Return the directory path of the file this is called from."
   (when-let (path (imp:path:current:file))
     (directory-file-name (file-name-directory path))))
 ;; (imp:path:current:dir)
