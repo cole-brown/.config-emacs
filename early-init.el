@@ -15,24 +15,6 @@
 ;;; Code:
 
 
-;; TODO: an output debug thing that isn't an hack.
-(defun innit:debug:hack (msg &rest args)
-  "MSG ARGS."
-  (let ((buffer (get-buffer-create "innit")))
-    (with-current-buffer buffer
-      (let ((buffer:end (point-max)))
-        (goto-char buffer:end)
-        (unless (= (point-min) buffer:end)
-          (insert "\n"))
-        (insert (format msg args))))
-    ;; Show buffer?
-    (pop-to-buffer buffer)))
-
-(innit:debug:hack "[innit] early-init.el: hello?")
-
-
-
-
 ;;------------------------------------------------------------------------------
 ;; Modules Required for Init
 ;;------------------------------------------------------------------------------
@@ -55,6 +37,7 @@
     (load (expand-file-name "output/nub/init"  path-core-modules))
     (load (expand-file-name "emacs/innit/init" path-core-modules))))
 
+
 ;;------------------------------------------------------------------------------
 ;; Settings & Overrides
 ;;------------------------------------------------------------------------------
@@ -67,6 +50,7 @@
 (imp:load :feature  '(:settings)
           :optional t
           :filename "settings")
+
 
 ;;------------------------------------------------------------------------------
 ;; Output
@@ -94,6 +78,12 @@
                        (cons :warn  (list nub-innit-sink-fn :default))
                        (cons :info  (list nub-innit-sink-fn :default))
                        (cons :debug (list nub-innit-sink-fn :default)))))
+
+(nub:out :innit
+         :debug
+         "early-init.el"
+         ;; Is "Power On Self Test" a good term to steal?
+         "POST")
 
 
 ;;------------------------------------------------------------------------------
@@ -327,6 +317,11 @@ CALLER should be string of function or file name which called this."
 ;;------------------------------------------------------------------------------
 ;; Load Early-Init Files
 ;;------------------------------------------------------------------------------
+
+(nub:out :innit
+         :debug
+         "early-init.el"
+         "Boot Loader: 00 Early")
 
 (imp:timing
     '(:innit early-init load)

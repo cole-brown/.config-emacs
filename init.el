@@ -10,8 +10,11 @@
 ;;; Commentary:
 ;;; Code:
 
-(innit:debug:hack "[innit] init.el: hello?")
 
+(nub:out :innit
+         :debug
+         "init.el"
+         "Sanity Checks, Etc.")
 
 ;;------------------------------------------------------------------------------
 ;; Sanity Check: Has "early-init" run?
@@ -54,6 +57,11 @@
   ;;     - `imp' - file loading library
   ;;     - `no-littering' - direct other Emacs packages to not litter the `user-emacs-directory'.
   ;;     - etc
+
+  (nub:out :innit
+           :debug
+           "init.el"
+           "Boot Loader: 10 Early")
   (setq progress-reporter (make-progress-reporter (format "[innit] %s: %s..."
                                                           caller
                                                           "10-init")
@@ -67,9 +75,13 @@
   ;; Config
   ;;------------------------------
   ;; Standard Emacs set-up.
+  (nub:out :innit
+           :debug
+           "init.el"
+           "Boot Loader: 20 Config")
   (setq progress-reporter (make-progress-reporter (format "[innit] %s: %s..."
                                                           caller
-                                                          "10-init")
+                                                          "20-config")
                                                   0
                                                   100))
   (innit:load caller "20-config")
@@ -80,9 +92,13 @@
   ;; Finalize
   ;;------------------------------
   ;; Last chance to do things.
+  (nub:out :innit
+           :debug
+           "init.el"
+           "Boot Loader: 99 Finalize")
   (setq progress-reporter (make-progress-reporter (format "[innit] %s: %s..."
                                                           caller
-                                                          "10-init")
+                                                          "99-finalize")
                                                   0
                                                   100))
   (innit:load caller "99-finalize")
@@ -92,4 +108,10 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
+(nub:out :innit
+         :debug
+         "init.el"
+         '("Boot Loader: 100 Done"
+           :newline
+           "Now witness the firepower of this full armed and operational operating system."))
 (imp:provide :dot-emacs 'init)
