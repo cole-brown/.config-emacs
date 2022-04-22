@@ -154,6 +154,7 @@ If TYPE is provided, PATH must exist and match."
 (defun path:parent (path)
   "Returns the parent directory of PATH."
   (directory-file-name (file-name-directory path)))
+;; (path:parent "relative/path/to/foo.test")
 
 
 ;; TODO: Move to regex.el?
@@ -693,8 +694,8 @@ Does not fix or validate PATH or SEGMENT components; they are expected to be val
 ;; Relative Paths
 ;;------------------------------------------------------------------------------
 
-(defun path:canonicalize:relative (&optional path root)
-  "Returns a file path to PATH relative to ROOT.
+(defun path:canonicalize:relative (path root)
+  "Return a file path to PATH relative to ROOT.
 
 Could just return PATH if it has no relation to ROOT.
 
@@ -723,7 +724,6 @@ Raises an error if ROOT is not nil and not a string."
 ;; (path:canonicalize:relative "/path/to/a/file/location.txt" "/path/to/a/")
 ;; (path:canonicalize:relative "/path/to/a/dir/location/" "/path/to/a/")
 ;; (path:canonicalize:relative "/path/to/a/dir/location/" "/path/to/a")
-;; (path:canonicalize:relative)
 
 
 (defalias 'path:relative           'path:canonicalize:relative)
@@ -772,7 +772,7 @@ Raises an error signal if it cannot find a file path."
 
 Uses `path:current:file' and just chops off the filename."
   (when-let (path (path:current:file))
-    (directory-file-name (file-name-directory path))))
+    (path:parent path)))
 ;; (path:current:dir)
 
 
