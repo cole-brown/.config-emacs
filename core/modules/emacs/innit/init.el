@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-04-13
-;; Modified:   2022-04-14
+;; Modified:   2022-04-25
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -36,16 +36,17 @@
 ;; Load files.
 ;;------------------------------------------------------------------------------
 
-;; (imp:timing
-;;     :innit
-;;     "init.el"
-;;     (imp:path:current:dir)
-;;
-;;   (imp:load :feature  '(:innit feature-name)
-;;             :filename "feature-name")
-;;
-;;   ;; End load timing.
-;;   )
+(imp:timing
+    :innit
+    "init.el"
+    (imp:path:current:dir)
+
+  (imp:load :feature  '(:innit vars)
+            :filename "vars")
+  (imp:load :feature  '(:innit nub)
+            :filename "nub")
+  ;; End load timing.
+  )
 
 
 ;;------------------------------------------------------------------------------

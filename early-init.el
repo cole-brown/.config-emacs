@@ -58,83 +58,13 @@
   ;;------------------------------------------------------------------------------
 
   ;; Set up `nub' for use by `innit'.
-  (let* (;; TODO: Make this a defcustom so it can be changed in settings.
-         (nub-innit-pop-to-buffer t)
-         ;; TODO: Make this a defcustom too?
-         (nub-innit-buffer-name "ⓘ-innit-ⓘ")
-         ;; TODO: More defcustoms?
-         nub-innit-interactive-debug-tags
-         nub-innit-levels-prefixes
-         nub-innit-levels-enabled
-         (nub-innit-sink-fn (nub:output:sink :innit
-                                             nub-innit-buffer-name
-                                             nub-innit-pop-to-buffer)))
-    (nub:vars:init :innit
-                   nub-innit-interactive-debug-tags ; common debug tags (for interactive toggling auto-complete help)
-                   nub-innit-levels-prefixes ; output message prefixes
-                   nub-innit-levels-enabled  ; default enabled/disabled per output levels
-                   ;; Sinks by Level: Add our sink to all so that they get
-                   ;; collected there as well as output by default funcs.
-                   (list (cons :error (list nub-innit-sink-fn :default))
-                         (cons :warn  (list nub-innit-sink-fn :default))
-                         (cons :info  (list nub-innit-sink-fn :default))
-                         (cons :debug (list nub-innit-sink-fn :default)))))
+  (innit:nub:init)
 
   (nub:out :innit
            :debug
            file/this
            ;; Is "Power On Self Test" a good term to steal?
            "POST")
-
-
-  ;;------------------------------------------------------------------------------
-  ;; Init Constants & Variables
-  ;;------------------------------------------------------------------------------
-  ;; We already called the core "core", so... The next layer is "mantle", I guess?
-  ;; And a third layer would be called "crust"?
-
-  (defconst innit:path:core/boot (path:join user-emacs-directory "core/boot/")
-    "Absolute path to the \"core/boot\" subdirectory.")
-
-
-  (defconst innit:path:core/modules (path:join user-emacs-directory "core/modules/")
-    "Absolute path to the \"core/modules\" subdirectory.")
-
-
-  (defconst innit:filenames:mantle
-    '(:init   "init.el"
-      :config "config.el")
-    "Names of files to look for in `innit:paths:mantle' for loading.")
-
-
-  (defvar innit:features:mantle nil
-    "List of `imp' feature lists to load after their core counterpart.
-
-An element in the list would be either 1) just the keyword,
-or 2) a specific sub-feature.
-  1) '(:path)
-  2) '(:path regex)
-
-Each path in the list will optionally load a file (if it is present) during a
-specific part of init:
-  1) \"init.el\"
-     - Just after core's init is finished, and before config.
-  2) \"config.el\"
-     - Just after core's config is finished, before completing start-up.
-
-Paths should be absolute directory paths. \"init.el\" and \"config.el\" will be
-appended to them for looking for the proper file to load.")
-
-
-  (defconst innit:rx:filename
-    (rx string-start
-        (one-or-more printing) ".el"
-        string-end)
-    "Base filename must match to be loaded by `innit:load:files:ordered'.")
-
-
-  (defvar innit:status nil
-    "Alist of innit sequence keyword to status.")
 
 
   ;;------------------------------------------------------------------------------
