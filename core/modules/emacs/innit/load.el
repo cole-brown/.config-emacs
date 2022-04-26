@@ -17,6 +17,8 @@
 ;;; Code:
 
 
+(imp:require :innit 'debug)
+
 ;;------------------------------------------------------------------------------
 ;; Ordered Loading (by file/dir name)
 ;;------------------------------------------------------------------------------
@@ -171,6 +173,24 @@ error string."
              step
              result))
     result))
+
+
+;;------------------------------------------------------------------------------
+;; Optimization
+;;------------------------------------------------------------------------------
+
+(defun innit:optimize? ()
+  "Guard predicate for optimizing interactive start-up.
+
+Return false (i.e. do not optimize) if:
+  - Emacs is in:
+    - daemon (service) mode
+    - noninteractive (batch/script) mode
+  - Emacs or `innit' is in:
+    - some sort of debug mode"
+  (not (or (daemonp)
+           noninteractive
+           (innit:debug? :any))))
 
 
 ;;------------------------------------------------------------------------------

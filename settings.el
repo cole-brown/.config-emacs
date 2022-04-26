@@ -25,11 +25,6 @@
 ;; Init Output
 ;;------------------------------------------------------------------------------
 
-;; See `innit:verbosity:valid' for all valid values.
-;; NOTE: Defaults to `t' (all) if debugging, so forcing here for that.
-(setq innit:verbosity '(t)) ;; t = all verbosity tags
-
-
 ;; Allow messages during innit for debugging.
 (setq innit:display:messages  t
       innit:display:load-file t)

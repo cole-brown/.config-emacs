@@ -38,6 +38,8 @@
             :filename "vars")
   (imp:load :feature  '(:innit nub)
             :filename "nub")
+  (imp:load :feature  '(:innit time)
+            :filename "time")
   (imp:load :feature  '(:innit status)
             :filename "status")
   (imp:load :feature  '(:innit debug)
