@@ -26,13 +26,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Set up custom vars.
-;;------------------------------------------------------------------------------
-
-;; TODO: Put defgroup, defcustom here? Or in settings.el or customs.el or vars.el...
-
-
-;;------------------------------------------------------------------------------
 ;; Load files.
 ;;------------------------------------------------------------------------------
 
@@ -45,6 +38,12 @@
             :filename "vars")
   (imp:load :feature  '(:innit nub)
             :filename "nub")
+  (imp:load :feature  '(:innit status)
+            :filename "status")
+  (imp:load :feature  '(:innit load)
+            :filename "load")
+  (imp:load :feature  '(:innit feature)
+            :filename "feature")
   ;; End load timing.
   )
 

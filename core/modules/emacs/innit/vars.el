@@ -49,34 +49,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Variables
-;;------------------------------------------------------------------------------
-
-
-(defvar innit:features:mantle nil
-  "List of `imp' feature lists to load after their core counterpart.
-
-An element in the list would be either 1) just the keyword,
-or 2) a specific sub-feature.
-  1) '(:path)
-  2) '(:path regex)
-
-Each path in the list will optionally load a file (if it is present) during a
-specific part of init:
-  1) \"init.el\"
-     - Just after core's init is finished, and before config.
-  2) \"config.el\"
-     - Just after core's config is finished, before completing start-up.
-
-Paths should be absolute directory paths. \"init.el\" and \"config.el\" will be
-appended to them for looking for the proper file to load.")
-
-
-(defvar innit:status nil
-  "Alist of innit sequence keyword to status.")
-
-
-;;------------------------------------------------------------------------------
 ;; Customs
 ;;------------------------------------------------------------------------------
 
