@@ -39,14 +39,14 @@
 
     ;; ...but restore `file-name-handler-alist' later, because it is needed for
     ;; handling encrypted or compressed files, among other things.
-    (defun innit:hook:file-handler-alist:reset ()
+    (defun dotemacs:hook:file-handler-alist:reset ()
       "Merge original `file-handler-alist' with any additions during Emacs start-up."
       (setq file-name-handler-alist
             ;; Merge instead of overwrite because there may have bene changes to
             ;; `file-name-handler-alist' since startup we want to preserve.
             (delete-dups (append file-name-handler-alist
                                  file-name-handler-alist:orig))))
-    (add-hook 'emacs-startup-hook #'innit:hook:file-handler-alist:reset 101))
+    (add-hook 'emacs-startup-hook #'dotemacs:hook:file-handler-alist:reset 101))
 
   ;; Premature redisplays can substantially affect startup times and produce
   ;; ugly flashes of unstyled Emacs.
@@ -56,12 +56,12 @@
     ;; Writing to the *Messages* buffer & minibuffer slows down startup as well.
     (setq-default inhibit-message t))
 
-  (defun innit:hook:inhibit-display:reset ()
+  (defun dotemacs:hook:inhibit-display:reset ()
     "Re-enable display, messages."
     (setq-default inhibit-redisplay nil
                   inhibit-message nil)
     (redisplay))
-  (add-hook 'window-setup-hook #'innit:hook:inhibit-display:reset)
+  (add-hook 'window-setup-hook #'dotemacs:hook:inhibit-display:reset)
 
 
   (unless innit:display:load-file

@@ -66,6 +66,7 @@
 ;;------------------------------------------------------------------------------
 
 ;; TODO: defcustom?
+;; TODO: move out of innit?
 (defvar innit:display:messages? nil
   "Allow output to *Messages* buffer during init?
 
@@ -73,10 +74,45 @@ Default to no messages (nil).")
 
 
 ;; TODO: defcustom?
+;; TODO: move out of innit?
 (defvar innit:display:load-file nil
   "Allow `load-file' to output its message(s) during init?
 
 Default to no (`nil').")
+
+
+;;------------------------------------------------------------------------------
+;; Non-`innit' Settings
+;;------------------------------------------------------------------------------
+
+(defmacro innit:settings:optional (settings &rest body)
+  "Safely handle running BODY on SETTINGS which may or may not exist.
+
+SETTINGS should be a symbol or list of symbols. Will check that they all are
+bound before running BODY."
+  (cond ((symbolp settings)
+         (when (boundp settings)
+           `(progn
+             ,@body)))
+
+        ((listp settings)
+         (let ((valid :init))
+           (dolist (setting settings)
+             (setq valid (and valid
+                              (symbolp setting)
+                              (boundp setting))))
+           (when valid
+             `(progn
+                ,@body))))
+
+        (t
+         ;; Just ignore anything else?
+         nil)))
+;; (innit:settings:optional inhibit-redisplay (message "print me"))
+;; (innit:settings:optional innit:test:dne (message "don't print me"))
+;; (innit:settings:optional (inhibit-redisplay track-mouse) (message "print me"))
+;; (innit:settings:optional (innit:test:dne) (message "don't print me"))
+;; (innit:settings:optional "ignored?" (message "don't print me"))
 
 
 ;;------------------------------------------------------------------------------
