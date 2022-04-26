@@ -54,7 +54,7 @@
 
 
   ;;------------------------------------------------------------------------------
-  ;; Output
+  ;; Initialize `innit'
   ;;------------------------------------------------------------------------------
 
   ;; Set up `nub' for use by `innit'.
@@ -65,6 +65,9 @@
            file/this
            ;; Is "Power On Self Test" a good term to steal?
            "POST")
+
+  ;; Set up `innit' & Emacs' debug flags based on one another.
+  (innit:debug:init)
 
 
   ;;------------------------------------------------------------------------------

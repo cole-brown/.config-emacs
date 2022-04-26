@@ -1,14 +1,23 @@
-;;; 10-debug.el --- Early Debugging -*- lexical-binding: t; -*-
+;;; debug.el --- Better with less bugs, innit? -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2022-04-26
+;; Modified:   2022-04-26
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
 ;; Move along.
 ;;
 ;;; Commentary:
+;;
+;;  Better with less bugs, innit?
+;;
 ;;; Code:
+
+
+(imp:require :nub)
 
 
 ;;------------------------------------------------------------------------------
@@ -62,56 +71,68 @@ NOTE: If it needs to get any more fancy, consider a minor mode like
 
 
 ;;------------------------------------------------------------------------------
-;; Set-Up
+;; Debug Set-Up
 ;;------------------------------------------------------------------------------
 
-;; Set our debug variable (`innit:debug?') and Emacs' variables based on inputs.
-(cond
- ;;---
- ;; Environment Variable: DEBUG
- ;;---
- ((and (getenv-internal "DEBUG")
-       (not init-file-debug)
-       (not debug-on-error))
-  (setq innit:debug? (getenv-internal "DEBUG"))
+(defun innit:debug:init ()
+  "Initialize `innit' debugging based on Emacs' variables.
 
-  ;; Also cascade into Emacs?
-  (setq init-file-debug t
-        debug-on-error t)
+Checks:
+  - `init-file-debug'
+  - `debug-on-error'
 
-  (nub:out :innit
-           :debug
-           (imp:path:current:dir/relative :innit)
-           "Enable `innit:debug?' from environment variable DEBUG: %S"
-           innit:debug?))
+Returns `innit:debug?'"
+  ;; Set our debug variable (`innit:debug?') and Emacs' variables based on inputs.
+  (cond
+   ;;---
+   ;; Environment Variable: DEBUG
+   ;;---
+   ((and (getenv-internal "DEBUG")
+         (not init-file-debug)
+         (not debug-on-error))
+    (setq innit:debug? (getenv-internal "DEBUG"))
 
- ;;---
- ;; CLI Flag: "--debug-init"
- ;;---
- (init-file-debug
-  (setq innit:debug? init-file-debug)
+    ;; Also cascade into Emacs?
+    (setq init-file-debug t
+          debug-on-error t)
 
-  (nub:out :innit
-           :debug
-           (imp:path:current:dir/relative :innit)
-           "Enable `innit:debug?' from '--debug-init' CLI flag: %S"
-           innit:debug?))
+    (nub:out :innit
+             :debug
+             (imp:path:current:dir/relative :innit)
+             "Enable `innit:debug?' from environment variable DEBUG: %S"
+             innit:debug?))
 
- ;;---
- ;; Interactive Flag?
- ;;---
- ;; How did you get this set and not `init-file-debug'? Debugging some small
- ;; piece of init, maybe?
- (debug-on-error
-  (setq innit:debug? debug-on-error)
+   ;;---
+   ;; CLI Flag: "--debug-init"
+   ;;---
+   (init-file-debug
+    (setq innit:debug? init-file-debug)
 
-  (nub:out :innit
-           :debug
-           (imp:path:current:dir/relative :innit)
-           "Enable `innit:debug?' from `debug-on-error' variable: %S"
-           innit:debug?)))
+    (nub:out :innit
+             :debug
+             (imp:path:current:dir/relative :innit)
+             "Enable `innit:debug?' from '--debug-init' CLI flag: %S"
+             innit:debug?))
+
+   ;;---
+   ;; Interactive Flag?
+   ;;---
+   ;; How did you get this set and not `init-file-debug'? Debugging some small
+   ;; piece of init, maybe?
+   (debug-on-error
+    (setq innit:debug? debug-on-error)
+
+    (nub:out :innit
+             :debug
+             (imp:path:current:dir/relative :innit)
+             "Enable `innit:debug?' from `debug-on-error' variable: %S"
+             innit:debug?)))
+
+  ;; Return what the `innit:debug?' setting is now.
+  innit:debug?)
 
 
 ;;------------------------------------------------------------------------------
-;; The End
+;; The End.
 ;;------------------------------------------------------------------------------
+(imp:provide:with-emacs :innit 'debug)

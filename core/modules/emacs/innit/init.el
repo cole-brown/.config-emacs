@@ -40,6 +40,8 @@
             :filename "nub")
   (imp:load :feature  '(:innit status)
             :filename "status")
+  (imp:load :feature  '(:innit debug)
+            :filename "debug")
   (imp:load :feature  '(:innit load)
             :filename "load")
   (imp:load :feature  '(:innit feature)
