@@ -174,6 +174,13 @@ current verbosity (e.g. #'error for `:error' verbosity normally).
 
 For valid levels, see `nub:output:levels' keywords.
 
+If CALLER is `nil', uses relative path from `user-emacs-directory' to
+the caller's file (using `path:current:file' and `path:relative').
+  Examples:
+    - \"init.el\"
+    - \"core/modules/output/nub/foo.el\"
+    - \"/some/path/outside/user-emacs-directory/file.el\"
+
 Uses FORMATTING string/list-of-strings with `int<nub>:output:format' to create
 the message format, then applies that format plus any ARGS to the `error'
 signaled."
@@ -181,7 +188,10 @@ signaled."
   ;; an error message... but also try to let them know they did something wrong
   ;; so it can be fixed.
 
-  (let ((func.name "nub:output"))
+  (let ((func.name "nub:output")
+        (caller (or caller
+                    (path:relative (path:current:file)
+                                   user-emacs-directory))))
     ;;------------------------------
     ;; Validate Inputs
     ;;------------------------------

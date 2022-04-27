@@ -157,6 +157,17 @@ Example:
 
 
 ;;------------------------------------------------------------------------------
+;; Canonical / Normalized Paths
+;;------------------------------------------------------------------------------
+
+(defun int<imp>:path:canonical (path &optional root)
+  "Expand PATH to a full/absolute/canonical path, based off of ROOT if relative.
+
+If ROOT is `nil', `default-directory' is used if needed."
+  (expand-file-name path root))
+
+
+;;------------------------------------------------------------------------------
 ;; `imp:path:roots' Getters
 ;;------------------------------------------------------------------------------
 
@@ -167,7 +178,7 @@ If NO-ERROR is `nil' and FEATURE:BASE is not in `imp:path:roots',
 signals an error."
   (if-let ((dir (nth 0 (int<imp>:alist:get/value feature:base
                                                  imp:path:roots))))
-      (expand-file-name "" dir)
+      (int<imp>:path:canonical "" dir)
     (if no-error
         nil
       (int<imp>:error "int<imp>:path:root/dir"
@@ -186,7 +197,7 @@ Then checks that:
   1) It exists as a file.
   2) The file is readable."
   ;; Join PATHS, canonicalize at ROOT.
-  (let ((filepath (expand-file-name (imp:path:join paths) root)))
+  (let ((filepath (int<imp>:path:canonical (imp:path:join paths) root)))
     ;; Check that it exists.
     (if (and (file-regular-p  filepath)
              (file-readable-p filepath))
@@ -199,7 +210,7 @@ Then checks that:
   "Returns canonical path to file if ROOT and PATHS are strings, else nil."
   (if (and (stringp root)
            (seq-every-p #'stringp paths))
-      (expand-file-name (imp:path:join paths) root)
+      (int<imp>:path:canonical (imp:path:join paths) root)
     nil))
 
 
@@ -535,19 +546,20 @@ a directory path.
 (defun imp:path:current:dir ()
   "Return the directory path of the file this is called from."
   (when-let (path (imp:path:current:file))
+    (message "imp:path:current:dir: file path: %s" path)
     (directory-file-name (file-name-directory path))))
 ;; (imp:path:current:dir)
 
 
-(defun imp:path:current:dir/relative (feature:base)
+(defun imp:path:current:dir/relative (feature/base)
   "Returns the relative path from feature's path root to the dir this is called.
 
 Could just return
 
-Raises an error if FEATURE:BASE does not have a path root.
+Raises an error if FEATURE/BASE does not have a path root.
 
 Raises an error if `(imp:path:current:dir)' (i.e. the absolute path)
-has no relation to FEATURE:BASE's root path.
+has no relation to FEATURE/BASE's root path.
 
 Example (assuming `:dot-emacs' has root path initialized as \"~/.config\":
   ~/.config/emacs/init.el:
@@ -556,31 +568,43 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config\":
     (imp:path:current:dir/relative :dot-emacs)
       -> \"emacs\""
   ;; Make sure both paths are equivalent (directory paths) for the regex replace.
-  (let* ((path:root (file-name-as-directory (int<imp>:path:root/dir feature:base)))
-         (path:here (file-name-as-directory (imp:path:current:dir)))
+  (let* ((path/root (file-name-as-directory (int<imp>:path:root/dir feature/base)))
+         (path/here (file-name-as-directory (imp:path:current:dir)))
          ;; Don't like `file-relative-name' as it can return wierd things when it
          ;; goes off looking for actual directories and files...
-         (path:relative (replace-regexp-in-string
+         (path/relative (replace-regexp-in-string
                          ;; Make sure root dir has ending slash.
-                         path:root ;; Look for root directory path...
+                         path/root ;; Look for root directory path...
                          ""        ;; Replace with nothing to get a relative path.
-                         path:here
+                         path/here
                          :fixedcase
                          :literal)))
     ;; End up with the same thing? Not a relative path - signal error.
-    (when (string= path:relative path:here)
+    (when (string= path/relative path/here)
+      ;; Error message gets truncated to oblivion, so... hello again:
+      (message (mapconcat #'identity
+                          '("Current directory is not relative to FEATURE/BASE!"
+                            "  FEATURE/BASE: %S"
+                            "  root path:    %s"
+                            "  curr path:    %s"
+                            "---> result:    %s")
+                          "\n")
+               feature/base
+               path/root
+               path/here
+               path/relative)
       (int<imp>:error "imp:path:current:dir/relative"
-                      '("Current directory is not relative to FEATURE:BASE!\n"
-                        "  FEATURE:BASE: %S\n"
+                      '("Current directory is not relative to FEATURE/BASE!\n"
+                        "  FEATURE/BASE: %S\n"
                         "  root path:    %s\n"
                         "  curr path:    %s\n"
                         "---> result:    %s")
-                      feature:base
-                      path:root
-                      path:here
-                      path:relative))
+                      feature/base
+                      path/root
+                      path/here
+                      path/relative))
     ;; Return relative path, sans final slash.
-    (directory-file-name path:relative)))
+    (directory-file-name path/relative)))
 ;; Should be "" since we're at the root dir for imp:
 ;;   (imp:path:current:dir/relative :imp)
 
@@ -794,10 +818,10 @@ Returns normalized path."
                           "Path is not absolute: %s"
                           path)
         ;; Actually normalize it before returning.
-        (expand-file-name (if sans-extension
-                              ;; Take out the extension if requested.
-                              (file-name-sans-extension path)
-                            path))))))
+        (int<imp>:path:canonical (if sans-extension
+                                     ;; Take out the extension if requested.
+                                     (file-name-sans-extension path)
+                                   path))))))
 ;; Just Normalize:
 ;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load")
 ;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load.el")

@@ -98,7 +98,7 @@ Returns `innit:debug?'"
 
     (nub:out :innit
              :debug
-             (imp:path:current:dir/relative :innit)
+             nil
              "Enable `innit:debug?' from environment variable DEBUG: %S"
              innit:debug?))
 
@@ -110,7 +110,7 @@ Returns `innit:debug?'"
 
     (nub:out :innit
              :debug
-             (imp:path:current:dir/relative :innit)
+             nil
              "Enable `innit:debug?' from '--debug-init' CLI flag: %S"
              innit:debug?))
 
@@ -124,7 +124,7 @@ Returns `innit:debug?'"
 
     (nub:out :innit
              :debug
-             (imp:path:current:dir/relative :innit)
+             nil
              "Enable `innit:debug?' from `debug-on-error' variable: %S"
              innit:debug?)))
 
