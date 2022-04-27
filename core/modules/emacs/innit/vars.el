@@ -82,6 +82,37 @@ Default to no (`nil').")
 
 
 ;;------------------------------------------------------------------------------
+;; Versioning & Early-Init Flag
+;;------------------------------------------------------------------------------
+
+;; "init.el" will check that version exists as a check that early-init happened.
+(defconst int<innit>:version
+  '(:major 4
+    :minor 0
+    ;; Can be ISO-8601 or RFC-3339 date or datetime.
+    ;; Will get smashed down to just digits.
+    :revision "2022-04-27"
+    ;; (spy:datetime/string.get 'iso-8601 'short)
+    ;; (spy:datetime/string.get 'yyyymmdd)
+    )
+  "Plist version data for this Emacs config.")
+
+
+(defun int<innit>:version ()
+  "Create SemVer string from version plist."
+  (format "%d.%d.%s"
+          (plist-get int<innit>:version :major)
+          (plist-get int<innit>:version :minor)
+          (replace-regexp-in-string (rx (not digit))
+                                    ""
+                                    (plist-get int<innit>:version :revision))))
+
+
+(defconst innit:version (int<innit>:version)
+  "Semantic Version string of this Emacs config.")
+
+
+;;------------------------------------------------------------------------------
 ;; Non-`innit' Settings
 ;;------------------------------------------------------------------------------
 
