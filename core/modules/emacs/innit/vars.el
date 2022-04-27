@@ -62,26 +62,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Variables
-;;------------------------------------------------------------------------------
-
-;; TODO: defcustom?
-;; TODO: move out of innit?
-(defvar innit:display:messages? nil
-  "Allow output to *Messages* buffer during init?
-
-Default to no messages (nil).")
-
-
-;; TODO: defcustom?
-;; TODO: move out of innit?
-(defvar innit:display:load-file nil
-  "Allow `load-file' to output its message(s) during init?
-
-Default to no (`nil').")
-
-
-;;------------------------------------------------------------------------------
 ;; Versioning & Early-Init Flag
 ;;------------------------------------------------------------------------------
 

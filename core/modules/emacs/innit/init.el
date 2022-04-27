@@ -48,6 +48,8 @@
             :filename "load")
   (imp:load :feature  '(:innit feature)
             :filename "feature")
+  (imp:load :feature  '(:innit optimize)
+            :filename "optimize")
   (imp:load :feature  '(:innit package)
             :filename "package")
   ;; End load timing.
