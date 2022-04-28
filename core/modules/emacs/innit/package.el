@@ -131,13 +131,7 @@ Can be called earlier too, if you want..."
     ;; `package-user-dir' doesn't get set via `customize-set-variable'?!
     ;;   (customize-set-variable 'package-user-dir innit:path:packages:elpa)
     ;; So use `setq' instead:
-    (setq package-user-dir innit:path:packages:elpa)
-    (nub:out :innit
-             :debug
-             (imp:file:current)
-             "%s: `package-user-dir': %s"
-             (imp:file:current)
-             package-user-dir))
+    (setq package-user-dir innit:path:packages:elpa))
   ;; NOTE: Also, this gets wiped out when 'package.el' is loaded? So... Set it
   ;; as much as needed to force Emacs to behave?
 
@@ -193,12 +187,6 @@ this needs to be called during \"init.el\"."
   ;;------------------------------
   ;; Set 'package.el' paths again as 'package.el' overwrites them when it loads...
   (innit:package:init/paths)
-
-  (nub:out :innit
-             :debug
-             (imp:file:current)
-             "init:  `package-user-dir': %s"
-             package-user-dir)
 
   ;; Update packages list if we are on a new install.
   (unless (or (package-installed-p 'use-package)
