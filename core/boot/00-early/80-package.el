@@ -4,7 +4,7 @@
 ;;------------------------------------------------------------------------------
 ;; Package Set-Up
 ;;------------------------------------------------------------------------------
+
 ;; `package-initialize` is called between "early-init.el" and "init.el", so we
 ;; need to be all set-up and ready by the end of "early-init.el".
-
-(innit:package:init)
+(innit:package:init/early)

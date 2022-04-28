@@ -19,37 +19,12 @@
 
 
 ;;------------------------------
-;; `use-package'
+;; `package.el' & `use-package'
 ;;------------------------------
 ;; https://github.com/jwiegley/use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(nub:out :innit
-         :debug
-         (imp:file:current)
-         '("load-paths are:"
-           :newline
-           "%S")
-         load-path)
-(require 'use-package)
 
-;;---
-;; Use-Package Global Settings:
-;;---
-
-;; Don't force ensure - let packages lazily auto-load as they think they're needed.
-;; Can always override on a per-package basis.
-;; (customize-set-variable 'use-package-always-ensure t)
-
-;;---
-;; Use-Package & Debugging
-;;---
-
-(setq use-package-compute-statistics    innit:debug?
-      use-package-verbose               innit:debug?
-      use-package-minimum-reported-time (if innit:debug? 0 0.1)
-      use-package-expand-minimally      innit:interactive?)
+;; Finish `package.el' init; install & require `use-package'.
+(innit:package:init/normal)
 
 
 ;;------------------------------

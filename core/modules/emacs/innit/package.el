@@ -96,13 +96,51 @@ Else error."
                 keyword-or-cons))))
 
 
-(defun innit:package:init ()
-  "Set-up Emacs 'package.el'.
+(defun innit:package:init/paths ()
+  "Set 'package.el' paths.
+
+Some (`package-user-dir') get overwritten when 'package.el' loads, so this must
+be called after 'package.el' loads.
+
+Can be called earlier too, if you want..."
+  ;;---
+  ;; Set path packages are saved to.
+  ;;---
+  (when innit:path:packages:elpa
+    ;; `package-user-dir' doesn't get set via `customize-set-variable'?!
+    ;;   (customize-set-variable 'package-user-dir innit:path:packages:elpa)
+    ;; So use `setq' instead:
+    (setq package-user-dir innit:path:packages:elpa)
+    (nub:out :innit
+             :debug
+             (imp:file:current)
+             "%s: `package-user-dir': %s"
+             (imp:file:current)
+             package-user-dir))
+  ;; NOTE: Also, this gets wiped out when 'package.el' is loaded? So... Set it
+  ;; as much as needed to force Emacs to behave?
+
+  (when innit:path:gpg
+    (customize-set-variable 'package-gnupghome-dir innit:path:gpg))
+
+  ;; TODO: NOTE: Emacs doesn't add its "elpa/" packages dir to the load path?!
+  ;; TODO: Let's do that for it then, I guess?
+  ;; (add-to-list 'load-path package-user-dir)
+  )
+
+
+(defun innit:package:init/early ()
+  "Prepare Emacs 'package.el' for the `package-initialize' step.
 
 `package-initialize' is called between \"early-init.el\" and \"init.el\", so
-this needs to be called by the end of \"early-init.el\"."
+this needs to be called during \"early-init.el\"."
+  (nub:out :innit
+           :debug
+           (imp:file:current)
+           "'package.el' early init...")
+
   ;;---
-  ;; Set enabled archives.
+  ;; Set enabled package archives.
   ;;---
   (when innit:package:archives:enabled
     (customize-set-variable 'package-archives
@@ -112,9 +150,74 @@ this needs to be called by the end of \"early-init.el\"."
   ;;---
   ;; Set path packages are saved to.
   ;;---
-  (when innit:path:packages:elpa
-    (customize-set-variable 'package-user-dir innit:path:packages:elpa))
-  )
+  (innit:package:init/paths))
+
+
+(defun innit:package:init/normal ()
+  "Initialize Emacs 'package.el' after the `package-initialize' step.
+
+1. Download package metadata if needed.
+2. Install `use-package' if needed.
+3. Require `use-package'.
+
+`package-initialize' is called between \"early-init.el\" and \"init.el\", so
+this needs to be called during \"init.el\"."
+  (nub:out :innit
+           :debug
+           (imp:file:current)
+           "'package.el' normal init...")
+
+  ;;------------------------------
+  ;; `package.el'
+  ;;------------------------------
+  ;; Set 'package.el' paths again as 'package.el' overwrites them when it loads...
+  (innit:package:init/paths)
+
+  (nub:out :innit
+             :debug
+             (imp:file:current)
+             "init:  `package-user-dir': %s"
+             package-user-dir)
+
+  ;; Update packages list if we are on a new install.
+  (unless (or (package-installed-p 'use-package)
+              package-archive-contents)
+    (nub:out :innit
+             :debug
+             (imp:file:current)
+             "Update packages list...")
+    (package-refresh-contents))
+
+  ;;------------------------------
+  ;; `use-package'
+  ;;------------------------------
+  ;;---
+  ;; Install & require `use-package' so it's available for rest of init.
+  ;;---
+  (unless (package-installed-p 'use-package)
+    (nub:out :innit
+             :debug
+             (imp:file:current)
+             "Install `use-package'...")
+    (package-install 'use-package))
+
+  (require 'use-package)
+
+  ;;---
+  ;; Use-Package Global Settings:
+  ;;---
+  ;; Don't force ensure - let packages lazily auto-load as they think they're needed.
+  ;; Can always override on a per-package basis.
+  ;; (customize-set-variable 'use-package-always-ensure t)
+
+  ;;---
+  ;; Use-Package & Debugging
+  ;;---
+  (setq use-package-compute-statistics    innit:debug?
+        use-package-verbose               innit:debug?
+        use-package-minimum-reported-time (if innit:debug? 0 0.1)
+        use-package-expand-minimally      innit:interactive?))
+
 
 
 ;;------------------------------------------------------------------------------
