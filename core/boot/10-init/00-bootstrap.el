@@ -34,9 +34,9 @@
   ;;--------------------
   :custom
   ;;--------------------
-  ;; Stick with default "etc"/"var" directory names.
-  ;; (no-littering-etc-directory (expand-file-name "config/" user-emacs-directory))
-  ;; (no-littering-var-directory (expand-file-name "data/"   user-emacs-directory))
+  ;; Set the `no-littering' directory paths.
+  (no-littering-etc-directory innit:path:etc)
+  (no-littering-var-directory innit:path:var)
 
 
   ;;--------------------
@@ -52,6 +52,8 @@
   (setq auto-save-file-name-transforms
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
+  ;; TODO: An innit function to set this or not.
+  ;; TODO: Or just `(when some-variable ...)'
   ;; We don't want a "custom.el" at all, but if we did, it should be in the
   ;; `no-littering' etc dir.
   ;; (setq custom-file (no-littering-expand-etc-file-name "custom.el"))

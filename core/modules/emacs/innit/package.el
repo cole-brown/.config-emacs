@@ -72,6 +72,27 @@
 ;;   :type 'string)
 
 
+;; TODO: Here or move to a 'no-littering' file?
+(defcustom innit:path:var (path:join user-emacs-directory "var")
+  "Directory for persistent data files."
+  :group 'innit:group
+  :type  'string)
+
+
+;; TODO: Here or move to a 'no-littering' file?
+(defcustom innit:path:etc (path:join user-emacs-directory "config")
+  "Directory for persistent config files."
+  :group 'innit:group
+  :type  'string)
+
+
+;; TODO: Here or move to a 'no-littering' file?
+(defcustom innit:path:gpg (path:join innit:path:var "gpg")
+  "Directory for gpg keys for e.g. `package-gnupghome-dir'."
+  :group 'innit:group
+  :type  'string)
+
+
 ;;------------------------------------------------------------------------------
 ;; Package Early-Init
 ;;------------------------------------------------------------------------------
