@@ -53,15 +53,6 @@
 
 
 ;;------------------------------
-;; `imp'
-;;------------------------------
-(load (path:join innit:path:core/modules "imp/init.el"))
-
-;; From here on, `imp' should be used instead of `load', `require', etc.
-;; And `use-package' should be used for any packages.
-
-
-;;------------------------------
 ;; `no-littering'
 ;;------------------------------
 (use-package no-littering
