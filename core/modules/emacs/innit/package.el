@@ -201,7 +201,7 @@ this needs to be called during \"init.el\"."
   ;; `use-package'
   ;;------------------------------
   ;;---
-  ;; Install & require `use-package' so it's available for rest of init.
+  ;; Install:
   ;;---
   (unless (package-installed-p 'use-package)
     (nub:out :innit
@@ -213,14 +213,16 @@ this needs to be called during \"init.el\"."
   (require 'use-package)
 
   ;;---
-  ;; Use-Package Global Settings:
+  ;; Global Settings:
   ;;---
-  ;; Don't force ensure - let packages lazily auto-load as they think they're needed.
-  ;; Can always override on a per-package basis.
-  ;; (customize-set-variable 'use-package-always-ensure t)
+  ;; Automatically install package if not found.
+  ;;   https://github.com/jwiegley/use-package#package-installation
+  ;; NOTE: Does not keep anything up-to-date. For that you would use package
+  ;; `auto-package-update' or something similar.
+  (customize-set-variable 'use-package-always-ensure t)
 
   ;;---
-  ;; Use-Package & Debugging
+  ;; Debugging Settings:
   ;;---
   (setq use-package-compute-statistics    innit:debug?
         use-package-verbose               innit:debug?
