@@ -39,7 +39,7 @@
 ;;------------------------------
 ;; `no-littering'
 ;;------------------------------
-(use-package no-littering
+(imp:use-package no-littering
   ;;--------------------
   :custom
   ;;--------------------
