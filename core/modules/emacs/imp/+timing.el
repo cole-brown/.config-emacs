@@ -490,3 +490,22 @@ Returns result of evaluating BODY."
     (int<imp>:timing:buffer:insert
      (format imp:timing:format:time:total
              imp:timing:sum))))
+
+
+;;------------------------------------------------------------------------------
+;; Use-Package & Imp Timing
+;;------------------------------------------------------------------------------
+
+(defmacro imp:use-package (name &rest args)
+  "Wrap `use-package' in imp timing.
+
+NAME and ARGS should be exactly as `use-package' requires.
+
+Expects `use-package' to be loaded already."
+  `(imp:timing
+      (list :use-package ,name)
+      ,(imp:file:current)
+      ,(imp:path:current:dir)
+    (use-package ,name
+       ,@args)))
+;; (imp:use-package no-littering)
