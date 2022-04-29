@@ -502,10 +502,11 @@ Returns result of evaluating BODY."
 NAME and ARGS should be exactly as `use-package' requires.
 
 Expects `use-package' to be loaded already."
-  `(imp:timing
-      (list :use-package ,name)
-      ,(imp:file:current)
-      ,(imp:path:current:dir)
-    (use-package ,name
-       ,@args)))
-;; (imp:use-package no-littering)
+  (let ((feature (list :use-package name)))
+    `(imp:timing
+         (quote ,feature)
+         ,(imp:file:current)
+         ,(imp:path:current:dir)
+       (use-package ,name
+         ,@args))))
+;; (imp:use-package test-foo)
