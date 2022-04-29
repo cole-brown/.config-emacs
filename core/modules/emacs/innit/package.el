@@ -53,6 +53,20 @@
 ;; Modify `package' path: want a top-level dir that can hold the "elpa"
 ;; `package' dir, any local packages, `straight.el' repos, etc...
 
+;; TODO: Here or move to a 'no-littering' file?
+(defcustom innit:path:var (path:join user-emacs-directory "var")
+  "Directory for persistent data files."
+  :group 'innit:group
+  :type  'string)
+
+
+;; TODO: Here or move to a 'no-littering' file?
+(defcustom innit:path:etc (path:join user-emacs-directory "config")
+  "Directory for persistent config files."
+  :group 'innit:group
+  :type  'string)
+
+
 (defcustom innit:path:packages (path:join user-emacs-directory "packages")
   "Top-level directory for packages. ELPA, others will have subdirectories."
   :group 'innit:group
@@ -72,22 +86,7 @@
 ;;   :type 'string)
 
 
-;; TODO: Here or move to a 'no-littering' file?
-(defcustom innit:path:var (path:join user-emacs-directory "var")
-  "Directory for persistent data files."
-  :group 'innit:group
-  :type  'string)
-
-
-;; TODO: Here or move to a 'no-littering' file?
-(defcustom innit:path:etc (path:join user-emacs-directory "config")
-  "Directory for persistent config files."
-  :group 'innit:group
-  :type  'string)
-
-
-;; TODO: Here or move to a 'no-littering' file?
-(defcustom innit:path:gpg (path:join innit:path:var "gpg")
+(defcustom innit:path:packages:gpg (path:join innit:path:var "packages" "gpg")
   "Directory for gpg keys for e.g. `package-gnupghome-dir'."
   :group 'innit:group
   :type  'string)
@@ -135,13 +134,8 @@ Can be called earlier too, if you want..."
   ;; NOTE: Also, this gets wiped out when 'package.el' is loaded? So... Set it
   ;; as much as needed to force Emacs to behave?
 
-  (when innit:path:gpg
-    (customize-set-variable 'package-gnupghome-dir innit:path:gpg))
-
-  ;; TODO: NOTE: Emacs doesn't add its "elpa/" packages dir to the load path?!
-  ;; TODO: Let's do that for it then, I guess?
-  ;; (add-to-list 'load-path package-user-dir)
-  )
+  (when innit:path:packages:gpg
+    (customize-set-variable 'package-gnupghome-dir innit:path:packages:gpg)))
 
 
 (defun innit:package:init/early ()
