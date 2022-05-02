@@ -55,10 +55,12 @@
 ;; TODO: If none of these used, get rid of (or move to somewhere later/more appropriate).
 ;; (defconst innit:emacs:28+  (> emacs-major-version 27))
 ;; (defconst innit:emacs:29+  (> emacs-major-version 28))
-;; (defconst innit:os:mac     (eq system-type 'darwin))
-;; (defconst innit:os:linux   (eq system-type 'gnu/linux))
-;; (defconst innit:os:windows (memq system-type '(cygwin windows-nt ms-dos)))
-;; (defconst innit:os:bsd     (or IS-MAC (eq system-type 'berkeley-unix)))
+
+
+(defconst innit:os:linux?   (eq system-type 'gnu/linux))
+(defconst innit:os:mac?     (eq system-type 'darwin))
+(defconst innit:os:windows? (memq system-type '(cygwin windows-nt ms-dos)))
+(defconst innit:os:bsd?     (or innit:os:mac? (eq system-type 'berkeley-unix)))
 
 
 ;;------------------------------------------------------------------------------

@@ -12,7 +12,26 @@
 
 
 ;;------------------------------------------------------------------------------
-;; [Speed]: Interactive vs Non-interactive
+;; Fast, innit?
+;;------------------------------------------------------------------------------
+
+;; Always set up our Emacs start-up timing benchmark.
+(innit:time:init)
+
+
+;;==============================================================================
+;;                       ------------------------------
+;;                                   -----
+;;                           The Speeeeeeeeeeed!!!
+;;                                   -----
+;;                       ------------------------------
+;;==============================================================================
+
+;; A lot of these are about speeding up start-up a bit.
+
+
+;;------------------------------------------------------------------------------
+;; Interactive vs Non-interactive
 ;;------------------------------------------------------------------------------
 
 ;; TODO: Safe to do this or not? We're not pre-compiling everything like Doom is.
@@ -38,8 +57,34 @@
   (innit:optimize:load-message:inhibit))
 
 
-;; Always set up our Emacs start-up timing benchmark.
-(innit:time:init)
+;; HACK `tty-run-terminal-initialization' is *tremendously* slow for some
+;;      reason; inexplicably doubling startup time for terminal Emacs. Keeping
+;;      it disabled will have nasty side-effects, so we simply delay it instead,
+;;      and invoke it later, at which point it runs quickly; how mysterious!
+(unless (daemonp)
+  (advice-add #'tty-run-terminal-initialization :override #'ignore)
+  (add-hook! 'window-setup-hook
+    (defun doom-init-tty-h ()
+      (advice-remove #'tty-run-terminal-initialization #'ignore)
+      (tty-run-terminal-initialization (selected-frame) nil t))))
+
+
+;;------------------------------------------------------------------------------
+;; Display
+;;------------------------------------------------------------------------------
+
+;; Emacs "updates" its ui more often than it needs to, so slow it down slightly
+(setq idle-update-delay 1.0)  ; default is 0.5
+
+
+;;------------------------------------------------------------------------------
+;; Processes
+;;------------------------------------------------------------------------------
+
+;; Increase how much is read from processes in a single chunk .
+;; This is further increased elsewhere, where needed (like our LSP module).
+(setq read-process-output-max (max read-process-output-max ; default is 4kb?
+                                   (* 64 1024))) ; 64kb
 
 
 ;;------------------------------------------------------------------------------
@@ -102,6 +147,12 @@
 ;; fonts that are larger than the system default (which would resize the frame).
 (setq frame-inhibit-implied-resize t)
 
+;; Font compacting can be terribly expensive, especially for rendering icon
+;; fonts on Windows. Whether disabling it has a notable affect on Linux and Mac
+;; hasn't been determined, but do it there anyway, just in case. This increases
+;; memory usage, however!
+(setq inhibit-compacting-font-caches t)
+
 
 ;;------------------------------
 ;; Bidirectional Text
@@ -118,9 +169,9 @@
 (setq bidi-inhibit-bpa t)  ; Emacs 27+
 
 
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; Cursor
-;;------------------------------
+;;------------------------------------------------------------------------------
 
 ;; Reduce rendering/line scan work for Emacs by not rendering cursors or regions
 ;; in non-focused windows.
@@ -128,14 +179,73 @@
 (setq highlight-nonselected-windows nil)
 
 
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; Scrolling
-;;------------------------------
+;;------------------------------------------------------------------------------
 
 ;; ;; More performant rapid scrolling over unfontified regions. May cause brief
 ;; ;; spells of inaccurate syntax highlighting right after scrolling, which should
 ;; ;; quickly self-correct.
 ;; (setq fast-but-imprecise-scrolling t)
+;; TODO: Set or no? Does not setting help some modes that are having trouble (e.g. csharp-mode)?
+
+
+;; Introduced in Emacs HEAD (b2f8c9f), this inhibits fontification while
+;; receiving input, which should help a little with scrolling performance.
+;; See help for the variable for more info.
+(setq redisplay-skip-fontification-on-input t)
+
+
+;;------------------------------------------------------------------------------
+;; [OS]: Windows
+;;------------------------------------------------------------------------------
+;; Windows is... special.
+
+;;------------------------------
+;; Is Windows?
+;;------------------------------
+
+;; Generally, use `innit:os:windows?'... but in this case we have a specific
+;; variable to check the existance of.
+;;
+;; Performance on Windows is considerably worse than elsewhere. We'll need
+;; everything we can get.
+(when (boundp 'w32-get-true-file-attributes)
+  (setq w32-get-true-file-attributes nil   ; decrease file IO workload
+        w32-pipe-read-delay 0              ; faster IPC
+        w32-pipe-buffer-size (* 64 1024))  ; read more at a time (was 4K)
+
+  ;; The clipboard on Windows could be in another encoding (likely utf-16), so
+  ;; let Emacs/the OS decide what to use there.
+  (setq selection-coding-system 'utf-8))
+
+
+;;------------------------------------------------------------------------------
+;; [OS]: Linux
+;;------------------------------------------------------------------------------
+
+;;------------------------------
+;; _-NOT-_ Linux?
+;;------------------------------
+
+;; Remove command line options that aren't relevant to our current OS; means
+;; slightly less to process at startup.
+(unless innit:os:linux?
+  (setq command-line-x-option-alist nil))
+
+
+;;------------------------------------------------------------------------------
+;; [OS]: MacOS
+;;------------------------------------------------------------------------------
+
+;;------------------------------
+;; _-NOT-_ MacOS?
+;;------------------------------
+
+;; Remove command line options that aren't relevant to our current OS; means
+;; slightly less to process at startup.
+(unless innit:os:mac?
+  (setq command-line-ns-option-alist nil))
 ;;------------------------------------------------------------------------------
 ;; The End
 ;;------------------------------------------------------------------------------
