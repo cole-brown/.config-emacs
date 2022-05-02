@@ -42,18 +42,6 @@
 (innit:time:init)
 
 
-;;------------------------------
-;; UTF-8
-;;------------------------------
-
-;; Contrary to what many Emacs users have in their configs, you don't need
-;; more than this to make UTF-8 the default coding system:
-(set-language-environment "UTF-8")
-
-;; set-language-enviornment sets default-input-method, which is unwanted
-(setq default-input-method nil)
-
-
 ;;------------------------------------------------------------------------------
 ;; Security
 ;;------------------------------------------------------------------------------
@@ -85,9 +73,35 @@
 (setq auto-mode-case-fold nil)
 
 
+;; Don't ping things that look like domain names.
+(setq ffap-machine-p-known 'reject)
+
+
 ;;------------------------------------------------------------------------------
 ;; Text
 ;;------------------------------------------------------------------------------
+
+;;------------------------------
+;; UTF-8
+;;------------------------------
+
+;; Contrary to what many Emacs users have in their configs, you don't need
+;; more than this to make UTF-8 the default coding system:
+(set-language-environment "UTF-8")
+
+;; set-language-enviornment sets default-input-method, which is unwanted
+(setq default-input-method nil)
+
+
+;;------------------------------
+;; Font
+;;------------------------------
+
+;; Resizing the Emacs frame can be a terribly expensive part of changing the
+;; font. By inhibiting this, we halve startup times, particularly when we use
+;; fonts that are larger than the system default (which would resize the frame).
+(setq frame-inhibit-implied-resize t)
+
 
 ;;------------------------------
 ;; Bidirectional Text
@@ -102,6 +116,26 @@
 ;; reordering of bidirectional text with embedded parentheses and other bracket
 ;; characters whose 'paired-bracket' Unicode property is non-nil.
 (setq bidi-inhibit-bpa t)  ; Emacs 27+
+
+
+;;------------------------------
+;; Cursor
+;;------------------------------
+
+;; Reduce rendering/line scan work for Emacs by not rendering cursors or regions
+;; in non-focused windows.
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
+
+
+;;------------------------------
+;; Scrolling
+;;------------------------------
+
+;; ;; More performant rapid scrolling over unfontified regions. May cause brief
+;; ;; spells of inaccurate syntax highlighting right after scrolling, which should
+;; ;; quickly self-correct.
+;; (setq fast-but-imprecise-scrolling t)
 ;;------------------------------------------------------------------------------
 ;; The End
 ;;------------------------------------------------------------------------------

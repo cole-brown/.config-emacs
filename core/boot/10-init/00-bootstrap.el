@@ -39,6 +39,12 @@
 ;;------------------------------
 ;; `no-littering'
 ;;------------------------------
+;; Keep the `user-emacs-directory' clean by changing where Emacs & packages
+;; store their data. Move it from various & sundry places in and under
+;; `user-emacs-directory' to be in one of two `user-emacs-directory'
+;; sub-directories:
+;;   - `no-littering-etc-directory'
+;;   - `no-littering-var-directory'
 (imp:use-package no-littering
   ;;--------------------
   :custom
@@ -74,6 +80,34 @@
     (startup-redirect-eln-cache
      (convert-standard-filename
       (no-littering-expand-var-file-name "eln-cache/")))))
+
+
+;;------------------------------
+;; Garbage Collector Magic Hacks (`gcmh')
+;;------------------------------
+;; https://github.com/emacsmirror/gcmh
+
+;; The GC introduces annoying pauses and stuttering into our Emacs experience,
+;; so we use `gcmh' to stave off the GC while we're using Emacs, and provoke it
+;; when it's idle. However, if the idle delay is too long, we run the risk of
+;; runaway memory usage in busy sessions. If it's too low, then we may as well
+;; not be using `gcmh' at all.
+(imp:use-package gcmh
+
+  ;;--------------------
+  :custom
+  ;;--------------------
+  (gcmh-idle-delay 'auto)  ; default is 15s
+  (gcmh-auto-idle-delay-factor 10)
+  ;; GCMH default:  1 MB
+  ;; Doom default: 16 MB
+  ;; I have 32 or 64 GB of ram, depending on computer, so higher?
+  (gcmh-high-cons-threshold (* 32 1024 1024))
+
+  ;;--------------------
+  :config
+  ;;--------------------
+  (gcmh-mode 1))
 
 
 ;;------------------------------------------------------------------------------
