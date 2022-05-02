@@ -87,6 +87,14 @@
 ;;------------------------------
 ;; https://github.com/emacsmirror/gcmh
 
+
+;; NOTE: WARNING!
+;;   If you do not want `gcmh', be sure to set this back to something reasonable!
+;;   It was set to `most-positive-fixnum' during early-init in
+;;   "core/boot/00-early/00-bootstrap.el"!
+;; (setq gc-cons-threshold 800000) ;; Emacs' default value
+
+
 ;; The GC introduces annoying pauses and stuttering into our Emacs experience,
 ;; so we use `gcmh' to stave off the GC while we're using Emacs, and provoke it
 ;; when it's idle. However, if the idle delay is too long, we run the risk of
