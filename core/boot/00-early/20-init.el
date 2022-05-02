@@ -41,6 +41,9 @@
 ;; ;; to skip the mtime checks on every *.elc file.
 ;; (setq load-prefer-newer noninteractive)
 
+;;------------------------------
+;; Interactive && NOT Debugging
+;;------------------------------
 ;; Run these unless Emacs is in:
 ;;   - daemon (service) mode
 ;;   - noninteractive (batch/script) mode
@@ -52,16 +55,55 @@
   ;; happened during start-up.
   (innit:optimize:file-name-handler-alist:inhibit)
 
+
   ;; Speed up start-up a bit by inhibiting redrawing display, writing messages.
   (innit:optimize:display:inhibit)
-  (innit:optimize:load-message:inhibit))
+  (innit:optimize:load-message:inhibit)
 
 
-;; HACK `tty-run-terminal-initialization' is *tremendously* slow for some
-;;      reason; inexplicably doubling startup time for terminal Emacs. Keeping
-;;      it disabled will have nasty side-effects, so we simply delay it instead,
-;;      and invoke it later, at which point it runs quickly; how mysterious!
+  ;; Disable warnings from legacy advice system. They aren't useful, and what can
+  ;; we do about them, besides changing packages upstream?
+  (setq ad-redefinition-action 'accept)
+
+
+  ;; Reduce *Message* noise at startup. An empty scratch buffer (or the dashboard)
+  ;; is more than enough.
+  (setq inhibit-startup-screen t
+        ;; See var docstring for why user login name.
+        inhibit-startup-echo-area-message user-login-name)
+
+
+  ;; There can also be a "default.el" init file, found via the standard search
+  ;; path for libraries. Generally used for site-lisp, it seems? I've never had
+  ;; one, so don't bother looking in every `load-path' directory for it - just
+  ;; skip it.
+  (setq inhibit-default-init t)
+
+
+  ;; Shave seconds off startup time by starting the scratch buffer in
+  ;; `fundamental-mode', rather than, say, `org-mode' or `text-mode', which
+  ;; pull in a ton of packages.
+  (setq initial-major-mode 'fundamental-mode
+        initial-scratch-message nil)
+  ;; TODO: Add a hook here for first visit of the scratch buffer or something
+  ;; (idle timer?). I want to put it into `emacs-lisp' mode eventually.
+  )
+
+
+;;------------------------------
+;; NOT a Daemon Start-Up
+;;------------------------------
 (unless (daemonp)
+  ;; Get rid of "For information about GNU Emacs..." message at startup, unless
+  ;; we're in a daemon session where it'll say "Starting Emacs daemon." instead,
+  ;; which isn't so bad.
+  (advice-add #'display-startup-echo-area-message :override #'ignore)
+
+
+  ;; HACK `tty-run-terminal-initialization' is *tremendously* slow for some
+  ;;      reason; inexplicably doubling startup time for terminal Emacs. Keeping
+  ;;      it disabled will have nasty side-effects, so we simply delay it instead,
+  ;;      and invoke it later, at which point it runs quickly; how mysterious!
   (advice-add #'tty-run-terminal-initialization :override #'ignore)
   (add-hook! 'window-setup-hook
     (defun doom-init-tty-h ()
@@ -246,6 +288,9 @@
 ;; slightly less to process at startup.
 (unless innit:os:mac?
   (setq command-line-ns-option-alist nil))
+
+
 ;;------------------------------------------------------------------------------
 ;; The End
 ;;------------------------------------------------------------------------------
+(imp:provide :dot-emacs 'core 'boot '00-early 'init)

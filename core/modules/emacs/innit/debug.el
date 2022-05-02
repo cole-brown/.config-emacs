@@ -94,7 +94,8 @@ Returns `innit:debug?'"
 
     ;; Also cascade into Emacs?
     (setq init-file-debug t
-          debug-on-error t)
+          debug-on-error t
+          jka-compr-verbose t)
 
     (nub:out :innit
              :debug
@@ -107,6 +108,10 @@ Returns `innit:debug?'"
    ;;---
    (init-file-debug
     (setq innit:debug? init-file-debug)
+
+    ;; Also cascade into Emacs?
+    (setq debug-on-error t
+          jka-compr-verbose t)
 
     (nub:out :innit
              :debug
@@ -122,11 +127,26 @@ Returns `innit:debug?'"
    (debug-on-error
     (setq innit:debug? debug-on-error)
 
+    ;; Also cascade into Emacs?
+    (setq jka-compr-verbose t)
+    ;; Don't set `init-file-debug'?
+    ;; (setq init-file-debug t)
+
     (nub:out :innit
              :debug
              nil
              "Enable `innit:debug?' from `debug-on-error' variable: %S"
-             innit:debug?)))
+             innit:debug?))
+
+   ;;---
+   ;; _-NOT-_ Debugging
+   ;;---
+   (t
+    ;; Set everything to "no"?
+    (setq innit:debug?      nil
+          init-file-debug   nil
+          debug-on-error    nil
+          jka-compr-verbose nil)))
 
   ;; Return what the `innit:debug?' setting is now.
   innit:debug?)
