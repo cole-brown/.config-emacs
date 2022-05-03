@@ -546,7 +546,6 @@ a directory path.
 (defun imp:path:current:dir ()
   "Return the directory path of the file this is called from."
   (when-let (path (imp:path:current:file))
-    (message "imp:path:current:dir: file path: %s" path)
     (directory-file-name (file-name-directory path))))
 ;; (imp:path:current:dir)
 
@@ -582,17 +581,17 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config\":
     ;; End up with the same thing? Not a relative path - signal error.
     (when (string= path/relative path/here)
       ;; Error message gets truncated to oblivion, so... hello again:
-      (message (mapconcat #'identity
-                          '("Current directory is not relative to FEATURE/BASE!"
-                            "  FEATURE/BASE: %S"
-                            "  root path:    %s"
-                            "  curr path:    %s"
-                            "---> result:    %s")
-                          "\n")
-               feature/base
-               path/root
-               path/here
-               path/relative)
+      ;; (message (mapconcat #'identity
+      ;;                     '("Current directory is not relative to FEATURE/BASE!"
+      ;;                       "  FEATURE/BASE: %S"
+      ;;                       "  root path:    %s"
+      ;;                       "  curr path:    %s"
+      ;;                       "---> result:    %s")
+      ;;                     "\n")
+      ;;          feature/base
+      ;;          path/root
+      ;;          path/here
+      ;;          path/relative)
       (int<imp>:error "imp:path:current:dir/relative"
                       '("Current directory is not relative to FEATURE/BASE!\n"
                         "  FEATURE/BASE: %S\n"
