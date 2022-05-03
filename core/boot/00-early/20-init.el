@@ -105,10 +105,15 @@
   ;;      it disabled will have nasty side-effects, so we simply delay it instead,
   ;;      and invoke it later, at which point it runs quickly; how mysterious!
   (advice-add #'tty-run-terminal-initialization :override #'ignore)
-  (add-hook! 'window-setup-hook
-    (defun doom-init-tty-h ()
-      (advice-remove #'tty-run-terminal-initialization #'ignore)
-      (tty-run-terminal-initialization (selected-frame) nil t))))
+  (defun innit:hook:tty-run-terminal-initialization ()
+    "Remove the `tty-run-terminal-initialization' override advice.
+
+Advice just ignores calls to the fuction to speed up terminal Emacs init.
+
+Remove the advice, allowing original func to run, and then run original func."
+    (advice-remove #'tty-run-terminal-initialization #'ignore)
+    (tty-run-terminal-initialization (selected-frame) nil t))
+  (add-hook 'window-setup-hook #'innit:hook:tty-run-terminal-initialization))
 
 
 ;;------------------------------------------------------------------------------

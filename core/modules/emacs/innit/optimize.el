@@ -91,8 +91,7 @@ Revert those changes in a hook on `window-setup-hook'."
 
   ;; Revert our changes once far enough along in start-up that redisplays and
   ;; messages are necessary.
-  (add-hook 'window-setup-hook
-            #'innit:optimize:display:permit))
+  (add-hook 'window-setup-hook #'innit:optimize:display:permit))
 
 
 ;;------------------------------------------------------------------------------
