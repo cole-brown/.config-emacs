@@ -21,11 +21,11 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Required Packages & Modules
+;; Packages & Modules: Part 01
 ;;------------------------------------------------------------------------------
-;; Load a few "must exist ASAP" things that we'll use for the rest of Emacs
-;; start-up.
-
+;; Set up for packages via `use-package', then immediately install
+;; `no-littering' before anything can think about littering our beautiful
+;; `user-emacs-directory'.
 
 ;;------------------------------
 ;; `package.el' & `use-package'
@@ -46,6 +46,10 @@
 ;;   - `no-littering-etc-directory'
 ;;   - `no-littering-var-directory'
 (imp:use-package no-littering
+  ;; Make sure this loads ASAP. It's used for init/config of other packages.
+  :demand t
+
+
   ;;--------------------
   :custom
   ;;--------------------
@@ -68,19 +72,96 @@
   (setq auto-save-file-name-transforms
         `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
-  ;; TODO: An innit function to set this or not.
-  ;; TODO: Or just `(when some-variable ...)'
-  ;; TODO:   - One for the settings.el file to adjust?
-  ;; We don't want a "custom.el" at all, but if we did, it should be in the
-  ;; `no-littering' etc dir.
-  ;; (setq custom-file (no-littering-expand-etc-file-name "custom.el"))
-
   ;; Native Compliation (Emacs 28+):
   (when (fboundp 'startup-redirect-eln-cache)
     (startup-redirect-eln-cache
      (convert-standard-filename
       (no-littering-expand-var-file-name "eln-cache/")))))
 
+
+;;------------------------------
+;; WARNING: Do _NOT_ put any more packages here!!!
+;;------------------------------
+;; Before any other packages happen, we also need to deal with 'custom.el',
+;; which is bad and should feel bad.
+
+
+;;------------------------------------------------------------------------------
+;; Go away, "custom.el"...            ಠ_ಠ
+;;------------------------------------------------------------------------------
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Saving-Customizations.html
+;;
+;; We won't support `customize'/"custom.el" and never will. It's a clumsy
+;; interface that sets variables at a time where it can be easily and
+;; unpredictably overwritten. Always configure things in the Emacs init files.
+(let ((path-for-message (path:join user-emacs-directory "mantle/*.el")))
+  ;;------------------------------
+  ;; Disable some 'custom'/'customize' functions.
+  ;;------------------------------
+  ;; Disabling like this won't affect using them during init, but will show the
+  ;; user the message we assign if they call the interactively.
+  (dolist (symbol '(customize-option customize-browse customize-group customize-face
+                                     customize-rogue customize-saved customize-apropos
+                                     customize-changed customize-unsaved customize-variable
+                                     customize-set-value customize-customized customize-set-variable
+                                     customize-apropos-faces customize-save-variable
+                                     customize-apropos-groups customize-apropos-options
+                                     customize-changed-options customize-save-customized))
+    (put symbol
+         'disabled
+         (format "`innit' doesn't support `customize'; configure Emacs from '%s' instead"
+                 path-for-message)))
+
+  ;;------------------------------
+  ;; Disable `customize-themes'?
+  ;;------------------------------
+  ;; TODO: What do I use to set my theme then?
+  ;;   - `customize-themes' still, like I still use `customize-set-variable'?
+  ;;   - `load-theme'?
+  ;;   - `use-package'?
+  ;; TODO: Decide when 'zenburn' theme is installed.
+  (put 'customize-themes 'disabled
+       (format "`innit' doesn't support `customize'; set your theme with `load-theme' or `use-package' in '%s' instead"
+               path-for-message))
+
+  ;;------------------------------
+  ;; Custom File
+  ;;------------------------------
+  ;; Move all the customizations to null device or a file that is never loaded.
+  ;;   https://www.reddit.com/r/emacs/comments/9rrhy8/emacsers_with_beautiful_initel_files_what_about/e8juc8v
+  ;;
+  ;; Two options from that reddit thread:
+
+  ;;---
+  ;; 1. Null device aka '/dev/null':
+  ;;---
+  (setq custom-file null-device)
+  ;; If you get some weird error like this:
+  ;;   > custom-initialize-reset: Renaming: Invalid argument, \
+  ;;   >   c:/path/to/tmpasnG58, c:/path/to/NUL
+  ;; You should try option #2 instead.
+
+
+  ;;---
+  ;; 2. Move all the customizations to a file that is never loaded.
+  ;;---
+  ;; NOTE: `null-device' didn't work on Windows with Emacs ~26. Haven't tried in
+  ;; a few Emacs versions, but if that's still the case, do one of these
+  ;; instead:
+  ;;
+  ;; ;; Using `no-littering':
+  ;; (setq custom-file (no-littering-expand-etc-file-name "custom.ignored.el"))
+  ;;
+  ;; ;; Not using no-littering:
+  ;; (setq custom-file (path:join user-emacs-directory "custom.ignored.el"))
+  )
+
+
+;;------------------------------------------------------------------------------
+;; Packages & Modules: Part 02
+;;------------------------------------------------------------------------------
+;; Load a few "must exist ASAP" things that we'll use for the rest of Emacs
+;; start-up.
 
 ;;------------------------------
 ;; Garbage Collector Magic Hacks (`gcmh')
