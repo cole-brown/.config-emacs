@@ -132,10 +132,12 @@
   ;;
   ;; Two options from that reddit thread:
 
+
   ;;---
   ;; 1. Null device aka '/dev/null':
   ;;---
   (setq custom-file null-device)
+
   ;; If you get some weird error like this:
   ;;   > custom-initialize-reset: Renaming: Invalid argument, \
   ;;   >   c:/path/to/tmpasnG58, c:/path/to/NUL
@@ -154,6 +156,14 @@
   ;;
   ;; ;; Not using no-littering:
   ;; (setq custom-file (path:join user-emacs-directory "custom.ignored.el"))
+
+
+  ;;---
+  ;; 3. DEBUGGING:
+  ;;---
+  ;; Set it back to normal if you need to figure out what Emacs is writing to '/dev/null'.
+  ;; (setq custom-file (path:join user-emacs-directory "custom.el"))
+  ;; ...Just don't leave it like that.
   )
 
 
