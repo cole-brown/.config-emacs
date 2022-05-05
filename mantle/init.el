@@ -11,8 +11,6 @@
 ;;; Code:
 
 
-;; NOTE: This file is loaded with an imp timing wrapper so no need to wrap here.
-
 (nub:out :innit
          :debug
          (imp:file:current)

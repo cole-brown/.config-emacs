@@ -26,13 +26,8 @@
 ;; Run 'mantle/' init.
 ;;------------------------------------------------------------------------------
 
-(imp:timing
-    '(:mantle init)
-    (imp:file:current)
-    (imp:path:current:dir)
-
-  (imp:load :feature  '(:mantle init)
-            :filename "init"))
+(imp:load :feature  '(:mantle init)
+          :filename "init")
 
 
 ;;------------------------------------------------------------------------------
