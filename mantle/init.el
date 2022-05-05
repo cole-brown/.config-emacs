@@ -81,7 +81,9 @@
         )
 
   ;; NOTE: The theme in the `zenburn-theme' package is just called `zenburn'.
-  (load-theme 'zenburn))
+  ;;
+  ;; Load the theme please and yes, I do want to load a theme thank you.
+  (load-theme 'zenburn :no-confirm))
 
 
 ;;------------------------------------------------------------------------------
