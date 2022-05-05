@@ -8,21 +8,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; `imp' root paths
-;;------------------------------------------------------------------------------
-
-;; NOTE: 'mantle/' directory is available/encouraged for users to put their
-;; Emacs init stuff in.
-(imp:path:root :mantle
-               (imp:path:join user-emacs-directory "mantle")
-               "init.el")
-
-
-;; NOTE: `:core' and `:modules' already exist for `user-emacs-directory'
-;; subdirectories 'core/' and 'modules/', respectively.
-
-
-;;------------------------------------------------------------------------------
 ;; Run 'mantle/' init.
 ;;------------------------------------------------------------------------------
 
@@ -33,4 +18,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :dot-emacs 'core 'boot '10-init 'load)
+(imp:provide :core 'boot '10-init 'load)

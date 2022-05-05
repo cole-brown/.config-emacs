@@ -560,12 +560,12 @@ Raises an error if FEATURE/BASE does not have a path root.
 Raises an error if `(imp:path:current:dir)' (i.e. the absolute path)
 has no relation to FEATURE/BASE's root path.
 
-Example (assuming `:dot-emacs' has root path initialized as \"~/.config\":
-  ~/.config/emacs/init.el:
+Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
+  ~/.config/emacs/foo/bar.el:
     (imp:path:current:dir)
-      -> \"/home/<username>/.config/emacs/init.el\"
+      -> \"/home/<username>/.config/emacs/foo/\"
     (imp:path:current:dir/relative :dot-emacs)
-      -> \"emacs\""
+      -> \"foo\""
   ;; Make sure both paths are equivalent (directory paths) for the regex replace.
   (let* ((path/root (file-name-as-directory (int<imp>:path:root/dir feature/base)))
          (path/here (file-name-as-directory (imp:path:current:dir)))

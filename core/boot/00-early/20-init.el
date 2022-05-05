@@ -298,4 +298,4 @@ Remove the advice, allowing original func to run, and then run original func."
 ;;------------------------------------------------------------------------------
 ;; The End
 ;;------------------------------------------------------------------------------
-(imp:provide :dot-emacs 'core 'boot '00-early 'init)
+(imp:provide :core 'boot '00-early 'init)

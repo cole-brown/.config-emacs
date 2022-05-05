@@ -38,6 +38,32 @@
     (load (expand-file-name "emacs/innit/init" path-core-modules))))
 
 
+;;------------------------------------------------------------------------------
+;; Set-Up `imp' Roots for Initialization Directories
+;;------------------------------------------------------------------------------
+;; `imp' is now loaded, so we can set ourselves up to use it.
+
+;; 'early-init.el' and 'init.el' only, probably...
+(imp:path:root :root
+               user-emacs-directory)
+
+;; Core elisp for `innit' to invoke during start-up.
+(imp:path:root :core
+               innit:path:core/boot)
+
+;; NOTE: 'mantle/' directory is available/encouraged for users to put their
+;; Emacs init stuff in. `innit' will call 'mantle/init.el' during one phase of
+;; 'init.el', and then will call 'mantle/config.el' during a later phase of
+;; 'init.el'.
+(imp:path:root :mantle
+               (imp:path:join user-emacs-directory "mantle")
+               "init.el")
+
+;; User's modules; not our "core/modules/" directory.
+(imp:path:root :modules
+               (imp:path:join user-emacs-directory "modules"))
+
+
 (let ((file/this (imp:file:current)))
   ;;------------------------------------------------------------------------------
   ;; Settings & Overrides
@@ -89,4 +115,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-;; TODO: Provide anything? Push to some list or whatever that can be added to imp after the fact?
+(imp:provide :root 'init 'early)

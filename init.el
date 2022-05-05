@@ -113,4 +113,4 @@
            '("Boot Loader: 100 Done"
              :newline
              "Now witness the firepower of this full armed and operational operating system.")))
-(imp:provide :dot-emacs 'init)
+(imp:provide :root 'init 'standard)

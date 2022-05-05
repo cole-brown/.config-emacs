@@ -29,4 +29,4 @@
          :debug
          (imp:file:current)
          "Boot Loader: 99 Finalize :: Every Has Been Done.")
-(imp:provide :dot-emacs 'core 'boot '99-finalize 'finalize)
+(imp:provide :core 'boot '99-finalize 'finalize)

@@ -12,24 +12,11 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Set-Up: `imp'
-;;------------------------------------------------------------------------------
-;; `imp' is now loaded, so we can set ourselves up to use it.
-
-(imp:path:root :core    innit:path:core/boot)
-(imp:path:root :modules (imp:path:join user-emacs-directory "modules"))
-
-
-;; NOTE: User's list of things to load (the "mantle" layer to our "core") are
-;; in "20-load.el".
-
-
-;;------------------------------------------------------------------------------
 ;; Initialize!
 ;;------------------------------------------------------------------------------
-
-;; (imp:load :feature  '(:dot-emacs innit systems)
-;;           :path     (imp:path:current:dir/relative :dot-emacs)
+;; TODO: This doesn't go here. This goes in mantle
+;; (imp:load :feature  '(:innit systems)
+;;           :path     (imp:path:current:dir/relative "...?")
 ;;           :filename "systems")
 
 
@@ -82,4 +69,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :dot-emacs 'core 'boot '10-init 'init)
+(imp:provide :innit 'core 'boot '10-init 'init)
