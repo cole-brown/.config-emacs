@@ -11,10 +11,24 @@
 ;;; Code:
 
 
+;; NOTE: This file is loaded with an imp timing wrapper so no need to wrap here.
+
 (nub:out :innit
          :debug
          (imp:file:current)
          "mantle/init: Start")
+
+
+;;------------------------------------------------------------------------------
+;; "init.el" and "config.el"
+;;------------------------------------------------------------------------------
+;; Add `imp' feature lists to be loaded if correct file is present at
+;; imp root path.
+;;   - "init.el" will be checked for after core init is run.
+;;   - "config.el" will be checked for after core config is run.
+;;
+;; (innit:feature:mantle:add "core/10-init/20-load.el" :foo)
+;; (innit:feature:mantle:add "core/10-init/20-load.el" :zort narf)
 
 
 ;;------------------------------------------------------------------------------
@@ -28,57 +42,48 @@
 ;; Run User's Init
 ;;------------------------------------------------------------------------------
 
-;; TODO: Call all the mantle files using imp timing somehow. For now, this:
-(imp:timing
-    '(:dot-emacs 'mantle 'init)
-    (imp:file:current)
-    (imp:path:current:dir)
+;; TODO: Move into another file so this can just be the load order thingy...
+;;------------------------------------------------------------------------------
+;; Color scheme: Zenburn
+;;------------------------------------------------------------------------------
+(imp:use-package zenburn-theme
+  ;; Don't see any reason not to demand the theme.
+  :demand t
 
-  ;; TODO: Move into another file so this can just be the load order thingy...
-  ;;------------------------------------------------------------------------------
-  ;; Color scheme: Zenburn
-  ;;------------------------------------------------------------------------------
-  (imp:use-package zenburn-theme
-    ;; Don't see any reason not to demand the theme.
-    :demand t
+  ;;--------------------
+  :init
+  ;;--------------------
+  ;; NOTE: 'zenburn' uses "-N" for lighter and "+N" for darker in their names
+  ;; in the `zenburn-default-colors-alist' variable.
+  ;;
+  ;; These are some additional colors I'm testing out.
+  ;;
+  ;; Went to this website and plugged in `zenburn-magenta' and `zenburn-bg'
+  ;; with 10 midpoints:
+  ;;   https://meyerweb.com/eric/tools/color-blend/#3F3F3F:DC8CC3:10:hex
+  (setq dot-emacs:theme:color:zenburn-magenta-bg   "#4D464B"
+        dot-emacs:theme:color:zenburn-magenta-bg-1 "#5C4D57"
+        dot-emacs:theme:color:zenburn-magenta-bg-2 "#6A5463"
+        dot-emacs:theme:color:zenburn-magenta-bg-3 "#785B6F"
+        dot-emacs:theme:color:zenburn-magenta-bg-4 "#86627B"
+        dot-emacs:theme:color:zenburn-magenta-bg-5 "#956987")
 
-    ;;--------------------
-    :init
-    ;;--------------------
-    ;; NOTE: 'zenburn' uses "-N" for lighter and "+N" for darker in their names
-    ;; in the `zenburn-default-colors-alist' variable.
-    ;;
-    ;; These are some additional colors I'm testing out.
-    ;;
-    ;; Went to this website and plugged in `zenburn-magenta' and `zenburn-bg'
-    ;; with 10 midpoints:
-    ;;   https://meyerweb.com/eric/tools/color-blend/#3F3F3F:DC8CC3:10:hex
-    (setq dot-emacs:theme:color:zenburn-magenta-bg   "#4D464B"
-          dot-emacs:theme:color:zenburn-magenta-bg-1 "#5C4D57"
-          dot-emacs:theme:color:zenburn-magenta-bg-2 "#6A5463"
-          dot-emacs:theme:color:zenburn-magenta-bg-3 "#785B6F"
-          dot-emacs:theme:color:zenburn-magenta-bg-4 "#86627B"
-          dot-emacs:theme:color:zenburn-magenta-bg-5 "#956987")
+  ;; ;;--------------------
+  ;; :custom
+  ;; ;;--------------------
 
-    ;; ;;--------------------
-    ;; :custom
-    ;; ;;--------------------
+  ;;--------------------
+  :config
+  ;;--------------------
 
-    ;;--------------------
-    :config
-    ;;--------------------
+  ;; NOTE: These are all `defvar', so they can't be set in `:custom' section.
+  (setq zenburn-scale-org-headlines     t ; Scale headings in `org-mode'?
+        zenburn-scale-outline-headlines t ; Scale headings in `outline-mode'?
+        ;; zenburn-use-variable-pitch   t ; Use variable-pitch fonts for some headings and titles
+        )
 
-    ;; NOTE: These are all `defvar', so they can't be set in `:custom' section.
-    (setq zenburn-scale-org-headlines     t ; Scale headings in `org-mode'?
-          zenburn-scale-outline-headlines t ; Scale headings in `outline-mode'?
-          ;; zenburn-use-variable-pitch   t ; Use variable-pitch fonts for some headings and titles
-          )
-
-    ;; NOTE: The theme in the `zenburn-theme' package is just called `zenburn'.
-    (load-theme 'zenburn))
-
-  ;; End `imp:timing'.
-  )
+  ;; NOTE: The theme in the `zenburn-theme' package is just called `zenburn'.
+  (load-theme 'zenburn))
 
 
 ;;------------------------------------------------------------------------------
@@ -88,4 +93,4 @@
          :debug
          (imp:file:current)
          "mantle/init: End")
-(imp:provide :dot-emacs 'mantle 'init)
+(imp:provide :mantle 'init)

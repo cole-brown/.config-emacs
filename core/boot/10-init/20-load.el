@@ -10,28 +10,29 @@
 ;;------------------------------------------------------------------------------
 ;; `imp' root paths
 ;;------------------------------------------------------------------------------
-;; Add `imp' root keywords to paths:
-;;   (imp:path:root :foo  (imp:path:join user-emacs-directory "mantle" :foo))
-;;   (imp:path:root :quxx (imp:path:join user-emacs-directory "mantle" "foo-barbar" "baz"))
-;;
-;; NOTE: "mantle" directory is available/encouraged for you to put your stuff in.
-;; Your imp root should be a subdirectory, as in examples above.
-;;
+
+;; NOTE: 'mantle/' directory is available/encouraged for users to put their
+;; Emacs init stuff in.
+(imp:path:root :mantle
+               (imp:path:join user-emacs-directory "mantle")
+               "init.el")
+
+
 ;; NOTE: `:core' and `:modules' already exist for `user-emacs-directory'
-;; subdirectories "core/" and "modules/", respectively.
-
+;; subdirectories 'core/' and 'modules/', respectively.
 
 
 ;;------------------------------------------------------------------------------
-;; "init.el" and "config.el"
+;; Run 'mantle/' init.
 ;;------------------------------------------------------------------------------
-;; Add `imp' feature lists to be loaded if correct file is present at
-;; imp root path.
-;;   - "init.el" will be checked for after core init is run.
-;;   - "config.el" will be checked for after core config is run.
-;;
-;; (innit:feature:mantle:add "core/10-init/20-load.el" :foo)
-;; (innit:feature:mantle:add "core/10-init/20-load.el" :zort narf)
+
+(imp:timing
+    '(:mantle init)
+    (imp:file:current)
+    (imp:path:current:dir)
+
+  (imp:load :feature  '(:mantle init)
+            :filename "init"))
 
 
 ;;------------------------------------------------------------------------------
