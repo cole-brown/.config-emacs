@@ -45,20 +45,35 @@
         mantle:theme:color:zenburn-magenta-bg-3 "#785B6F"
         mantle:theme:color:zenburn-magenta-bg-4 "#86627B"
         mantle:theme:color:zenburn-magenta-bg-5 "#956987")
-
   ;; ;;----------------------------------------------------------------------------
   ;; :custom
   ;; ;;----------------------------------------------------------------------------
+
 
   ;;----------------------------------------------------------------------------
   :config
   ;;----------------------------------------------------------------------------
 
+  ;;------------------------------
+  ;; Settings that aren't `defcustom'
+  ;;------------------------------
   ;; NOTE: These are all `defvar', so they can't be set in `:custom' section.
+
   (setq zenburn-scale-org-headlines     t ; Scale headings in `org-mode'?
         zenburn-scale-outline-headlines t ; Scale headings in `outline-mode'?
         ;; zenburn-use-variable-pitch   t ; Use variable-pitch fonts for some headings and titles
         )
+
+
+  ;;------------------------------
+  ;; Faces
+  ;;------------------------------
+
+
+
+  ;;------------------------------
+  ;; Finally: Load the Theme
+  ;;------------------------------
 
   ;; NOTE: The theme in the `zenburn-theme' package is just called `zenburn'.
   ;;

@@ -21,7 +21,7 @@
 ;; Set Theme
 ;;------------------------------------------------------------------------------
 
-(defcustom mantle:theme:path (imp:path:join (imp:path:current:dir) "theme")
+(defcustom mantle:theme:path (imp:path:current:dir)
   "Absolute path string to theme's directory (or file).
 
 Used by `imp:load'.
