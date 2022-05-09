@@ -1,0 +1,223 @@
+;;; theme.el --- Theme Helpers -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2022-05-06
+;; Modified:   2022-05-06
+;; URL:        https://github.com/cole-brown/.config-emacs
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;  Theme Helpers
+;;
+;;; Code:
+
+
+;; On loan from Doom:
+;;   - "core/autoload/themes.el"
+;;   - "core/core-ui.el"
+
+
+(imp:require :innit 'var)
+(imp:require :str '+random)
+
+
+;;------------------------------------------------------------------------------
+;; Customs
+;;------------------------------------------------------------------------------
+
+(defcustom innit:theme:path (path:join innit:path:mantle "theme")
+  "Absolute path string to theme's directory.
+
+Used by `imp:load'.
+
+`innit:theme:path' and `innit:theme:file' must be set in order to load
+your theme."
+  :group 'innit:group
+  :type  'string)
+
+
+(defcustom innit:theme:file nil
+  "String of either filename or absolute filepath to theme.
+
+Used by `imp:load'.
+
+`innit:theme:path' and `innit:theme:file' must be set in order to load
+your theme."
+  :group 'innit:group
+  :type  'string)
+
+
+(defcustom innit:theme:feature nil
+  "`imp' feature name for theme.
+
+Used by `imp:load'.
+
+Set to `nil' if you don't want `mantle' to load a theme for you."
+  :group 'innit:group
+  :type  '(restricted-sexp :match-alternatives (keywordp symbolp stringp)))
+
+
+;;------------------------------------------------------------------------------
+;; Theme Loading
+;;------------------------------------------------------------------------------
+
+;;----------------------------
+;; Loading Hooks
+;;----------------------------
+
+(defvar innit:theme:customize:hook nil
+  "Hook to run for theme customization.
+
+This hook is run by `innit:theme:load:hook'.")
+
+
+(defvar innit:theme:load:hook nil
+  "Hook run after the theme is loaded.
+
+Run when loaded with `load-theme' or reloaded with `innit:theme:reload'.")
+
+
+(defun innit:theme:customize:apply ()
+  "Run `innit:theme:customize:hook' functions."
+  (run-hooks 'innit:theme:customize:hook))
+
+
+;; Always run `innit:theme:customize:hook' when running `innit:theme:load:hook'.
+(add-hook 'innit:theme:load:hook  #'innit:theme:customize:apply)
+
+
+;;----------------------------
+;; Load Theme
+;;----------------------------
+
+(defvar innit:theme:loaded nil
+  "Theme that user has loaded, or `nil' for \"not loaded (yet)\".")
+
+
+(defun innit:theme:load (theme)
+  "Load THEME and mark as loaded.
+
+THEME must be the theme's quoted symbol name (e.g. `'zenburn'); it will be
+passed to `load-theme'."
+  ;; Load the theme please and yes, I do want to load a theme thank you.
+  (load-theme theme :no-confirm)
+  ;; Save that theme was loaded.
+  (setq innit:theme:loaded theme))
+
+
+;; TODO: Currently doesn't interact with `innit:theme:loaded'. Should it?
+(defun innit:theme:reload ()
+  "Reload the current Emacs theme(s)."
+  (interactive)
+  (unless innit:theme:feature
+    ;; TODO: nub error func?
+    (user-error (concat "innit:theme:reload: "
+                        "No theme is active. "
+                        "Make sure `innit:theme:feature', `innit:theme:path', "
+                        "and `innit:theme:file' are set properly.")))
+  (let ((themes (copy-sequence custom-enabled-themes)))
+    ;; Turn themes off and back on again...
+    (mapc #'disable-theme custom-enabled-themes)
+    (let (innit:theme:load:hook) ; Disable load hook while we re-enable the themes.
+      (mapc #'enable-theme (reverse themes)))
+    ;; Apply the hook funcs once now that the themes are all reloaded.
+    (innit:hook:run 'innit:theme:load:hook)
+    ;; TODO: Steal Doom fonts init/functions/etc too?
+    ;; (doom/reload-font)
+    (message "%s %s"
+             (propertize
+              (format "Reloaded %d theme%s:"
+                      (length themes)
+                      (if (cdr themes) "s" ""))
+              'face 'bold)
+             (mapconcat #'prin1-to-string themes ", "))))
+
+
+;;------------------------------------------------------------------------------
+;; Theme Init
+;;------------------------------------------------------------------------------
+
+(defun innit:theme:init ()
+  "Initialize themes."
+  ;; User themes should live in "<user-emacs-directory>/mantle/theme/",
+  ;; not "<user-emacs-directory>/".
+  (setq custom-theme-directory innit:theme:path)
+
+  ;; Always prioritize the user's themes above the built-in/packaged ones.
+  (setq custom-theme-load-path
+        ;; Delete `custom-theme-directory' and re-add at start of list.
+        (cons 'custom-theme-directory
+              (delq 'custom-theme-directory custom-theme-load-path))))
+
+
+;;------------------------------------------------------------------------------
+;; Faces
+;;------------------------------------------------------------------------------
+
+(defun int<innit>:theme:face:set (spec)
+  "Convert Doom's more user-friendly face SPEC into an Emacs' face spec."
+  ;; Multiple faces, same spec:
+  (cond ((listp (car spec))
+         (cl-loop for face in (car spec)
+                  collect
+                  (car (int<innit>:theme:face:set (cons face (cdr spec))))))
+        ;; FACE :keyword value [...]
+        ((keywordp (cadr spec))
+         `((,(car spec) ((t ,(cdr spec))))))
+        ;; Fallback: Assume it's in Emacs' face spec already.
+        (`((,(car spec) ,(cdr spec))))))
+;; (int<innit>:theme:face:set (list 'org-done :foreground "#506b50"))
+;; (int<innit>:theme:face:set (list '+org-todo-active :foreground "#a9a1e1" :background "#383838"))
+
+
+(defmacro innit:theme:face:set (theme &rest specs)
+  "Apply a list of face SPECS as user customizations for THEME.
+
+THEME can be a single symbol or list thereof. If nil, apply these settings to
+all themes. It will apply to all themes once they are loaded."
+  (declare (indent defun))
+
+  ;; Make a function name for the hook based on THEME.
+  (let ((fn (gensym (concat "innit:theme:face:hook:"
+                            (if (listp theme)
+                                (apply #'str:join "/" (str:normalize:name->list theme))
+                              (str:normalize:name theme))))))
+    ;; Create a function for applying the faces.
+    `(progn
+       (defun ,fn ()
+         (let (custom--inhibit-theme-enable)
+           (dolist (theme (doom-enlist (or ,theme 'user)))
+             (when (or (eq theme 'user)
+                       (custom-theme-enabled-p theme))
+               (apply #'custom-theme-set-faces theme
+                      (mapcan #'int<innit>:theme:face:set
+                              (list ,@specs)))))))
+       ;; Apply the changes immediately if the user is not using `innit' theme
+       ;; variables or the theme has already loaded. This allows you to evaluate
+       ;; these macros on the fly and customize your faces iteratively.
+       (when (or int<innit>:theme:loaded
+                 (null innit:theme:feature))
+         (funcall #',fn))
+       ;; Add to the customize hook in any case.
+       (add-hook 'innit:theme:customize:hook #',fn 100))))
+
+
+(defmacro innit:face:set (&rest specs)
+  "Apply a list of face SPECS as user customizations.
+
+This is a convenience macro alternative to `custom-set-face' which allows for a
+simplified face format, and takes care of load order issues, so you can use
+doom-themes' API  worry."
+  (declare (indent defun))
+  `(innit:theme:face:set 'user ,@specs))
+
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
+(imp:provide :innit 'theme)

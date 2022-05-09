@@ -35,6 +35,11 @@
   "Absolute path to the \"core/modules\" subdirectory.")
 
 
+(defconst innit:path:mantle (path:join user-emacs-directory "mantle/")
+  "Absolute path to the \"mantle\" subdirectory.")
+
+
+;; TODO: Use this?
 (defconst innit:filenames:mantle
   '(:init   "init.el"
     :config "config.el")
