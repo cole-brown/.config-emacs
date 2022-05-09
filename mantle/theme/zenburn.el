@@ -45,6 +45,151 @@
         mantle:theme:color:zenburn-magenta-bg-3 "#785B6F"
         mantle:theme:color:zenburn-magenta-bg-4 "#86627B"
         mantle:theme:color:zenburn-magenta-bg-5 "#956987")
+
+
+  ;;------------------------------
+  ;; Faces
+  ;;------------------------------
+  ;; I need to customize some org-mode faces - they're not the greatest (IMO) in
+  ;; Zenburn. So here are the vars at their defaults. The config section can
+  ;; update them as desired.
+  ;;
+  ;; Could maybe move these out of Zenburn into general theme stuff if ever
+  ;; other themes want to adjust the same faces?
+  ;;------------------------------
+
+  (defface mantle:theme:face:org.todo.keyword:todo
+    (list (cons
+           ;; display type
+           t
+           ;; attributes
+           (list
+            :weight 'bold
+            :inherit 'warning)))
+    "Face for todo keyword in todo sequence."
+    :group 'doom-themes)
+
+
+  (defface mantle:theme:face:org.todo.keyword:background
+    (list (cons
+           ;; display type
+           t
+           ;; attributes
+           nil))
+    "Face for todo keyword in todo sequence."
+    :group 'doom-themes)
+
+
+  (defface mantle:theme:face:org.todo.keyword:done.good
+    (list (cons
+           ;; display type
+           t
+           ;; attributes
+           (list
+            :inherit 'org-done)))
+    "Face for todo keyword in todo sequence."
+    :group 'doom-themes)
+
+
+  (defface mantle:theme:face:org.todo.keyword:done.bad
+    (list (cons
+           ;; display type
+           t
+           ;; attributes
+           (list
+            :inherit 'org-done)))
+    "Face for todo keyword in todo sequence."
+    :group 'doom-themes)
+
+
+  (defface mantle:theme:face:org.todo.keyword:info
+    (list (cons
+           ;; display type
+           t
+           ;; attributes
+           (list
+            :inherit 'org-done)))
+    "Face for todo keyword in todo sequence."
+    :group 'doom-themes)
+
+  (defface mantle:theme:face:org.todo.keyword:null
+    (list (cons
+           ;; display type
+           t
+           ;; attributes
+           (list
+            :inherit 'org-done)))
+    "Face for todo keyword in todo sequence."
+    :group 'doom-themes)
+
+
+  ;; TODO: Steal `doom-darken', `doom-color', etc?
+  ;;
+  ;; TODO: Use above color variables or zenburn's color variables?
+  ;; TODO: Use website from above color variables to check on the colors used here?
+  ;;
+  ;; TODO: Combine these into the defface? No real point having them separate unless I'm going to use Zenburn funcs to set the colors....
+  ;;   - ALT-TODO: Use Zenburn funcs to set the colors, move back down to `:config'
+
+  ;; ;; Attributes plist:
+  ;; (let ((face-plist
+  ;;        (list :foreground "#c67eaf" ;; (doom-darken (doom-color 'magenta) 0.1)
+  ;;              :background "#383838" ;; (doom-color 'bg-alt)
+  ;;              :weight 'bold
+  ;;              ;; :underline t
+  ;;              )))
+
+  ;;   (face-spec-set 'mantle:theme:face:org.todo.keyword:todo
+  ;;                  (list (cons
+  ;;                         ;; display type
+  ;;                         t
+  ;;                         ;; attributes
+  ;;                         face-plist)))
+
+  ;;   (face-spec-set 'mantle:theme:face:org.todo.keyword:background
+  ;;                  (list (cons
+  ;;                         ;; display type
+  ;;                         t
+  ;;                         ;; attributes
+  ;;                         (list :background "#383838" ;; (doom-color 'bg-alt)
+  ;;                               ))))
+
+  ;;   (face-spec-set 'mantle:theme:face:org.todo.keyword:done.good
+  ;;                  (list (cons
+  ;;                         ;; display type
+  ;;                         t
+  ;;                         ;; attributes
+  ;;                         (list :background "#383838" ;; (doom-color 'bg-alt)
+  ;;                               :inherit 'org-done))))
+
+  ;;   (face-spec-set 'mantle:theme:face:org.todo.keyword:done.bad
+  ;;                  (list (cons
+  ;;                         ;; display type
+  ;;                         t
+  ;;                         ;; attributes
+  ;;                         (list :background "#383838" ;; (doom-color 'bg-alt)
+  ;;                               :foreground "#7e4a4a" ;; (doom-darken (doom-color 'red-4) 0.1)
+  ;;                               ))))
+
+  ;;   (face-spec-set 'mantle:theme:face:org.todo.keyword:info
+  ;;                  (list (cons
+  ;;                         ;; display type
+  ;;                         t
+  ;;                         ;; attributes
+  ;;                         (list :background "#383838" ;; (doom-color 'bg-alt)
+  ;;                               :foreground "#6F6F6F" ;; (doom-color 'base7)
+  ;;                               ))))
+
+  ;;   (face-spec-set 'mantle:theme:face:org.todo.keyword:null
+  ;;                  (list (cons
+  ;;                         ;; display type
+  ;;                         t
+  ;;                         ;; attributes
+  ;;                         (list :background "#383838" ;; (doom-color 'bg-alt)
+  ;;                               :foreground "#6F6F6F" ;; (doom-color 'base7)
+  ;;                               )))))
+
+
   ;; ;;----------------------------------------------------------------------------
   ;; :custom
   ;; ;;----------------------------------------------------------------------------
@@ -74,11 +219,8 @@
   ;;------------------------------
   ;; Finally: Load the Theme
   ;;------------------------------
-
   ;; NOTE: The theme in the `zenburn-theme' package is just called `zenburn'.
-  ;;
-  ;; Load the theme please and yes, I do want to load a theme thank you.
-  (load-theme 'zenburn :no-confirm))
+  (innit:theme:load 'zenburn))
 
 
 ;;------------------------------------------------------------------------------

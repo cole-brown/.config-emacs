@@ -20,50 +20,54 @@
 ;;------------------------------------------------------------------------------
 ;; Set Theme
 ;;------------------------------------------------------------------------------
+;; <mantle-user-set-up>
 
-(defcustom mantle:theme:path (imp:path:current:dir)
-  "Absolute path string to theme's directory (or file).
+;; ;; Set to your theme's directory.
+;; ;; Default is here / (path:join innit:path:mantle "theme")
+;; (customize-set-variable 'innit:theme:path    (path:join user-emacs-directory
+;;                                                         "somewhere-else"
+;;                                                         "theme"))
 
-Used by `imp:load'.
+;; Set to your theme's filename.
+(customize-set-variable 'innit:theme:file    "zenburn")
 
-`mantle:theme:path' and/or `mantle:theme:file' must be set in order to load
-your theme."
-  :group 'innit:group
-  :type  'string)
-
-
-(defcustom mantle:theme:file "zenburn"
-  "String of either filename or absolute filepath to theme.
-
-Used by `imp:load'.
-
-`mantle:theme:path' and/or `mantle:theme:file' must be set in order to load
-your theme."
-  :group 'innit:group
-  :type  'string)
+;; Set to your theme's `imp' feature name.
+;; example:
+;;   (imp:provide :mantle 'theme 'zenburn)
+;;   (customize-set-variable 'mantle:theme:feature '(:mantle 'theme 'zenburn))
+(customize-set-variable 'innit:theme:feature '(:mantle theme zenburn))
 
 
-;; Delibrately set `mantle:theme:file' to the filename sans extension so that we
-;; can co-opt it here for the feature name, but could be just:
-;;   '(:mantle theme zenburn)
-;; ...which might be less confusing.
-(defcustom mantle:theme:feature (list :mantle 'theme mantle:theme:file)
-  "`imp' feature name for theme.
+;; </mantle-user-set-up>
+;;------------------------------------------------------------------------------
+;; Initialize `innit' For Theming
+;;------------------------------------------------------------------------------
 
-Used by `imp:load'.
-
-Set to `nil' if you don't want `mantle' to load a theme for you."
-  :group 'innit:group
-  :type  '(restricted-sexp :match-alternatives (keywordp symbolp stringp)))
+;; `innit:theme:path' and `innit:theme:file' are already set to something,
+;; either when defined or in e.g. "settings.el". If you want to, redefine
+;; here/now instead.
+;;
+;; `innit:theme:init' sets Emacs' theme variables from `innit:theme:path', so
+;; they must be correct for your theme by the time `innit:theme:init' runs right
+;; about.... now:
+(innit:theme:init)
 
 
 ;;------------------------------------------------------------------------------
 ;; Load User's Theme(s)
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  mantle:theme:feature
-          :path     mantle:theme:path
-          :filename mantle:theme:file)
+(nub:out :innit
+         :debug
+         (imp:file:current)
+         "mantle/theme/init: load theme %S?"
+         innit:theme:feature)
+
+;; No theme is defined by default, so this load must be optional.
+(imp:load :feature  innit:theme:feature
+          :path     innit:theme:path
+          :filename innit:theme:file
+          :optional t)
 
 
 ;;------------------------------------------------------------------------------
