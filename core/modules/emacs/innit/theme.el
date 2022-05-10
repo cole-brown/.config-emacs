@@ -228,11 +228,12 @@ doom-themes' API  worry."
 
 ;; We don't want to reimplement every theme to define color names, so this
 ;; isn't as useful as we won't have a guaranteed alist of color names to values.
-(defun innit:color (name colors-alist &optional type)
+(defun innit:color (name &optional colors-alist type)
   "Get a specific color NAME's value from COLORS-ALIST.
 
 NAME should be a symbol or a hexadecimal color string.
-  - If NAME is a string/list, it will be returned as-is as the color value.
+  - If NAME is a string, the value of `innit:color:name->hex' is returned.
+  - If NAME is a symbol, the value is searched for in the COLORS-ALIST.
 
 COLORS-ALIST should be an alist of NAME symbols to color values.
 Color values should be either:
@@ -248,31 +249,41 @@ Color values should be either:
 TYPE should be `nil', 256, 16, or 8.
 
 Return a hexadecimal string from COLORS-ALIST or nil."
-  ;; NAME is a string, not a symbol, so just return it.
+  ;; NAME is a string, not a symbol, so just convert it to a hex value.
   (cond ((stringp name)
-         name)
+         (innit:color:name->hex name))
 
         ;; Find NAME in the COLORS-ALIST.
+        ((and colors-alist
+          (symbolp name))
+         (if-let ((values (assq name colors-alist)))
+             ;; Found something in the list; get color from that.
+             (let ((colors (cdr-safe values)))
+               (when (and colors
+                          (listp colors))
+                 (let ((i (or (plist-get '(256 1 16 2 8 3) type) 0)))
+                   (if (> i (1- (length colors)))
+                       (car (last colors))
+                     (nth i colors)))))
+           ;; Not found in list; try a string instead?
+           (innit:color (symbol-name name) colors-alist type)))
+
+        ;; Symbol but no COLORS-ALIST; try a string?
         ((symbolp name)
-         (let ((colors (cdr-safe (assq name colors-alist))))
-           (when (and colors
-                      (listp colors))
-             (let ((i (or (plist-get '(256 1 16 2 8 3) type) 0)))
-               (if (> i (1- (length colors)))
-                   (car (last colors))
-                 (nth i colors))))))
+         (innit:color (symbol-name name) colors-alist type))
 
         ;; Invalid name?
         (t
          (error "innit:color: Invalid input NAME. Should be a string or quoted symbol, got: %S"
                 name))))
+;; (innit:color 'magenta)
 
 
 (defun innit:color:name->rgb (name)
   "Get the hexidecimal string repesenting the color NAME.
 
 NAME should be either:
-  - a string (e.g. \"red\")
+  - a string (e.g. \"red\", \"#ff0000\")
   - a quoted symbol (e.g. `'red')"
   (if-let ((name (cond ((stringp name)
                         name)
@@ -286,9 +297,46 @@ NAME should be either:
     ;; Invalid input?
     (error "innit:color:name->rgb: Invalid color NAME. Should be a string or quoted symbol, got: %S"
            name)))
+;; (innit:color:name->rgb 'red)
+;; (innit:color:name->rgb "red")
+;; (innit:color:name->rgb "#ff0000")
 
 
-(defun innit:color:blend (color0 color1 alpha colors-alist)
+(defun innit:color:rgb->hex (red green blue)
+  "Convert RED, GREEN, and BLUE numbers into a hex color string.
+
+RED, GREEN, and BLUE /should/ be between 0.0 and 1.0 (inclusive).
+They will be clamped to that range."
+  (if (or (not (numberp red))
+          (not (numberp green))
+          (not (numberp blue)))
+      ;; Invalid input?
+      (error "innit:color:rgb->hex: Invalid input(s); colors must be floats between 0 and 1! Got: RED: %S, GREEN: %S, BLUE: %S"
+             red
+             green
+             blue)
+    ;; Clamp inputs and convert to hex string.
+    (format "#%02x%02x%02x"
+            (* (color-clamp red)   255)
+            (* (color-clamp green) 255)
+            (* (color-clamp blue)  255))))
+;; (innit:color:rgb->hex 1 0 0)
+
+
+(defun innit:color:name->hex (name)
+  "Get the hexidecimal string repesenting the color NAME.
+
+NAME should be either:
+  - a string (e.g. \"red\", \"#ff0000\")
+  - a quoted symbol (e.g. `'red')
+
+This is merely a convenience for:
+  (innit:color:rgb->hex (innit:color:name->rgb name))"
+  (apply #'innit:color:rgb->hex (innit:color:name->rgb name)))
+;; (innit:color:name->hex 'red)
+
+
+(defun innit:color:blend (color0 color1 alpha &optional colors-alist)
   "Blend two colors together by an alpha coefficient.
 
 COLOR0 and COLOR1 should be:
@@ -312,6 +360,7 @@ Color values should be either:
     ;; Both COLORs are symobls.
     (cond ((and (symbolp color0)
                 (symbolp color1))
+           ;; Convert to hex strings and recurse.
            (innit:color:blend (innit:color color0 colors-alist)
                               (innit:color color1 colors-alist)
                               alpha))
@@ -326,7 +375,7 @@ Color values should be either:
           ;; Both colors are hex color strings.
           ((and (string-prefix-p "#" color0)
                 (string-prefix-p "#" color1))
-           (apply (lambda (r g b) (format "#%02x%02x%02x" (* r 255) (* g 255) (* b 255)))
+           (apply #'innit:color:rgb->hex
                   (cl-loop for it    in (innit:color:name->rgb color0)
                            for other in (innit:color:name->rgb color1)
                            collect (+ (* alpha it) (* other (- 1 alpha))))))
@@ -341,7 +390,7 @@ Color values should be either:
                   color0 color1)))
 
 
-(defun innit:color:darken (color alpha colors-alist)
+(defun innit:color:darken (color alpha &optional colors-alist)
   "Darken a COLOR by a coefficient ALPHA.
 
 COLOR should be one of:
@@ -373,7 +422,7 @@ Color values should be either:
         ((innit:color:blend color "#000000" (- 1 alpha) colors-alist))))
 
 
-(defun innit:color:lighten (color alpha colors-alist)
+(defun innit:color:lighten (color alpha &optional colors-alist)
   "Brighten a COLOR by a coefficient ALPHA.
 
 COLOR should be one of:
