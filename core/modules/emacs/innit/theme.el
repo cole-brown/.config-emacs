@@ -22,7 +22,7 @@
 ;;   - "core/core-ui.el"
 
 
-(imp:require :innit 'var)
+(imp:require :innit 'vars)
 (imp:require :str '+random)
 
 
