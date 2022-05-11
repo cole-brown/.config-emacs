@@ -27,9 +27,12 @@
 ;; (customize-set-variable 'innit:theme:path    (path:join user-emacs-directory
 ;;                                                         "somewhere-else"
 ;;                                                         "theme"))
+;; innit:theme:path
+
 
 ;; Set to your theme's filename.
-(customize-set-variable 'innit:theme:file    "zenburn")
+(customize-set-variable 'innit:theme:file "zenburn")
+
 
 ;; Set to your theme's `imp' feature name.
 ;; example:
@@ -60,8 +63,16 @@
 (nub:out :innit
          :debug
          (imp:file:current)
-         "mantle/theme/init: load theme %S?"
-         innit:theme:feature)
+         "mantle/theme/init: load theme %S? %s: %s, %s: %s"
+         innit:theme:feature
+         (if (path:exists? innit:theme:path :dir)
+             "dir"
+           "dir(DNE!)")
+         innit:theme:path
+         (if (path:exists? (path:join innit:theme:path (concat innit:theme:file ".el")) :file)
+             "file"
+           "file(DNE!")
+         (path:join innit:theme:path (concat innit:theme:file ".el")))
 
 ;; No theme is defined by default, so this load must be optional.
 (imp:load :feature  innit:theme:feature
