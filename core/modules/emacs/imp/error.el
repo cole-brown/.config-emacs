@@ -11,6 +11,26 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Hack?
+;;------------------------------------------------------------------------------
+;; TODO: Unhack?
+;; TODO: Or at least move it into `imp:output:level' by making that able to use
+;;       multiple sinks or something of the like.
+
+(defvar int<imp>:error:sink:hack/debug #'message
+  "Also send error messages to this function?
+
+Value should be `nil' or a function with a signature like `message'.
+
+Error messages get truncated and I haven't figured out how not to truncate:
+  Lisp error: (error \"[ERROR   ]: imp:require: Failed to find/load requi...\")
+
+This is really annoying when you error out in 'early-init.el' and cannot expand
+the messages to find out what happened... So also send to this function, which
+does not truncate.")
+
+
+;;------------------------------------------------------------------------------
 ;; Output Functions / Variables
 ;;------------------------------------------------------------------------------
 
@@ -78,6 +98,22 @@ ARGS should be a list of args for formatting the STRING, or nil."
   (when-let ((func (int<imp>:output:level/get level :func))
              (prefix (int<imp>:output:level/get level :prefix)))
 
+    ;; TODO-HACK: Format & send error output to *Messages* buffer?
+    (when (and (eq level :error)
+               (functionp int<imp>:error:sink:hack/debug))
+      (apply int<imp>:error:sink:hack/debug
+             (concat prefix
+                     caller
+                     (if caller ": " "")
+                     (cond ((stringp string)
+                            string)
+                           ((null string)
+                            nil)
+                           ((listp string)
+                            (apply #'concat string))))
+             args))
+
+    ;; Format & send output to the level's output function.
     (apply func
            (concat prefix
                    caller
