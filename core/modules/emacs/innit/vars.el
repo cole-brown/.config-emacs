@@ -144,6 +144,13 @@ bound before running BODY."
   :link '(url-link "https://github.com/cole-brown/.config-emacs"))
 
 
+(defgroup innit:group:theme nil
+  "Theme variables."
+  :prefix "mantle:theme"
+  :group 'innit:group
+  :link '(url-link "https://github.com/cole-brown/.config-emacs"))
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
