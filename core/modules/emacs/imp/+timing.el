@@ -123,7 +123,7 @@ Args to this format string are:
   :risky t)
 
 
-(defcustom imp:timing:format:optional "skip %1$S; optional file does not exist"
+(defcustom imp:timing:format:optional "skip %1$S; optional file does not exist: %3$s"
   "Format string for skipping loading of an optional file.
 
 Args to this format string are:

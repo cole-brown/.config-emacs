@@ -587,14 +587,15 @@ Return nil for failure, non-nil for success."
                                                ,macro:path:current-dir
                                                (upcase "load-args-plist")
                                                (list ,@load-args-plist)))
-            (macro:path          (plist-get macro:parsed :path))
-            (macro:path:filename (int<imp>:path:filename macro:path))
-            (macro:path:parent   (int<imp>:path:parent   macro:path))
-            (macro:feature       (plist-get macro:parsed :feature))
-            (macro:skip?         (plist-get macro:parsed :skip))
+            (macro:path:load   (plist-get macro:parsed :path))
+            (macro:path:file   (concat macro:path:load ".el")) ;; With extension for output, checking if file exists.
+            (macro:name:load   (int<imp>:path:filename macro:path:load)) ;; Filename sans extension.
+            (macro:path:parent (int<imp>:path:parent   macro:path:load))
+            (macro:feature     (plist-get macro:parsed :feature))
+            (macro:skip?       (plist-get macro:parsed :skip))
             ;; Invert for `load' parameter NO-ERROR.
-            (macro:error?        (plist-get macro:parsed :error))
-            (macro:optional?     (plist-get macro:parsed :optional))
+            (macro:error?      (plist-get macro:parsed :error))
+            (macro:optional?   (plist-get macro:parsed :optional))
             ;; Set `file-name-handler-alist' to nil to speed up loading.
             file-name-handler-alist
             (macro:load-file? t)
@@ -608,9 +609,9 @@ Return nil for failure, non-nil for success."
                          "  skip?:     %S\n"
                          "  error?:    %S\n"
                          "  optional?: %S")
-                       macro:path
+                       macro:path:load
                        macro:path:parent
-                       macro:path:filename
+                       macro:name:load
                        macro:feature
                        macro:skip?
                        macro:error?
@@ -627,8 +628,8 @@ Return nil for failure, non-nil for success."
                    (imp:provided? macro:feature))
               ;; Skip w/ optional timing message.
               (imp:timing:already-provided macro:feature
-                                           macro:path:filename
-                                           macro:path:parent)
+                                           macro:name:load
+                                           macro:path:file)
               (setq macro:load-file? nil)
               ;; Return nil for 'did not load'.
               (setq load-result nil))
@@ -638,11 +639,11 @@ Return nil for failure, non-nil for success."
              ;;---
              ;; Skip if optional and file doesn't exist.
              ((and macro:optional?
-                   (not (file-exists-p macro:path)))
+                   (not (file-exists-p macro:path:file)))
               ;; Skip w/ optional timing message.
               (imp:timing:optional-dne macro:feature
-                                       macro:path:filename
-                                       macro:path:parent)
+                                       macro:name:load
+                                       macro:path:file)
               (setq macro:load-file? nil)
               ;; Return nil for 'did not load'.
               (setq load-result nil))
@@ -669,11 +670,11 @@ Return nil for failure, non-nil for success."
          ;; Load w/ timing info if desired.
          (imp:timing
              macro:feature
-             macro:path:filename
+             macro:name:load
              macro:path:parent
            ;; Actually do the load.
            (setq load-result
-                 (load macro:path
+                 (load macro:path:load
                        (not macro:error?)
                        'nomessage)))
 
@@ -691,7 +692,7 @@ Return nil for failure, non-nil for success."
                                  "  path:          %S\n"
                                  "  `load'-result: %S")
                                macro:feature
-                               macro:path
+                               macro:path:load
                                load-result)
              ;; Nullify load-result - we have decided we're in error due to the missing feature.
              (setq load-result nil))))
