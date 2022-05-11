@@ -33,6 +33,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-;; TODO: Am I providing all my init files or just actual features?
-;;(provide 'innit/settings)
-;;; settings.el ends here
+(imp:provide :settings)
