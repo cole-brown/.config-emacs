@@ -22,6 +22,8 @@
 ;;   - "core/core-ui.el"
 
 
+(require 'color) ; `color-clamp'
+
 (imp:require :innit 'vars)
 (imp:require :str '+random)
 
