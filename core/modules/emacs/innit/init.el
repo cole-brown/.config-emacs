@@ -37,7 +37,7 @@
 
   (imp:load :feature  '(:innit vars)
             :filename "vars")
-  (imp:load :feature  '(:innit vars)
+  (imp:load :feature  '(:innit error)
             :filename "error")
   (imp:load :feature  '(:innit nub)
             :filename "nub")
