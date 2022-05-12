@@ -22,22 +22,22 @@
 ;;------------------------------------------------------------------------------
 ;; <mantle-user-set-up>
 
-;; ;; Set to your theme's directory.
-;; ;; Default is here / (path:join innit:path:mantle "theme")
-;; (customize-set-variable 'innit:theme:path    (path:join user-emacs-directory
-;;                                                         "somewhere-else"
-;;                                                         "theme"))
-;; innit:theme:path
+;; Set to your theme's directory?
+;; Default is here AKA `innit:theme:path'
+(customize-set-variable 'innit:theme:path (path:join innit:theme:path
+                                                     "zenburn"))
 
 
 ;; Set to your theme's filename.
-(customize-set-variable 'innit:theme:file "zenburn")
+(customize-set-variable 'innit:theme:file "init")
 
 
 ;; Set to your theme's `imp' feature name.
-;; example:
-;;   (imp:provide :mantle 'theme 'zenburn)
-;;   (customize-set-variable 'mantle:theme:feature '(:mantle 'theme 'zenburn))
+;; Example:
+;;   - If theme does this:
+;;     (imp:provide :mantle 'theme 'zenburn)
+;;   - You should do this:
+;;     (customize-set-variable 'mantle:theme:feature '(:mantle theme zenburn))
 (customize-set-variable 'innit:theme:feature '(:mantle theme zenburn))
 
 
