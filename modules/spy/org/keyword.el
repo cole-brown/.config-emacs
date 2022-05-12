@@ -3,27 +3,30 @@
 (imp:require :modules 'spy 'buffer 'delete)
 
 
+;;------------------------------------------------------------------------------
+;; Org Keywords
+;;------------------------------------------------------------------------------
+
 ;; http://kitchingroup.cheme.cmu.edu/blog/2013/05/05/Getting-keyword-options-in-org-files/
-(defun sss:org/keywords.get ()
+(defun int<spy>:org:keywords/get ()
   "Parse the buffer and return a cons list of (property . value)
 from lines like:
-#+PROPERTY: value
-"
+#+PROPERTY: value"
   (org-element-map (org-element-parse-buffer 'element) 'keyword
     (lambda (keyword) (cons (org-element-property :key keyword)
                             (org-element-property :value keyword)))))
-;; (sss:org/keywords.get)
+;; (int<spy>:org:keywords/get)
 
 
 ;; http://kitchingroup.cheme.cmu.edu/blog/2013/05/05/Getting-keyword-options-in-org-files/
-(defun spy:org/keyword.get (keyword)
+(defun spy:org:keyword/get (keyword)
   "Get the value of a KEYWORD in the form of #+KEYWORD: value
 "
-  (cdr (assoc keyword (sss:org/keywords.get))))
-;; (spy:org/keyword.get "TICKET-ID")
+  (cdr (assoc keyword (int<spy>:org:keywords/get))))
+;; (spy:org:keyword/get "TICKET-ID")
 
 
-(defun spy:org/keyword.set (keyword value)
+(defun spy:org:keyword/set (keyword value)
   "Get the value of a KEYWORD in the form of #+KEYWORD: value
 "
   ;; Expand to full buffer contents.
@@ -60,12 +63,16 @@ from lines like:
        ;; Move past keyword to its value.
        (forward-to-word 1)
        ;; Delete old id and replace with new id.
-       (sss:buffer/delete.word 1)
+       (int<spy>:buffer/delete.word 1)
        (insert value)
        ))))
 
 
-(defun sss:org/todo.keyword (word wrap
+;;------------------------------------------------------------------------------
+;; Org TODO Sequences
+;;------------------------------------------------------------------------------
+
+(defun int<spy>:org:todo/keyword (word wrap
                                   &optional
                                   key on-enter on-exit-if)
   "Creates an org-todo-keyword with WORD.
@@ -132,7 +139,7 @@ notes.
                keyword-string)
 
            ;;---
-           ;; Basic wrapped keyword.
+           ;; Basic wrapped keyword/
            ;;---
            ;; <wrap><word></wrap>
            (setq keyword-string
@@ -162,17 +169,17 @@ notes.
                            ;; on-exit-if: notes, timestamp, or nothing.
                            exit)))
            keyword-string))))
-;; (sss:org/todo.keyword "bob" "├─┤")
-;; (sss:org/todo.keyword "bob" "[-]"
-;; (sss:org/todo.keyword "bob" "[-]" "b")
-;; (sss:org/todo.keyword "bob" "[-]" "b" 'timestamp)
-;; (sss:org/todo.keyword "bob" "[-]" "b" 'notes)
-;; (sss:org/todo.keyword "bob" "[-]" "b" nil 'notes)
-;; (sss:org/todo.keyword "bob" "[-]" "b" nil 'timestamp)
-;; (sss:org/todo.keyword "bob" "[-]" "b" 'timestamp 'notes)
+;; (int<spy>:org:todo/keyword "bob" "├─┤")
+;; (int<spy>:org:todo/keyword "bob" "[-]"
+;; (int<spy>:org:todo/keyword "bob" "[-]" "b")
+;; (int<spy>:org:todo/keyword "bob" "[-]" "b" 'timestamp)
+;; (int<spy>:org:todo/keyword "bob" "[-]" "b" 'notes)
+;; (int<spy>:org:todo/keyword "bob" "[-]" "b" nil 'notes)
+;; (int<spy>:org:todo/keyword "bob" "[-]" "b" nil 'timestamp)
+;; (int<spy>:org:todo/keyword "bob" "[-]" "b" 'timestamp 'notes)
 
 
-(defun spy:cmd:org/convert.todo (skip-bare)
+(defun spy:cmd:org:convert/todo (skip-bare)
   "Convert old TODO sequence to new."
   (interactive
    (list (y-or-n-p "Skip bare->wrap? ")))
@@ -183,13 +190,13 @@ notes.
        (message "'TODO' -> '[TODO   ]'")
        (let* ((wrap "[ ]")
               (replacements
-               `(("TODO"      . ,(sss:org/todo.keyword "TODO" wrap))
-                 ("STARTED"   . ,(sss:org/todo.keyword "CURRENT" wrap))
-                 ("WAITING"   . ,(sss:org/todo.keyword "WAITING" wrap))
-                 ("DONE"      . ,(sss:org/todo.keyword "DONE" wrap))
-                 ("SUCCESS"   . ,(sss:org/todo.keyword "SUCCESS" wrap))
-                 ("FAILURE"   . ,(sss:org/todo.keyword "FAILURE" wrap))
-                 ("CANCELLED" . ,(sss:org/todo.keyword "KILLED" wrap)))))
+               `(("TODO"      . ,(int<spy>:org:todo/keyword "TODO" wrap))
+                 ("STARTED"   . ,(int<spy>:org:todo/keyword "CURRENT" wrap))
+                 ("WAITING"   . ,(int<spy>:org:todo/keyword "WAITING" wrap))
+                 ("DONE"      . ,(int<spy>:org:todo/keyword "DONE" wrap))
+                 ("SUCCESS"   . ,(int<spy>:org:todo/keyword "SUCCESS" wrap))
+                 ("FAILURE"   . ,(int<spy>:org:todo/keyword "FAILURE" wrap))
+                 ("CANCELLED" . ,(int<spy>:org:todo/keyword "KILLED" wrap)))))
          (dolist (replacement replacements)
            (funcall-interactively #'query-replace
                                   (car replacement) (cdr replacement)
@@ -199,47 +206,47 @@ notes.
      ;; "[TODO   ]" -> "├TODO───┤"
      (let* ((wrap "[ ]")
             (replacements/old (list
-                               (sss:org/todo.keyword "TODO" wrap)
-                               (sss:org/todo.keyword "PROJECT" wrap)
-                               (sss:org/todo.keyword "CURRENT" wrap)
-                               (sss:org/todo.keyword "WAITING" wrap)
-                               (sss:org/todo.keyword "HOLDING" wrap)
-                               (sss:org/todo.keyword "DONE" wrap)
-                               (sss:org/todo.keyword "SUCCESS" wrap)
-                               (sss:org/todo.keyword "FAILURE" wrap)
-                               (sss:org/todo.keyword "KILLED" wrap)
-                               (sss:org/todo.keyword " " wrap)
-                               (sss:org/todo.keyword "▶" wrap)
-                               (sss:org/todo.keyword "-" wrap)
-                               (sss:org/todo.keyword "?" wrap)
-                               (sss:org/todo.keyword "…" wrap)
-                               (sss:org/todo.keyword "⁈" wrap)
-                               (sss:org/todo.keyword "X" wrap)
-                               (sss:org/todo.keyword "X" wrap)
-                               (sss:org/todo.keyword "✘" wrap)
-                               (sss:org/todo.keyword "÷" wrap))))
+                               (int<spy>:org:todo/keyword "TODO" wrap)
+                               (int<spy>:org:todo/keyword "PROJECT" wrap)
+                               (int<spy>:org:todo/keyword "CURRENT" wrap)
+                               (int<spy>:org:todo/keyword "WAITING" wrap)
+                               (int<spy>:org:todo/keyword "HOLDING" wrap)
+                               (int<spy>:org:todo/keyword "DONE" wrap)
+                               (int<spy>:org:todo/keyword "SUCCESS" wrap)
+                               (int<spy>:org:todo/keyword "FAILURE" wrap)
+                               (int<spy>:org:todo/keyword "KILLED" wrap)
+                               (int<spy>:org:todo/keyword " " wrap)
+                               (int<spy>:org:todo/keyword "▶" wrap)
+                               (int<spy>:org:todo/keyword "-" wrap)
+                               (int<spy>:org:todo/keyword "?" wrap)
+                               (int<spy>:org:todo/keyword "…" wrap)
+                               (int<spy>:org:todo/keyword "⁈" wrap)
+                               (int<spy>:org:todo/keyword "X" wrap)
+                               (int<spy>:org:todo/keyword "X" wrap)
+                               (int<spy>:org:todo/keyword "✘" wrap)
+                               (int<spy>:org:todo/keyword "÷" wrap))))
 
        (let* ((wrap "├─┤")
               (replacements/new (list
-                                 (sss:org/todo.keyword "TODO" wrap)
-                                 (sss:org/todo.keyword "PROJECT" wrap)
-                                 (sss:org/todo.keyword "CURRENT" wrap)
-                                 (sss:org/todo.keyword "WAITING" wrap)
-                                 (sss:org/todo.keyword "HOLDING" wrap)
-                                 (sss:org/todo.keyword "DONE" wrap)
-                                 (sss:org/todo.keyword "SUCCESS" wrap)
-                                 (sss:org/todo.keyword "FAILURE" wrap)
-                                 (sss:org/todo.keyword "KILLED" wrap)
-                                 (sss:org/todo.keyword "_" wrap)
-                                 (sss:org/todo.keyword "▶" wrap)
-                                 (sss:org/todo.keyword "-" wrap)
-                                 (sss:org/todo.keyword "?" wrap)
-                                 (sss:org/todo.keyword "…" wrap)
-                                 (sss:org/todo.keyword "⁈" wrap)
-                                 (sss:org/todo.keyword "X" wrap)
-                                 (sss:org/todo.keyword "X" wrap)
-                                 (sss:org/todo.keyword "✘" wrap)
-                                 (sss:org/todo.keyword "÷" wrap))))
+                                 (int<spy>:org:todo/keyword "TODO" wrap)
+                                 (int<spy>:org:todo/keyword "PROJECT" wrap)
+                                 (int<spy>:org:todo/keyword "CURRENT" wrap)
+                                 (int<spy>:org:todo/keyword "WAITING" wrap)
+                                 (int<spy>:org:todo/keyword "HOLDING" wrap)
+                                 (int<spy>:org:todo/keyword "DONE" wrap)
+                                 (int<spy>:org:todo/keyword "SUCCESS" wrap)
+                                 (int<spy>:org:todo/keyword "FAILURE" wrap)
+                                 (int<spy>:org:todo/keyword "KILLED" wrap)
+                                 (int<spy>:org:todo/keyword "_" wrap)
+                                 (int<spy>:org:todo/keyword "▶" wrap)
+                                 (int<spy>:org:todo/keyword "-" wrap)
+                                 (int<spy>:org:todo/keyword "?" wrap)
+                                 (int<spy>:org:todo/keyword "…" wrap)
+                                 (int<spy>:org:todo/keyword "⁈" wrap)
+                                 (int<spy>:org:todo/keyword "X" wrap)
+                                 (int<spy>:org:todo/keyword "X" wrap)
+                                 (int<spy>:org:todo/keyword "✘" wrap)
+                                 (int<spy>:org:todo/keyword "÷" wrap))))
 
          ;; "[TODO   ]" -> "├TODO───┤"
          (message "'[TODO   ]' -> '├TODO───┤'")
@@ -259,11 +266,12 @@ notes.
 ;; Per File Org-Keywords
 ;;------------------------------------------------------------------------------
 
-(defun spy:cmd:org/file.keywords (todo-sequence)
+;; TODO: Need a face param; replace `spy:theme.face/org.todo.keyword/todo'.
+(defun spy:cmd:org:file:todo/keywords (todo-sequence)
   "Create 'per-file' keyword lines using TODO-SEQUENCE (or the prompt input).
 
 See here for acceptable inputs:
-  - https://orgmode.org/manual/Per_002dfile-keywords.html
+  - https://orgmode.org:manual/Per_002dfile-keywords.html
   - e.g. TODO FEEDBACK VERIFY | DONE CANCELED
 
 Replaces a \"#+TODO\" keyword if found.
@@ -281,7 +289,7 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
   (let* ((keyword/todo "TODO")
          (keyword/face-var "org-todo-keyword-faces")
          (todo/wrap "├─┤")
-         (todo/existing (spy:org/keyword.get keyword/todo))
+         (todo/existing (spy:org:keyword/get keyword/todo))
          todo/new.list
          todo/new.str
          keywords-set)
@@ -292,7 +300,7 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
           ;; Leave as-is - it's the todo/done separator.
           (push keyword todo/new.list)
         ;; Wrap it.
-        (push (sss:org/todo.keyword keyword todo/wrap) todo/new.list)))
+        (push (int<spy>:org:todo/keyword keyword todo/wrap) todo/new.list)))
 
     ;; Convert the wrapped list into a wrapped string.
     (setq todo/new.str (mapconcat #'identity
@@ -302,11 +310,11 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
     ;; Insert into the buffer.
     (if todo/existing
         ;; Find `TODO' keyword in file, change it.
-        (if (not (yes-or-no-p (format "Found existing 'TODO' keyword. Replace? Existing: \"%s\", New: \"%s\""
+        (if (not (yes-or-no-p (format "Found existing 'TODO' keyword/ Replace? Existing: \"%s\", New: \"%s\""
                                       todo/existing todo/new.str)))
             (message "Ok; changed nothing.")
 
-          (spy:org/keyword.set keyword/todo todo/new.str)
+          (spy:org:keyword/set keyword/todo todo/new.str)
           (message "Updated keywords to: \"%S\"" todo/new.str)
           (setq keywords-set t))
 
