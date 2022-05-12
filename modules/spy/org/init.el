@@ -5,10 +5,15 @@
 ;; Org-Mode Stuff
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:modules spy org keyword)
-          :filename "keyword")
-(imp:load :feature  '(:modules spy org link)
-          :filename "link")
+(imp:timing
+    '(:modules spy org)
+    (imp:file:current)
+    (imp:path:current:dir)
+
+  (imp:load :feature  '(:modules spy org keyword)
+            :filename "keyword")
+  (imp:load :feature  '(:modules spy org link)
+            :filename "link"))
 
 
 ;;------------------------------------------------------------------------------
