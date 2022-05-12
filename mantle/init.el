@@ -17,36 +17,65 @@
          "mantle/init: Start")
 
 
-;;------------------------------------------------------------------------------
-;; "init.el" and "config.el"
-;;------------------------------------------------------------------------------
-;; Add `imp' feature lists to be loaded if correct file is present at
-;; imp root path.
-;;   - "init.el" will be checked for after core init is run.
-;;   - "config.el" will be checked for after core config is run.
+;; TODO: delete?
+;; ;;------------------------------------------------------------------------------
+;; ;; "init.el" and "config.el"
+;; ;;------------------------------------------------------------------------------
+;; ;; Add `imp' feature lists to be loaded if correct file is present at
+;; ;; imp root path.
+;; ;;   - "init.el" will be checked for after core init is run.
+;; ;;   - "config.el" will be checked for after core config is run.
+;; ;;
+;; ;; (innit:feature:mantle:add "core/10-init/20-load.el" :foo)
+;; ;; (innit:feature:mantle:add "core/10-init/20-load.el" :zort narf)
+;; ;; TODO: delete those functions from innit and just do things KISS here...
 ;;
-;; (innit:feature:mantle:add "core/10-init/20-load.el" :foo)
-;; (innit:feature:mantle:add "core/10-init/20-load.el" :zort narf)
+;; ;;------------------------------------------------------------------------------
+;; ;; Order of User Init
+;; ;;------------------------------------------------------------------------------
+;;
+;; ;; TODO: something like `doom!' so user can define a load order easily?
 
 
 ;;------------------------------------------------------------------------------
-;; Order of User Init
+;; Run User's Inits in This Order
 ;;------------------------------------------------------------------------------
 
-;; TODO: something like `doom!' so user can define a load order easily.
+;;--------------------
+;; [EARLY] User Modules: Utils, etc for use in rest of `mantle'.
+;;--------------------
+;; Group the early stuff under a separate timing.
+(imp:timing
+    '(:mantle modules)
+    (imp:file:current)
+    (imp:path:current:dir)
+
+TODO: (imp:require :modules 'spy 'buffer 'delete)
+  - Needed by '(:modules spy org)
+
+  (imp:load :feature  '(:modules spy org)
+            :path     (imp:path:join innit:path:modules "spy" "org")
+            :filename "init"))
 
 
-;;------------------------------------------------------------------------------
-;; Run User's Init
-;;------------------------------------------------------------------------------
-
-;;---
+;;--------------------
 ;; Theme
-;;---
+;;--------------------
 (imp:load :feature  '(:mantle theme init)
-          :path     (imp:path:join (imp:path:current:dir) "theme")
+          :path     innit:theme:path
           :filename "init")
 
+;; ;;--------------------
+;; ;; TODO: <other stuff>
+;; ;;--------------------
+;;
+;; ;; Group this stuff under a separate timing.
+;; (imp:timing
+;;   :modules
+;;   (imp:file:current)
+;;   (imp:path:current:dir)
+;;   ...
+;; )
 
 ;;------------------------------------------------------------------------------
 ;; The End.
