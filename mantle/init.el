@@ -50,12 +50,13 @@
     (imp:file:current)
     (imp:path:current:dir)
 
-;; TODO: (imp:require :module 'spy 'buffer 'delete)
-;;   - Needed by '(:module spy org)
+  (imp:load :feature  '(:module emacs buffer)
+            :path     (imp:path:join innit:path:module "emacs" "buffer")
+            :filename "init") ; Needed by '(:module mode org)
 
-  (imp:load :feature  '(:module spy org)
-            :path     (imp:path:join innit:path:module "spy" "org")
-            :filename "init"))
+  (imp:load :feature  '(:module mode org)
+            :path     (imp:path:join innit:path:module "mode" "org")
+            :filename "init")) ; Needed by '(:mantle theme init)
 
 
 ;;--------------------
