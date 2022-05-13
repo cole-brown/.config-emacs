@@ -60,8 +60,7 @@
                "init.el")
 
 ;; User's modules; not our "core/modules/" directory.
-(imp:path:root :modules
-               (imp:path:join user-emacs-directory "modules"))
+(imp:path:root :module innit:path:module)
 
 
 (let ((file/this (imp:file:current)))
