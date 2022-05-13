@@ -1,26 +1,35 @@
-;;; spy/buffer/line.el -*- lexical-binding: t; -*-
+;;; emacs/buffer/line.el -*- lexical-binding: t; -*-
 
 ;;------------------------------------------------------------------------------
 ;; Rebind to Smarter Functions:
 ;;------------------------------------------------------------------------------
 
-;; ;; remap C-a to `smarter-move-beginning-of-line'
+;;------------------------------
+;; Emacs
+;;------------------------------
+;; ;; Remap C-a to `buffer:cmd:line/smart:move-beginning:logical'
 ;; (bind-key [remap move-beginning-of-line]
-;;           'spy:smarter-move-beginning-of-line)
+;;           'buffer:cmd:line/smart:move-beginning:logical)
 ;;
 ;;
-;; ;; remap C-a to `smarter-beginning-of-visual-line' in visual-line-mode-map
+;; ;; Remap C-a to `buffer:cmd:line/smart:move-beginning:visual' in visual-line-mode-map
 ;; (bind-keys :map visual-line-mode-map
 ;;            ;; beginning of line
 ;;            ([remap beginning-of-visual-line]
-;;             . spy:smarter-beginning-of-visual-line)
+;;             . buffer:cmd:line/smart:move-beginning:visual)
 ;;            ([remap move-beginning-of-line]
-;;             . spy:smarter-beginning-of-visual-line)
+;;             . buffer:cmd:line/smart:move-beginning:visual)
 ;;            ;; end of line
 ;;            ([remap end-of-visual-line]
-;;             . spy:smarter-end-of-visual-line)
+;;             . buffer:cmd:line/smart:move-end:visual)
 ;;            ([remap move-end-of-line]
-;;             . spy:smarter-end-of-visual-line))
+;;             . buffer:cmd:line/smart:move-end:visual))
+
+
+;;------------------------------
+;; Evil
+;;------------------------------
+;; TODO: Info for evil.
 
 
 ;;------------------------------------------------------------------------------
@@ -36,7 +45,7 @@
 ;; Trial 1 [2019-01-29]: Use code from link.
 ;; Trial 2 [2019-05-17]: Do beginning of line first, not second.
 ;; TRIAL END [2020-02-03]: Trial successful; keep this.
-(defun spy:cmd:smarter-move-beginning-of-line (arg)
+(defun buffer:cmd:line/smart:move-beginning:logical (arg)
   "Move point to beginning of line, or indentation.
 
 Move point to the beginning of the line. If point is already
@@ -45,8 +54,7 @@ Effectively toggle between the beginning of the line and the
 first non-whitespace character.
 
 If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there.
-"
+point reaches the beginning or end of the buffer, stop there."
   (interactive "^p")
   (setq arg (or arg 1))
 
@@ -72,7 +80,7 @@ point reaches the beginning or end of the buffer, stop there.
 ;; Visual Lines
 ;;---
 
-(defun spy:cmd:smarter-beginning-of-visual-line (arg)
+(defun buffer:cmd:line/smart:move-beginning:visual (arg)
   "Move point to beginning of visual line, or actual line, or indentation.
 
 Move point to the beginning of the (visual) line. If point is
@@ -83,8 +91,7 @@ of the visual line, logical line, and the first non-whitespace
 character.
 
 If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there.
-"
+point reaches the beginning or end of the buffer, stop there."
   (interactive "^p")
   (setq arg (or arg 1))
 
@@ -96,13 +103,13 @@ point reaches the beginning or end of the buffer, stop there.
   ;; Move in the line now.
   (let ((orig-point (point)))
     (beginning-of-visual-line 1)
-    ;; If that did nothing, jump into `spy:cmd:smarter-move-beginning-of-line'
+    ;; If that did nothing, jump into `buffer:cmd:line/smart:move-beginning:logical'
     ;; for more beginnings.
     (when (= orig-point (point))
-      (spy:cmd:smarter-move-beginning-of-line 1))))
+      (buffer:cmd:line/smart:move-beginning:logical 1))))
 
 
-(defun spy:cmd:smarter-end-of-visual-line (arg)
+(defun buffer:cmd:line/smart:move-end:visual (arg)
   "Move point to end of visual line, or actual line.
 
 Move point to the end of the (visual) line. If point is already
@@ -111,8 +118,7 @@ Effectively toggle between the end of the visual line and
 logical line.
 
 If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there.
-"
+point reaches the beginning or end of the buffer, stop there."
   (interactive "^p")
   (setq arg (or arg 1))
 
@@ -132,4 +138,4 @@ point reaches the beginning or end of the buffer, stop there.
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'buffer 'line)
+(imp:provide :modules 'emacs 'buffer 'line)

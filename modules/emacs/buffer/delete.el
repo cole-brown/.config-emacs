@@ -1,15 +1,15 @@
-;;; spy/buffer/delete.el -*- lexical-binding: t; -*-
+;;; emacs/buffer/delete.el -*- lexical-binding: t; -*-
 
 
 
-(defun sss:buffer/delete.word (arg)
-  "Avoids kill ring. Kill characters forward until encountering
-the end of a word. Delete ARG number of words.
-"
+(defun int<buffer>:delete:word (arg)
+  "Delete ARG number of words without putting them in the kill ring.
+
+Kill characters forward until encountering the end of a word."
   (delete-region (point) (progn (forward-word arg) (point))))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'buffer 'delete)
+(imp:provide :module 'emacs 'buffer 'delete)

@@ -1,7 +1,9 @@
-;;; spy/buffer/eval.el -*- lexical-binding: t; -*-
+;;; emacs/buffer/eval.el -*- lexical-binding: t; -*-
 
-(defun spy:buffer:eval ()
+
+(defun buffer:eval:defun ()
   "Execute the current buffer as Lisp code.
+
 Top-level forms are evaluated with `eval-defun' so that `defvar'
 and `defcustom' forms reset their default values."
   (interactive)
@@ -15,4 +17,4 @@ and `defcustom' forms reset their default values."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'buffer 'eval)
+(imp:provide :modules 'emacs 'buffer 'eval)

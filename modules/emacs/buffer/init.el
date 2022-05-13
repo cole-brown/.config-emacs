@@ -1,28 +1,32 @@
-;;; spy/buffer/init.el -*- lexical-binding: t; -*-
+;;; emacs/buffer/init.el -*- lexical-binding: t; -*-
 
 
 ;;------------------------------------------------------------------------------
 ;; Load our sub-module thingies.
 ;;------------------------------------------------------------------------------
 
-;; Always load unless specifically removed.
-(imp:load :feature  '(:modules spy buffer delete)
-          :filename "delete")
-(imp:load :feature  '(:modules spy buffer eval)
-          :filename "eval")
-(imp:load :feature  '(:modules spy buffer line)
-          :filename "line")
-(imp:load :feature  '(:modules spy buffer manage)
-          :filename "manage")
-(imp:load :feature  '(:modules spy buffer name)
-          :filename "name")
-(imp:load :feature  '(:modules spy buffer point)
-          :filename "point")
-(imp:load :feature  '(:modules spy buffer search)
-          :filename "search")
+(imp:timing
+    '(:module emacs buffer)
+    (imp:file:current)
+    (imp:path:current:dir)
+
+  (imp:load :feature  '(:module emacs buffer delete)
+            :filename "delete")
+  (imp:load :feature  '(:module emacs buffer eval)
+            :filename "eval")
+  (imp:load :feature  '(:module emacs buffer line)
+            :filename "line")
+  (imp:load :feature  '(:module emacs buffer manage)
+            :filename "manage")
+  (imp:load :feature  '(:module emacs buffer name)
+            :filename "name")
+  (imp:load :feature  '(:module emacs buffer point)
+            :filename "point")
+  (imp:load :feature  '(:module emacs buffer search)
+            :filename "search"))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'buffer)
+(imp:provide :module 'emacs 'buffer)

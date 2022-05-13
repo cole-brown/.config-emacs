@@ -1,5 +1,4 @@
-;;; spy/buffer/manage.el -*- lexical-binding: t; -*-
-
+;;; emacs/buffer/manage.el -*- lexical-binding: t; -*-
 
 
 ;;------------------------------------------------------------------------------
@@ -7,7 +6,7 @@
 ;;------------------------------------------------------------------------------
 
 ;; Like `kill-buffer-ask' but no confirmation for unmodified buffers.
-(defun spy:buffer/kill.ask (buffer-or-name &optional delete-process)
+(defun buffer:kill:ask (buffer-or-name &optional delete-process)
   "Kill BUFFER-OR-NAME if confirmed. No confirm given for unmodified
 buffers; just kill.
 
@@ -24,55 +23,54 @@ Returns buffer-name on kill, nil on no kill."
         (prog1
             ;; return name when killed
             (buffer-name buffer)
-          (when delete-process (spy:buffer/process.delete buffer))
+          (when delete-process (buffer:process:delete buffer))
           (kill-buffer buffer))
       ;; else, ret nil when no kill
       nil)))
 
 
-(defun spy:buffer/kill.special (arg)
+(defun buffer:kill:special (arg)
   "Kills my special(ly named) buffers, and deletes any process they may have
 running.
 
-If ARG is the symbol `by-regexp', use `spy:buffer/regexp/bookend' to kill
+If ARG is the keyword `:regex', use `buffer:regex/bookend' to kill
 special buffers.
 
-If ARG is a string, the `spy:buffer/regexp/bookend' is checked to see if the
+If ARG is a string, the `buffer:regex/bookend' is checked to see if the
 stcring/regexp is 'correctly' guarded by them, adding them in if needed. It uses
-`spy:buffer/special-name' with nil priority to add the bookends.
+`buffer:special-name' with nil priority to add the bookends.
 
 If ARG is not a string, assume it's a buffer and try to kill it's process and it
 directly."
 
   (cond ((null arg)
-         (mis0/warning nil nil
-                      "spy:buffer/kill.special: Cannot kill; null arg."))
+         (user-error "buffer:kill:special: Cannot kill; null arg: %S" arg))
 
-        ((and (symbolp arg)
-              (eq arg 'by-regexp))
-         ;; Use our regexp to try to kill them all without confirmation.
-           (spy:buffer/kill.matching spy:buffer/regexp/bookend nil t t t))
+        ((and (keywordp arg)
+              (eq arg :regex))
+         ;; Use our regex to try to kill them all without confirmation.
+           (buffer:kill:matching buffer:regex/bookend nil t t t))
 
         ((stringp arg)
          ;; We have a string. Make sure it's formatted as "special-buffer",
          ;; and then try to kill any matching without confirmation.
-         (let ((arg (if (string-match-p spy:buffer/regexp/bookend arg)
+         (let ((arg (if (string-match-p buffer:regex/bookend arg)
                         arg
-                      (spy:buffer/special-name arg))))
-           (spy:buffer/kill.matching arg nil t t t)))
+                      (buffer:special-name arg))))
+           (buffer:kill:matching arg nil t t t)))
 
         (t
          ;; Else we have a buffer, probably? Go for the kill ourselves.
-         (spy:buffer/process.delete arg)
+         (buffer:process:delete arg)
          (kill-buffer arg))))
-;; (spy:buffer/kill.special 'by-regexp)
-;; (spy:buffer/kill.special (rx word-boundary (1+ printing) word-boundary))
-;; (spy:buffer/kill.special "\\b[[:print:]]+\\b")
-;; (spy:buffer/special-name "\\b[[:print:]]+\\b")
-;; (spy:buffer/kill.special "§- \\b[[:print:]]+\\b -§")
+;; (buffer:kill:special :regex)
+;; (buffer:kill:special (rx word-boundary (1+ printing) word-boundary))
+;; (buffer:kill:special "\\b[[:print:]]+\\b")
+;; (buffer:special-name "\\b[[:print:]]+\\b")
+;; (buffer:kill:special "§- \\b[[:print:]]+\\b -§")
 
 
-(defun spy:buffer/process.delete (buffer-or-name)
+(defun buffer:process:delete (buffer-or-name)
   "Gets buffer, gets buffer's process (if any), and ends/deletes/kills/SIGKILLs
 it. BUFFER-OR-NAME must be exact."
   (let ((proc (get-buffer-process (get-buffer buffer-or-name))))
@@ -86,9 +84,9 @@ it. BUFFER-OR-NAME must be exact."
 ;;------------------------------------------------------------------------------
 
 ;; §-TODO-§ [2020-02-13]: A "bury-matching in all windows" like
-;; `spy:buffer/kill.matching'?
+;; `buffer:kill:matching'?
 
-(defun spy:buffer/kill.matching (regex &rest keywords)
+(defun buffer:kill:matching (regex &rest keywords)
   "Kill buffers whose name matches the specified REGEX.
 
 KEYWORDS should be nil or keywords. Valid KEYWORDS are:
@@ -109,9 +107,9 @@ KEYWORDS should be nil or keywords. Valid KEYWORDS are:
         (kill/process?  (memq :process  keywords))
         (quiet?         (memq :quiet    keywords))
         ;; List: "buffer name matches regex".
-        buffer/matches
+        buffer:matches
         ;; List: "actually killed buffer name".
-        buffer/killed
+        buffer:killed
         ;; If not `quiet?', a progress reporter will be created.
         progress-reporter)
 
@@ -130,14 +128,14 @@ KEYWORDS should be nil or keywords. Valid KEYWORDS are:
                    (or kill/internal? (/= (aref name 0) ?\s))
                    ;; ...and matches regex.
                    (string-match regex name))
-          (push name buffer/matches))))
+          (push name buffer:matches))))
 
     ;;------------------------------
     ;; TODO: Confirmation?
     ;;------------------------------
     ;; TODO: Find all matching buffers and do a "Does this look about right?" prompt?
 
-    (if (not buffer/matches)
+    (if (not buffer:matches)
         ;;------------------------------
         ;; No matches - inform!
         ;;------------------------------
@@ -154,23 +152,23 @@ KEYWORDS should be nil or keywords. Valid KEYWORDS are:
               (make-progress-reporter (format "Killing all '%s' buffers..."
                                               regex)
                                       0
-                                      (length buffer/matches))))
+                                      (length buffer:matches))))
 
       ;; Annnd... kill buffers!
       (let ((count 0))
-        (dolist (name buffer/matches)
+        (dolist (name buffer:matches)
           (setq count (1+ count))
           (if (not kill/modified?)
               ;; Ask if we should kill it if modifed, else just kill it.
-              (when-let ((maybe-kill-name (spy:buffer/kill.ask name
+              (when-let ((maybe-kill-name (buffer:kill:ask name
                                                                kill/process?)))
-                (push maybe-kill-name buffer/killed))
+                (push maybe-kill-name buffer:killed))
 
             ;; Just kill it.
             (when kill/process?
-              (spy:buffer/process.delete name))
+              (buffer:process:delete name))
             (kill-buffer name)
-            (push name buffer/killed))
+            (push name buffer:killed))
 
           ;; Update progress.
           (unless quiet?
@@ -183,7 +181,7 @@ KEYWORDS should be nil or keywords. Valid KEYWORDS are:
         (progress-reporter-done progress-reporter)
 
         ;; And finally, give some goddamn output (looking at you, kill-matching-buffers).
-        (let ((num/killed (length buffer/killed)))
+        (let ((num/killed (length buffer:killed)))
           (cond
            ((= 0 num/killed)
             (message "No buffers killed matching '%s'."
@@ -192,7 +190,7 @@ KEYWORDS should be nil or keywords. Valid KEYWORDS are:
             (message "Killed %s buffer matching '%s': %s"
                      num/killed
                      regex
-                     (nth 0 buffer/killed)))
+                     (nth 0 buffer:killed)))
            ;; ;; 10 or more killed: don't list?
            ;; ((< 10 num/killed)
            ;;  (message "Killed %s buffers matching '%s'."
@@ -200,21 +198,21 @@ KEYWORDS should be nil or keywords. Valid KEYWORDS are:
            ;;           regex))
            (t
             (message "Killed %s buffers matching '%s':\n%s"
-                     (length buffer/killed)
+                     (length buffer:killed)
                      regex
                      ;; List of buffer names.
                      (mapconcat (lambda (name) (format "  - %s" name))
-                                buffer/killed
+                                buffer:killed
                                 "\n"))))))
 
       ;; Return number of buffers killed.
-      (length buffer/killed))))
+      (length buffer:killed))))
 
 
-(defun spy:cmd:buffer/kill.matching (regex)
+(defun buffer:cmd:kill:matching (regex)
   "Kill buffers whose name matches the specified REGEX.
 
-If you want to control what gets killed & how, see `spy:buffer/kill.matching'
+If you want to control what gets killed & how, see `buffer:kill:matching'
 for kewords like:
   - `:internal'
     - Don't ignore buffers whose name starts with a space (internal buffers).
@@ -228,10 +226,10 @@ for kewords like:
   - `:quiet'
     - Do not output the informative messages."
   (interactive "sKill buffers matching regex: ")
-  (spy:buffer/kill.matching regex))
+  (buffer:kill:matching regex))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'buffer 'manage)
+(imp:provide :modules 'emacs 'buffer 'manage)

@@ -1,24 +1,24 @@
-;;; spy/buffer/search.el -*- lexical-binding: t; -*-
+;;; emacs/buffer/search.el -*- lexical-binding: t; -*-
 
 ;;------------------------------------------------------------------------------
 ;; Constants
 ;;------------------------------------------------------------------------------
 
-(defconst sss:buffer/search.header/boundry 1000
-  "Buffer position boundry for `spy:cmd:buffer/search.header'.")
+(defconst int<buffer>:search:header:max/default 1000
+  "Buffer position boundry for `buffer:cmd:search.header'.")
+
 
 ;;------------------------------------------------------------------------------
 ;; Buffer Searching Functions
 ;;------------------------------------------------------------------------------
 
-(defun spy:cmd:buffer/search.header (string &optional max-chars)
-  "Searches for STRING in the first MAX-CHARS of the buffer.
+(defun buffer:cmd:search:header (string &optional max-chars)
+  "Searche for STRING in the first MAX-CHARS of the buffer.
 
-If MAX-CHARS is nil, use `sss:buffer/search.header/boundry'.
-"
+If MAX-CHARS is nil, use `int<buffer>:search:header:max/default'."
   (interactive "sSearch for: ")
   (let ((max-chars (or max-chars
-                       sss:buffer/search.header/boundry))
+                       int<buffer>:search:header:max/default))
          found-at-point)
     (save-mark-and-excursion
       (org-with-wide-buffer
@@ -50,4 +50,4 @@ If MAX-CHARS is nil, use `sss:buffer/search.header/boundry'.
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'buffer 'search)
+(imp:provide :module 'emacs 'buffer 'search)
