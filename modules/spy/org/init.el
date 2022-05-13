@@ -6,17 +6,17 @@
 ;;------------------------------------------------------------------------------
 
 (imp:timing
-    '(:modules spy org)
+    '(:module spy org)
     (imp:file:current)
     (imp:path:current:dir)
 
-  (imp:load :feature  '(:modules spy org keyword)
+  (imp:load :feature  '(:module spy org keyword)
             :filename "keyword")
-  (imp:load :feature  '(:modules spy org link)
+  (imp:load :feature  '(:module spy org link)
             :filename "link"))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'org)
+(imp:provide :module 'spy 'org)

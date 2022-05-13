@@ -31,16 +31,16 @@
   "Absolute path to the \"core/boot\" subdirectory.")
 
 
-(defconst innit:path:core/modules (path:join user-emacs-directory "core/modules/")
-  "Absolute path to the \"core/modules\" subdirectory.")
+(defconst innit:path:core/module (path:join user-emacs-directory "core/modules/")
+  "Absolute path to the \"core/module\" subdirectory.")
 
 
 (defconst innit:path:mantle (path:join user-emacs-directory "mantle/")
   "Absolute path to the \"mantle\" subdirectory.")
 
 
-(defconst innit:path:modules (path:join user-emacs-directory "modules/")
-  "Absolute path to the \"modules\" subdirectory.")
+(defconst innit:path:module (path:join user-emacs-directory "modules/")
+  "Absolute path to the \"module\" subdirectory.")
 
 
 (defconst innit:rx:filename

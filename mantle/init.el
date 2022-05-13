@@ -50,11 +50,11 @@
     (imp:file:current)
     (imp:path:current:dir)
 
-TODO: (imp:require :modules 'spy 'buffer 'delete)
-  - Needed by '(:modules spy org)
+;; TODO: (imp:require :module 'spy 'buffer 'delete)
+;;   - Needed by '(:module spy org)
 
-  (imp:load :feature  '(:modules spy org)
-            :path     (imp:path:join innit:path:modules "spy" "org")
+  (imp:load :feature  '(:module spy org)
+            :path     (imp:path:join innit:path:module "spy" "org")
             :filename "init"))
 
 
@@ -71,7 +71,7 @@ TODO: (imp:require :modules 'spy 'buffer 'delete)
 ;;
 ;; ;; Group this stuff under a separate timing.
 ;; (imp:timing
-;;   :modules
+;;   :module
 ;;   (imp:file:current)
 ;;   (imp:path:current:dir)
 ;;   ...

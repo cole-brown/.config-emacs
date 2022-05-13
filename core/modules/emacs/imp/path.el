@@ -260,7 +260,7 @@ Or if NO-EXIST-CHECK is non-nil, skips file existance check."
                       "FEATURE:BASE '%S' unknown."
                       feature:base))))
 ;; (int<imp>:path:root/file/init :imp)
-;; (int<imp>:path:root/file/init :modules)
+;; (int<imp>:path:root/file/init :module)
 
 
 (defun int<imp>:path:root/file/features (feature:base &optional no-exist-check)
@@ -294,7 +294,7 @@ Or if NO-EXIST-CHECK is non-nil, skips file existance check."
                     "FEATURE:BASE '%S' unknown."
                     feature:base)))
 ;; (int<imp>:path:root/file/features :imp)
-;; (int<imp>:path:root/file/features :modules)
+;; (int<imp>:path:root/file/features :module)
 
 
 (defun int<imp>:path:root/contains? (feature:base)

@@ -1,6 +1,6 @@
 ;;; spy/org/keyword.el -*- lexical-binding: t; -*-
 
-(imp:require :modules 'spy 'buffer 'delete)
+(imp:require :module 'spy 'buffer 'delete)
 
 
 ;;------------------------------------------------------------------------------
@@ -375,4 +375,4 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'org 'keyword)
+(imp:provide :module 'spy 'org 'keyword)

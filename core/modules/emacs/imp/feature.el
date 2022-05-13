@@ -244,7 +244,7 @@ If INPUT item is:
   - Symbol:  Return as-is.
   - String:  Convert to a keyword.
 E.g.
-  1) `:modules' -> `:modules'
+  1) `:module' -> `:module'
   2) `feature' -> `feature'
   3) \"str-4874\" -> `:str-4874'"
   (let* ((normalized (int<imp>:feature:normalize input)))
