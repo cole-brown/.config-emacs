@@ -1,6 +1,6 @@
 ;;; mode/org/keyword.el -*- lexical-binding: t; -*-
 
-(imp:require :module 'mode 'buffer 'delete)
+(imp:require :module 'emacs 'buffer 'delete)
 
 
 ;;------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ from lines like:
        ;; Move past keyword to its value.
        (forward-to-word 1)
        ;; Delete old id and replace with new id.
-       (int<emacs>:buffer/delete.word 1) ;; TODO is this its new name???
+       (int<buffer>:delete:word 1)
        (insert value)))))
 
 
