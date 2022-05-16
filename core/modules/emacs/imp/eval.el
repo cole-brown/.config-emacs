@@ -44,11 +44,21 @@ This is a wrapper around `eval-after-load' that:
 1. Suppresses warnings for disabled features at compile-time
 2. Supports compound feature statements
 3. Prevents eager expansion pulling in autoloaded macros all at once"
-  (declare (indent defun) (debug t))
+  (declare (indent 1) (debug t))
   ;;------------------------------
-  ;; Single Feature
+  ;; Error Cases
   ;;------------------------------
-  (cond ((symbolp feature)
+  (cond ((null feature)
+         (error "imp:eval:after: FEATURE must not be null! Got: %S" feature))
+
+        ((and (listp feature)
+              (eq 'quote (car feature)))
+         (error "imp:eval:after: FEATURE should not be quoted! Got: %S" feature))
+
+        ;;------------------------------
+        ;; Single Feature
+        ;;------------------------------
+        ((symbolp feature)
          (list (if (or (not (bound-and-true-p byte-compile-current-file))
                        ;; `imp:require' will check Emacs and imp for:
                        ;;   1) Is the feature already provided?
@@ -56,19 +66,22 @@ This is a wrapper around `eval-after-load' that:
                        ;; It signals a `user-error' if the answers are no, which
                        ;; we need to prevent; this is just a check for if it's
                        ;; ready right now.
-                       (ignore-error user-error
+                       (ignore-error '(error user-error)
                          (imp:require feature)))
                    #'progn
                  #'with-no-warnings)
                ;; We intentionally avoid `with-eval-after-load' to prevent eager
                ;; macro expansion from pulling (or failing to pull) in autoloaded
                ;; macros/features.
-               `(eval-after-load ',feature ',(macroexp-progn body))))
+               `(eval-after-load ',(if (keywordp feature)
+                                       (int<imp>:feature:normalize:imp->emacs feature)
+                                     feature)
+                  ',(macroexp-progn body))))
 
         ((and (listp feature)
               (not (memq (car feature) '(:and :all :or :any))))
          ;; Convert imp feature list to Emacs feature symbol & recurse to hit the above case.
-         `(imp:eval:after (int<imp>:feature:normalize:imp->emacs ,@feature) ,@body))
+         `(imp:eval:after ,(apply #'int<imp>:feature:normalize:imp->emacs feature) ,@body))
 
         ;;------------------------------
         ;; Multiple Features
@@ -107,7 +120,16 @@ This is a wrapper around `eval-after-load' that:
                   `(int<imp>:error "imp:eval:after"
                                    "Unhandled condition `%S' for features: %S"
                                    condition
-                                   feature)))))))
+                                   feature)))
+           ))))
+;; (imp:eval:after nil (message "hi"))
+;; (imp:eval:after ':imp (message "hi"))
+;; (imp:eval:after :imp (message "hi"))
+;; (imp:eval:after imp (message "hi"))
+;; (imp:eval:after (:imp eval) (message "hi"))
+;; (imp:eval:after (:and :imp (imp eval)) (message "hi"))
+;; Incorrect:
+;;   (imp:eval:after 'zenburn (message "hi"))
 
 
 ;;------------------------------------------------------------------------------
