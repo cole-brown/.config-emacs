@@ -43,8 +43,8 @@
 ;;------------------------------------------------------------------------------
 
 ;; Run this after both `zenburn' and `org-mode' have loaded.
-;; Need elisp from both.
-(imp:eval:after '(zenburn org-mode)
+;; Need elisp from both in order to evaluate this.
+(imp:eval:after '(:and zenburn org-mode)
 
   ;; Set up keys as variables from :
   ;;   - `zenburn-default-colors-alist'
