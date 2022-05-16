@@ -232,4 +232,4 @@ for kewords like:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'emacs 'buffer 'manage)
+(imp:provide :module 'emacs 'buffer 'manage)
