@@ -5,25 +5,34 @@
 ;; Load our sub-module thingies.
 ;;------------------------------------------------------------------------------
 
-(imp:timing
-    '(:module emacs buffer)
-    (imp:file:current)
-    (imp:path:current:dir)
+(let ((path/parent (imp:path:current:dir)))
 
-  (imp:load :feature  '(:module emacs buffer delete)
-            :filename "delete")
-  (imp:load :feature  '(:module emacs buffer eval)
-            :filename "eval")
-  (imp:load :feature  '(:module emacs buffer line)
-            :filename "line")
-  (imp:load :feature  '(:module emacs buffer manage)
-            :filename "manage")
-  (imp:load :feature  '(:module emacs buffer name)
-            :filename "name")
-  (imp:load :feature  '(:module emacs buffer point)
-            :filename "point")
-  (imp:load :feature  '(:module emacs buffer search)
-            :filename "search"))
+  (imp:timing
+      '(:module emacs buffer)
+      (imp:file:current)
+      path/parent
+
+    (imp:load :feature  '(:module emacs buffer delete)
+              :path     path/parent
+              :filename "delete")
+    (imp:load :feature  '(:module emacs buffer eval)
+              :path     path/parent
+              :filename "eval")
+    (imp:load :feature  '(:module emacs buffer line)
+              :path     path/parent
+              :filename "line")
+    (imp:load :feature  '(:module emacs buffer manage)
+              :path     path/parent
+              :filename "manage")
+    (imp:load :feature  '(:module emacs buffer name)
+              :path     path/parent
+              :filename "name")
+    (imp:load :feature  '(:module emacs buffer point)
+              :path     path/parent
+              :filename "point")
+    (imp:load :feature  '(:module emacs buffer search)
+              :path     path/parent
+              :filename "search")))
 
 
 ;;------------------------------------------------------------------------------
