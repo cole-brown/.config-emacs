@@ -90,6 +90,10 @@
           :path     (imp:path:current:dir)
           :filename "org-mode")
 
+(imp:load :feature  '(:mantle theme zenburn org-mode)
+          :path     (imp:path:current:dir)
+          :filename "whitespace")
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.
