@@ -49,15 +49,15 @@
   ;;
   ;; TODO-color-font-lock: NOTE: Enable colors font-lock with `font:font-lock:color:hex'.
   ;; TODO-color-font-lock: Is that the right function name?
-  (zenburn-override-colors-alist '((zenburn-magenta-bg   . "#4D464B")
-                                   (zenburn-magenta-bg-1 . "#5C4D57")
-                                   (zenburn-magenta-bg-2 . "#6A5463")
-                                   (zenburn-magenta-bg-3 . "#785B6F")
-                                   (zenburn-magenta-bg-4 . "#86627B")
-                                   (zenburn-magenta-bg-5 . "#956987")
-                                   (zenburn-violet       . "#a9a1e1")
-                                   (zenburn-magenta-01   . "#c67eaf")
-                                   (zenburn-magenta-03   . "#9a6288")))
+  (zenburn-override-colors-alist '(("zenburn-magenta-bg"   . "#4D464B")
+                                   ("zenburn-magenta-bg-1" . "#5C4D57")
+                                   ("zenburn-magenta-bg-2" . "#6A5463")
+                                   ("zenburn-magenta-bg-3" . "#785B6F")
+                                   ("zenburn-magenta-bg-4" . "#86627B")
+                                   ("zenburn-magenta-bg-5" . "#956987")
+                                   ("zenburn-violet"       . "#a9a1e1")
+                                   ("zenburn-magenta-01"   . "#c67eaf")
+                                   ("zenburn-magenta-03"   . "#9a6288")))
 
 
   ;;----------------------------------------------------------------------------
