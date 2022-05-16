@@ -29,9 +29,15 @@ Copy/pasted here from Zenburn & my init code:
 - State "├INFO───┤"  from              [2021-05-07 Fri 04:20]
 :END:
 
+Doom theme code source files:
+  - [ ] [[file:~/.config/emacs-doom/.local/straight/repos/themes/doom-themes-base.el::;;; doom-themes-base.el --- base faces for all doom themes -*- lexical-binding: t; -*-][doom-themes-base.el]]
+  - [ ] [[file:~/.config/emacs-doom/.local/straight/repos/themes/doom-themes.el::;;; doom-themes.el --- an opinionated pack of modern color-themes -*- lexical-binding: t; -*-][doom-themes.el]]
+
+
+
 Doom themes are here:
-  - D:\home\spydez\.emacs.d\.local\straight\repos\emacs-doom-themes\themes
-  - D:\home\spydez\.emacs.d\.local\straight\repos\emacs-doom-themes\themes\doom-zenburn-theme.el
+  - /path/to/doom-emacs-d/.local/straight/repos/emacs-doom-themes/themes
+  - /path/to/doom-emacs-d/.local/straight/repos/emacs-doom-themes/themes/doom-zenburn-theme.el
 
 How to customize:
   ;; from: ~/.emacs.d/modules/lang/emacs-lisp/demos.org
