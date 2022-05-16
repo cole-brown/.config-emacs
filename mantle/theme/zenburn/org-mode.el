@@ -35,6 +35,9 @@
 ;;; Code:
 
 
+(imp:require :innit 'theme)
+
+
 ;;------------------------------------------------------------------------------
 ;; Zenburn Theme Tweaks for Org-Mode
 ;;------------------------------------------------------------------------------
@@ -77,15 +80,61 @@
    ;;                         (list [...]))))
    ;;------------------------------
 
-   (defface mantle:theme:face:org.todo.keyword:background
+   ;; HACK: Face specs fed directly to `org-todo-keyword-faces' don't respect
+   ;;       underlying faces like the `org-todo' face does, so we define our own
+   ;;       intermediary faces that extend from org-todo.
+
+   (defface mantle:theme:face:org.todo.keyword:active
      (list (cons
             ;; display type
             t
             ;; attributes
-            ;; nil
-            (list :background zenburn-bg-05)))
-     "Face for the background of todo sequence keywords."
+            '(:inherit (bold font-lock-constant-face org-todo))))
+     "Face spec for 'active' todo sequence keywords."
      :group 'innit:group:theme)
+
+
+   (defface mantle:theme:face:org.todo.keyword:project
+     (list (cons
+            ;; display type
+            t
+            ;; attributes
+            '(:inherit (bold font-lock-doc-face org-todo))))
+     "Face spec for 'project' todo sequence keyword(s)."
+     :group 'innit:group:theme)
+
+
+   (defface mantle:theme:face:org.todo.keyword:holding
+     (list (cons
+            ;; display type
+            t
+            ;; attributes
+            '(:inherit (bold warning org-todo))))
+     "Face spec for 'on-hold' todo sequence keyword(s)."
+     :group 'innit:group:theme)
+
+
+   ;; TODO: Delete?
+   ;; (defface mantle:theme:face:org.todo.keyword:cancel
+   ;;   (list (cons
+   ;;          ;; display type
+   ;;          t
+   ;;          ;; attributes
+   ;;          '(:inherit (bold error org-todo))))
+   ;;   "Face spec for 'cancelled'/'killed' todo sequence keyword(s)."
+   ;;   :group 'innit:group:theme)
+
+
+   ;; TODO: Delete?
+   ;; (defface mantle:theme:face:org.todo.keyword:background
+   ;;   (list (cons
+   ;;          ;; display type
+   ;;          t
+   ;;          ;; attributes
+   ;;          ;; nil
+   ;;          (list :background zenburn-bg-05)))
+   ;;   "Face spec for the background of todo sequence keywords."
+   ;;   :group 'innit:group:theme)
 
 
    (defface mantle:theme:face:org.todo.keyword:todo
@@ -99,11 +148,11 @@
             (list :foreground zenburn-magenta-01
                   :background zenburn-bg-05
                   :weight 'bold)))
-     "Face for todo keyword in todo sequence."
+     "Face spec for 'todo' keyword in todo sequence."
      :group 'innit:group:theme)
 
 
-   (defface mantle:theme:face:org.todo.keyword:done.good
+   (defface mantle:theme:face:org.todo.keyword:done/good
      (list (cons
             ;; display type
             t
@@ -112,11 +161,11 @@
             ;;  :inherit 'org-done)
             (list :background zenburn-bg-05
                   :inherit 'org-done)))
-     "Face for todo keyword in todo sequence."
+     "Face spec for good/successful 'done'/'finished' keyword in todo sequence."
      :group 'innit:group:theme)
 
 
-   (defface mantle:theme:face:org.todo.keyword:done.bad
+   (defface mantle:theme:face:org.todo.keyword:done/bad
      (list (cons
             ;; display type
             t
@@ -125,7 +174,7 @@
             ;;  :inherit 'org-done)))
             (list :background zenburn-bg-05
                   :foreground zenburn-red-5)))
-     "Face for todo keyword in todo sequence."
+     "Face spec for bad/failed 'done'/'finished' keyword in todo sequence."
      :group 'innit:group:theme)
 
 
@@ -138,7 +187,7 @@
             ;;  :inherit 'org-done)
             (list :background zenburn-bg-05
                   :foreground zenburn-bg+3)))
-     "Face for todo keyword in todo sequence."
+     "Face spec for info keyword in todo sequence."
      :group 'innit:group:theme)
 
 
@@ -151,13 +200,80 @@
             ;;  :inherit 'org-done)
             (list :background zenburn-bg-05
                   :foreground zenburn-bg+3)))
-     "Face for todo keyword in todo sequence."
+     "Face spec for empty/null/spacer keyword in todo sequence."
      :group 'innit:group:theme)
 
 
    ;;---------------------------------------------------------------------------
    ;; Configure Org-Mode
    ;;---------------------------------------------------------------------------
+
+   (innit:theme:face:set 'zenburn
+     ;;---
+     ;; Done states - little less dark.
+     ;;---
+     (list 'org-done                     :foreground 'zenburn-green-3)
+     (list 'org-agenda-done              :foreground 'zenburn-bg+3)
+     (list 'org-checkbox-statistics-done :foreground 'zenburn-green-3)
+     ;; "Done" Headlines - success/fail/info/etc.
+     ;;    - Would be nice to have green, red, and gray... but we only have the one 'done' face.
+     ;;    - So a lighter gray?
+     (list 'org-headline-done :foreground 'zenburn-fg-05)
+     ;; (list 'org-headline-done :foreground 'zenburn-green-3)
+
+     ;;---
+     ;; Org Headlines - adjust a few to be less dark.
+     ;;---
+     ;; Some unique, headliney colors.
+     (list 'outline-1 :foreground 'zenburn-orange)
+     (list 'outline-2 :foreground 'zenburn-green+2)
+     (list 'outline-3 :foreground 'zenburn-blue-1)
+     (list 'outline-4 :foreground 'zenburn-red-1)
+     ;; ...and repeat.
+     (list 'outline-5 :foreground 'zenburn-orange)
+     (list 'outline-6 :foreground 'zenburn-green+2)
+     (list 'outline-7 :foreground 'zenburn-blue-1)
+     (list 'outline-8 :foreground 'zenburn-red-1)
+     ;; ...and 9+ starts over at `outline-1'.
+
+     ;;---
+     ;; Org TODO States
+     ;;---
+     ;; ├CURRENT┤
+     (list 'mantle:theme:face:org.todo.keyword:active
+           :foreground 'zenburn-violet
+           :background 'zenburn-bg-05)
+     ;; ├WAITING┤, ├HOLDING┤
+     (list 'mantle:theme:face:org.todo.keyword:holding
+           :foreground 'zenburn-magenta-03
+           :background 'zenburn-bg-05)
+     ;; ├PROJECT┤
+     (list 'mantle:theme:face:org.todo.keyword:project
+           :foreground 'zenburn-blue-3
+           :background 'zenburn-bg-05)
+
+     ;;---
+     ;; Org ~inline code~ and =inline verbatim=
+     ;;---
+     ;; Want these to be different enough from all the outline levels.
+     ;;   - `org-code' was exactly the same as `outline-1'.
+     ;;   - `org-verbatim' was similar to `outline-2' and to code comments (green).
+     ;; Change to inheriting from `org-cite', a teal affair, with some background color, maybe.
+     ;; TODO: Make the foreground color of these slightly different from each other.
+     (list 'org-code     :inherit 'org-cite :background 'zenburn-bg+05)
+     (list 'org-verbatim :inherit 'org-cite :background 'zenburn-bg-05)
+
+     ;;---
+     ;; "#+DOC_KEYWORD" - needs to be slightly lighter.
+     ;;---
+     (list 'org-document-info-keyword :foreground 'zenburn-bg+3))
+  ;; mantle:theme:face:org.todo.keyword:active  - bold green
+  ;; mantle:theme:face:org.todo.keyword:holding  - orangey
+  ;; mantle:theme:face:org.todo.keyword:project - darker green than bold green
+  ;; org-checkbox
+  ;; org-checkbox-statistics-todo
+  ;; org-headline-todo
+  ;; org-todo
 
 
    ;; TODO:
@@ -214,34 +330,34 @@
 
   ;;         ;; And set some faces for these. strings.
   ;;         org-todo-keyword-faces
-  ;;         (list (list (sss:org/todo.keyword "TODO" wrap)    'spy:theme.face/org.todo.keyword/todo)
-  ;;               (list (sss:org/todo.keyword "PROJECT" wrap) '+org-todo-project)
+  ;;         (list (list (sss:org/todo.keyword "TODO" wrap)    'mantle:theme:face:org.todo.keyword:todo)
+  ;;               (list (sss:org/todo.keyword "PROJECT" wrap) 'mantle:theme:face:org.todo.keyword:project)
 
-  ;;               (list (sss:org/todo.keyword "CURRENT" wrap) '+org-todo-active)
-  ;;               (list (sss:org/todo.keyword "▶" wrap)       '+org-todo-active)
+  ;;               (list (sss:org/todo.keyword "CURRENT" wrap) 'mantle:theme:face:org.todo.keyword:active)
+  ;;               (list (sss:org/todo.keyword "▶" wrap)       'mantle:theme:face:org.todo.keyword:active)
 
-  ;;               (list (sss:org/todo.keyword "WAITING" wrap) '+org-todo-onhold)
-  ;;               (list (sss:org/todo.keyword "HOLDING" wrap) '+org-todo-onhold)
-  ;;               (list (sss:org/todo.keyword "INFO" wrap)    'spy:theme.face/org.todo.keyword/info)
-  ;;               (list (sss:org/todo.keyword "MEETING" wrap) 'spy:theme.face/org.todo.keyword/info)
-  ;;               (list (sss:org/todo.keyword "ⓘ" wrap)       'spy:theme.face/org.todo.keyword/info)
-  ;;               (list (sss:org/todo.keyword "♫" wrap)       'spy:theme.face/org.todo.keyword/info)
-  ;;               (list (sss:org/todo.keyword "─" wrap)       'spy:theme.face/org.todo.keyword/null)
-  ;;               (list (sss:org/todo.keyword "∅" wrap)       'spy:theme.face/org.todo.keyword/null)
-  ;;               (list (sss:org/todo.keyword "?" wrap)       '+org-todo-onhold)
-  ;;               (list (sss:org/todo.keyword "…" wrap)       '+org-todo-onhold)
-  ;;               (list (sss:org/todo.keyword "⁈" wrap)       '+org-todo-onhold)
+  ;;               (list (sss:org/todo.keyword "WAITING" wrap) 'mantle:theme:face:org.todo.keyword:holding)
+  ;;               (list (sss:org/todo.keyword "HOLDING" wrap) 'mantle:theme:face:org.todo.keyword:holding)
+  ;;               (list (sss:org/todo.keyword "INFO" wrap)    'mantle:theme:face:org.todo.keyword:info)
+  ;;               (list (sss:org/todo.keyword "MEETING" wrap) 'mantle:theme:face:org.todo.keyword:info)
+  ;;               (list (sss:org/todo.keyword "ⓘ" wrap)       'mantle:theme:face:org.todo.keyword:info)
+  ;;               (list (sss:org/todo.keyword "♫" wrap)       'mantle:theme:face:org.todo.keyword:info)
+  ;;               (list (sss:org/todo.keyword "─" wrap)       'mantle:theme:face:org.todo.keyword:null)
+  ;;               (list (sss:org/todo.keyword "∅" wrap)       'mantle:theme:face:org.todo.keyword:null)
+  ;;               (list (sss:org/todo.keyword "?" wrap)       'mantle:theme:face:org.todo.keyword:holding)
+  ;;               (list (sss:org/todo.keyword "…" wrap)       'mantle:theme:face:org.todo.keyword:holding)
+  ;;               (list (sss:org/todo.keyword "⁈" wrap)       'mantle:theme:face:org.todo.keyword:holding)
 
-  ;;               (list (sss:org/todo.keyword "MOVED" wrap)   'spy:theme.face/org.todo.keyword/info)
-  ;;               (list (sss:org/todo.keyword "☇" wrap)       'spy:theme.face/org.todo.keyword/info)
-  ;;               (list (sss:org/todo.keyword "DONE" wrap)    'spy:theme.face/org.todo.keyword/done.good)
-  ;;               (list (sss:org/todo.keyword "X" wrap)       'spy:theme.face/org.todo.keyword/done.good)
-  ;;               (list (sss:org/todo.keyword "SUCCESS" wrap) 'spy:theme.face/org.todo.keyword/done.good)
-  ;;               (list (sss:org/todo.keyword "X" wrap)       'spy:theme.face/org.todo.keyword/done.good)
-  ;;               (list (sss:org/todo.keyword "FAILURE" wrap) 'spy:theme.face/org.todo.keyword/done.bad)
-  ;;               (list (sss:org/todo.keyword "✘" wrap)       'spy:theme.face/org.todo.keyword/done.bad)
-  ;;               (list (sss:org/todo.keyword "KILLED" wrap)  'spy:theme.face/org.todo.keyword/done.bad)
-  ;;               (list (sss:org/todo.keyword "÷" wrap)       'spy:theme.face/org.todo.keyword/done.bad)))
+  ;;               (list (sss:org/todo.keyword "MOVED" wrap)   'mantle:theme:face:org.todo.keyword:info)
+  ;;               (list (sss:org/todo.keyword "☇" wrap)       'mantle:theme:face:org.todo.keyword:info)
+  ;;               (list (sss:org/todo.keyword "DONE" wrap)    'mantle:theme:face:org.todo.keyword:done/good)
+  ;;               (list (sss:org/todo.keyword "X" wrap)       'mantle:theme:face:org.todo.keyword:done/good)
+  ;;               (list (sss:org/todo.keyword "SUCCESS" wrap) 'mantle:theme:face:org.todo.keyword:done/good)
+  ;;               (list (sss:org/todo.keyword "X" wrap)       'mantle:theme:face:org.todo.keyword:done/good)
+  ;;               (list (sss:org/todo.keyword "FAILURE" wrap) 'mantle:theme:face:org.todo.keyword:done/bad)
+  ;;               (list (sss:org/todo.keyword "✘" wrap)       'mantle:theme:face:org.todo.keyword:done/bad)
+  ;;               (list (sss:org/todo.keyword "KILLED" wrap)  'mantle:theme:face:org.todo.keyword:done/bad)
+  ;;               (list (sss:org/todo.keyword "÷" wrap)       'mantle:theme:face:org.todo.keyword:done/bad)))
 
   ;;   ;; I guess this guy is covered by `hl-todo' instead of `org'?
   ;;   ;; (push `(,(sss:org/todo.keyword "TODO" wrap) warning bold) hl-todo-keyword-faces)
