@@ -100,13 +100,16 @@
   ;;------------------------------
   ;; Disabling like this won't affect using them during init, but will show the
   ;; user the message we assign if they call the interactively.
-  (dolist (symbol '(customize-option customize-browse customize-group customize-face
-                                     customize-rogue customize-saved customize-apropos
-                                     customize-changed customize-unsaved customize-variable
-                                     customize-set-value customize-customized customize-set-variable
-                                     customize-apropos-faces customize-save-variable
-                                     customize-apropos-groups customize-apropos-options
-                                     customize-changed-options customize-save-customized))
+  (dolist (symbol '(customize-option          customize-browse
+                    customize-group           customize-face
+                    customize-rogue           customize-saved
+                    customize-apropos         customize-changed
+                    customize-unsaved         customize-variable
+                    customize-set-value       customize-customized
+                    customize-set-variable    customize-apropos-faces
+                    customize-save-variable   customize-apropos-groups
+                    customize-apropos-options customize-changed-options
+                    customize-save-customized))
     (put symbol
          'disabled
          (format "`innit' doesn't support `customize'; configure Emacs from '%s' instead"
@@ -115,13 +118,9 @@
   ;;------------------------------
   ;; Disable `customize-themes'?
   ;;------------------------------
-  ;; TODO: What do I use to set my theme then?
-  ;;   - `customize-themes' still, like I still use `customize-set-variable'?
-  ;;   - `load-theme'?
-  ;;   - `use-package'?
-  ;; TODO: Decide when 'zenburn' theme is installed.
+  ;; Use `load-theme` to set your theme. See: '/mantle/theme/init.el'
   (put 'customize-themes 'disabled
-       (format "`innit' doesn't support `customize'; set your theme with `load-theme' or `use-package' in '%s' instead"
+       (format "`innit' doesn't support `customize'; set your theme with `load-theme' in '%s' instead"
                path-for-message))
 
   ;;------------------------------
