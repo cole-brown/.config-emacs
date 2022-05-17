@@ -1,4 +1,4 @@
-;;; init.el --- tree/value store -*- lexical-binding: t; -*-
+;;; jerky/init.el --- tree/value store -*- lexical-binding: t; -*-
 ;;
 ;; Author: Cole Brown <code@brown.dev>
 ;; URL:    https://github.com/cole-brown/.config-emacs
@@ -17,6 +17,9 @@
 ;; Store values at the leaf nodes of a tree.
 ;;
 ;;; Code:
+
+
+(imp:require :nub)
 
 
 ;;------------------------------------------------------------------------------
