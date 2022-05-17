@@ -16,7 +16,7 @@
 
 (defun sss:hash-table/test/string=/hash (key)
   "Get a hashed value for the (lowercased) key for
-`jerky//repo.test.string='.
+`spy:hash-table/test/string='.
 "
   (sxhash-equal (downcase key)))
 

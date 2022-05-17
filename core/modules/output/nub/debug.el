@@ -21,6 +21,7 @@
 (imp:require :nub 'utils)
 (imp:require :nub 'variables)
 (imp:require :nub 'output)
+(imp:require :path)
 
 
 ;;------------------------------------------------------------------------------
@@ -345,7 +346,7 @@ is true:
      ((not (int<nub>:var:debug:tags user))
       t)
 
-     ;; If use is debugging for specific tags, but TAGS is nil, it is also a yes.
+     ;; If user is debugging for specific tags, but TAGS is nil, it is also a yes.
      ;; Return something other than `t' in case this case should be checked?
      ((null tags/input)
       ;; Try returning active tags? If that's not good, return `:tags/other' or something.
@@ -799,34 +800,46 @@ Will only evaluate MSG, and ARGS when debugging.
 Only prints if debugging (`int<nub>:var:debugging') and if any tag in TAGS
 matches USER's active debugging tags (`int<nub>:var:debug:tags').
 
-CALLER should be the calling function's name (string).
+CALLER (string) should be the calling function's name or calling file's path.
+If CALLER is `nil', uses relative path from `user-emacs-directory' to
+the caller's file (using `path:current:file' and `path:relative').
+  Examples:
+    - \"foo-function\"
+    - nil
+    - \"init.el\"
+    - \"core/modules/output/nub/foo.el\"
+    - \"/some/path/outside/user-emacs-directory/file.el\"
 
 MSG should be the `message' formatting string.
 
 ARGS should be the `message' arguments."
   (declare (indent 3))
 
-  `(let* ((int<nub>:macro:user      ,user)
-          (int<nub>:macro:tags      ,tags)
-          (int<nub>:macro:caller    ,caller)
-          (int<nub>:macro:func.name (int<nub>:format:callers "nub:debug"
-                                                             int<nub>:macro:caller)))
-     (int<nub>:user:exists? int<nub>:macro:func.name
-                            int<nub>:macro:user
-                            :error)
-     (int<nub>:debug:tags:verify int<nub>:macro:func.name
-                                 int<nub>:macro:user
-                                 int<nub>:macro:tags
-                                 :error)
+  (let ((caller (or caller
+                    (path:relative (path:current:file)
+                                   user-emacs-directory))))
 
-     (when (int<nub>:debug:active? int<nub>:macro:func.name
+    `(let* ((int<nub>:macro:user      ,user)
+            (int<nub>:macro:tags      ,tags)
+            (int<nub>:macro:caller    ,caller)
+            (int<nub>:macro:func.name (int<nub>:format:callers "nub:debug"
+                                                               int<nub>:macro:caller)))
+       (int<nub>:user:exists? int<nub>:macro:func.name
+                              int<nub>:macro:user
+                              :error)
+       (int<nub>:debug:tags:verify int<nub>:macro:func.name
                                    int<nub>:macro:user
-                                   int<nub>:macro:tags)
-       (int<nub>:output int<nub>:macro:user
-                        :debug
-                        int<nub>:macro:caller
-                        ,msg
-                        ,@args))))
+                                   int<nub>:macro:tags
+                                   :error)
+
+       (when (int<nub>:debug:active? int<nub>:macro:func.name
+                                     int<nub>:macro:user
+                                     int<nub>:macro:tags)
+         (int<nub>:output int<nub>:macro:user
+                          :debug
+                          int<nub>:macro:caller
+                          ,msg
+                          ,@args)))))
 ;; Make sure it only evals args when debugging:
 ;; (nub:debug :default "test-func" nil (message "test"))
 ;; (nub:debug :default "test-func" '(:derive) (message "test"))
