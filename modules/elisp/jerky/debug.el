@@ -1,38 +1,30 @@
-;;; spy/jerky/debug.el -*- lexical-binding: t; -*-
+;;; jerky/debug.el -*- lexical-binding: t; -*-
 
 ;;; Commentary:
-
+;;
 ;; Debugging functionality for jerky.
+;;
+;;; Code:
+
 
 ;;------------------------------------------------------------------------------
 ;; Debugging Toggle
 ;;------------------------------------------------------------------------------
 
-(defvar jerky//debugging nil
-  "Debug flag.")
-
-
-(defun jerky//debug/toggle ()
+(defun jerky:debug:toggle ()
   "Toggle debugging for jerky."
   (interactive)
-  (setq jerky//debugging (not jerky//debugging))
-  (message "jerky//debugging: %s"
-           (if jerky//debugging
-               "enabled"
-             "disabled")))
+  (nub:debug:toggle :jerky))
 
 
 ;;------------------------------------------------------------------------------
 ;; Debugging Functions
 ;;------------------------------------------------------------------------------
 
-(defun jerky//debug (func msg &rest args)
-  "Print out a debug message if debugging."
-  (when jerky//debugging
-    (apply #'message
-           (concat func ": " msg)
-           args)))
-;; (jerky//debug "test")
+;; Just use:
+;;   - `nub:debug'
+;;   - `nub:debug:func/start'
+;;   - `nub:debug:func/end'
 
 
 ;;------------------------------------------------------------------------------

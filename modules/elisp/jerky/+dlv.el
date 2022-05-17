@@ -27,9 +27,12 @@
 ;;------------------------------------------------------------------------------
 
 (defun jerky:dlv:namespace/set (directory namespace)
-  "Sets Jerky's local NAMESPACE for the DIRECTORY."
-  (int<jerky>:debug "int<jerky>:dlv:namespace/set" "\n  dir: %s \n  ns:  %S"
-                    directory namespace)
+  "Set Jerky's local NAMESPACE for the DIRECTORY."
+  (nub:debug:func/start :jerky
+                        "jerky:dlv:namespace/set"
+                        '(:dlv)
+                        (list (cons 'directory . directory)
+                              (cons 'namespace . namespace)))
 
   (if (not (jerky:namespace:has namespace))
       (error "jerky:dlv:namespace/set: No known namespace called '%s'" namespace)
@@ -39,16 +42,11 @@
              nil ;; global mode
              (list 'int<jerky>:dlv:namespace/local
                    namespace
-                   :safe))
+                   :safe)))
 
-    (nub:out :innit
-             :debug
-             nil
-             '("\n"
-               "  directory:  %S\n"
-               "  namespace:  %S")
-             directory
-             namespace)))
+  (nub:debug:func/end :jerky
+                      "jerky:dlv:namespace/set"
+                      '(:dlv)))
 ;; (jerky:get 'path 'org 'journal :namespace :work)
 ;;   -> "d:/home/main/.org.d/logbook/work/"
 ;; (jerky:dlv:namespace/set "d:/home/main/.org.d/logbook/work/" :work)
