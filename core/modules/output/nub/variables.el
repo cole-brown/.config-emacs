@@ -312,6 +312,20 @@ Valid sinks:
     - Valid list members are the values above.")
 
 
+(defvar int<nub>:var:inhibit-message
+  (list (cons int<nub>:var:user:fallback '((:error . nil)
+                                           (:warn  . nil)
+                                           (:info  . nil)
+                                           (:debug . t))))
+  "`inhibit-message' setting per user per output level.
+
+Alist of USER keyword to an alist of output level keyword to `inhibit-message'
+value.
+
+Setting `inhibit-message' vaule to non-nil will prevent `message' from
+displaying to the minibuffer, if `message' happens to be the sink.")
+
+
 (defun int<nub>:var:sink:verify (caller sink &optional error? context list-invalid?)
   "Returns non-nil if SINK is valid.
 
@@ -392,47 +406,61 @@ If LIST-INVALID? is non-nil, a list is not valid. Used for recursion."
 ;;   (int<nub>:var:sink:verify "test" '(t nil (t nil)) :error "Invalid test for list-in-list.")
 
 
-(defun int<nub>:init:sink (user alist)
-  "Set 'sink' ALIST for USER.
+(defun int<nub>:init:sink (user sink-alist &optional inhibit-message-alist)
+  "Set SINK-ALIST for USER, and optionally INHIBIT-MESSAGE-ALIST.
 
-ALIST should have all output levels in it.
+SINK-ALIST and INHIBIT-MESSAGE-ALIST should have all output levels in it.
 
-Sets both current and backup values (backups generally only used for tests)."
+Set both current and backup values (backups generally only used for tests)."
   ;; Ensure USER is ok.
   (int<nub>:user:exists? "int<nub>:init:sink" user :error)
+
+  ;;------------------------------
+  ;; Set SINK-ALIST.
+  ;;------------------------------
   ;; Ensure the sinks are ok.
-  (if (int<nub>:alist:alist? alist)
-      (dolist (entry alist)
+  (if (int<nub>:alist:alist? sink-alist)
+      (dolist (entry sink-alist)
         (int<nub>:var:sink:verify "int<nub>:init:sink"
                                   (cdr entry)
                                   :error
                                   ;; Full entry for context in case of error.
                                   entry))
     (int<nub>:error "int<nub>:init:sink"
-                    "ALIST must be an alist. Got: %S"
-                    alist))
+                    "SINK-ALIST must be an alist. Got: %S"
+                    sink-alist))
 
   ;; Set in the backup variable.
   ;; Use a copy so it doesn't get changed out from under us.
-  (let ((alist/copy (int<nub>:alist:copy/shallow alist)))
+  (let ((sink-alist/copy (int<nub>:alist:copy/shallow sink-alist)))
     (int<nub>:alist:update
      user
-     alist/copy
+     sink-alist/copy
      int<nub>:var:sink:backup))
 
   ;; Set in the actual variable.
   (int<nub>:alist:update
    user
-   alist
-   int<nub>:var:sink))
-;; (int<nub>:init:sink :test '((:error . message)))
+   sink-alist
+   int<nub>:var:sink)
+
+  ;;------------------------------
+  ;; Set INHIBIT-MESSAGE-ALIST.
+  ;;------------------------------
+  (when inhibit-message-alist
+    ;; No backup; just set in the actual variable.
+    (int<nub>:alist:update
+     user
+     inhibit-message-alist
+     int<nub>:var:inhibit-message)))
+;; (int<nub>:init:sink :test '((:error . message)) '((:message . t)))
 
 
 (defun int<nub>:var:sink (user level &optional default)
-  "Returns non-nil if output is enabled for USER at output LEVEL.
+  "Return output sink for USER at output LEVEL.
 
-Returns DEFAULT if USER has no setting for LEVEL.
-  - If DEFAULt is `:default', returns the standard/default/fallback for LEVEL."
+Return DEFAULT if USER has no output sink for LEVEL.
+  - If DEFAULt is `:default', returns the default/fallback sink for LEVEL."
   ;; Ensure USER and LEVEL are ok.
   (int<nub>:var:assert-user-level "int<nub>:var:sink" user level :error)
 
@@ -469,8 +497,37 @@ Returns DEFAULT if USER has no setting for LEVEL.
     (int<nub>:alist:update user
                            alist/updated
                            int<nub>:var:sink)))
+;; (nub:vars:init :test)
 ;; (int<nub>:var:sink:set :test :debug 'ignore)
 ;; (int<nub>:var:sink:set :test :warn 'warn)
+
+
+(defun int<nub>:var:inhibit-message? (user level &optional default)
+  "Return `inhibit-message' boolean value for USER at output LEVEL.
+
+Returns DEFAULT if USER has no setting for LEVEL.
+  - If DEFAULt is `:default', returns the standard/default/fallback for LEVEL."
+  ;; Ensure USER and LEVEL are ok.
+  (int<nub>:var:assert-user-level "int<nub>:var:sink" user level :error)
+
+  (let ((inhibit? (int<nub>:var:user-at-level user
+                                              level
+                                              int<nub>:var:inhibit-message
+                                              default)))
+    (if (and (eq default int<nub>:var:user:fallback)
+             (eq inhibit? default))
+        ;; Either didn't find it, or the user has the default/fallback as an explicit inhibit.
+        ;; Get the fallback.
+        (int<nub>:var:user-at-level int<nub>:var:user:fallback
+                                    level
+                                    int<nub>:var:inhibit-message
+                                    default)
+      inhibit?)))
+;; (nub:vars:init :test)
+;; (int<nub>:var:inhibit-message? :test :error)
+;; (int<nub>:var:inhibit-message? :test :debug)
+;; (int<nub>:var:inhibit-message? :test :debug :default)
+;; (int<nub>:var:inhibit-message? :test<nub/debug>::nub:debug :debug :default)
 
 
 ;;------------------------------------------------------------------------------

@@ -18,20 +18,22 @@
 ;; Output Message Helpers
 ;;------------------------------------------------------------------------------
 
-(defun int<nub>:output:sinks (level sinks msg args)
-  "Output MSG with ARGS to any/all SINKS."
-  ;; List of sinks to output to?
-  (if (and sinks
-           (listp sinks))
-      (dolist (sink sinks)
-        (int<nub>:output:sink level sink msg args))
+(defun int<nub>:output:sinks (user level sinks msg args)
+  "Output USER's MSG with ARGS to any/all LEVEL SINKS."
+  ;; Inhibit minibuffer message if output sink function is `message'?
+  (let ((inhibit-message (int<nub>:var:inhibit-message? user level int<nub>:var:user:fallback)))
+    ;; List of sinks to output to?
+    (if (and sinks
+             (listp sinks))
+        (dolist (sink sinks)
+          (int<nub>:output:sink level sink msg args))
 
-    ;; Just one sink.
-  (int<nub>:output:sink level sinks msg args)))
+      ;; Just one sink.
+      (int<nub>:output:sink level sinks msg args))))
 
 
 (defun int<nub>:output:sink (level sink msg args)
-  "Output MSG with ARGS to the one SINK."
+  "Output MSG with ARGS to one SINK at LEVEL."
   ;; If we should use the default/fallback sink, grab that first.
   (when (or (eq sink int<nub>:var:user:fallback)
             (eq sink t))
@@ -61,7 +63,9 @@
 
 
 (defun int<nub>:output:message (user level msg args)
-  "Decides how to output LEVEL keyword (`int<nub>:output:enabled?') MSG and
+  "Output MSG w/ ARGS to USER's LEVEL sink.
+
+Decide how to output LEVEL keyword (`int<nub>:output:enabled?') MSG and
 ARGS based on current verbosity for the level."
   (let ((func.name "int<nub>:output:message"))
     (int<nub>:user:exists? func.name user :error)
