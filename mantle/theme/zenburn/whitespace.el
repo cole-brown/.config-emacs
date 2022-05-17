@@ -23,7 +23,7 @@
 
 ;; Run this after both `zenburn' and `whitespace-mode' have loaded.
 ;; Need elisp from both in order to evaluate this.
-(imp:eval:after '(:and zenburn whitespace-mode)
+(imp:eval:after (:and zenburn whitespace-mode)
 
   ;; Set up keys as variables from :
   ;;   - `zenburn-default-colors-alist'
