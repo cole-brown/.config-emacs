@@ -1,4 +1,4 @@
-;;; spy/lisp/functions.el -*- lexical-binding: t; -*-
+;;; elisp/utils/functions.el -*- lexical-binding: t; -*-
 
 
 
@@ -8,11 +8,8 @@
 
 ;;(require 'subr-x)
 
-;; Don't rely on too much from `:spy'. This should be low-level stuff for use
-;; by other `:spy' code.
-;; (imp:require :jerky)
-;; (imp:require :modules 'spy 'buffer 'point)
-;; (imp:require :modules 'spy 'datetime 'format)
+;; Try to not rely on anything more than the core modules... This should be
+;; low-level stuff for use by other code.
 
 
 ;;------------------------------------------------------------------------------
@@ -26,7 +23,7 @@
 3. `unintern'    - Removes the symbol name from the symbol table."
   (fmakunbound symbol)
   (makunbound symbol)
-  (unintern symbol))
+  (unintern symbol nil))
 
 
 (defun spy:lisp/ert.delete-all (symbol)
@@ -102,4 +99,4 @@ Returns a list of lists:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'lisp 'functions)
+(imp:provide :elisp 'utils 'functions)
