@@ -25,10 +25,10 @@
 ;; Jerky's Repository of... dried meats?
 ;;------------------------------------------------------------------------------
 
-(defun int<jerky>:repo.test.string=/cmp (a b)
+(defun int<jerky>:repo/test/string=:cmp (a b)
   "Compare strings A and B (ignoring case).
 
-For `int<jerky>:repo.test.string=' (`define-hash-table-test')."
+For `int<jerky>:repo/test/string=' (`define-hash-table-test')."
   ;; `compare-strings' returns t or integer.
   ;; Convert that to a bool t/nil.
   (eq t
@@ -36,20 +36,20 @@ For `int<jerky>:repo.test.string=' (`define-hash-table-test')."
       (compare-strings a nil nil b nil nil t)))
 
 
-(defun int<jerky>:repo.test.string=/hash (key)
+(defun int<jerky>:repo/test/string=:hash (key)
   "Get a hashed value for the (lowercased) KEY.
 
-For `int<jerky>:repo.test.string=' (`define-hash-table-test')."
+For `int<jerky>:repo/test/string=' (`define-hash-table-test')."
   (sxhash-equal (downcase key)))
 
 
 ;; String comparison, ignores case.
-(define-hash-table-test 'int<jerky>:repo.test.string=
-  'int<jerky>:repo.test.string=/cmp
-  'int<jerky>:repo.test.string=/hash)
+(define-hash-table-test 'int<jerky>:repo/test/string=
+  'int<jerky>:repo/test/string=:cmp
+  'int<jerky>:repo/test/string=:hash)
 
 
-(defvar int<jerky>:repo (make-hash-table :test 'int<jerky>:repo.test.string=
+(defvar int<jerky>:repo (make-hash-table :test 'int<jerky>:repo/test/string=
                                      :weakness nil)
   "A key-path/value store, basically.
 
@@ -65,7 +65,7 @@ The `:record' association holds an alist of 3-tuples (aka 'record'):
 So a hash table tuple might look like this:
   '(:key \"path/to/jeff\"
     :record ((:default \"default value\" \"default docstr\")
-            (:jeff    \"jeff value\"    \"jeff docstr\")
+             (:jeff    \"jeff value\"    \"jeff docstr\")
              ...))
 
 VALUES can be whatever.
@@ -231,34 +231,34 @@ Returns t/nil if QUIET is non-nil, else it signals error on failure."
 ;; (int<jerky>:namespace:valid? 'not-keyword)
 
 
-(defun int<jerky>:namespace:entry.namespace/get (entry)
+(defun int<jerky>:namespace:entry/namespace:get (entry)
   "Return namespace keyword symbol from ENTRY."
   (nth 0 entry))
 
 
-(defun int<jerky>:namespace:entry.title/get (entry)
+(defun int<jerky>:namespace:entry/title:get (entry)
   "Return namespace's title string from ENTRY."
   (nth 1 entry))
 
 
-(defun int<jerky>:namespace:entry.docstr/get (entry)
+(defun int<jerky>:namespace:entry/docstr:get (entry)
   "Return namespace doc string from ENTRY."
   (nth 2 entry))
 
 
-(defun int<jerky>:namespace:entry.fallback/get (entry)
+(defun int<jerky>:namespace:entry/fallback:get (entry)
   "Return namespace fallback list from ENTRY."
   (nth 3 entry))
 
 
-(defun int<jerky>:namespace:entry/get (namespace)
+(defun int<jerky>:namespace:entry:get (namespace)
   "Get a NAMESPACE's entry from `int<jerky>:namespaces'."
   (assoc namespace int<jerky>:namespaces))
-;; (int<jerky>:namespace:entry/get :default)
-;; (int<jerky>:namespace:entry/get :jeff)
+;; (int<jerky>:namespace:entry:get :default)
+;; (int<jerky>:namespace:entry:get :jeff)
 
 
-(defun int<jerky>:namespace:entry/set (namespace title docstr fallbacks)
+(defun int<jerky>:namespace:entry:set (namespace title docstr fallbacks)
   "Create or overwrite a NAMESPACE entry in `int<jerky>:namespaces'.
 
 TITLE, DOCSTR, and FALLBACKS are used to create the NAMESPACE entry.
@@ -274,12 +274,12 @@ Return the created namespace entry."
   ;; Error checks.
   ;;------------------------------
   (when (eq namespace jerky:namespace/default)
-    (error (concat "int<jerky>:namespace:entry/set: "
+    (error (concat "int<jerky>:namespace:entry:set: "
                    "Cannot create the default namespace's entry: %s")
            namespace))
 
   (when (not (keywordp namespace))
-    (error (concat "int<jerky>:namespace:entry/set: "
+    (error (concat "int<jerky>:namespace:entry:set: "
                    "NAMESPACE must be a keyword: %s")
            namespace))
 
@@ -292,12 +292,12 @@ Return the created namespace entry."
              (push fb-ns verified-fallbacks))
 
             ((not (keywordp fb-ns))
-             (error (concat "int<jerky>:namespace:entry/set: "
+             (error (concat "int<jerky>:namespace:entry:set: "
                             "FALLBACK must be a keyword: %s")
                     fb-ns))
 
             ((not (int<jerky>:namespace/ordered fb-ns 'quiet))
-             (error (concat "int<jerky>:namespace:entry/set: "
+             (error (concat "int<jerky>:namespace:entry:set: "
                             "FALLBACK must be an existing namespace: %s")
                     fb-ns))
 
@@ -311,12 +311,12 @@ Return the created namespace entry."
     (list namespace title docstr verified-fallbacks)))
 
 
-(defun int<jerky>:namespace/set (entry &optional action)
+(defun int<jerky>:namespace:set (entry &optional action)
   "Create or overwrite namespace ENTRY in `int<jerky>:namespaces'.
 
 If ACTION is `int<jerky>:action/delete', delete the namespace instead."
-  (let* ((namespace (int<jerky>:namespace:entry.namespace/get entry))
-         (existing (int<jerky>:namespace:entry/get namespace)))
+  (let* ((namespace (int<jerky>:namespace:entry/namespace:get entry))
+         (existing (int<jerky>:namespace:entry:get namespace)))
     (if (null existing)
         ;; None exists. Add it.
         (push entry int<jerky>:namespaces)
@@ -336,13 +336,13 @@ If ACTION is `int<jerky>:action/delete', delete the namespace instead."
 
         ;; Return the updated entry.
         entry))))
-;; (int<jerky>:namespace/set :jeffory)
+;; (int<jerky>:namespace:set :jeffory)
 ;; int<jerky>:namespaces
-;; (int<jerky>:namespace/set :jeff :jeffory)
+;; (int<jerky>:namespace:set :jeff :jeffory)
 ;; int<jerky>:namespaces
 
 
-(defun jerky:namespace/create (namespace &rest args)
+(defun jerky:namespace:create (namespace &rest args)
   "Make the NAMESPACE, which must be a keyword, with optional ARGS.
 
 ARGS is a keyword plist. These are the keywords supported:
@@ -366,19 +366,19 @@ used/allowed."
                                    jerky:namespace/default))))
 
     ;; Set new entry.
-    (int<jerky>:namespace/set
+    (int<jerky>:namespace:set
      ;; Make new entry from provided args.
-     (int<jerky>:namespace:entry/set namespace title docstr fallbacks))))
-;; (jerky:namespace/create :the-namespace :title "hello there" :docstr "jeff" :fallbacks '(a b c))
-;; (jerky:namespace/create :the-namespace :title "hello there" :docstr "jeff")
+     (int<jerky>:namespace:entry:set namespace title docstr fallbacks))))
+;; (jerky:namespace:create :the-namespace :title "hello there" :docstr "jeff" :fallbacks '(a b c))
+;; (jerky:namespace:create :the-namespace :title "hello there" :docstr "jeff")
 
 
-(defun jerky:namespace/has (namespace)
+(defun jerky:namespace:has (namespace)
   "Return t if NAMESPACE is a current Jerky namespace.
 
 That is, is NAMESPACE present in `jerky:namespace/default'?"
   (not (null (assoc namespace int<jerky>:namespaces))))
-;; (jerky:namespace/has :jeff)
+;; (jerky:namespace:has :jeff)
 
 
 (defun int<jerky>:namespace/ordered (namespace &optional quiet)
@@ -415,7 +415,7 @@ Return an ordered list of namespaces. If NAMESPACE isn't found, return
                 int<jerky>:namespaces))
         ;; Create a default to give user.
         (setq entry
-              (int<jerky>:namespace:entry/set jerky:namespace/default
+              (int<jerky>:namespace:entry:set jerky:namespace/default
                                           "No default namespace exists."
                                           "No default namespace exists."
                                           jerky:namespace/no-fallback))))
@@ -427,10 +427,10 @@ Return an ordered list of namespaces. If NAMESPACE isn't found, return
     ;; Follow namespaces and keep appending on to the list until done.
 
     ;; First things first: the actual namespace.
-    (push (int<jerky>:namespace:entry.namespace/get entry) namespaces)
+    (push (int<jerky>:namespace:entry/namespace:get entry) namespaces)
 
     ;; Second things second: actual namespace's fallbacks.
-    (dolist (ns (int<jerky>:namespace:entry.fallback/get entry))
+    (dolist (ns (int<jerky>:namespace:entry/fallback:get entry))
       ;; If we already got a no-fallback, or this one is, set `stop?' flag
       ;; and ignore the rest.
       (if (or stop?
@@ -446,7 +446,7 @@ Return an ordered list of namespaces. If NAMESPACE isn't found, return
       (dolist (ns (cdr namespaces)) ; Skip primary namespace.
         ;; When we have a fallback entry with fallbacks...
         (when-let* ((fb-entry (assoc ns int<jerky>:namespaces))
-                    (fb-fb (int<jerky>:namespace:entry.fallback/get fb-entry)))
+                    (fb-fb (int<jerky>:namespace:entry/fallback:get fb-entry)))
           ;; ...push each of those onto the list if not there already.
           (dolist (fb-ns fb-fb)
             (unless (or (memq fb-ns namespaces)
@@ -473,7 +473,7 @@ Check/return first to be non-nil of:
                   (not (null int<jerky>:dlv/namespace.local)))
              int<jerky>:dlv/namespace.local
 
-           (if-let ((system (jerky/get 'namespace 'system)))
+           (if-let ((system (jerky:get 'namespace 'system)))
                system
              jerky:namespace/default))))
     (int<jerky>:debug "jerky:namespace:get"
@@ -487,7 +487,7 @@ Check/return first to be non-nil of:
                   (if (boundp 'int<jerky>:dlv/namespace.local)
                       int<jerky>:dlv/namespace.local
                     "<jerky/+dlv not in use>")
-                  (jerky/get 'namespace 'system)
+                  (jerky:get 'namespace 'system)
                   jerky:namespace/default
                   namespace)
     namespace))
@@ -559,7 +559,7 @@ If QUIET is non-nil, return nil instead of signaling error.
 
 
 (defun jerky:key:string (&rest keys)
-  "Return the jerky key string obtained by combining & normalizing the ARGS."
+  "Return the jerky key string obtained by combining & normalizing KEYS."
   (int<jerky>:key:normalize keys))
 ;; (jerky:key:string "a/b")
 ;; (jerky:key:string 'a :b)
@@ -571,22 +571,22 @@ If QUIET is non-nil, return nil instead of signaling error.
 ;; Reading from Key-Value Store
 ;;------------------------------------------------------------------------------
 
-(defun int<jerky>:repo/get (key)
+(defun int<jerky>:repo:get (key)
   "Get the key-record plist in jerky's repo at KEY's location."
   (gethash key int<jerky>:repo))
 
 
-(defun int<jerky>:repo.key/get (plist)
+(defun int<jerky>:repo/key:get (plist)
   "Get the `:key' from this key-record PLIST in jerky's repo."
   (plist-get plist :key))
 
 
-(defun int<jerky>:repo.record/get (plist)
+(defun int<jerky>:repo/record:get (plist)
   "Get the `:record' from this key-record PLIST in jerky's repo."
   (plist-get plist :record))
 
 
-(defun int<jerky>:repo.record.namespace/get (namespaces record)
+(defun int<jerky>:repo/record/namespace:get (namespaces record)
   "Get the specific NAMESPACES's alist assoc from the key's RECORD in the repo.
 
 If NAMESPACES is a keyword, get exactly that namespace's.
@@ -606,24 +606,24 @@ list in order and return record from first namespace that has one."
                (setq item (assoc ns record))))))
 
         (t
-         (error (concat "int<jerky>:repo.record.namespace/get: "
+         (error (concat "int<jerky>:repo/record/namespace:get: "
                         "`namespaces' must be a keyword or a list of them. "
                         "Got: %S")
                 namespaces))))
 
 
-(defun int<jerky>:record.namespace/get (record)
+(defun int<jerky>:record/namespace:get (record)
   "Get the namespace of this RECORD in jerky's repo."
   (nth 0 record))
 
 
-(defun int<jerky>:record.value/get (record)
+(defun int<jerky>:record/value:get (record)
   "Get the value of this RECORD in jerky's repo."
     ;; value is at index 1
     (nth 1 record))
 
 
-(defun int<jerky>:record.docstr/get (record)
+(defun int<jerky>:record/docstr:get (record)
   "Get the docstr of this RECORD in jerky's repo."
   ;; docstr is at index 2
   (nth 2 record))
@@ -673,13 +673,13 @@ If nothing found at key, return will be nil."
 
     ;; Set up getter.
     (cond ((eq field :namespace)
-           (setq getter #'int<jerky>:record.namespace/get))
+           (setq getter #'int<jerky>:record/namespace:get))
 
           ((eq field :value)
-           (setq getter #'int<jerky>:record.value/get))
+           (setq getter #'int<jerky>:record/value:get))
 
           ((eq field :docstr)
-           (setq getter #'int<jerky>:record.docstr/get)))
+           (setq getter #'int<jerky>:record/docstr:get)))
 
     ;; Ok... Get namespaced... whatever they asked for.
     (when int<jerky>:debugging
@@ -688,10 +688,10 @@ If nothing found at key, return will be nil."
                     (int<jerky>:namespace/ordered namespace 'quiet)))
     (funcall getter
              ;; Filter all down to the namespace we want.
-             (int<jerky>:repo.record.namespace/get
+             (int<jerky>:repo/record/namespace:get
               (int<jerky>:namespace/ordered namespace 'quiet)
               ;; Get the record.
-              (int<jerky>:repo.record/get (int<jerky>:repo/get key))))))
+              (int<jerky>:repo/record:get (int<jerky>:repo:get key))))))
 ;; (jerky:get 'path 'to 'thing)
 ;; (jerky:get :test :jeff)
 ;; (jerky:get :test :jill)
@@ -704,7 +704,7 @@ If nothing found at key, return will be nil."
 ;; Writing to Key-Value Store
 ;;------------------------------------------------------------------------------
 
-(defun int<jerky>:repo.record.namespace/set (namespace value docstr record)
+(defun int<jerky>:repo/record/namespace:set (namespace value docstr record)
   "Create/overwrite NAMESPACE's alist assoc with new VALUE & DOCSTR.
 
 If VALUE is `int<jerky>:action/delete', remove NAMESPACE's record instead.
@@ -732,21 +732,21 @@ replaced with."
       ;; Return the updated record.
       record)))
 ;; (setq int<jerky>:alist/test '((:default "default value" "default ds")))
-;; (int<jerky>:repo.record.namespace/set :home "test" "test ds" 'int<jerky>:alist/test)
+;; (int<jerky>:repo/record.namespace:set :home "test" "test ds" 'int<jerky>:alist/test)
 ;; int<jerky>:alist/test
 
 
-(defun int<jerky>:repo.key/set (key plist)
+(defun int<jerky>:repo/key:set (key plist)
   "Set the KEY in the hash table value PLIST.
 
 Return the updated plist that the old plist should be replaced with; you may or
 may not get a copy and the original may or may not have been destructievly
 updated."
   (plist-put plist :key key))
-;; (int<jerky>:repo.key/set 'jeff nil)
+;; (int<jerky>:repo/key:set 'jeff nil)
 
 
-(defun int<jerky>:repo.record/set (record plist)
+(defun int<jerky>:repo/record:set (record plist)
   "Set the RECORD in the hash table value PLIST.
 
 Return the updated plist that the old plist should be replaced with; you may or
@@ -755,7 +755,7 @@ updated."
   (plist-put plist :record record))
 
 
-(defun int<jerky>:repo/set (key plist)
+(defun int<jerky>:repo:set (key plist)
   "Create/overwrite the KEY in `int<jerky>:repo', setting it to PLIST.
 
 If PLIST is `int<jerky>:action/delete', remove KEY from `int<jerky>:repo'
@@ -771,7 +771,7 @@ instead."
 
         ;; Error out, I guess.
         (t
-         (error (concat "int<jerky>:repo/set: plist must be "
+         (error (concat "int<jerky>:repo:set: plist must be "
                         "`int<jerky>:action/delete' or an actual plist "
                         "with `:key' and `:record' members. Got: %s")
                 plist))))
@@ -784,20 +784,20 @@ File it under KEY in `int<jerky>:repo'.
 To delete the NAMESPACE's value, pass `int<jerky>:action/delete' as the value."
   ;; Get existing plist value in our repo under key. Could be nil if it
   ;; doesn't exist; that's fine.
-  (let* ((plist (int<jerky>:repo/get key))
-         (record (int<jerky>:repo.record/get plist)))
+  (let* ((plist (int<jerky>:repo:get key))
+         (record (int<jerky>:repo/record:get plist)))
 
     ;; plist/record will be nil if they don't exist.
     ;; The code path is the same for a brand new thing and for updating
     ;; an existing thing.
 
-    (int<jerky>:repo/set
+    (int<jerky>:repo:set
      key
      ;; Make the record w/ plist from making the key.
-     (int<jerky>:repo.record/set
-      (int<jerky>:repo.record.namespace/set namespace value docstr record)
+     (int<jerky>:repo/record:set
+      (int<jerky>:repo/record/namespace:set namespace value docstr record)
       ;; Make plist for the key.
-      (int<jerky>:repo.key/set key plist)))))
+      (int<jerky>:repo/key:set key plist)))))
 
 
 (defun jerky:set (&rest keys-and-options)
@@ -870,14 +870,14 @@ can exist multiple times."
                (when (and (stringp key)
                           (string-prefix-p search-key key))
                  ;; Matched key; get record from 'value'.
-                 (if-let ((records (int<jerky>:repo.record/get value)))
+                 (if-let ((records (int<jerky>:repo/record:get value)))
                      (dolist (rec records)
                        ;; Check namespace if needed; add rec if matches.
                        (when (or (null namespace)
-                                 (eq namespace (int<jerky>:record.namespace/get rec)))
+                                 (eq namespace (int<jerky>:record/namespace:get rec)))
                          (push (list key
-                                     (int<jerky>:record.namespace/get rec)
-                                     (int<jerky>:record.value/get rec))
+                                     (int<jerky>:record/namespace:get rec)
+                                     (int<jerky>:record/value:get rec))
                                results))))))
              int<jerky>:repo)
 
