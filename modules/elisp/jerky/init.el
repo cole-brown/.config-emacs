@@ -31,10 +31,6 @@
                (imp:file:current))
 
 
-;; Just use defaults for all settings.
-(nub:vars:init :jerky)
-
-
 ;;------------------------------------------------------------------------------
 ;; Load Jerky Files.
 ;;------------------------------------------------------------------------------
@@ -46,6 +42,9 @@
 
   (imp:load :feature  '(:jerky debug)
             :filename "debug")
+  ;; Initialize debugging before going any further.
+  (int<jerky>:debug:init)
+
   (imp:load :feature  '(:jerky jerky)
             :filename "jerky")
 

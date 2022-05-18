@@ -922,10 +922,10 @@ VALUEs are optional and should be:
 (defun nub:debug:func/end (user func/name func/tags &rest value)
   "Print out end-of-function message, with optional VALUEs.
 
-VALUEs are optional and should be:
+VALUE is optional and should be:
   - nil
   - `cons' pairs of: '(name . value)
-    + Intended for input params."
+    + Intended for output value."
   (int<nub>:debug:func "nub:debug:func/end"
     user
     func/name

@@ -11,6 +11,8 @@
 
 (imp:require :str)
 (imp:require :modules 'spy 'lisp)
+
+(imp:require :nub)
 (imp:require :jerky 'debug)
 
 
@@ -19,6 +21,9 @@
 ;;     current: (jerky:get :path 'to "key" :namespace :work)
 ;;     desired: (jerky:get '(:path to "key") :namespace :work)
 ;;     desired: (jerky:get "path/to/key" :namespace :work)
+
+;; TODO: Make '(namespace system) key a defconst or defcustom.
+;;   - also known as: 'namespace 'system
 
 
 ;;------------------------------------------------------------------------------
@@ -464,32 +469,34 @@ Return an ordered list of namespaces. If NAMESPACE isn't found, return
   "Look for a namespace to use.
 
 Check/return first to be non-nil of:
-  - `int<jerky>:dlv/namespace.local' for a Directory Local Variable value
+  - `int<jerky>:dlv:namespace/local' for a Directory Local Variable value
     (if using jerky/+dlv).
   - Jerky key: 'namespace 'system
   - `jerky:namespace/default'"
   (let ((namespace
-         (if (and (boundp 'int<jerky>:dlv/namespace.local)
-                  (not (null int<jerky>:dlv/namespace.local)))
-             int<jerky>:dlv/namespace.local
+         (if (and (boundp 'int<jerky>:dlv:namespace/local)
+                  (not (null int<jerky>:dlv:namespace/local)))
+             int<jerky>:dlv:namespace/local
 
            (if-let ((system (jerky:get 'namespace 'system)))
                system
              jerky:namespace/default))))
-    (int<jerky>:debug "jerky:namespace:get"
-                  (concat "jerky:namespace:get: \n"
-                          "  dlv enabled? %S\n"
-                          "  namespace.local: %S\n"
-                          "  system:          %S\n"
-                          "  default:         %S\n"
-                          "  result:          %S")
-                  (imp:provided? :jerky 'dlv)
-                  (if (boundp 'int<jerky>:dlv/namespace.local)
-                      int<jerky>:dlv/namespace.local
-                    "<jerky/+dlv not in use>")
-                  (jerky:get 'namespace 'system)
-                  jerky:namespace/default
-                  namespace)
+    (nub:debug :jerky
+               "jerky:namespace:get"
+               '(:namespace)
+               '("vars/settings:\n"
+                 "  dlv enabled?     %S\n"
+                 "  namespace/local: %S\n"
+                 "  system:          %S\n"
+                 "  default:         %S\n"
+                 "  result:          %S")
+               (imp:provided? :jerky 'dlv)
+               (if (boundp 'int<jerky>:dlv:namespace/local)
+                   int<jerky>:dlv:namespace/local
+                 "<jerky/+dlv not in use>")
+               (jerky:get 'namespace 'system)
+               jerky:namespace/default
+               namespace)
     namespace))
 ;; (jerky:namespace:get)
 
@@ -651,11 +658,15 @@ If nothing found at key, return will be nil."
                                        '(:namespace :field)))
           (getter nil)
           ((&plist :namespace namespace :field field) kwargs)
-          (dbg.func "jerky:get"))
-
-    (int<jerky>:debug dbg.func "key: %s" key)
-    (int<jerky>:debug dbg.func "kwargs: %s" kwargs)
-    (int<jerky>:debug dbg.func "namespace: %s, key: %s" namespace key)
+          (func.name "jerky:get")
+          (func.tags '(:get)))
+    (nub:debug:func/start :jerky
+                          func.name
+                          func.tags
+                          (list
+                           (cons 'key       key)
+                           (cons 'kwargs    kwargs)
+                           (cons 'namespace namespace)))
 
     ;; Check field... is it a known value?
     (cond ((memq field '(:namespace :value :docstr))
@@ -681,17 +692,25 @@ If nothing found at key, return will be nil."
           ((eq field :docstr)
            (setq getter #'int<jerky>:record/docstr:get)))
 
-    ;; Ok... Get namespaced... whatever they asked for.
-    (when int<jerky>:debugging
-      (int<jerky>:debug dbg.func
+    (nub:debug:func :jerky
+                    func.name
+                    func.tags
                     "ordered namespaces: %s"
-                    (int<jerky>:namespace/ordered namespace 'quiet)))
-    (funcall getter
-             ;; Filter all down to the namespace we want.
-             (int<jerky>:repo/record/namespace:get
-              (int<jerky>:namespace/ordered namespace 'quiet)
-              ;; Get the record.
-              (int<jerky>:repo/record:get (int<jerky>:repo:get key))))))
+                    (int<jerky>:namespace/ordered namespace 'quiet))
+    ;; Return whatever the field-getter gets from the namespaced record.
+    (let ((got (funcall getter
+                        ;; Filter all down to the namespace we want.
+                        (int<jerky>:repo/record/namespace:get
+                         (int<jerky>:namespace/ordered namespace 'quiet)
+                         ;; Get the record.
+                         (int<jerky>:repo/record:get (int<jerky>:repo:get key))))))
+
+      (nub:debug:func/end :jerky
+                          func.name
+                          func.tags
+                          (cons 'got got))
+
+      got)))
 ;; (jerky:get 'path 'to 'thing)
 ;; (jerky:get :test :jeff)
 ;; (jerky:get :test :jill)
@@ -915,15 +934,25 @@ Example:
   ;; and a namespace.
   (-let* (((partial-key kwargs) (int<jerky>:parse keys-and-options '(:namespace)))
           ;; dash-let's plist match pattern to non-keys in ARGS.
-          ((&plist :namespace namespace) kwargs))
-
-    (int<jerky>:debug "jerky:has" "keys-and-options: %S" keys-and-options)
-    (int<jerky>:debug "jerky:has" "  -> key:    %S" partial-key)
-    (int<jerky>:debug "jerky:has" "  -> kwargs: %S" kwargs)
-    (int<jerky>:debug "jerky:has" "partial-key: %S" partial-key)
-    (int<jerky>:debug "jerky:has" "namespace:   %S" namespace)
+          ((&plist :namespace namespace) kwargs)
+          matches)
+    (nub:debug:func/start :jerky
+                          "jerky:has"
+                          '(:get)
+                          (list
+                           (cons "keys-and-options" keys-and-options)
+                           (cons "->    key"           partial-key)
+                           (cons "-> kwargs"        kwargs)
+                           (cons "partial-key"      partial-key)
+                           (cons "namespace"        namespace)))
     ;; Now we can search & filter.
-    (int<jerky>:search/filter partial-key namespace)))
+    (setq matches (int<jerky>:search/filter partial-key namespace)
+    (nub:debug:func/start :jerky
+                          "jerky:has"
+                          '(:get)
+                          (list
+                           (cons 'matches matches)))
+    matches))
 ;; (jerky:has 'signature 'id)
 ;; (jerky:has "signature/id")
 ;; (jerky:has 'signature 'id :namespace :work)

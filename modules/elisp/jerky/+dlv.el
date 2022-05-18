@@ -3,7 +3,9 @@
 ;; Jerky Directory Local Variable support for auto-namespaces.
 
 (imp:require :dlv)
+
 (imp:require :nub)
+(imp:require :jerky 'debug)
 
 
 ;;------------------------------------------------------------------------------
@@ -33,8 +35,8 @@
     (nub:debug:func/start :jerky
                           func.name
                           func.tags
-                          (list (cons 'directory . directory)
-                                (cons 'namespace . namespace)))
+                          (list (cons 'directory directory)
+                                (cons 'namespace namespace)))
 
     (if (not (jerky:namespace:has namespace))
         (error "%s: No known namespace called '%s'"
