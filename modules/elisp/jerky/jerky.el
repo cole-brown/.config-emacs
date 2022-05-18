@@ -7,17 +7,19 @@
 ;;├────────────────────────────────┼ jerky ┼───────────────────────────────────┤
 
 
-(require 'dash)
+(require 'dash) ; `-let*', `-flatten', `-non-nil'
+
 (imp:require :str)
 (imp:require :modules 'spy 'lisp)
 (imp:require :jerky 'debug)
 
-;; Optional:
-;; (imp:optional :jerky '+dlv)
-
-;; §-TODO-§ [2020-10-23]: Make this its own package.
 
 ;; TODO [2020-11-06]: Change get/set to take only one keys arg. list or str.
+;;   e.g.
+;;     current: (jerky:get :path 'to "key" :namespace :work)
+;;     desired: (jerky:get '(:path to "key") :namespace :work)
+;;     desired: (jerky:get "path/to/key" :namespace :work)
+
 
 ;;------------------------------------------------------------------------------
 ;; Jerky's Repository of... dried meats?
@@ -85,7 +87,7 @@ DOCSTR should be short.
 (defcustom jerky:key/separator "/"
   "Jerky keys will be split/joined using this character.
 
-E.g.: (jerky/get 'my/key :path \"to/dir\")
+E.g.: (jerky:get 'my/key :path \"to/dir\")
   The key path used would be: '(my key path to dir)"
   :group 'jerky:group
   :type  '(string))
