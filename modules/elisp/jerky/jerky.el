@@ -7,7 +7,6 @@
 ;;├────────────────────────────────┼ jerky ┼───────────────────────────────────┤
 
 
-(require 's)
 (require 'dash)
 (imp:require :str)
 (imp:require :modules 'spy 'lisp)
@@ -546,8 +545,8 @@ If QUIET is non-nil, return nil instead of signaling error.
 
       ;; Now we have strings. They are in backwards order. They need to be turned
       ;; into a final separated string.
-      (setq key (s-join jerky:key/separator
-                        (nreverse strings)))
+      (setq key (string-join (nreverse strings)
+                             jerky:key/separator))
 
       ;; Return the full key string.
       key)))
@@ -867,7 +866,7 @@ can exist multiple times."
     ;; Maphash's function must take only: key and value.
     (maphash (lambda (key value)
                (when (and (stringp key)
-                          (s-starts-with? search-key key))
+                          (string-prefix-p search-key key))
                  ;; Matched key; get record from 'value'.
                  (if-let ((records (int<jerky>:repo.record/get value)))
                      (dolist (rec records)
