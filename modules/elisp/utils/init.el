@@ -25,7 +25,10 @@
             :filename "functions")
   (imp:load :feature  '(:elisp utils types)
             :path     (imp:path:current:dir/relative :elisp)
-            :filename "types"))
+            :filename "types")
+  (imp:load :feature  '(:elisp utils test)
+            :path     (imp:path:current:dir/relative :elisp)
+            :filename "test"))
 
 
 ;;------------------------------------------------------------------------------
