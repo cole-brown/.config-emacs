@@ -1,41 +1,54 @@
-;;; emacs/dlv/debug.el -*- lexical-binding: t; -*-
+;;; emacs/dlv/debug.el --- Debugging functionality for `dlv'. -*- lexical-binding: t; -*-
+
+;;; Commentary:
+;;
+;; Debugging functionality for `dlv'.
+;;
+;;; Code:
+
+
+(imp:require :nub)
+
 
 ;;------------------------------------------------------------------------------
-;; Debugging Help
+;; Initialization
 ;;------------------------------------------------------------------------------
 
-(defvar int<dlv>:debug/enabled? nil
-  "Debug flag.")
+(defun int<dlv>:debug:init ()
+  "Initialize dlv debugging."
+  ;; Defaults for all the settings except for the levels/enabled setting.
+  (nub:vars:init :dlv
+                 nil
+                 nil
+                 (list (cons :error t)
+                       (cons :warn  t)
+                       (cons :info  t)
+                       (cons :debug (imp:flag? :dlv +debug)))
+                 nil))
 
 
-(defun int<dlv>:debug:toggle ()
-  "Toggle debugging for DLV."
+
+;;------------------------------------------------------------------------------
+;; Debugging Toggle
+;;------------------------------------------------------------------------------
+
+(defun dlv:debug:toggle ()
+  "Toggle debugging for dlv."
   (interactive)
-  (setq int<dlv>:debug/enabled? (not int<dlv>:debug/enabled?))
-  (message "DLV debugging: %s"
-           (if int<dlv>:debug/enabled?
-               "enabled"
-             "disabled")))
+  (nub:debug:toggle :dlv))
 
 
-(defun int<dlv>:debug (func msg &rest args)
-  "Print out a debug message if debugging."
-  (when int<dlv>:debug/enabled?
-    (apply #'message
-           (concat func ": " msg)
-           args)))
-;; (int<dlv>:debug "test")
+;;------------------------------------------------------------------------------
+;; Debugging Functions
+;;------------------------------------------------------------------------------
 
-
-(defun int<dlv>:debug:init-if-flagged ()
-  "Initialize DLV Debug Mode based on module flags."
-  (when (featurep! +debug)
-    (setq int<dlv>:debug/enabled? t)
-    (int<dlv>:debug "int<dlv>:debug:flagged?"
-                    "[DEBUG]: ENABLED")))
+;; Just use:
+;;   - `nub:debug'
+;;   - `nub:debug:func/start'
+;;   - `nub:debug:func/end'
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide:with-emacs :dlv 'debug)
+(imp:provide :dlv 'debug)

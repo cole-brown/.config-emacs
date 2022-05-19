@@ -1,14 +1,8 @@
-;;; init.el --- Init for DLV doom module. -*- lexical-binding: t; -*-
+;;; dlv/init.el --- Directory Local Variables -*- lexical-binding: t; -*-
 ;;
-
-;; Copyright (C) 2020-2021  Cole Brown
-;; Author: Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created: 2020-07-14
-;; Modified: 2021-02-14
-;; Version: 3.0
-;; Keywords:
-;; Homepage: https://github.com/cole-brown/.config-doom
+;; Homepage:   https://github.com/cole-brown/.config-doom
 ;;
 ;;; Commentary:
 ;;
@@ -24,85 +18,90 @@
 ;;   `test<dlv>:' - Emacs ERT functions, variables, etc
 ;; ------------------------------
 ;;
-;; TODO: describe flags
+;; TODO: describe `imp' flags
 ;; Flags:
 ;;   - +debug
-;;   - -enabled
-;;   - +enabled/safe
-;;   - +enabled/all
-;;   - +enabled/flag
+;;   - NOTE: Currently considering these mutually exclusive
+;;     - -enabled
+;;     - +enabled/safe
+;;     - +enabled/all
+;;     - +enabled/flag
 ;;   - -display
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Code:
 
 
 ;;------------------------------------------------------------------------------
-;; Set imp Root
+;; Set-Up.
 ;;------------------------------------------------------------------------------
 
 (imp:path:root :dlv
-               (imp:path:join doom-private-dir
-                              "modules"
-                              "emacs"
-                              "dlv")
-               "init.el")
+               (imp:path:current:dir)
+               (imp:file:current))
 
 
 ;;------------------------------------------------------------------------------
 ;; Load Files.
 ;;------------------------------------------------------------------------------
 
-;;------------------------------
-;; Debugging
-;;------------------------------
+(imp:timing
+    :dlv
+    (imp:file:current)
+    (imp:path:current:dir)
 
-(imp:load :feature  '(:dlv debug)
-          :filename "debug")
+  ;;------------------------------
+  ;; Debugging
+  ;;------------------------------
 
-;;------------------------------
-;; Actual Functions
-;;------------------------------
+  (imp:load :feature  '(:dlv debug)
+            :filename "debug")
+  ;; Initialize debugging before going any further.
+  (int<dlv>:debug:init)
 
-(imp:load :feature  '(:dlv path)
-          :filename "path")
-(imp:load :feature  '(:dlv class)
-          :filename "class") ;; requires path
 
-(imp:load :feature  '(:dlv dlv)
-          :filename "dlv") ;; requires path, class,
+  ;;------------------------------
+  ;; Required
+  ;;------------------------------
 
-;;------------------------------
-;; Optional Files
-;;------------------------------
+  (imp:load :feature  '(:dlv path)
+            :filename "path")
+  (imp:load :feature  '(:dlv class)
+            :filename "class")
+  (imp:load :feature  '(:dlv dlv)
+            :filename "dlv")
 
-;; Always load unless specifically removed.
-(unless (featurep! -display)
-  (imp:load :feature  '(:dlv +display)
-            :filename "+display"))
+  ;;------------------------------
+  ;; Optional Files
+  ;;------------------------------
+
+  ;; Always load unless specifically removed.
+  (unless (imp:flag? :dlv -display)
+    (imp:load :feature  '(:dlv +display)
+              :filename "+display")))
 
 
 ;;------------------------------------------------------------------------------
 ;; Optional Functionality
 ;;------------------------------------------------------------------------------
 
-;; Only run the optional functionality checks/enables when loading.
+;; Only run the optional functionality checks/enables when loading this file.
 (when (imp:provide:loading?)
-  ;;------------------------------
-  ;; Enable debugging now (if feature flagged for it).
-  ;;------------------------------
-  (int<dlv>:debug:init-if-flagged)
-
   ;;------------------------------
   ;; Enable/disable DLVs?
   ;;------------------------------
-  ;; If we're loading, check for a feature flag for how to enable DLVs.
-  (cond ((featurep! -enabled) ;; Not enabled == disabled.
+  ;; Check for a feature flag for how to enable DLVs.
+  ;; NOTE: Currently considering these flags mutually exclusive.
+  (cond ((imp:flag? :dlv -enabled) ;; Not enabled == disabled.
          (dlv:enable :disable))
-        ((featurep! +enabled/safe) ;; Only safe DLVs allowed!
+        ((imp:flag? :dlv +enabled/safe) ;; Only safe DLVs allowed!
          (dlv:enable :safe))
-        ((featurep! +enabled/all) ;; Always allow anything - potentially dangerous!
+        ((imp:flag? :dlv +enabled/all) ;; Always allow anything - potentially dangerous!
          (dlv:enable :all))
-        ((featurep! 'dlv :emacs +enabled/prompt) ;; Always ask the user.
+        ((imp:flag? :dlv +enabled/prompt) ;; Always ask the user.
          (dlv:enable :prompt))
         ;; Default: Always enable DLVs unless specifically told not to.
         (t

@@ -3,8 +3,8 @@
 ;; Author:   Cole Brown <code@brown.dev>
 ;; URL:      https://github.com/cole-brown/.config-emacs
 ;; Created:  2020-07-14
-;; Modified: 2021-02-14
-;; Version:  3.1
+;; Modified: 2021-05-19
+;; Version:  3.2
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,9 +17,6 @@
 ;; Store values at the leaf nodes of a tree.
 ;;
 ;;; Code:
-
-
-(imp:require :nub)
 
 
 ;;------------------------------------------------------------------------------
