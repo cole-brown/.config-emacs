@@ -50,13 +50,21 @@
     (imp:file:current)
     (imp:path:current:dir)
 
+  (imp:load :feature  '(:module elisp utils)
+            :path     (imp:path:join innit:path:module "elisp" "utils")
+            :filename "init") ; Needed by ':module/elisp/jerky'.
+
+  (imp:load :feature  '(:module elisp jerky)
+            :path     (imp:path:join innit:path:module "elisp" "jerky")
+            :filename "init") ; Needed by ':module/mode/org'.
+
   (imp:load :feature  '(:module emacs buffer)
             :path     (imp:path:join innit:path:module "emacs" "buffer")
-            :filename "init") ; Needed by '(:module mode org)
+            :filename "init") ; Needed by ':module/mode/org'.
 
   (imp:load :feature  '(:module mode org)
             :path     (imp:path:join innit:path:module "mode" "org")
-            :filename "init")) ; Needed by '(:mantle theme init)
+            :filename "init")) ; Needed by ':mantle/theme/init'.
 
 
 ;;--------------------

@@ -10,7 +10,7 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Delete Function
+;; Delete Functions
 ;;------------------------------------------------------------------------------
 
 (defun elisp:func/delete (symbol)
@@ -23,6 +23,13 @@
   (unintern symbol nil))
 
 
+;;------------------------------------------------------------------------------
+;; List Functions
+;;------------------------------------------------------------------------------
+
+;; TODO: move to a list utils module?
+;;   - I think I have other list util functions hiding... somewhere.
+;;     - Maybe in `alist'...
 (defun elisp:list:flatten (args)
   "Return ARGS as a single, flat list."
   ;; If it's a list, flatten it. Else it's a list now.
