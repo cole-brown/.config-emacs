@@ -31,11 +31,30 @@
       '(:innit early-init modules)
       "early-init.el"
       (imp:path:current:dir)
-    (load (expand-file-name "emacs/str/init"   path-core-modules))
-    (load (expand-file-name "emacs/alist/init" path-core-modules))
-    (load (expand-file-name "emacs/path/init"  path-core-modules))
-    (load (expand-file-name "output/nub/init"  path-core-modules))
-    (load (expand-file-name "emacs/innit/init" path-core-modules))))
+
+    (imp:load :feature  '(:str)
+              :path     (imp:path:join path-core-modules "emacs/str")
+              :filename "init")
+
+    (imp:load :feature  '(:alist)
+              :path     (imp:path:join path-core-modules "emacs/alist")
+              :filename "init")
+
+    (imp:load :feature  '(:path)
+              :path     (imp:path:join path-core-modules "emacs/path")
+              :filename "init")
+
+    (imp:load :feature  '(:nub)
+              :path     (imp:path:join path-core-modules "output/nub")
+              :filename "init")
+
+    (imp:load :feature  '(:innit)
+              :path     (imp:path:join path-core-modules "emacs/innit")
+              :filename "init")
+
+    (imp:load :feature  '(:dlv)
+              :path     (imp:path:join path-core-modules "emacs/dlv")
+              :filename "init")))
 
 
 ;;------------------------------------------------------------------------------
