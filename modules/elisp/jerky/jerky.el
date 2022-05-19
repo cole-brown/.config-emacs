@@ -9,10 +9,10 @@
 ;; │                                 Jerky.                                    │
 ;; └───────────────────────────────────────────────────────────────────────────┘
 
-(require 'dash) ; `-let*', `-flatten', `-non-nil'
+(require 'dash) ; `-let*', `-non-nil'
 
 (imp:require :str)
-(imp:require :modules 'spy 'lisp)
+(imp:require :elisp 'utils)
 
 (imp:require :nub)
 (imp:require :jerky 'debug)
@@ -162,9 +162,7 @@ output will be nil."
                           (t                 ; Use the defaults.
                            ;; Backwards so they'll end up forwards.
                            '(:docstr :value :namespace))))
-          ((args kwargs) (apply #'spy:lisp/func.args
-                                args-list
-                                keywords))
+          ((args kwargs) (elisp:parse:args+kwargs args-list keywords))
           parsed)
 
     ;; If extra keywords, add first so they're at the end of the plist.
@@ -369,8 +367,8 @@ used/allowed."
   ;; dash-let's plist match pattern to non-keys in ARGS.
   (-let* (((&plist :docstr docstr :title title :fallbacks fallbacks) args)
           ;; Make fallbacks a flat list of inputs or the default.
-          (fallbacks (-flatten (or fallbacks
-                                   jerky:namespace/default))))
+          (fallbacks (elisp:list:flatten (or fallbacks
+                                             jerky:namespace/default))))
 
     ;; Set new entry.
     (int<jerky>:namespace:set
@@ -532,7 +530,7 @@ If QUIET is non-nil, return nil instead of signaling error.
 
             ;; If a list, turn each item into a string and push to the `strings' list.
             ((listp args)
-             (dolist (arg (-flatten args)) ; Just want one level of list.
+             (dolist (arg (elisp:list:flatten args)) ; Just want one level of list.
                ;; Push string args to strings, turn non-strings into strings.
                (cond ((stringp arg)
                       (push arg strings))
@@ -963,4 +961,4 @@ Example:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide:with-emacs :jerky 'jerky)
+(imp:provide :jerky 'jerky)

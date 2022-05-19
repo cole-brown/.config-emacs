@@ -1,10 +1,10 @@
 ;;; jerky/init.el --- tree/value store -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
-;; Created: 2020-07-14
+;; Author:   Cole Brown <code@brown.dev>
+;; URL:      https://github.com/cole-brown/.config-emacs
+;; Created:  2020-07-14
 ;; Modified: 2021-02-14
-;; Version: 3.1
+;; Version:  3.1
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
