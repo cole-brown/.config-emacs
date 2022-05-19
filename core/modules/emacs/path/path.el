@@ -868,16 +868,15 @@ For `:windows' -> `:wsl':
 
 
 (defun int<path>:type (path)
-  "Tries to guess a path type.
+  "Try to guess a PATH type.
 
 Returns:
    :wsl     - Linux path to a windows drive?
    :windows - Windows path?
-   :linix   - Linux path?
-"
+   :linix   - Linux path?"
   ;; Start guessing...
   ;; If it has a backslash, it's probably windows.
-  (cond ((s-contains? "\\" path)
+  (cond ((str:contains? "\\" path)
          :windows)
 
         ;; Does it start with a drive-letter and colon?
@@ -899,8 +898,9 @@ Returns:
          :linux)))
 
 
+;; TODO: "desired type" param?
 (defun path:cmd:translate (path)
-  "Tries to auto-guess source/dest path types and then translate the path."
+  "Try to auto-guess PATH type and then translate the path."
   (interactive "sPath: ")
   (let* ((source (int<path>:type path))
          (dest (if (eq source :windows)

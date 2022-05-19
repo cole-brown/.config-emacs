@@ -2,8 +2,13 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Words
+;; Utils
 ;;------------------------------------------------------------------------------
+
+(defun str:contains? (needle haystack)
+  "Return t/nil for whether HAYSTACK string contains NEEDLE string."
+  (not (null (string-match-p (regexp-quote needle) haystack))))
+
 
 ;;------------------------------------------------------------------------------
 ;; Regions

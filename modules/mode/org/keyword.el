@@ -149,9 +149,9 @@ notes.
            ;; Had to format it first, now I want to replace the normal spaces with
            ;; non-breaking spaces or something so that whitespace-mode won't
            ;; override the face sytle.
-           (setq keyword-string (s-replace " "
-                                           (char-to-string (elt wrap 1))
-                                           keyword-string))
+           (setq keyword-string (string-replace " "
+                                                (char-to-string (elt wrap 1))
+                                                keyword-string))
 
            ;;---
            ;; Add in key/enter/exit codes?

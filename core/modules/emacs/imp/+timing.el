@@ -502,6 +502,7 @@ Returns result of evaluating BODY."
 NAME and ARGS should be exactly as `use-package' requires.
 
 Expects `use-package' to be loaded already."
+  (declare (indent 1))
   (let ((feature (list :use-package name)))
     `(imp:timing
          (quote ,feature)
