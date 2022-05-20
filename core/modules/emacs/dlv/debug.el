@@ -1,5 +1,5 @@
-;;; emacs/dlv/debug.el --- Debugging functionality for `dlv'. -*- lexical-binding: t; -*-
-
+;;; dlv/debug.el --- Debugging functionality for `dlv'. -*- lexical-binding: t; -*-
+;;
 ;;; Commentary:
 ;;
 ;; Debugging functionality for `dlv'.
@@ -22,7 +22,7 @@
                  nil
                  (list (cons :error t)
                        (cons :warn  t)
-                       (cons :info  t)
+                       (cons :info  (imp:flag? :dlv +debug))
                        (cons :debug (imp:flag? :dlv +debug)))
                  nil))
 

@@ -4,6 +4,10 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Homepage:   https://github.com/cole-brown/.config-doom
 ;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
 ;;; Commentary:
 ;;
 ;; Code-Defined Directory Local Variables
@@ -61,7 +65,6 @@
             :filename "debug")
   ;; Initialize debugging before going any further.
   (int<dlv>:debug:init)
-
 
   ;;------------------------------
   ;; Required

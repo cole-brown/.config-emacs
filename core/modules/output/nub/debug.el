@@ -922,6 +922,12 @@ VALUEs are optional and should be:
 (defun nub:debug:func/end (user func/name func/tags &rest value)
   "Print out end-of-function message, with optional VALUEs.
 
+USER should be the nub user keyword.
+
+FUNC/NAME should be the calling function's string name.
+
+FUNC/TAGS should be nil or a list of debug tag keywords.
+
 VALUE is optional and should be:
   - nil
   - `cons' pairs of: '(name . value)
@@ -932,6 +938,31 @@ VALUE is optional and should be:
     func/tags
     :end
     value))
+
+
+(defmacro nub:debug:func/return (user func/name func/tags &rest body)
+  "Print out end-of-function message, with return value from BODY.
+
+USER should be the nub user keyword.
+
+FUNC/NAME should be the calling function's string name.
+
+FUNC/TAGS should be nil or a list of debug tag keywords.
+
+BODY forms will be evaluated and the final value will be returned,
+and also printed in the debug message (if debugging)."
+  (declare (indent 3))
+  ;; Execute caller's BODY forms.
+  `(let ((macro<nub>:return-value (progn ,@body)))
+     ;; Log the debug message?
+     (int<nub>:debug:func "nub:debug:func/return"
+                          ,user
+                          ,func/name
+                          ,func/tags
+                          :end
+                          macro<nub>:return-value)
+     ;; Return the value.
+     macro<nub>:return-value))
 
 
 ;;------------------------------------------------------------------------------
