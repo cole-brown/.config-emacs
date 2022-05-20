@@ -220,7 +220,7 @@ Ignores VALUE; always returns t."
 
 (defun test<dlv>:dir->class (dir)
   "Returns the DLV class symbol for DIR path."
-  (int<dlv>:class:symbol.create (int<dlv>:dir:normalize dir)))
+  (int<dlv>:class:symbol/create (int<dlv>:dir:normalize dir)))
 
 
 ;;------------------------------------------------------------------------------
