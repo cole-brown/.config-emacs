@@ -108,7 +108,7 @@ Usage:
       ;; USER is a valid nub user keyword.
       ...))"
   ;; Get something from the user.
-  (let ((func.name (int<nub>:format:callers "int<nub>:prompt:user"
+  (let ((func.name (nub:format:callers "int<nub>:prompt:user"
                                             caller))
         (choice.string (int<nub>:prompt:generic prompt
                                                 int<nub>:var:users
@@ -163,7 +163,7 @@ Usage:
         <do something about invalid user>
       ;; Do something about tag.
       ...))"
-  (let ((func.name (int<nub>:format:callers "int<nub>:prompt:debug:tag"
+  (let ((func.name (nub:format:callers "int<nub>:prompt:debug:tag"
                                             caller))
         tag.string)
     ;; Make sure user is valid.
@@ -198,7 +198,7 @@ USER should be a valid `nub' user keyword.
 
 QUIT should be a list of strings to stop the loop. If nil, it will stop on
 nil/empty input only."
-  (let ((func.name (int<nub>:format:callers "int<nub>:prompt:debug:tag"
+  (let ((func.name (nub:format:callers "int<nub>:prompt:debug:tag"
                                             caller)))
     ;; Make sure user is valid.
     (if (null (int<nub>:user:exists? func.name user nil))
@@ -259,7 +259,7 @@ Returns TAGS if TAGS are valid.
 If tags are not valid:
   If ERROR? is non-nil, signals an error.
   Else returns nil."
-  (let ((func.name (int<nub>:format:callers "int<nub>:debug:tags:verify"
+  (let ((func.name (nub:format:callers "int<nub>:debug:tags:verify"
                                             caller)))
     (int<nub>:user:exists? func.name user :error)
 
@@ -324,7 +324,7 @@ is true:
   - `int<nub>:var:debug:tags' for the user is non-nil AND matches one or more
      of the tags in TAGS.
     + Looking for a specific debug tag and found it."
-  (let* ((func.name (int<nub>:format:callers "int<nub>:debug:active?"
+  (let* ((func.name (nub:format:callers "int<nub>:debug:active?"
                                              caller))
          (tags/input tags)
          (tags/active (int<nub>:var:debug:tags user))
@@ -639,7 +639,7 @@ Prints end message w/ optional return value when START-OR-END is `:end'.
 VALUEs are optional and should be:
   - nil
   - `cons' pairs of: '(name . value)"
-    (let ((callers (int<nub>:format:callers "int<nub>:debug:func" caller))
+    (let ((callers (nub:format:callers "int<nub>:debug:func" caller))
         value/formatted)
       (int<nub>:user:exists? callers user :error)
       (int<nub>:debug:tags:verify callers
@@ -822,7 +822,7 @@ ARGS should be the `message' arguments."
     `(let* ((int<nub>:macro:user      ,user)
             (int<nub>:macro:tags      ,tags)
             (int<nub>:macro:caller    ,caller)
-            (int<nub>:macro:func.name (int<nub>:format:callers "nub:debug"
+            (int<nub>:macro:func.name (nub:format:callers "nub:debug"
                                                                int<nub>:macro:caller)))
        (int<nub>:user:exists? int<nub>:macro:func.name
                               int<nub>:macro:user
@@ -869,7 +869,7 @@ ARGS should be the `message' arguments."
   `(let* ((int<nub>:macro:user      ,user)
           (int<nub>:macro:tags      ,tags)
           (int<nub>:macro:caller    ,caller)
-          (int<nub>:macro:func.name (int<nub>:format:callers "nub:debug"
+          (int<nub>:macro:func.name (nub:format:callers "nub:debug"
                                                              int<nub>:macro:caller)))
        (int<nub>:user:exists? int<nub>:macro:func.name
                               int<nub>:macro:user
@@ -911,6 +911,7 @@ VALUEs are optional and should be:
   - nil
   - `cons' pairs of: '(name . value)
     + Intended for input params."
+  (declare (indent 3))
   (int<nub>:debug:func "nub:debug:func/start"
     user
     func/name
@@ -932,6 +933,7 @@ VALUE is optional and should be:
   - nil
   - `cons' pairs of: '(name . value)
     + Intended for output value."
+  (declare (indent 3))
   (int<nub>:debug:func "nub:debug:func/end"
     user
     func/name
@@ -960,7 +962,7 @@ and also printed in the debug message (if debugging)."
                           ,func/name
                           ,func/tags
                           :end
-                          macro<nub>:return-value)
+                          (cons 'return macro<nub>:return-value))
      ;; Return the value.
      macro<nub>:return-value))
 

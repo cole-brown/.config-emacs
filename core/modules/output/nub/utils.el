@@ -17,6 +17,39 @@
 ;; Utility Functions & Such That Don't Really Fit Elsewhere
 ;;------------------------------------------------------------------------------
 
+(defun nub:format:callers (caller parents)
+  "Build a 'caller' string.
+
+Builds from CALLER (string) and PARENTS (string or nil).
+
+Returns a string."
+  ;;------------------------------
+  ;; Error Checks:
+  ;;------------------------------
+  ;; CALLER must be a string.
+  (cond ((not (stringp caller))
+         (int<nub>:error "int<nub>:format:callers"
+                         "Invalid CALLER param. Expected a string; got: caller: %S, parents: %S"
+                         caller parents))
+        ;; PARENTS must be a string if not nil.
+        ((and parents
+              (not (stringp parents)))
+         (int<nub>:error "int<nub>:format:callers"
+                         "Invalid CALLER param. Expected a string; got: parents: %S, caller: %S"
+                         parents caller))
+
+        ;;------------------------------
+        ;; Valid: Concat caller w/ parents.
+        ;;------------------------------
+        (t
+         (if parents
+             (concat caller " <-via- " parents)
+           caller))))
+;; (nub:format:callers "bob" nil)
+;; (nub:format:callers "bob" "alice")
+;; (nub:format:callers "C" (nub:format:callers "B" "A"))
+;; (nub:format:callers nil nil)
+
 
 ;;------------------------------------------------------------------------------
 ;; Normalization

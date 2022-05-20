@@ -66,40 +66,6 @@ The acceptable keywords are:
 ;; (int<nub>:format :newlines "Hi." "  -> Line 2")
 
 
-(defun int<nub>:format:callers (this callers)
-  "Build a 'caller' string.
-
-Builds from THIS (string) and CALLERS (string or nil).
-
-Returns a string."
-  ;;------------------------------
-  ;; Error Checks:
-  ;;------------------------------
-  ;; THIS must be a string.
-  (cond ((not (stringp this))
-         (int<nub>:error "int<nub>:format:callers"
-                         "Invalid THIS param. Expected a string; got: this: %S, callers: %S"
-                         this callers))
-        ;; CALLERS must be a string if not nil.
-        ((and callers
-              (not (stringp callers)))
-         (int<nub>:error "int<nub>:format:callers"
-                         "Invalid CALLER param. Expected a string; got: callers: %S, this: %S"
-                         callers this))
-
-        ;;------------------------------
-        ;; Valid: Concat this w/ callers.
-        ;;------------------------------
-        (t
-         (if callers
-             (concat this " <-via- " callers)
-           this))))
-;; (int<nub>:format:callers "bob" nil)
-;; (int<nub>:format:callers "bob" "alice")
-;; (int<nub>:format:callers "C" (int<nub>:format:callers "B" "A"))
-;; (int<nub>:format:callers nil nil)
-
-
 ;;------------------------------------------------------------------------------
 ;; Errors
 ;;------------------------------------------------------------------------------
