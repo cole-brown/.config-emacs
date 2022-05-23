@@ -1,4 +1,13 @@
-;; -*- no-byte-compile: t; lexical-binding: t; -*-
+;;; dlv/test/dlv.el --- Test "dlv/dlv.el" functions. -*- no-byte-compile: t; lexical-binding: t; -*-
+;;
+;;; Commentary:
+;;
+;; Test "dlv/dlv.el" functions.
+;;
+;;; Code:
+
+
+;;
 ;;; emacs/dlv/test/dlv.el
 
 ;;------------------------------------------------------------------------------
@@ -28,14 +37,14 @@
 ;; Constants & Variables
 ;;------------------------------------------------------------------------------
 
-(setq test<dlv>:const/path.root "~/temp/emacs-dlv-test/")
+(setq test<dlv>:const:path/root "~/temp/emacs-dlv-test/")
 
-(setq test<dlv>:const/unique-paths? nil)
+(setq test<dlv>:const:path/unique? nil)
 
-(setq test<dlv>:fixture/dir.name nil)
-(setq test<dlv>:fixture/file.name nil)
-(setq test<dlv>:fixture/dir.path nil)
-(setq test<dlv>:fixture/file.path nil)
+(setq test<dlv>:fixture:dir/name nil)
+(setq test<dlv>:fixture:file/name nil)
+(setq test<dlv>:fixture:dir/path nil)
+(setq test<dlv>:fixture:file/path nil)
 
 
 ;;------------------------------
@@ -56,9 +65,12 @@
 (setq test<dlv>:enable-local-variables enable-local-variables)
 
 
+;;------------------------------
 ;; Unique Counters
-(setq test<dlv>:var.uid 0)
-(setq test<dlv>:path.uid 0)
+;;------------------------------
+
+(setq test<dlv>:uid/var 0)
+(setq test<dlv>:uid/path 0)
 
 
 ;;------------------------------------------------------------------------------
@@ -69,42 +81,48 @@
 ;; Variables
 ;;------------------------------
 
-(defun test<dlv>:var/value.local (test-name &optional suffix)
+(defun test<dlv>:var:value/local (test-name &optional suffix)
   "Get a unique local value for the variable.
+
+TEST-NAME should be a short, unique string.
+e.g. `test<dlv>:example:do-specific-thing' might be \"specific-thing\".
 
 If SUFFIX is non-nil, appends it to the end of the value, prefixed with
 a \"/\" separator."
-  (let ((uid test<dlv>:var.uid)
+  (let ((uid test<dlv>:uid/var)
         (suffix-fmt (if suffix "/%s" "")))
-    (setq test<dlv>:var.uid (1+ test<dlv>:var.uid))
+    (setq test<dlv>:uid/var (1+ test<dlv>:uid/var))
     (intern (format (concat ":test/"
                             test-name "/"
                             "%s/%03d"
                             suffix-fmt)
-                    (test<dlv>:time.str)
+                    (test<dlv>:time/str)
                     uid
                     suffix))))
-;; (test<dlv>:var/value.local "test")
-;; (test<dlv>:var/value.local "test" "jeff")
-;; (test<dlv>:var/value.local "test" 0)
+;; (test<dlv>:var:value/local "test")
+;; (test<dlv>:var:value/local "test" "jeff")
+;; (test<dlv>:var:value/local "test" 0)
 
 
-(defun test<dlv>:var/value.default (test-name)
-  "Get a default value for the variable."
+(defun test<dlv>:var:value/default (test-name)
+  "Get a default value for the variable.
+
+TEST-NAME should be a short, unique string.
+e.g. `test<dlv>:example:do-specific-thing' might be \"specific-thing\"."
   :test:default
-  ;; (let ((uid test<dlv>:var.uid))
-  ;;   (setq test<dlv>:var.uid (1+ test<dlv>:var.uid))
+  ;; (let ((uid test<dlv>:uid/var))
+  ;;   (setq test<dlv>:uid/var (1+ test<dlv>:uid/var))
   ;;   (intern (format (concat ":test/"
   ;;                           test-name "/"
   ;;                           "DEFAULT/"
   ;;                           "%s/%03d")
-  ;;                   (test<dlv>:time.str)
+  ;;                   (test<dlv>:time/str)
   ;;                   uid)))
   )
-;; (test<dlv>:var/value.default "test")
+;; (test<dlv>:var:value/default "test")
 
 
-(defun test<dlv>:var/create (test-name symbol &rest plist)
+(defun test<dlv>:var:create (test-name symbol &rest plist)
   "Create a variable named SYMBOL for testing TEST-NAME.
 
 TEST-NAME should be a short, unique string.
@@ -115,15 +133,17 @@ PLIST can have these keywords:
   - `:safe-value'
   - `:default-value'
 
-If `:safe-fn' keyword's value is not nil, put it in the SYMBOL's `safe-local-variable' property.
+If `:safe-fn' keyword's value is not nil, put it in the SYMBOL's
+`safe-local-variable' property.
 
-If `:safe-value' keyword's value is not nil, put it in the `safe-local-variable-values' alist.
+If `:safe-value' keyword's value is not nil, put it in the
+`safe-local-variable-values' alist.
 
 If `:default-value' keyword exists, use it as the default value.
-  - Otherwise use `test<dlv>:var/value.default' function's output."
+  - Otherwise use `test<dlv>:var:value/default' function's output."
   (-let [(&plist :safe-fn :safe-value :default-value) plist]
     ;; Set the default values.
-    (set symbol (or default-value (test<dlv>:var/value.default test-name)))
+    (set symbol (or default-value (test<dlv>:var:value/default test-name)))
 
     ;; Set the `safe-local-variable' slots.
     (when safe-fn
@@ -134,7 +154,7 @@ If `:default-value' keyword exists, use it as the default value.
       (push (cons symbol safe-value) safe-local-variable-values))))
 
 
-(defun test<dlv>:var/delete (symbol)
+(defun test<dlv>:var:delete (symbol)
   "Unbinds the variable named SYMBOL.
 
 Also removes it from the `safe-local-variable-values' alist if it was in there."
@@ -160,7 +180,7 @@ Ignores VALUE; always returns t."
 ;; Strings
 ;;------------------------------
 
-(defun test<dlv>:time.str ()
+(defun test<dlv>:time/str ()
   "Get a time str for creating var values, filenames, etc."
   (format-time-string "%FT%H-%M-%S-%3N%z"))
 
@@ -169,13 +189,13 @@ Ignores VALUE; always returns t."
 ;; Paths
 ;;------------------------------
 
-(defun test<dlv>:path/parent.get (path)
-  "Returns the parent directory of PATH."
+(defun test<dlv>:path:parent/get (path)
+  "Return the parent directory of PATH."
   (file-name-directory (directory-file-name path)))
-;; (test<dlv>:path/parent.get test<dlv>:const/path.root)
+;; (test<dlv>:path:parent/get test<dlv>:const:path/root)
 
 
-(defun test<dlv>:path/dir.create (path)
+(defun test<dlv>:path:dir/create (path)
   "Create directory PATH unless it exists."
   (if (and (file-exists-p path)
            (file-directory-p path))
@@ -184,29 +204,29 @@ Ignores VALUE; always returns t."
 
 
 (defun test<dlv>:path/dirname (&optional name)
-  "Create a unique dirname using NAME, `test<dlv>:time.str', and `test<dlv>:path.uid'."
+  "Create a unique dirname using NAME, `test<dlv>:time/str', and `test<dlv>:uid/path'."
   (let ((name (or name "locals"))
-        (uid  test<dlv>:path.uid))
-    (if test<dlv>:const/unique-paths?
+        (uid  test<dlv>:uid/path))
+    (if test<dlv>:const:path/unique?
         (progn
-          (setq test<dlv>:path.uid (1+ test<dlv>:path.uid))
+          (setq test<dlv>:uid/path (1+ test<dlv>:uid/path))
           (format (concat name ".%s.%03d")
-                  (test<dlv>:time.str)
+                  (test<dlv>:time/str)
                   uid
                   "/"))
       name)))
 
 
 (defun test<dlv>:path/filename (&optional name ext)
-  "Create a unique filename using NAME, EXT, `test<dlv>:time.str', and `test<dlv>:path.uid'."
+  "Create a unique filename using NAME, EXT, `test<dlv>:time/str', and `test<dlv>:uid/path'."
   (let ((name (or name "locals"))
         (ext  (or ext "txt"))
-        (uid  test<dlv>:path.uid))
-    (if test<dlv>:const/unique-paths?
+        (uid  test<dlv>:uid/path))
+    (if test<dlv>:const:path/unique?
         (progn
-          (setq test<dlv>:path.uid (1+ test<dlv>:path.uid))
+          (setq test<dlv>:uid/path (1+ test<dlv>:uid/path))
           (format (concat name ".%s.%03d.%s")
-                  (test<dlv>:time.str)
+                  (test<dlv>:time/str)
                   uid
                   ext))
       (format (concat name ".%s")
@@ -219,7 +239,7 @@ Ignores VALUE; always returns t."
 ;;------------------------------
 
 (defun test<dlv>:dir->class (dir)
-  "Returns the DLV class symbol for DIR path."
+  "Return the DLV class symbol for DIR path."
   (int<dlv>:class:symbol/create (int<dlv>:dir:normalize dir)))
 
 
@@ -232,22 +252,24 @@ Ignores VALUE; always returns t."
 ;;------------------------------
 
 (defun test<dlv>:setup/paths (name)
-  "Ensure the dirs and files exist."
-  (test<dlv>:path/dir.create test<dlv>:const/path.root)
+  "Ensure the dirs and files exist.
+
+NAME should be the test name string."
+  (test<dlv>:path:dir/create test<dlv>:const:path/root)
 
   (if (null name)
       ;; No name provided - ensure the fixture dir/file vars are cleared.
-      (setq test<dlv>:fixture/dir.name nil
-            test<dlv>:fixture/file.name nil
-            test<dlv>:fixture/dir.path nil
-            test<dlv>:fixture/file.path nil)
+      (setq test<dlv>:fixture:dir/name nil
+            test<dlv>:fixture:file/name nil
+            test<dlv>:fixture:dir/path nil
+            test<dlv>:fixture:file/path nil)
 
     ;; Setup dir/file vars and ensure dir exists.
-    (setq test<dlv>:fixture/dir.name  (test<dlv>:path/dirname name)
-          test<dlv>:fixture/file.name (test<dlv>:path/filename name)
-          test<dlv>:fixture/dir.path  (file-name-as-directory (concat test<dlv>:const/path.root test<dlv>:fixture/dir.name))
-          test<dlv>:fixture/file.path (concat test<dlv>:fixture/dir.path test<dlv>:fixture/file.name))
-    (test<dlv>:path/dir.create test<dlv>:fixture/dir.path)))
+    (setq test<dlv>:fixture:dir/name  (test<dlv>:path/dirname name)
+          test<dlv>:fixture:file/name (test<dlv>:path/filename name)
+          test<dlv>:fixture:dir/path  (file-name-as-directory (concat test<dlv>:const:path/root test<dlv>:fixture:dir/name))
+          test<dlv>:fixture:file/path (concat test<dlv>:fixture:dir/path test<dlv>:fixture:file/name))
+    (test<dlv>:path:dir/create test<dlv>:fixture:dir/path)))
 ;; (test<dlv>:setup/paths "test-setup-paths")
 
 
@@ -261,7 +283,9 @@ Ignores VALUE; always returns t."
 
 
 (defun test<dlv>:setup (name)
-  "Run setup for tests."
+  "Run setup for tests.
+
+NAME should be the test name string."
   ;; Ensure data is cleaned from last test run (could have errored out and not finished).
   (test<dlv>:teardown/paths)
 
@@ -280,12 +304,12 @@ Ignores VALUE; always returns t."
 
 (defun test<dlv>:teardown/paths ()
   "Remove all the files & dirs used in the test by deleting the root dir."
-  (setq test<dlv>:fixture/dir.name nil)
-  (setq test<dlv>:fixture/file.name nil)
-  (setq test<dlv>:fixture/dir.path nil)
-  (setq test<dlv>:fixture/file.path nil)
+  (setq test<dlv>:fixture:dir/name nil)
+  (setq test<dlv>:fixture:file/name nil)
+  (setq test<dlv>:fixture:dir/path nil)
+  (setq test<dlv>:fixture:file/path nil)
 
-  (delete-directory test<dlv>:const/path.root :recursive))
+  (delete-directory test<dlv>:const:path/root :recursive))
 
 
 (defun test<dlv>:teardown/vars ()
@@ -309,28 +333,32 @@ Ignores VALUE; always returns t."
 ;;------------------------------
 
 (defmacro test<dlv>:with:fixture (name test-teardown-fn &rest body)
-  "Run `test<dlv>:setup', then BODY, then ensures `test<dlv>:teardown' is run
+  "Run a test BODY with set-up & tear-down.
+
+Run `test<dlv>:setup', then BODY, then ensures `test<dlv>:teardown' is run
 no matter what happens in BODY. Binds NAME to `test-name'.
 
-If NAME is non-nil, it is used to create a directory and file name (paths too), saved to:
- - `test<dlv>:fixture/dir.name'
- - `test<dlv>:fixture/file.name'
- - `test<dlv>:fixture/dir.path'
- - `test<dlv>:fixture/file.path'
+If NAME is non-nil, it is used to create a directory and file name (paths too),
+saved to:
+ - `test<dlv>:fixture:dir/name'
+ - `test<dlv>:fixture:file/name'
+ - `test<dlv>:fixture:dir/path'
+ - `test<dlv>:fixture:file/path'
 
-If TEST-TEARDOWN-FN is non-nil, it is /always/ called after the test is run (even if it errors out/fails/etc).
-TEST-TEARDOWN-FN should take one parameter: NAME."
+If TEST-TEARDOWN-FN is non-nil, it is /always/ called after the test is run
+\(even if it errors out/fails/etc). TEST-TEARDOWN-FN should take one parameter:
+NAME."
   (declare (indent 2))
   ;; `unwind-protect' lets us run teardown even if errors, etc.
   `(let ((test-name ,name)
-         (test<dlv>:with:fixture/teardown-fn ,test-teardown-fn))
+         (test<dlv>:with:fixture:teardown-fn ,test-teardown-fn))
      (unwind-protect
          (progn
            (test<dlv>:setup test-name)
 
            ,@body)
-       (when test<dlv>:with:fixture/teardown-fn
-         (test<dlv>:with:fixture/teardown-fn test-name))
+       (when test<dlv>:with:fixture:teardown-fn
+         (test<dlv>:with:fixture:teardown-fn test-name))
        (test<dlv>:teardown))))
 
 
@@ -361,10 +389,10 @@ If you want the buffer in BODY, it is store in the lexical variable
 ;;------------------------------------------------------------------------------
 
 (defun test<dlv>:assert:valid-path (assert/info-str expected-parent path)
-  "Returns true if PATH is a child of EXPECTED-PARENT after expanding.
+  "Return non-nil if PATH is a child of EXPECTED-PARENT after expanding.
 
 If ASSERT/INFO-STR is non-nil, assert it similar to:
-(should assert/info-str)
+\(should assert/info-str)
   - It will show up in the list ('l') of asserts for the test in ERT."
   (let ((parent (expand-file-name expected-parent))
         (child (expand-file-name path))
@@ -394,7 +422,7 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
             (setq found-parent? t
                   loop-path nil)
 
-          (let ((next (test<dlv>:path/parent.get loop-path)))
+          (let ((next (test<dlv>:path:parent/get loop-path)))
             ;; Should not get stuck at the root.
             (if (string= loop-path next)
                 (setq stuck t
@@ -413,7 +441,7 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
 KVPs are tuples of: '(symbol safe-fn).
 
 If ASSERT/INFO-STR is non-nil, assert it similar to:
-(should assert/info-str)
+\(should assert/info-str)
   - It will show up in the list ('l') of asserts for the test in ERT."
   (let ((info.count 0))
     (when assert/info-str
@@ -434,13 +462,13 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
         (should (eq safe-fn
                     (get symbol 'safe-local-variable)))))))
 
-(defun test<dlv>:assert:dlv.class (assert/info-str &rest kvp)
+(defun test<dlv>:assert:dlv/class (assert/info-str &rest kvp)
   "Assert for each KVP that class has the mode and the mode has the symbol/value.
 
 KVPs are tuples of: '(class-symbol mode var-symbol value)
 
 If ASSERT/INFO-STR is non-nil, assert it similar to:
-(should assert/info-str)
+\(should assert/info-str)
   - It will show up in the list ('l') of asserts for the test in ERT."
   (let ((info.count 0))
     (dolist (item kvp)
@@ -451,10 +479,10 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
              (value     (nth 3 item))
              (dlv.class (dir-locals-get-class-variables class)))
         (when assert/info-str
-          (should (format "SUBTEST START: test<dlv>:assert:dlv.class: %02d: %s" info.count assert/info-str))
+          (should (format "SUBTEST START: test<dlv>:assert:dlv/class: %02d: %s" info.count assert/info-str))
           (setq info.count (1+ info.count))
 
-          (should (format "test<dlv>:assert:dlv.class: %02d: class: %S" info.count class))
+          (should (format "test<dlv>:assert:dlv/class: %02d: class: %S" info.count class))
           (setq info.count (1+ info.count)))
 
         ;; Validate the CLASS struct exists.
@@ -481,23 +509,24 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
             (should (eq value dlv.class.value))))))))
 
 
-(defun test<dlv>:assert:dlv.dir (assert/info-str &rest kvp)
-  "Assert for each KVP that the filepath's parent dir has a DLV structure with
-the class symbol in it.
+(defun test<dlv>:assert:dlv/dir (assert/info-str &rest kvp)
+  "Assert that each KVP has a DLV structure.
 
 KVPs are tuples of: '(filepath class-symbol)
+  - Assert that the filepath's parent dir has a DLV structure with the
+    class-symbol in it.
 
 If ASSERT/INFO-STR is non-nil, assert it similar to:
-(should assert/info-str)
+\(should assert/info-str)
   - It will show up in the list ('l') of asserts for the test in ERT."
   (let ((info.count 0))
     (dolist (item kvp)
       (let* ((filepath (nth 0 item))
-             (dirpath (test<dlv>:path/parent.get filepath))
+             (dirpath (test<dlv>:path:parent/get filepath))
              (class   (nth 1 item)))
 
         (when assert/info-str
-          (should (format "test<dlv>:assert:dlv.dir: %02d: %s" info.count assert/info-str))
+          (should (format "test<dlv>:assert:dlv/dir: %02d: %s" info.count assert/info-str))
           (setq info.count (1+ info.count)))
 
         ;; Get the DLV class for the file's path and verify.
@@ -505,7 +534,7 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
           (should file/dlv.classes)
           (should (= 3 (length file/dlv.classes)))
           (test<dlv>:assert:valid-path (concat assert/info-str
-                                               "::assert:dlv.dir")
+                                               "::assert:dlv/dir")
                                        (nth 0 file/dlv.classes)
                                        dirpath)
           ;; Expecting to only have the one dlv class.
@@ -526,7 +555,7 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
   "Test very basic DLV set. No DLV lib code."
 
   (test<dlv>:with:fixture nil nil
-    (let ((dir test<dlv>:const/path.root)
+    (let ((dir test<dlv>:const:path/root)
           (file "locals.hard-coded.txt"))
       (defvar dlv-test-hard-coded-var :test/default)
       (put 'dlv-test-hard-coded-var 'safe-local-variable #'test<dlv>:always-safe?)
@@ -551,11 +580,11 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
   "Test very basic DLV set. No DLV lib code."
 
   (test<dlv>:with:fixture "simple-vars" nil
-    (let* ((value.local   (test<dlv>:var/value.local test-name))
+    (let* ((value/local   (test<dlv>:var:value/local test-name))
            (class 'dlv-test-simple-class)
            (mode nil)
            (symbol 'dlv-test-simple-var))
-      (test<dlv>:var/create test-name
+      (test<dlv>:var:create test-name
                             symbol
                             :safe-fn #'test<dlv>:always-safe?
                             ;; :safe-value nil
@@ -563,14 +592,14 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
                             )
 
       ;; Create the DLV.
-      (let ((dlv.struct (list (cons mode (list (cons symbol value.local))))))
+      (let ((dlv.struct (list (cons mode (list (cons symbol value/local))))))
         (dir-locals-set-class-variables class dlv.struct))
 
-      (dir-locals-set-directory-class test<dlv>:fixture/dir.path class)
+      (dir-locals-set-directory-class test<dlv>:fixture:dir/path class)
 
       ;; Test the DLV.
-      (test<dlv>:with:file-buffer test<dlv>:fixture/file.path
-        (should (eq value.local
+      (test<dlv>:with:file-buffer test<dlv>:fixture:file/path
+        (should (eq value/local
                     (symbol-value symbol)))))))
 
 
@@ -582,10 +611,10 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
   "Test very basic use of DLV function `dlv:create'."
 
   (test<dlv>:with:fixture "simple-dlv-set" nil
-    (let* ((value.local   (test<dlv>:var/value.local test-name))
+    (let* ((value/local   (test<dlv>:var:value/local test-name))
            (mode nil)
            (symbol 'dlv-test-simple-dlv-set-var))
-      (test<dlv>:var/create test-name
+      (test<dlv>:var:create test-name
                             symbol
                             :safe-fn #'test<dlv>:always-safe?
                             ;; :safe-value nil
@@ -593,13 +622,13 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
                             )
 
       ;; Create the DLV.
-      (dlv:create test<dlv>:fixture/dir.path
+      (dlv:create test<dlv>:fixture:dir/path
                   mode
-                  (list symbol value.local #'test<dlv>:always-safe?))
+                  (list symbol value/local #'test<dlv>:always-safe?))
 
       ;; Test the DLV.
-      (test<dlv>:with:file-buffer test<dlv>:fixture/file.path
-        (should (eq value.local
+      (test<dlv>:with:file-buffer test<dlv>:fixture:file/path
+        (should (eq value/local
                     (symbol-value symbol)))))))
 
 
@@ -615,33 +644,33 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
   "Test `dlv:create' more in-depth."
 
   (test<dlv>:with:fixture "full-dlv-set" nil
-    (let* ((class (test<dlv>:dir->class test<dlv>:fixture/dir.path))
+    (let* ((class (test<dlv>:dir->class test<dlv>:fixture:dir/path))
            (mode nil)
            (symbol 'dlv-test-full-dlv-set-var)
-           (value.local (test<dlv>:var/value.local test-name)))
-      (test<dlv>:var/create test-name symbol)
+           (value/local (test<dlv>:var:value/local test-name)))
+      (test<dlv>:var:create test-name symbol)
 
       ;;------------------------------
       ;; Create the DLV.
       ;;------------------------------
       ;; Should return non-nil.
-      (should (dlv:create test<dlv>:fixture/dir.path
+      (should (dlv:create test<dlv>:fixture:dir/path
                           mode
-                          (list symbol value.local #'test<dlv>:always-safe?)))
+                          (list symbol value/local #'test<dlv>:always-safe?)))
 
       ;;------------------------------
       ;; Test the DLV.
       ;;------------------------------
       (test<dlv>:assert:safe-local-variable test-name
                                             (list symbol #'test<dlv>:always-safe?))
-      (test<dlv>:assert:dlv.class test-name
-                                  (list class mode symbol value.local))
-      (test<dlv>:assert:dlv.dir test-name
-                                (list test<dlv>:fixture/file.path class))
+      (test<dlv>:assert:dlv/class test-name
+                                  (list class mode symbol value/local))
+      (test<dlv>:assert:dlv/dir test-name
+                                (list test<dlv>:fixture:file/path class))
 
       ;; Check the actual value in an actual file buffer.
-      (test<dlv>:with:file-buffer test<dlv>:fixture/file.path
-        (should (eq value.local
+      (test<dlv>:with:file-buffer test<dlv>:fixture:file/path
+        (should (eq value/local
                     (symbol-value symbol)))))))
 
 
@@ -653,20 +682,20 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
   "Test `dlv:create' with multiple tuples."
 
   (test<dlv>:with:fixture "multi-vars-dlv-set" nil
-    (let* ((class (test<dlv>:dir->class test<dlv>:fixture/dir.path))
+    (let* ((class (test<dlv>:dir->class test<dlv>:fixture:dir/path))
            (mode nil)
            (symbol.0 'dlv-test-multi-vars-dlv-set-var0)
-           (value.0.local (test<dlv>:var/value.local test-name 0))
+           (value.0.local (test<dlv>:var:value/local test-name 0))
            (symbol.1 'dlv-test-multi-vars-dlv-set-var1)
-           (value.1.local (test<dlv>:var/value.local test-name 1)))
-      (test<dlv>:var/create test-name symbol.0)
-      (test<dlv>:var/create test-name symbol.1)
+           (value.1.local (test<dlv>:var:value/local test-name 1)))
+      (test<dlv>:var:create test-name symbol.0)
+      (test<dlv>:var:create test-name symbol.1)
 
       ;;------------------------------
       ;; Create the DLV.
       ;;------------------------------
       ;; Should return non-nil.
-      (should (dlv:create test<dlv>:fixture/dir.path
+      (should (dlv:create test<dlv>:fixture:dir/path
                           mode
                           (list symbol.0 value.0.local #'test<dlv>:always-safe?)
                           (list symbol.1 value.1.local #'test<dlv>:always-safe?)))
@@ -677,14 +706,14 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
       (test<dlv>:assert:safe-local-variable test-name
                                             (list symbol.0 #'test<dlv>:always-safe?)
                                             (list symbol.1 #'test<dlv>:always-safe?))
-      (test<dlv>:assert:dlv.class test-name
+      (test<dlv>:assert:dlv/class test-name
                                   (list class mode symbol.0 value.0.local)
                                   (list class mode symbol.1 value.1.local))
-      (test<dlv>:assert:dlv.dir test-name
-                                (list test<dlv>:fixture/file.path class))
+      (test<dlv>:assert:dlv/dir test-name
+                                (list test<dlv>:fixture:file/path class))
 
       ;; Check the actual value in an actual file buffer.
-      (test<dlv>:with:file-buffer test<dlv>:fixture/file.path
+      (test<dlv>:with:file-buffer test<dlv>:fixture:file/path
         (should (eq value.0.local
                     (symbol-value symbol.0)))
         (should (eq value.1.local
@@ -702,9 +731,9 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
     (let* ((dir.0.name "dir-0")
            (dir.1.name "dir-1")
            (dir.2.name "dir-2")
-           (dir.0.path (file-name-as-directory (concat test<dlv>:fixture/dir.path dir.0.name)))
-           (dir.1.path (file-name-as-directory (concat test<dlv>:fixture/dir.path dir.1.name)))
-           (dir.2.path (file-name-as-directory (concat test<dlv>:fixture/dir.path dir.2.name)))
+           (dir.0.path (file-name-as-directory (concat test<dlv>:fixture:dir/path dir.0.name)))
+           (dir.1.path (file-name-as-directory (concat test<dlv>:fixture:dir/path dir.1.name)))
+           (dir.2.path (file-name-as-directory (concat test<dlv>:fixture:dir/path dir.2.name)))
 
            (file.0.name "file-0")
            (file.1.name "file-1")
@@ -725,18 +754,18 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
            (symbol.1 'dlv-test-multi-dir-dlv-set-var1)
            (symbol.2 'dlv-test-multi-dir-dlv-set-var2)
 
-           (value.0.local (test<dlv>:var/value.local test-name 0))
-           (value.1.local (test<dlv>:var/value.local test-name 1))
-           (value.2.local (test<dlv>:var/value.local test-name 2)))
+           (value.0.local (test<dlv>:var:value/local test-name 0))
+           (value.1.local (test<dlv>:var:value/local test-name 1))
+           (value.2.local (test<dlv>:var:value/local test-name 2)))
 
-      (test<dlv>:var/create test-name symbol.0)
-      (test<dlv>:var/create test-name symbol.1)
-      (test<dlv>:var/create test-name symbol.2)
+      (test<dlv>:var:create test-name symbol.0)
+      (test<dlv>:var:create test-name symbol.1)
+      (test<dlv>:var:create test-name symbol.2)
 
       ;; Create dirs as subdirectories under the one setup created.
-      (test<dlv>:path/dir.create dir.0.path)
-      (test<dlv>:path/dir.create dir.1.path)
-      (test<dlv>:path/dir.create dir.2.path)
+      (test<dlv>:path:dir/create dir.0.path)
+      (test<dlv>:path:dir/create dir.1.path)
+      (test<dlv>:path:dir/create dir.2.path)
 
       ;;------------------------------
       ;; Create the DLVs.
@@ -759,11 +788,11 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
                                             (list symbol.0 #'test<dlv>:always-safe?)
                                             (list symbol.1 #'test<dlv>:always-safe?)
                                             (list symbol.2 #'test<dlv>:always-safe?))
-      (test<dlv>:assert:dlv.class test-name
+      (test<dlv>:assert:dlv/class test-name
                                   (list class.0 mode.0 symbol.0 value.0.local)
                                   (list class.1 mode.1 symbol.1 value.1.local)
                                   (list class.2 mode.2 symbol.2 value.2.local))
-      (test<dlv>:assert:dlv.dir test-name
+      (test<dlv>:assert:dlv/dir test-name
                                 (list file.0.path class.0)
                                 (list file.1.path class.1)
                                 (list file.2.path class.2))
@@ -789,23 +818,23 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
 
   (test<dlv>:with:fixture "subdir-dlv-set" nil
     (let* ((parent.name "parent")
-           (parent.path (file-name-as-directory (concat test<dlv>:fixture/dir.path parent.name)))
-           (subdir.name "subdir")
-           (subdir.path (file-name-as-directory (concat parent.path subdir.name)))
+           (parent.path (file-name-as-directory (concat test<dlv>:fixture:dir/path parent.name)))
+           (subdir/name "subdir")
+           (subdir/path (file-name-as-directory (concat parent.path subdir/name)))
 
-           (file.name "subdir-file")
-           (file.path (concat subdir.path file.name))
+           (file/name "subdir-file")
+           (file/path (concat subdir/path file/name))
 
            (class (test<dlv>:dir->class parent.path))
            (mode nil)
            (symbol 'dlv-test-subdir-dlv-set-var)
-           (value.local (test<dlv>:var/value.local test-name)))
+           (value/local (test<dlv>:var:value/local test-name)))
 
-      (test<dlv>:var/create test-name symbol)
+      (test<dlv>:var:create test-name symbol)
 
       ;; Create our dirs.
-      (test<dlv>:path/dir.create parent.path)
-      (test<dlv>:path/dir.create subdir.path)
+      (test<dlv>:path:dir/create parent.path)
+      (test<dlv>:path:dir/create subdir/path)
 
       ;;------------------------------
       ;; Create the DLV in the parent dir.
@@ -813,21 +842,21 @@ If ASSERT/INFO-STR is non-nil, assert it similar to:
       ;; Should return non-nil.
       (should (dlv:create parent.path
                           mode
-                          (list symbol value.local #'test<dlv>:always-safe?)))
+                          (list symbol value/local #'test<dlv>:always-safe?)))
 
       ;;------------------------------
       ;; Test the DLV.
       ;;------------------------------
       (test<dlv>:assert:safe-local-variable test-name
                                             (list symbol #'test<dlv>:always-safe?))
-      (test<dlv>:assert:dlv.class test-name
-                                  (list class mode symbol value.local))
-      (test<dlv>:assert:dlv.dir test-name
-                                (list file.path class))
+      (test<dlv>:assert:dlv/class test-name
+                                  (list class mode symbol value/local))
+      (test<dlv>:assert:dlv/dir test-name
+                                (list file/path class))
 
       ;; Check the actual value in an actual file buffer.
-      (test<dlv>:with:file-buffer file.path
-        (should (eq value.local
+      (test<dlv>:with:file-buffer file/path
+        (should (eq value/local
                     (symbol-value symbol)))))))
 
 
@@ -847,22 +876,22 @@ The second DLV class doesn't pass tests for its local value."
     (let* ((assert.info/0 (concat test-name "/0"))
            (assert.info/1 (concat test-name "/1"))
 
-           (class/0 (test<dlv>:dir->class test<dlv>:fixture/dir.path))
+           (class/0 (test<dlv>:dir->class test<dlv>:fixture:dir/path))
            (mode/0 nil)
            (symbol/0 'same-dir-multi-dlvs--dlv-create/0)
-           (value.local/0 (test<dlv>:var/value.local test-name "0"))
+           (value/local/0 (test<dlv>:var:value/local test-name "0"))
 
-           (class/1 (test<dlv>:dir->class test<dlv>:fixture/dir.path))
+           (class/1 (test<dlv>:dir->class test<dlv>:fixture:dir/path))
            (mode/1 'test-mode/1)
            (symbol/1 'same-dir-multi-dlvs--dlv-create/1)
-           (value.local/1 (test<dlv>:var/value.local test-name "1")))
+           (value/local/1 (test<dlv>:var:value/local test-name "1")))
 
       ;;------------------------------
       ;; Make the vars.
       ;;------------------------------
 
-      (test<dlv>:var/create test-name symbol/0)
-      (test<dlv>:var/create test-name symbol/1)
+      (test<dlv>:var:create test-name symbol/0)
+      (test<dlv>:var:create test-name symbol/1)
 
       ;;------------------------------
       ;; DLV #0: Create & Test that it works.
@@ -873,23 +902,23 @@ The second DLV class doesn't pass tests for its local value."
       ;; Create the first DLV.
       ;;---
       ;; Should return non-nil.
-      (should (dlv:create test<dlv>:fixture/dir.path
+      (should (dlv:create test<dlv>:fixture:dir/path
                           mode/0
-                          (list symbol/0 value.local/0 #'test<dlv>:always-safe?)))
+                          (list symbol/0 value/local/0 #'test<dlv>:always-safe?)))
 
       ;;---
       ;; Test the DLV.
       ;;---
       (test<dlv>:assert:safe-local-variable assert.info/0
                                             (list symbol/0 #'test<dlv>:always-safe?))
-      (test<dlv>:assert:dlv.class assert.info/0
-                                  (list class/0 mode/0 symbol/0 value.local/0))
-      (test<dlv>:assert:dlv.dir assert.info/0
-                                (list test<dlv>:fixture/file.path class/0))
+      (test<dlv>:assert:dlv/class assert.info/0
+                                  (list class/0 mode/0 symbol/0 value/local/0))
+      (test<dlv>:assert:dlv/dir assert.info/0
+                                (list test<dlv>:fixture:file/path class/0))
 
       ;; Check the actual value in an actual file buffer.
-      (test<dlv>:with:file-buffer test<dlv>:fixture/file.path
-        (should (eq value.local/0
+      (test<dlv>:with:file-buffer test<dlv>:fixture:file/path
+        (should (eq value/local/0
                     (symbol-value symbol/0))))
 
       ;;------------------------------
@@ -901,9 +930,9 @@ The second DLV class doesn't pass tests for its local value."
       ;; Create the second DLV.
       ;;---
       ;; `dlv:create' validation should notice we're not allowed to create a new one for this path.
-      (should-error (dlv:create test<dlv>:fixture/dir.path
+      (should-error (dlv:create test<dlv>:fixture:dir/path
                                 mode/1
-                                (list symbol/1 value.local/1 #'test<dlv>:always-safe?)))
+                                (list symbol/1 value/local/1 #'test<dlv>:always-safe?)))
       ;;---
       ;; If it didn't notice/error: we would continue on like so to the `should-not'.
       ;;---
@@ -913,17 +942,17 @@ The second DLV class doesn't pass tests for its local value."
       ;; ;; These asserts should still work.
       ;; (test<dlv>:assert:safe-local-variable assert.info/0
       ;;                                       (list symbol/1 #'test<dlv>:always-safe?))
-      ;; (test<dlv>:assert:dlv.class assert.info/0
-      ;;                             (list class/1 mode/1 symbol/1 value.local/1))
-      ;; (test<dlv>:assert:dlv.dir assert.info/0
-      ;;                           (list test<dlv>:fixture/file.path class/1))
+      ;; (test<dlv>:assert:dlv/class assert.info/0
+      ;;                             (list class/1 mode/1 symbol/1 value/local/1))
+      ;; (test<dlv>:assert:dlv/dir assert.info/0
+      ;;                           (list test<dlv>:fixture:file/path class/1))
       ;;
       ;;
       ;; ;; [FAILURE] THIS SHOULD FAIL!!!
       ;; ;;   - Well... It should /not/ have a dir local value, so it should pass the `should-not'.
       ;; ;; Check the actual value in an actual file buffer.
-      ;; (test<dlv>:with:file-buffer test<dlv>:fixture/file.path
-      ;;   (should-not (eq value.local/1
+      ;; (test<dlv>:with:file-buffer test<dlv>:fixture:file/path
+      ;;   (should-not (eq value/local/1
       ;;                   (symbol-value symbol/1))))
 
       ;;------------------------------
@@ -937,14 +966,14 @@ The second DLV class doesn't pass tests for its local value."
       ;; These should work since DLV #1 isn't set yet.
       (test<dlv>:assert:safe-local-variable (concat assert.info/0 "/again")
                                             (list symbol/0 #'test<dlv>:always-safe?))
-      (test<dlv>:assert:dlv.class assert.info/0
-                                  (list class/0 mode/0 symbol/0 value.local/0))
-      (test<dlv>:assert:dlv.dir assert.info/0
-                                (list test<dlv>:fixture/file.path class/0))
+      (test<dlv>:assert:dlv/class assert.info/0
+                                  (list class/0 mode/0 symbol/0 value/local/0))
+      (test<dlv>:assert:dlv/dir assert.info/0
+                                (list test<dlv>:fixture:file/path class/0))
 
       ;; Check the actual value in an actual file buffer.
-      (test<dlv>:with:file-buffer test<dlv>:fixture/file.path
-        (should (eq value.local/0
+      (test<dlv>:with:file-buffer test<dlv>:fixture:file/path
+        (should (eq value/local/0
                     (symbol-value symbol/0)))))))
 
 
@@ -965,22 +994,22 @@ This /is/ expected to work, as opposed to `test<dlv>:same-dir/multi-dlvs::dlv:cr
     (let* ((assert.info/0 (concat test-name "/0"))
            (assert.info/1 (concat test-name "/1"))
 
-           (class/0 (test<dlv>:dir->class test<dlv>:fixture/dir.path))
+           (class/0 (test<dlv>:dir->class test<dlv>:fixture:dir/path))
            (mode/0 nil)
            (symbol/0 'same-dir-multi-dlvs--dlv-set/0)
-           (value.local/0 (test<dlv>:var/value.local test-name "0"))
+           (value/local/0 (test<dlv>:var:value/local test-name "0"))
 
-           (class/1 (test<dlv>:dir->class test<dlv>:fixture/dir.path))
+           (class/1 (test<dlv>:dir->class test<dlv>:fixture:dir/path))
            (mode/1 'text-mode) ;; Want a different mode; need one that the test file buffer will use.
            (symbol/1 'same-dir-multi-dlvs--dlv-set/1)
-           (value.local/1 (test<dlv>:var/value.local test-name "1")))
+           (value/local/1 (test<dlv>:var:value/local test-name "1")))
 
       ;;------------------------------
       ;; Make the vars.
       ;;------------------------------
 
-      (test<dlv>:var/create test-name symbol/0)
-      (test<dlv>:var/create test-name symbol/1)
+      (test<dlv>:var:create test-name symbol/0)
+      (test<dlv>:var:create test-name symbol/1)
 
       ;;------------------------------
       ;; DLV #0: Create & Test that it works.
@@ -992,9 +1021,9 @@ This /is/ expected to work, as opposed to `test<dlv>:same-dir/multi-dlvs::dlv:cr
       ;;---
       ;; `dlv:set' should create a new DLV.
       ;; Should return non-nil.
-      (should (dlv:set test<dlv>:fixture/dir.path
+      (should (dlv:set test<dlv>:fixture:dir/path
                        mode/0
-                       (list symbol/0 value.local/0 #'test<dlv>:always-safe?)))
+                       (list symbol/0 value/local/0 #'test<dlv>:always-safe?)))
 
       ;;---
       ;; Test the DLV.
@@ -1002,14 +1031,14 @@ This /is/ expected to work, as opposed to `test<dlv>:same-dir/multi-dlvs::dlv:cr
       ;; These should work since DLV #1 isn't set yet.
       (test<dlv>:assert:safe-local-variable assert.info/0
                                             (list symbol/0 #'test<dlv>:always-safe?))
-      (test<dlv>:assert:dlv.class assert.info/0
-                                  (list class/0 mode/0 symbol/0 value.local/0))
-      (test<dlv>:assert:dlv.dir assert.info/0
-                                (list test<dlv>:fixture/file.path class/0))
+      (test<dlv>:assert:dlv/class assert.info/0
+                                  (list class/0 mode/0 symbol/0 value/local/0))
+      (test<dlv>:assert:dlv/dir assert.info/0
+                                (list test<dlv>:fixture:file/path class/0))
 
       ;; Check the actual value in an actual file buffer.
-      (test<dlv>:with:file-buffer test<dlv>:fixture/file.path
-        (should (eq value.local/0
+      (test<dlv>:with:file-buffer test<dlv>:fixture:file/path
+        (should (eq value/local/0
                     (symbol-value symbol/0))))
 
       ;;------------------------------
@@ -1021,22 +1050,22 @@ This /is/ expected to work, as opposed to `test<dlv>:same-dir/multi-dlvs::dlv:cr
       ;; Create the second DLV.
       ;;---
       ;; `dlv:set' should update the existing DLV this time.
-      (should (dlv:set test<dlv>:fixture/dir.path mode/1
-                       (list symbol/1 value.local/1 #'test<dlv>:always-safe?)))
+      (should (dlv:set test<dlv>:fixture:dir/path mode/1
+                       (list symbol/1 value/local/1 #'test<dlv>:always-safe?)))
       ;;---
       ;; Test the DLV.
       ;;---
       ;; These asserts should still work.
       (test<dlv>:assert:safe-local-variable assert.info/0
                                             (list symbol/1 #'test<dlv>:always-safe?))
-      (test<dlv>:assert:dlv.class assert.info/0
-                                  (list class/1 mode/1 symbol/1 value.local/1))
-      (test<dlv>:assert:dlv.dir assert.info/0
-                                (list test<dlv>:fixture/file.path class/1))
+      (test<dlv>:assert:dlv/class assert.info/0
+                                  (list class/1 mode/1 symbol/1 value/local/1))
+      (test<dlv>:assert:dlv/dir assert.info/0
+                                (list test<dlv>:fixture:file/path class/1))
 
       ;; Check the actual value in an actual file buffer.
-      (test<dlv>:with:file-buffer test<dlv>:fixture/file.path
-        (should (eq value.local/1
+      (test<dlv>:with:file-buffer test<dlv>:fixture:file/path
+        (should (eq value/local/1
                     (symbol-value symbol/1))))
 
       ;;------------------------------
@@ -1050,14 +1079,14 @@ This /is/ expected to work, as opposed to `test<dlv>:same-dir/multi-dlvs::dlv:cr
       ;; These should work since DLV #1 isn't set yet.
       (test<dlv>:assert:safe-local-variable (concat assert.info/0 "/again")
                                             (list symbol/0 #'test<dlv>:always-safe?))
-      (test<dlv>:assert:dlv.class assert.info/0
-                                  (list class/0 mode/0 symbol/0 value.local/0))
-      (test<dlv>:assert:dlv.dir assert.info/0
-                                (list test<dlv>:fixture/file.path class/0))
+      (test<dlv>:assert:dlv/class assert.info/0
+                                  (list class/0 mode/0 symbol/0 value/local/0))
+      (test<dlv>:assert:dlv/dir assert.info/0
+                                (list test<dlv>:fixture:file/path class/0))
 
       ;; Check the actual value in an actual file buffer.
-      (test<dlv>:with:file-buffer test<dlv>:fixture/file.path
-        (should (eq value.local/0
+      (test<dlv>:with:file-buffer test<dlv>:fixture:file/path
+        (should (eq value/local/0
                     (symbol-value symbol/0)))))))
 
 
