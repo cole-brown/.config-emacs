@@ -20,7 +20,8 @@
   "Directory Local Variable for holding the directory's namespace.")
 
 ;; Mark our DLV variable as safe for DLV use.
-(dlv:var:safe/predicate 'int<jerky>:dlv:namespace/local #'int<jerky>:namespace:valid)
+(dlv:var:safe/predicate 'int<jerky>:dlv:namespace/local
+                        #'int<jerky>:namespace:valid?)
 ;; (get 'int<jerky>:dlv:namespace/local 'safe-local-variable)
 
 
