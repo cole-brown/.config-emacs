@@ -87,7 +87,7 @@ ARGS based on current verbosity for the level."
        ;;---
        ((eq verbosity:level t)
         ;; Do the normal/default thing.
-        (int<nub>:output:sinks level sinks msg args))
+        (int<nub>:output:sinks user level sinks msg args))
 
        ((eq verbosity:level nil)
         ;; Do nothing
@@ -101,7 +101,7 @@ ARGS based on current verbosity for the level."
         ;; Ask user if this level should be enabled (give default for level in case they want that).
         (when (funcall verbosity:level level (int<nub>:var:enabled? int<nub>:var:user:fallback level))
           ;; The user's predicate says the level is enabled; output.
-          (int<nub>:output:sinks level sinks msg args)))
+          (int<nub>:output:sinks user level sinks msg args)))
 
        ;;------------------------------
        ;; Errors/Invalids
