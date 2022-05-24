@@ -57,7 +57,7 @@ For `int<jerky>:repo/test/string=' (`define-hash-table-test')."
 
 
 (defvar int<jerky>:repo (make-hash-table :test 'int<jerky>:repo/test/string=
-                                     :weakness nil)
+                                         :weakness nil)
   "A key-path/value store, basically.
 
 Each hash table key/value is a plist 2-tuple of `:key' and `:record'
@@ -175,9 +175,9 @@ output will be nil."
 
     ;; Now look for the usual keywords...
     (dolist (key keywords)
-        ;; Add key and value (nil default) to output.
-        (push (plist-get kwargs key) parsed)
-        (push key parsed))
+      ;; Add key and value (nil default) to output.
+      (push (plist-get kwargs key) parsed)
+      (push key parsed))
 
     ;; And build our tuple output.
     (list (int<jerky>:key:normalize args) parsed)))
@@ -421,9 +421,9 @@ Return an ordered list of namespaces. If NAMESPACE isn't found, return
         ;; Create a default to give user.
         (setq entry
               (int<jerky>:namespace:entry:set jerky:namespace/default
-                                          "No default namespace exists."
-                                          "No default namespace exists."
-                                          jerky:namespace/no-fallback))))
+                                              "No default namespace exists."
+                                              "No default namespace exists."
+                                              jerky:namespace/no-fallback))))
 
     ;;------------------------------
     ;; Get Namespace and Fallbacks
@@ -456,7 +456,7 @@ Return an ordered list of namespaces. If NAMESPACE isn't found, return
           (dolist (fb-ns fb-fb)
             (unless (or (memq fb-ns namespaces)
                         (eq fb-ns jerky:namespace/no-fallback))
-                (push fb-ns namespaces))))))
+              (push fb-ns namespaces))))))
 
     ;; Return list of namespaces to check.
     (nreverse namespaces)))
@@ -482,21 +482,21 @@ Check/return first to be non-nil of:
                system
              jerky:namespace/default))))
     (nub:debug :jerky
-               "jerky:namespace:get"
-               '(:namespace)
-               '("vars/settings:\n"
-                 "  dlv enabled?     %S\n"
-                 "  namespace/local: %S\n"
-                 "  system:          %S\n"
-                 "  default:         %S\n"
-                 "  result:          %S")
-               (imp:provided? :jerky 'dlv)
-               (if (boundp 'int<jerky>:dlv:namespace/local)
-                   int<jerky>:dlv:namespace/local
-                 "<jerky/+dlv not in use>")
-               (jerky:get 'namespace 'system)
-               jerky:namespace/default
-               namespace)
+        "jerky:namespace:get"
+        '(:namespace)
+      '("vars/settings:\n"
+        "  dlv enabled?     %S\n"
+        "  namespace/local: %S\n"
+        "  system:          %S\n"
+        "  default:         %S\n"
+        "  result:          %S")
+      (imp:provided? :jerky 'dlv)
+      (if (boundp 'int<jerky>:dlv:namespace/local)
+          int<jerky>:dlv:namespace/local
+        "<jerky/+dlv not in use>")
+      (jerky:get 'namespace 'system)
+      jerky:namespace/default
+      namespace)
     namespace))
 ;; (jerky:namespace:get)
 
@@ -626,8 +626,8 @@ list in order and return record from first namespace that has one."
 
 (defun int<jerky>:record/value:get (record)
   "Get the value of this RECORD in jerky's repo."
-    ;; value is at index 1
-    (nth 1 record))
+  ;; value is at index 1
+  (nth 1 record))
 
 
 (defun int<jerky>:record/docstr:get (record)
@@ -655,18 +655,18 @@ If nothing found at key, return will be nil."
   ;; Some shenanigans to do to turn input into key/kwargs,
   ;; then kwargs into options.
   (-let* (((key kwargs) (int<jerky>:parse keys-and-options
-                                       '(:namespace :field)))
+                                          '(:namespace :field)))
           (getter nil)
           ((&plist :namespace namespace :field field) kwargs)
           (func.name "jerky:get")
           (func.tags '(:get)))
     (nub:debug:func/start :jerky
-                          func.name
-                          func.tags
-                          (list
-                           (cons 'key       key)
-                           (cons 'kwargs    kwargs)
-                           (cons 'namespace namespace)))
+        func.name
+        func.tags
+      (list
+       (cons 'key       key)
+       (cons 'kwargs    kwargs)
+       (cons 'namespace namespace)))
 
     ;; Check field... is it a known value?
     (cond ((memq field '(:namespace :value :docstr))
@@ -706,9 +706,9 @@ If nothing found at key, return will be nil."
                          (int<jerky>:repo/record:get (int<jerky>:repo:get key))))))
 
       (nub:debug:func/end :jerky
-                          func.name
-                          func.tags
-                          (cons 'got got))
+          func.name
+          func.tags
+        (cons 'got got))
 
       got)))
 ;; (jerky:get 'path 'to 'thing)
@@ -853,9 +853,9 @@ If not provided, they will be nil."
 
     ;; Get/update/create entries, set hash to key in repo.
     (int<jerky>:repo/update key
-                        (or namespace jerky:namespace/default)
-                        value
-                        docstr)))
+                            (or namespace jerky:namespace/default)
+                            value
+                            docstr)))
 ;; (jerky:set '(path to thing) :value "hello there")
 ;; (jerky:set '(:test :jeff) :value "jeffe" :docstr "I am a comment.")
 ;; (jerky:set :test "jeff" :value "jeffe overwrite" :docstr "I am not a comment.")
@@ -937,21 +937,21 @@ Example:
           ((&plist :namespace namespace) kwargs)
           matches)
     (nub:debug:func/start :jerky
-                          "jerky:has"
-                          '(:get)
-                          (list
-                           (cons "keys-and-options" keys-and-options)
-                           (cons "->    key"           partial-key)
-                           (cons "-> kwargs"        kwargs)
-                           (cons "partial-key"      partial-key)
-                           (cons "namespace"        namespace)))
+        "jerky:has"
+        '(:get)
+      (list
+       (cons "keys-and-options" keys-and-options)
+       (cons "->    key"           partial-key)
+       (cons "-> kwargs"        kwargs)
+       (cons "partial-key"      partial-key)
+       (cons "namespace"        namespace)))
     ;; Now we can search & filter.
-    (setq matches (int<jerky>:search/filter partial-key namespace)
-    (nub:debug:func/start :jerky
-                          "jerky:has"
-                          '(:get)
-                          (list
-                           (cons 'matches matches)))
+    (setq matches (int<jerky>:search/filter partial-key namespace))
+    (nub:debug:func/end :jerky
+        "jerky:has"
+        '(:get)
+      (list
+       (cons 'matches matches)))
     matches))
 ;; (jerky:has 'signature 'id)
 ;; (jerky:has "signature/id")
