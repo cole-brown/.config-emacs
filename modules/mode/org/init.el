@@ -8,15 +8,15 @@
 (let ((path/parent (imp:path:current:dir)))
 
   (imp:timing
-      '(:module mode org)
+      '(:mode org)
       (imp:file:current)
       path/parent
 
 
-      (imp:load :feature  '(:module mode org keyword)
+      (imp:load :feature  '(:mode org keyword)
                 :path     path/parent
                 :filename "keyword")
-      (imp:load :feature  '(:module mode org link)
+      (imp:load :feature  '(:mode org link)
                 :path     path/parent
                 :filename "link")))
 
@@ -24,4 +24,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :module 'mode 'org)
+(imp:provide :mode 'org)

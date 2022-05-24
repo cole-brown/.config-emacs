@@ -234,4 +234,4 @@ Return an absolute path string."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :module 'emacs 'buffer 'name)
+(imp:provide :emacs 'buffer 'name)

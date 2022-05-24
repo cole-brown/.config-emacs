@@ -138,4 +138,4 @@ point reaches the beginning or end of the buffer, stop there."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :module 'emacs 'buffer 'line)
+(imp:provide :emacs 'buffer 'line)

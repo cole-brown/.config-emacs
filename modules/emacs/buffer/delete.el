@@ -12,4 +12,4 @@ Kill characters forward until encountering the end of a word."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :module 'emacs 'buffer 'delete)
+(imp:provide :emacs 'buffer 'delete)

@@ -1,6 +1,6 @@
 ;;; mode/org/keyword.el -*- lexical-binding: t; -*-
 
-(imp:require :module 'emacs 'buffer 'delete)
+(imp:require :emacs 'buffer 'delete)
 
 
 ;;------------------------------------------------------------------------------
@@ -374,4 +374,4 @@ The `org-todo-keyword-faces' line must be at the top of the file to work."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :module 'mode 'org 'keyword)
+(imp:provide :mode 'org 'keyword)
