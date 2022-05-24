@@ -837,7 +837,7 @@ error."
                                         #'error))
 
            ;; Set the safe predicate.
-           (int<dlv>:vars:safe "dlv:var:safe/function" symbol predicate)))))
+           (int<dlv>:vars:safe "dlv:var:safe/predicate" symbol predicate)))))
 
 
 (defun dlv:var:safe/value (symbol value &optional remove-risky)

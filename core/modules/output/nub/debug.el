@@ -641,10 +641,11 @@ VALUEs are optional and should be:
   - `cons' pairs of: '(name . value)"
     (let ((callers (nub:format:callers "int<nub>:debug:func" caller))
         value/formatted)
-      (int<nub>:user:exists? callers user :error)
-      (int<nub>:debug:tags:verify callers
-                                  func/tags
-                                  :error)
+    (int<nub>:user:exists? callers user :error)
+    (int<nub>:debug:tags:verify callers
+                                user
+                                func/tags
+                                :error)
 
     ;;------------------------------
     ;; Error checks.
@@ -912,12 +913,12 @@ VALUEs are optional and should be:
   - `cons' pairs of: '(name . value)
     + Intended for input params."
   (declare (indent 3))
-  (int<nub>:debug:func "nub:debug:func/start"
-    user
-    func/name
-    func/tags
-    :start
-    value))
+  (int<nub>:debug:func (nub:format:callers "nub:debug:func/start" func/name)
+                       user
+                       func/name
+                       func/tags
+                       :start
+                       value))
 
 
 (defun nub:debug:func/end (user func/name func/tags &rest value)
@@ -934,12 +935,12 @@ VALUE is optional and should be:
   - `cons' pairs of: '(name . value)
     + Intended for output value."
   (declare (indent 3))
-  (int<nub>:debug:func "nub:debug:func/end"
-    user
-    func/name
-    func/tags
-    :end
-    value))
+  (int<nub>:debug:func (nub:format:callers "nub:debug:func/end" func/name)
+                       user
+                       func/name
+                       func/tags
+                       :end
+                       value))
 
 
 (defmacro nub:debug:func/return (user func/name func/tags &rest body)
@@ -957,7 +958,7 @@ and also printed in the debug message (if debugging)."
   ;; Execute caller's BODY forms.
   `(let ((macro<nub>:return-value (progn ,@body)))
      ;; Log the debug message?
-     (int<nub>:debug:func "nub:debug:func/return"
+     (int<nub>:debug:func (nub:format:callers "nub:debug:func/return" func/name)
                           ,user
                           ,func/name
                           ,func/tags
