@@ -109,7 +109,7 @@ Usage:
       ...))"
   ;; Get something from the user.
   (let ((func.name (nub:format:callers "int<nub>:prompt:user"
-                                            caller))
+                                       caller))
         (choice.string (int<nub>:prompt:generic prompt
                                                 int<nub>:var:users
                                                 'int<nub>:debug:user/history))
@@ -164,7 +164,7 @@ Usage:
       ;; Do something about tag.
       ...))"
   (let ((func.name (nub:format:callers "int<nub>:prompt:debug:tag"
-                                            caller))
+                                       caller))
         tag.string)
     ;; Make sure user is valid.
     (if (null (int<nub>:user:exists? func.name user nil))
@@ -199,7 +199,7 @@ USER should be a valid `nub' user keyword.
 QUIT should be a list of strings to stop the loop. If nil, it will stop on
 nil/empty input only."
   (let ((func.name (nub:format:callers "int<nub>:prompt:debug:tag"
-                                            caller)))
+                                       caller)))
     ;; Make sure user is valid.
     (if (null (int<nub>:user:exists? func.name user nil))
         ;; Invalid - message about it and return nil.
@@ -250,7 +250,11 @@ nil/empty input only."
 ;;------------------------------------------------------------------------------
 
 (defun int<nub>:debug:tags:verify (caller user tags &optional error?)
-  "Returns non-nil if TAGS are 'correct'.
+  "Return non-nil if TAGS are 'correct'.
+
+CALLER should be calling function's string name.
+
+USER should be the nub user keyword.
 
 Correct, currently, means that TAGS is:
   - a list containing only keywords
@@ -260,7 +264,7 @@ If tags are not valid:
   If ERROR? is non-nil, signals an error.
   Else returns nil."
   (let ((func.name (nub:format:callers "int<nub>:debug:tags:verify"
-                                            caller)))
+                                       caller)))
     (int<nub>:user:exists? func.name user :error)
 
     (cond ((null tags)
@@ -310,8 +314,7 @@ If tags are not valid:
 
 
 (defun int<nub>:debug:active? (caller user tags)
-  "Returns non-nil if USER is currently debugging for anything in the
-list of TAGS.
+  "Return non-nil if USER is currently debugging for any tag in TAGS.
 
 CALLER should be calling function's string name.
 
@@ -319,13 +322,11 @@ Debugging when `int<nub>:var:debugging' is non-nil for USER and one of these
 is true:
   - `int<nub>:var:debug:tags' for the user is nil
     + No specific debugging tags desired == all tags active.
-(progn
-
   - `int<nub>:var:debug:tags' for the user is non-nil AND matches one or more
      of the tags in TAGS.
     + Looking for a specific debug tag and found it."
   (let* ((func.name (nub:format:callers "int<nub>:debug:active?"
-                                             caller))
+                                        caller))
          (tags/input tags)
          (tags/active (int<nub>:var:debug:tags user))
          (tags/matched (seq-intersection tags/input tags/active)))
@@ -364,14 +365,16 @@ is true:
 ;;------------------------------------------------------------------------------
 
 (defun int<nub>:debug:tags:sorted (tags)
-  "Converts TAGS (list of keywords) into a sorted list of keyword strings."
+  "Convert TAGS (list of keywords) into a sorted list of keyword strings."
   (cl-sort tags
            #'string-lessp
            :key (lambda (element) (downcase (symbol-name element)))))
 
 
 (defun int<nub>:debug:status/message (prefix user &optional tags)
-  "Output debugging status and current debugging TAGS (list) for USER."
+  "Output debugging status and current debugging TAGS (list) for USER.
+
+PREFIX is an optional string to be printed first on its own line."
   (let ((func.name "int<nub>:debug:status/message"))
     (int<nub>:user:exists? func.name user :error)
 
@@ -514,7 +517,7 @@ The answer depends on TAGS:
 
 
 (defun nub:debug:clear (user)
-  "Turns off debugging for USER and clears all of USER's current debug tags."
+  "Turn off debugging for USER and clears all of USER's current debug tags."
   (interactive (int<nub>:prompt:user "nub:debug:clear"
                                      "Toggle Debug for User"
                                      :list))
@@ -633,13 +636,21 @@ The answer depends on TAGS:
 (defun int<nub>:debug:func (caller user func/name func/tags start-or-end value)
   "Print out start/end function message, with optional VALUE.
 
+CALLER (string) should be the calling function's name or calling file's path.
+
+USER should be the nub user keyword.
+
+FUNC/NAME should be the calling function's string name.
+
+FUNC/TAGS should be nil or a list of debug tag keywords.
+
 Prints start message when START-OR-END is `:start'.
 Prints end message w/ optional return value when START-OR-END is `:end'.
 
 VALUEs are optional and should be:
   - nil
   - `cons' pairs of: '(name . value)"
-    (let ((callers (nub:format:callers "int<nub>:debug:func" caller))
+  (let ((callers (nub:format:callers "int<nub>:debug:func" caller))
         value/formatted)
     (int<nub>:user:exists? callers user :error)
     (int<nub>:debug:tags:verify callers
@@ -824,7 +835,7 @@ ARGS should be the `message' arguments."
             (int<nub>:macro:tags      ,tags)
             (int<nub>:macro:caller    ,caller)
             (int<nub>:macro:func.name (nub:format:callers "nub:debug"
-                                                               int<nub>:macro:caller)))
+                                                          int<nub>:macro:caller)))
        (int<nub>:user:exists? int<nub>:macro:func.name
                               int<nub>:macro:user
                               :error)
@@ -871,42 +882,48 @@ ARGS should be the `message' arguments."
           (int<nub>:macro:tags      ,tags)
           (int<nub>:macro:caller    ,caller)
           (int<nub>:macro:func.name (nub:format:callers "nub:debug"
-                                                             int<nub>:macro:caller)))
-       (int<nub>:user:exists? int<nub>:macro:func.name
-                              int<nub>:macro:user
-                              :error)
-       (int<nub>:debug:tags:verify int<nub>:macro:func.name
-                                   int<nub>:macro:user
-                                   int<nub>:macro:tags
-                                   :error)
-
-       ;; Check with `int<nub>:debug:active?' first so that missing debug tags always error.
-       (cond
-        ;; Only message (at debug level) if passed checks.
-        ((int<nub>:debug:active? int<nub>:macro:func.name
+                                                        int<nub>:macro:caller)))
+     (int<nub>:user:exists? int<nub>:macro:func.name
+                            int<nub>:macro:user
+                            :error)
+     (int<nub>:debug:tags:verify int<nub>:macro:func.name
                                  int<nub>:macro:user
-                                 int<nub>:macro:tags)
-         (int<nub>:output int<nub>:macro:user
-                          :debug
-                          int<nub>:macro:caller
-                          ,msg
-                          ,@args))
+                                 int<nub>:macro:tags
+                                 :error)
 
-        ;; Always message (at debug level) - regardless of debugging toggle/flags.
-        (,message?
-         (int<nub>:output int<nub>:macro:user
-                          :debug
-                          int<nub>:macro:caller
-                          ,msg
-                          ,@args))
+     ;; Check with `int<nub>:debug:active?' first so that missing debug tags always error.
+     (cond
+      ;; Only message (at debug level) if passed checks.
+      ((int<nub>:debug:active? int<nub>:macro:func.name
+                               int<nub>:macro:user
+                               int<nub>:macro:tags)
+       (int<nub>:output int<nub>:macro:user
+                        :debug
+                        int<nub>:macro:caller
+                        ,msg
+                        ,@args))
 
-        ;; Not debugging and not allowing message through otherwise.
-        (t
-         nil))))
+      ;; Always message (at debug level) - regardless of debugging toggle/flags.
+      (,message?
+       (int<nub>:output int<nub>:macro:user
+                        :debug
+                        int<nub>:macro:caller
+                        ,msg
+                        ,@args))
+
+      ;; Not debugging and not allowing message through otherwise.
+      (t
+       nil))))
 
 
 (defun nub:debug:func/start (user func/name func/tags &rest value)
   "Print out start-of-function message, with optional VALUEs.
+
+USER should be the nub user keyword.
+
+FUNC/NAME should be the calling function's string name.
+
+FUNC/TAGS should be nil or a list of debug tag keywords.
 
 VALUEs are optional and should be:
   - nil

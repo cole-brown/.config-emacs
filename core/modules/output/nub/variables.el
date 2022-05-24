@@ -18,8 +18,9 @@
 ;;------------------------------------------------------------------------------
 
 (defconst int<nub>:var:user:fallback :default
-  "Fallback user - used when actual user not found so that output
-can still happen.")
+  "Nub's default/fallback user.
+
+ Used when actual user not found so that output can still happen.")
 
 
 (defconst nub:output:levels  '(:error :warn :info :debug)
@@ -27,7 +28,12 @@ can still happen.")
 
 
 (defun int<nub>:level:exists? (caller level &optional error?)
-  "Returns non-nil if level is a valid `nub' output level."
+  "Return non-nil if LEVEL is a valid `nub' output level.
+
+CALLER (string) should be the calling function's name or calling file's path.
+
+If ERROR? is non-nil, signals an error if things are not ok.
+Else returns nil if things are not ok."
   (if (memq level nub:output:levels)
       level
 
@@ -47,7 +53,11 @@ can still happen.")
 
 
 (defun int<nub>:user:exists? (caller user &optional error?)
-  "Returns non-nil if USER is a registered `nub' user."
+  "Return non-nil if USER is a registered `nub' user.
+
+CALLER (string) should be the calling function's name or calling file's path.
+
+USER should be the nub user keyword."
   (if (or (eq user int<nub>:var:user:fallback)
           (memq user int<nub>:var:users))
       t
@@ -60,12 +70,12 @@ can still happen.")
 
 
 (defun int<nub>:init:user (user)
-  "Adds USER as a registered `nub' user."
+  "Add USER as a registered `nub' user."
   (push user int<nub>:var:users))
 
 
 (defun int<nub>:terminate:user (user)
-  "Adds USER as a registered `nub' user."
+  "Add USER as a registered `nub' user."
   (setq int<nub>:var:users (remove user int<nub>:var:users)))
 
 
@@ -75,6 +85,8 @@ can still happen.")
 
 (defun int<nub>:var:assert-user-level (caller user level error?)
   "Assert that USER is registered and LEVEL is a valid `nub' output level.
+
+CALLER (string) should be the calling function's name or calling file's path.
 
 If ERROR? is non-nil, signals an error if things are not ok.
 Else returns nil if things are not ok."
@@ -133,12 +145,20 @@ Returns DEFAULT if not found.
                                            (:info  . "[INFO    ]: ")
                                            ;; Noticibly different so when debugging any error/warning messages stand out if all sent to the same buffer?
                                            (:debug . "[   debug]: "))))
-  "Alist of USER keyword to alist of verbosity level to prefixes for output messages.")
+  "Prefix strings for the verbosity levels.
+
+alist of USER keyword
+  -> alist of verbosity level
+     -> prefix strings for output messages")
 
 
 (defvar int<nub>:var:prefix
   (int<nub>:alist:copy/shallow int<nub>:var:prefix:backup)
-  "Alist of USER keyword to alist of verbosity level to prefixes for output messages.")
+  "Prefix strings for the verbosity levels.
+
+alist of USER keyword
+  -> alist of verbosity level
+     -> prefix strings for output messages")
 
 
 (defun int<nub>:var:prefix (user level)
@@ -327,7 +347,7 @@ displaying to the minibuffer, if `message' happens to be the sink.")
 
 
 (defun int<nub>:var:sink:verify (caller sink &optional error? context list-invalid?)
-  "Returns non-nil if SINK is valid.
+  "Return non-nil if SINK is valid.
 
 CALLER should be calling function's name.
 
