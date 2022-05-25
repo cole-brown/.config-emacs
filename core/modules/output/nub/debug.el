@@ -847,11 +847,11 @@ ARGS should be the `message' arguments."
        (when (int<nub>:debug:active? int<nub>:macro:func.name
                                      int<nub>:macro:user
                                      int<nub>:macro:tags)
-         (int<nub>:output int<nub>:macro:user
-                          :debug
-                          int<nub>:macro:caller
-                          ,msg
-                          ,@args)))))
+         (nub:output int<nub>:macro:user
+                     :debug
+                     int<nub>:macro:caller
+                     ,msg
+                     ,@args)))))
 ;; Make sure it only evals args when debugging:
 ;; (nub:debug :default "test-func" nil (message "test"))
 ;; (nub:debug :default "test-func" '(:derive) (message "test"))
@@ -897,19 +897,19 @@ ARGS should be the `message' arguments."
       ((int<nub>:debug:active? int<nub>:macro:func.name
                                int<nub>:macro:user
                                int<nub>:macro:tags)
-       (int<nub>:output int<nub>:macro:user
-                        :debug
-                        int<nub>:macro:caller
-                        ,msg
-                        ,@args))
+       (nub:output int<nub>:macro:user
+                   :debug
+                   int<nub>:macro:caller
+                   ,msg
+                   ,@args))
 
       ;; Always message (at debug level) - regardless of debugging toggle/flags.
       (,message?
-       (int<nub>:output int<nub>:macro:user
-                        :debug
-                        int<nub>:macro:caller
-                        ,msg
-                        ,@args))
+       (nub:output int<nub>:macro:user
+                   :debug
+                   int<nub>:macro:caller
+                   ,msg
+                   ,@args))
 
       ;; Not debugging and not allowing message through otherwise.
       (t

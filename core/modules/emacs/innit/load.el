@@ -26,7 +26,8 @@
 (defun innit:load:ordered:files (root relative)
   "Load files in ROOT + RELATIVE directory in alphanumeric order."
   ;; Ensure absolute path...
-  (let* ((path/root/abs (path:canonicalize:absolute root))
+  (let* ((func/name "innit:load:ordered:files")
+         (path/root/abs (path:canonicalize:absolute root))
          (path/dir/abs  (path:canonicalize:absolute root relative))
          (path/dir/rel  (path:canonicalize:relative path/dir/abs path/root/abs))
          (overall-result :init) ;; Start as something non-nil.
@@ -56,6 +57,8 @@
           ;; Drop the extension so `load' can choose ".elc" if appropriate.
           (let* ((path/load/abs (path:name:base path/file/abs))
                  (path/load/rel (path:relative path/load/abs path/root/abs)))
+            ;; If there was an error, we want to know which file 'innit' was
+            ;; loading, but also want the stack trace to be unaffected.
             (condition-case err
                 (let ((feature/name (list :innit path/load/rel)) ;; Fake out some feature name.
                       ;; Just `file:name', not `file:name:base', as we've already stripped the extension.
@@ -73,13 +76,20 @@
                   (setq overall-result (and overall-result file-result)))
               ;; Say what failed in case the failure didn't say.
               (error
-               (error "[ERROR] innit:load:ordered:files: Encountered error while loading '%s': %S %S"
-                      path/load/abs
-                      ;; error symbol: `error', `user-error', `arith-error', etc.
-                      (car err)
-                      ;; Always a nice string, even for errors without messages.
-                      ;;   e.g. `arith-error' -> "Arithmetic error"
-                      (error-message-string err)))))))
+               ;; _Print_ an error-level message out, but don't signal an error.
+               (nub:error:sink
+                   :innit
+                   func/name
+                   :debug ;; Output to `:debug' sink(s) instead of `:error'.
+                 "Encountered error while loading '%s': %S %S"
+                 path/load/abs
+                 ;; error symbol: `error', `user-error', `arith-error', etc.
+                 (car err)
+                 ;; Always a nice string, even for errors without messages.
+                 ;;   e.g. `arith-error' -> "Arithmetic error"
+                 (error-message-string err))
+               ;; And just re-raise/re-signal the error.
+               (signal (car err) (cdr err)))))))
 
       ;;------------------------------
       ;; Post-Loading

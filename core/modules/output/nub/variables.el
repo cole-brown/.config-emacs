@@ -64,8 +64,9 @@ USER should be the nub user keyword."
 
     (if error?
         (int<nub>:error caller
-                        "User %S is not a register `nub' user!"
-                        user)
+                        "User `%S' is not a register `nub' user! Registered: %S"
+                        user
+                        int<nub>:var:users)
       nil)))
 
 

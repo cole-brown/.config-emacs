@@ -53,6 +53,8 @@
             :filename "debug")
   (imp:load :feature  '(:nub debug format)
             :filename "debug-format")
+  (imp:load :feature  '(:nub error)
+            :filename "error")
 
   ;; End load timing.
   )
@@ -61,4 +63,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :nub)
+(imp:provide:with-emacs :nub)

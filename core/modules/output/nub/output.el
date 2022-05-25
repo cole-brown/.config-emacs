@@ -130,11 +130,11 @@ NOTE: Is just for the formatting /message/. Args should be passed to `error',
 `warn', etc. Or, best: use `int<nub>:output' for a higher-level API.
 
 Proper use:
-  (int<nub>:output :error
-                   \"example-function\"
-                   '(\"Imagine this '%s' is a long \"
-                     \"error string: %S %d\")
-                   some-string something some-integer)
+  (nub:output :error
+              \"example-function\"
+              '(\"Imagine this '%s' is a long \"
+                \"error string: %S %d\")
+              some-string something some-integer)
     -> \"[ERROR] 'examples error prefix here': example-function: <...>\"
 
 Alternative/direct use:
@@ -165,18 +165,20 @@ Alternative/direct use:
                     (push entry message)))))))
 
 
-;;------------------------------------------------------------------------------
-;; Output API - Errors, Warnings, etc
-;;------------------------------------------------------------------------------
-
-(defun nub:output (user level caller formatting &rest args)
+(defun int<nub>:output (user level/prefix level/sink caller msg args)
   "Output a message for USER at LEVEL.
 
 Format to standard message output for the USER with CALLER info, then output
-the message with FORMATTING and ARGS to the correct place according to LEVEL's
+the message with MSG and ARGS to the correct place according to LEVEL's
 current verbosity (e.g. #'error for `:error' verbosity normally).
 
 For valid levels, see `nub:output:levels' keywords.
+
+LEVEL/PREFIX should be a level keyword for determining what prefix string to
+use, or the prefix string itself.
+
+LEVEL/SINK should be a level keyword for determining what sink function to use,
+or the function itself.
 
 If CALLER is `nil', uses relative path from `user-emacs-directory' to
 the caller's file (using `path:current:file' and `path:relative').
@@ -185,41 +187,74 @@ the caller's file (using `path:current:file' and `path:relative').
     - \"core/modules/output/nub/foo.el\"
     - \"/some/path/outside/user-emacs-directory/file.el\"
 
-Uses FORMATTING string/list-of-strings with `int<nub>:output:format' to create
+Uses MSG string/list-of-strings with `int<nub>:output:format' to create
 the message format, then applies that format plus any ARGS to the `error'
-signaled."
+signaled.
+
+ARGS should be a list (or nil)."
   ;; Try to be real forgiving about what params are since we might be handling
   ;; an error message... but also try to let them know they did something wrong
   ;; so it can be fixed.
 
-  (let ((func.name "nub:output")
+  (let ((func/name "int<nub>:output")
         (caller (or caller
                     (path:relative (path:current:file)
                                    user-emacs-directory))))
     ;;------------------------------
     ;; Validate Inputs
     ;;------------------------------
-    (int<nub>:user:exists? func.name user :error)
+    (int<nub>:user:exists? func/name user :error)
 
     (unless (stringp caller)
       (int<nub>:output:message
        user
        :warn
        "%s: Invalid CALLER parameter! Should be a string, got: type: %S, value: %S, stringp?: %S"
-       func.name
-       (list (type-of caller)
+       (list func/name
+             (type-of caller)
              caller
              (stringp caller))))
 
-    (unless (or (stringp formatting) (listp formatting))
+
+    (unless (or (keywordp level/prefix) (stringp level/prefix))
       (int<nub>:output:message
        user
        :warn
-       "%s: invalid FORMATTING parameter! Should be a list or a string, got: type: %S, value: %S, string/list?: %S"
-       func.name
-       (list (type-of formatting)
-             formatting
-             (or (stringp formatting) (listp formatting)))))
+       "%s: invalid LEVEL/PREFIX parameter! Should be a keyword or a string, got: type: %S, value: %S, keyword/string?: %S"
+       (list func/name
+             (type-of level/prefix)
+             level/prefix
+             (or (keywordp level/prefix) (stringp level/prefix)))))
+
+    (unless (or (keywordp level/sink) (stringp level/sink))
+      (int<nub>:output:message
+       user
+       :warn
+       "%s: invalid LEVEL/SINK parameter! Should be a keyword or a string, got: type: %S, value: %S, keyword/string?: %S"
+       (list func/name
+             (type-of level/sink)
+             level/sink
+             (or (keywordp level/sink) (stringp level/sink)))))
+
+    (unless (or (stringp msg) (listp msg))
+      (int<nub>:output:message
+       user
+       :warn
+       "%s: invalid MSG parameter! Should be a list or a string, got: type: %S, value: %S, string/list?: %S"
+       (list func/name
+             (type-of msg)
+             msg
+             (or (stringp msg) (listp msg)))))
+
+    (unless (listp args) ;; nil or a list
+      (int<nub>:output:message
+       user
+       :warn
+       "%s: invalid ARGS parameter! Should be a list or nil, got: type: %S, value: %S, string/list?: %S"
+       (list func/name
+             (type-of args)
+             args
+             (or (stringp args) (listp args)))))
 
     ;;------------------------------
     ;; Output a Message
@@ -228,16 +263,16 @@ signaled."
      ;;---
      ;; Valid formatting.
      ;;---
-     ((listp formatting)
+     ((listp msg)
       (int<nub>:output:message user
-                               level
-                               (apply #'int<nub>:output:format caller user level formatting)
+                               level/sink
+                               (apply #'int<nub>:output:format caller user level/prefix msg)
                                args))
 
-     ((stringp formatting)
+     ((stringp msg)
       (int<nub>:output:message user
-                               level
-                               (int<nub>:output:format caller user level formatting)
+                               level/sink
+                               (int<nub>:output:format caller user level/prefix msg)
                                args))
 
      ;;---
@@ -251,13 +286,44 @@ signaled."
        (int<nub>:output:format
         caller
         user
-        level
-        (format "%s: Invalid FORMATTING - expected list or strig. formatting: '%S', args: '%S'"
-                func.name formatting args)))
+        level/prefix
+        (format "%s: Invalid MSG - expected list or string. msg: '%S', args: '%S'"
+                func/name msg args)))
 
       ;; Don't return `int<nub>:output:message' output.
       ;; Unit tests will disable error signaling sometimes so it's best if this returns nil.
       nil))))
+
+
+;;------------------------------------------------------------------------------
+;; Output API - Errors, Warnings, etc
+;;------------------------------------------------------------------------------
+
+(defun nub:output (user level caller msg &rest args)
+  "Output a message for USER at LEVEL.
+
+Format to standard message output for the USER with CALLER info, then output
+the message with MSG and ARGS to the correct place according to LEVEL's
+current verbosity (e.g. #'error for `:error' verbosity normally).
+
+For valid levels, see `nub:output:levels' keywords.
+
+If CALLER is `nil', uses relative path from `user-emacs-directory' to
+the caller's file (using `path:current:file' and `path:relative').
+  Examples:
+    - \"init.el\"
+    - \"core/modules/output/nub/foo.el\"
+    - \"/some/path/outside/user-emacs-directory/file.el\"
+
+Uses MSG string/list-of-strings with `int<nub>:output:format' to create
+the message format, then applies that format plus any ARGS to the `error'
+signaled."
+  (int<nub>:output user
+                   level
+                   level
+                   caller
+                   msg
+                   args))
 
 
 ;; Shorthand.
