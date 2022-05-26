@@ -56,40 +56,49 @@
         (when overall-result
           ;; Drop the extension so `load' can choose ".elc" if appropriate.
           (let* ((path/load/abs (path:name:base path/file/abs))
-                 (path/load/rel (path:relative path/load/abs path/root/abs)))
+                 (path/load/rel (path:relative path/load/abs path/root/abs))
+                 (unwind/interrupted? t))
             ;; If there was an error, we want to know which file 'innit' was
-            ;; loading, but also want the stack trace to be unaffected.
-            (condition-case err
-                (let ((feature/name (list :innit path/load/rel)) ;; Fake out some feature name.
-                      ;; Just `file:name', not `file:name:base', as we've already stripped the extension.
-                      (load/name   (file:name path/load/rel)))
-                  (nub:out :innit
-                           :debug
-                           (imp:file:current)
-                           "innit:load:ordered:files: Load file '%s'..."
-                           load/name)
-                  (imp:timing
-                      feature/name
-                      load/name
-                      path/dir/rel
-                    (setq file-result (load path/load/abs)))
-                  (setq overall-result (and overall-result file-result)))
+            ;; loading, but also want the stack trace to be unaffected so don't use `condition-case'.
+            ;; Instead, use `unwind-protect' with a guard variable (`success?').
+            (unwind-protect
+                ;;---
+                ;; Do This:
+                ;;---
+                (prog1
+                    (let ((feature/name (list :innit path/load/rel)) ;; Fake out some feature name.
+                          ;; Just `file:name', not `file:name:base', as we've already stripped the extension.
+                          (load/name   (file:name path/load/rel)))
+                      (nub:out :innit
+                               :debug
+                               (imp:file:current)
+                               "innit:load:ordered:files: Load file '%s'..."
+                               load/name)
+                      (imp:timing
+                          feature/name
+                          load/name
+                          path/dir/rel
+                        (setq file-result (load path/load/abs)))
+                      (setq overall-result (and overall-result file-result)))
+                  ;; Got throught the `unwind-protect' without being pre-empted by an error or other signal.
+                  (setq unwind/interrupted? nil))
+              ;;---
+              ;; Finally/Regardless, Do This:
+              ;;---
               ;; Say what failed in case the failure didn't say.
-              (error
-               ;; _Print_ an error-level message out, but don't signal an error.
-               (nub:error:sink
-                   :innit
-                   func/name
-                   :debug ;; Output to `:debug' sink(s) instead of `:error'.
-                 "Encountered error while loading '%s': %S %S"
-                 path/load/abs
-                 ;; error symbol: `error', `user-error', `arith-error', etc.
-                 (car err)
-                 ;; Always a nice string, even for errors without messages.
-                 ;;   e.g. `arith-error' -> "Arithmetic error"
-                 (error-message-string err))
-               ;; And just re-raise/re-signal the error.
-               (signal (car err) (cdr err)))))))
+              (when unwind/interrupted?
+                ;; _Print_ an error-level message out, but don't signal an error.
+                (nub:error:sink
+                    :innit
+                    func/name
+                    :debug ;; Output to `:debug' sink(s) instead of `:error'.
+                  "Encountered error while loading '%s': %S %S"
+                  path/load/abs
+                  ;; error symbol: `error', `user-error', `arith-error', etc.
+                  (car err)
+                  ;; Always a nice string, even for errors without messages.
+                  ;;   e.g. `arith-error' -> "Arithmetic error"
+                  (error-message-string err)))))))
 
       ;;------------------------------
       ;; Post-Loading
