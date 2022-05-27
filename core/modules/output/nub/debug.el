@@ -464,7 +464,7 @@ PREFIX is an optional string to be printed first on its own line."
 ;;------------------------------------------------------------------------------
 
 (defun nub:debug:status (user)
-  "Get message with status of debugging toggle, active debug tags."
+  "Get message with status of debugging toggle, active debug tags for USER."
   (interactive (int<nub>:prompt:user "nub:debug:status"
                                      "Debug Status for User"
                                      :list))
@@ -627,6 +627,122 @@ The answer depends on TAGS:
     ;; This also returns active tags, t, or nil.
     (int<nub>:debug:status/message (format "nub: Cleared all debug tags: %S" user)
                                    user)))
+
+
+;;------------------------------------------------------------------------------
+;; API: Debug Messages
+;;------------------------------------------------------------------------------
+
+(defmacro nub:debug (user caller tags msg &rest args)
+  "Print out a debug message.
+
+Will only evaluate MSG, and ARGS when debugging.
+
+Only prints if debugging (`int<nub>:var:debugging') and if any tag in TAGS
+matches USER's active debugging tags (`int<nub>:var:debug:tags').
+
+CALLER (string) should be the calling function's name or calling file's path.
+If CALLER is `nil', uses relative path from `user-emacs-directory' to
+the caller's file (using `path:current:file' and `path:relative').
+  Examples:
+    - \"foo-function\"
+    - nil
+    - \"init.el\"
+    - \"core/modules/output/nub/foo.el\"
+    - \"/some/path/outside/user-emacs-directory/file.el\"
+
+MSG should be the `message' formatting string.
+
+ARGS should be the `message' arguments."
+  (declare (indent 3))
+
+  (let ((caller (or caller
+                    (path:relative (path:current:file)
+                                   user-emacs-directory))))
+
+    `(let* ((int<nub>:macro:user      ,user)
+            (int<nub>:macro:tags      ,tags)
+            (int<nub>:macro:caller    ,caller)
+            (int<nub>:macro:func.name (nub:format:callers "nub:debug"
+                                                          int<nub>:macro:caller)))
+       (int<nub>:user:exists? int<nub>:macro:func.name
+                              int<nub>:macro:user
+                              :error)
+       (int<nub>:debug:tags:verify int<nub>:macro:func.name
+                                   int<nub>:macro:user
+                                   int<nub>:macro:tags
+                                   :error)
+
+       (when (int<nub>:debug:active? int<nub>:macro:func.name
+                                     int<nub>:macro:user
+                                     int<nub>:macro:tags)
+         (nub:output int<nub>:macro:user
+                     :debug
+                     int<nub>:macro:caller
+                     ,msg
+                     ,@args)))))
+;; Make sure it only evals args when debugging:
+;; (nub:debug :default "test-func" nil (message "test"))
+;; (nub:debug :default "test-func" '(:derive) (message "test"))
+;; (nub:debug :default "test-func" '(:jeff) (message "test"))
+;; (let ((caller "test-func")
+;;       (tags '(:derive))
+;;       (msg "test message"))
+;;   (nub:debug caller tags msg))
+
+
+(defmacro nub:debug-or-message (user caller tags message? msg &rest args)
+  "Print out a debug message or just a `message'.
+
+Will only evaluate CALLER, MSG, and ARGS when if MESSAGE? is non-nil or
+if debugging.
+
+If MESSAGE? is non-nil, always prints message. Otherwise only
+prints if USER is debugging and if any tag in TAGS matches USER's active
+debugging tags.
+
+CALLER should be the calling function's name (string).
+
+MSG should be the `message' formatting string.
+
+ARGS should be the `message' arguments."
+  (declare (indent 4))
+  `(let* ((int<nub>:macro:user      ,user)
+          (int<nub>:macro:tags      ,tags)
+          (int<nub>:macro:caller    ,caller)
+          (int<nub>:macro:func.name (nub:format:callers "nub:debug"
+                                                        int<nub>:macro:caller)))
+     (int<nub>:user:exists? int<nub>:macro:func.name
+                            int<nub>:macro:user
+                            :error)
+     (int<nub>:debug:tags:verify int<nub>:macro:func.name
+                                 int<nub>:macro:user
+                                 int<nub>:macro:tags
+                                 :error)
+
+     ;; Check with `int<nub>:debug:active?' first so that missing debug tags always error.
+     (cond
+      ;; Only message (at debug level) if passed checks.
+      ((int<nub>:debug:active? int<nub>:macro:func.name
+                               int<nub>:macro:user
+                               int<nub>:macro:tags)
+       (nub:output int<nub>:macro:user
+                   :debug
+                   int<nub>:macro:caller
+                   ,msg
+                   ,@args))
+
+      ;; Always message (at debug level) - regardless of debugging toggle/flags.
+      (,message?
+       (nub:output int<nub>:macro:user
+                   :debug
+                   int<nub>:macro:caller
+                   ,msg
+                   ,@args))
+
+      ;; Not debugging and not allowing message through otherwise.
+      (t
+       nil))))
 
 
 ;;------------------------------------------------------------------------------
@@ -801,120 +917,8 @@ VALUEs are optional and should be:
 
 
 ;;------------------------------------------------------------------------------
-;; API: Debug Messages
+;; API: Function Flow Messages
 ;;------------------------------------------------------------------------------
-
-(defmacro nub:debug (user caller tags msg &rest args)
-  "Print out a debug message.
-
-Will only evaluate MSG, and ARGS when debugging.
-
-Only prints if debugging (`int<nub>:var:debugging') and if any tag in TAGS
-matches USER's active debugging tags (`int<nub>:var:debug:tags').
-
-CALLER (string) should be the calling function's name or calling file's path.
-If CALLER is `nil', uses relative path from `user-emacs-directory' to
-the caller's file (using `path:current:file' and `path:relative').
-  Examples:
-    - \"foo-function\"
-    - nil
-    - \"init.el\"
-    - \"core/modules/output/nub/foo.el\"
-    - \"/some/path/outside/user-emacs-directory/file.el\"
-
-MSG should be the `message' formatting string.
-
-ARGS should be the `message' arguments."
-  (declare (indent 3))
-
-  (let ((caller (or caller
-                    (path:relative (path:current:file)
-                                   user-emacs-directory))))
-
-    `(let* ((int<nub>:macro:user      ,user)
-            (int<nub>:macro:tags      ,tags)
-            (int<nub>:macro:caller    ,caller)
-            (int<nub>:macro:func.name (nub:format:callers "nub:debug"
-                                                          int<nub>:macro:caller)))
-       (int<nub>:user:exists? int<nub>:macro:func.name
-                              int<nub>:macro:user
-                              :error)
-       (int<nub>:debug:tags:verify int<nub>:macro:func.name
-                                   int<nub>:macro:user
-                                   int<nub>:macro:tags
-                                   :error)
-
-       (when (int<nub>:debug:active? int<nub>:macro:func.name
-                                     int<nub>:macro:user
-                                     int<nub>:macro:tags)
-         (nub:output int<nub>:macro:user
-                     :debug
-                     int<nub>:macro:caller
-                     ,msg
-                     ,@args)))))
-;; Make sure it only evals args when debugging:
-;; (nub:debug :default "test-func" nil (message "test"))
-;; (nub:debug :default "test-func" '(:derive) (message "test"))
-;; (nub:debug :default "test-func" '(:jeff) (message "test"))
-;; (let ((caller "test-func")
-;;       (tags '(:derive))
-;;       (msg "test message"))
-;;   (nub:debug caller tags msg))
-
-
-(defmacro nub:debug-or-message (user caller tags message? msg &rest args)
-  "Print out a debug message or just a `message'.
-
-Will only evaluate CALLER, MSG, and ARGS when if MESSAGE? is non-nil or
-if debugging.
-
-If MESSAGE? is non-nil, always prints message. Otherwise only
-prints if USER is debugging and if any tag in TAGS matches USER's active
-debugging tags.
-
-CALLER should be the calling function's name (string).
-
-MSG should be the `message' formatting string.
-
-ARGS should be the `message' arguments."
-  (declare (indent 4))
-  `(let* ((int<nub>:macro:user      ,user)
-          (int<nub>:macro:tags      ,tags)
-          (int<nub>:macro:caller    ,caller)
-          (int<nub>:macro:func.name (nub:format:callers "nub:debug"
-                                                        int<nub>:macro:caller)))
-     (int<nub>:user:exists? int<nub>:macro:func.name
-                            int<nub>:macro:user
-                            :error)
-     (int<nub>:debug:tags:verify int<nub>:macro:func.name
-                                 int<nub>:macro:user
-                                 int<nub>:macro:tags
-                                 :error)
-
-     ;; Check with `int<nub>:debug:active?' first so that missing debug tags always error.
-     (cond
-      ;; Only message (at debug level) if passed checks.
-      ((int<nub>:debug:active? int<nub>:macro:func.name
-                               int<nub>:macro:user
-                               int<nub>:macro:tags)
-       (nub:output int<nub>:macro:user
-                   :debug
-                   int<nub>:macro:caller
-                   ,msg
-                   ,@args))
-
-      ;; Always message (at debug level) - regardless of debugging toggle/flags.
-      (,message?
-       (nub:output int<nub>:macro:user
-                   :debug
-                   int<nub>:macro:caller
-                   ,msg
-                   ,@args))
-
-      ;; Not debugging and not allowing message through otherwise.
-      (t
-       nil))))
-
 
 (defun nub:debug:func/start (user func/name func/tags &rest value)
   "Print out start-of-function message, with optional VALUEs.
