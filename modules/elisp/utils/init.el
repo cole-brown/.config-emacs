@@ -4,10 +4,9 @@
 ;; Set-Up.
 ;;------------------------------------------------------------------------------
 
-(imp:require :path)
 
 (imp:path:root :elisp
-               (path:parent (imp:path:current:dir))
+               (imp:path:parent (imp:path:current:dir))
                (imp:file:current))
 
 
