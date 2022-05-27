@@ -78,12 +78,15 @@
                           feature/name
                           load/name
                           path/dir/rel
-                        (setq file-result (load path/load/abs)))
+                        (setq file-result (load path/load/abs nil :no-message)))
                       (setq overall-result (and overall-result file-result)))
                   ;; Got throught the `unwind-protect' without being pre-empted by an error or other signal.
                   (setq unwind/interrupted? nil))
               ;;---
               ;; Finally/Regardless, Do This:
+              ;;---
+              ;; NOTE: If the above errored or exited nonlocally _and caused a backtrace buffer_,
+              ;; this code won't happen until after the backtrace is dismissed.
               ;;---
               ;; Say what failed in case the failure didn't say.
               (when unwind/interrupted?
@@ -92,13 +95,8 @@
                     :innit
                     func/name
                     :debug ;; Output to `:debug' sink(s) instead of `:error'.
-                  "Encountered error while loading '%s': %S %S"
-                  path/load/abs
-                  ;; error symbol: `error', `user-error', `arith-error', etc.
-                  (car err)
-                  ;; Always a nice string, even for errors without messages.
-                  ;;   e.g. `arith-error' -> "Arithmetic error"
-                  (error-message-string err)))))))
+                  "Encountered error while loading '%s'!"
+                  path/load/abs))))))
 
       ;;------------------------------
       ;; Post-Loading
