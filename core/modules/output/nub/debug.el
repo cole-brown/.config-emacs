@@ -689,7 +689,7 @@ VALUEs are optional and should be:
           ((not (int<nub>:alist:alist? value))
            (int<nub>:error callers
                            '(:newlines .
-                             ("VALUE is invalid for `%S'! Expecting `&rest VALUE' to be an alist. Got: %S"
+                             ("VALUE is invalid for `%S'! Expecting `VALUE' to be an alist. Got: %S"
                               "  user:         %S"
                               "  func/name:    %S"
                               "  func/tags:    %S"
@@ -980,7 +980,7 @@ and also printed in the debug message (if debugging)."
                           ,func/name
                           ,func/tags
                           :end
-                          (cons 'return macro<nub>:return-value))
+                          (list (cons 'return macro<nub>:return-value)))
      ;; Return the value.
      macro<nub>:return-value))
 
