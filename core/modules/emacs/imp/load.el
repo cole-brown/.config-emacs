@@ -81,7 +81,7 @@ FEATURE is only for `imp:timing' use."
                               (imp:timing
                                   feature
                                   (int<imp>:path:filename path:absolute)
-                                  (int<imp>:path:parent   path:absolute)
+                                  (imp:path:parent        path:absolute)
                                 (int<imp>:load:file path:absolute))))))))
 
 
@@ -590,7 +590,7 @@ Return nil for failure, non-nil for success."
             (macro:path:load   (plist-get macro:parsed :path))
             (macro:path:file   (concat macro:path:load ".el")) ;; With extension for output, checking if file exists.
             (macro:name:load   (int<imp>:path:filename macro:path:load)) ;; Filename sans extension.
-            (macro:path:parent (int<imp>:path:parent   macro:path:load))
+            (macro:path:parent (imp:path:parent        macro:path:load))
             (macro:feature     (plist-get macro:parsed :feature))
             (macro:skip?       (plist-get macro:parsed :skip))
             ;; Invert for `load' parameter NO-ERROR.

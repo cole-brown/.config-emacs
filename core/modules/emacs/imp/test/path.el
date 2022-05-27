@@ -871,16 +871,16 @@ to a path properly."
 
 
 ;;------------------------------
-;; int<imp>:path:parent
+;; imp:path:parent
 ;;------------------------------
 
-(ert-deftest test<imp/path>::int<imp>:path:parent ()
-  "Test that `int<imp>:path:parent' correctly identifies path types."
+(ert-deftest test<imp/path>::imp:path:parent ()
+  "Test that `imp:path:parent' correctly identifies path types."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/path>::int<imp>:path:parent"
+      "test<imp/path>::imp:path:parent"
       nil
       nil
 
@@ -888,17 +888,17 @@ to a path properly."
     ;; Run the test.
     ;;===
 
-    (should-error (int<imp>:path:parent ""))
+    (should-error (imp:path:parent ""))
 
     (should (string= "/"
-                     (int<imp>:path:parent "/")))
+                     (imp:path:parent "/")))
 
     (should (string= "/foo"
-                     (int<imp>:path:parent "/foo/bar")))
+                     (imp:path:parent "/foo/bar")))
     (should (string= "/foo"
-                     (int<imp>:path:parent "/foo/bar.el")))
+                     (imp:path:parent "/foo/bar.el")))
     (should (string= "/foo"
-                     (int<imp>:path:parent "/foo/bar/")))))
+                     (imp:path:parent "/foo/bar/")))))
 
 
 ;;------------------------------

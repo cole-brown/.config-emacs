@@ -445,7 +445,7 @@ Always loads the file."
                                                     (list ,@load-args-plist)))
             (macro:path          (plist-get macro:parsed :path))
             (macro:path:filename (int<imp>:path:filename macro:path))
-            (macro:path:parent   (int<imp>:path:parent   macro:path))
+            (macro:path:parent   (imp:path:parent        macro:path))
             (macro:feature:pre   (plist-get macro:parsed :feature:pre))
             (macro:feature:post  (plist-get macro:parsed :feature:post))
             ;; Invert for `load' parameter NO-ERROR.

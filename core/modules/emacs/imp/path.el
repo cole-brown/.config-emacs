@@ -447,7 +447,7 @@ Returns the list of normalized string."
 ;;------------------------------------------------------------------------------
 
 (defun int<imp>:path:dir? (path)
-  "Returns non-nil if PATH is a directory path."
+  "Return non-nil if PATH is a directory path."
   ;; Directory path if the PATH is equal to its path-as-a-directory.
   (string= (file-name-as-directory path)
            path))
@@ -456,14 +456,14 @@ Returns the list of normalized string."
 ;; (int<imp>:path:dir? nil)
 
 
-(defun int<imp>:path:parent (path)
-  "Returns the parent directory component of PATH."
+(defun imp:path:parent (path)
+  "Return the parent directory component of PATH."
   (cond
    ;;------------------------------
    ;; Errors
    ;;------------------------------
    ((not (stringp path))
-    (int<imp>:error "int<imp>:path:parent"
+    (int<imp>:error "imp:path:parent"
                     "PATH is not a string! %S"
                     path))
 
@@ -484,8 +484,8 @@ Returns the list of normalized string."
     ;; Then get its parent dir:    "/foo/bar.el" -> "/foo/"
     ;; Then get the parent's name: "/foo/"       -> "/foo"
     (directory-file-name (file-name-directory path)))))
-;; (int<imp>:path:parent "/foo/bar/")
-;; (int<imp>:path:parent "/foo/bar.el")
+;; (imp:path:parent "/foo/bar/")
+;; (imp:path:parent "/foo/bar.el")
 
 
 (defun int<imp>:path:filename (path &optional dirname?)
