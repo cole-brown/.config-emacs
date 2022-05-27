@@ -288,7 +288,8 @@ ARGS should be a list (or nil)."
         user
         level/prefix
         (format "%s: Invalid MSG - expected list or string. msg: '%S', args: '%S'"
-                func/name msg args)))
+                func/name msg args))
+       nil)
 
       ;; Don't return `int<nub>:output:message' output.
       ;; Unit tests will disable error signaling sometimes so it's best if this returns nil.
