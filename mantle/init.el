@@ -92,9 +92,6 @@
     (imp:file:current)
     (imp:path:current:dir)
 
-  (imp:load :feature  '(:elisp utils)
-            :path     (imp:path:join innit:path:module "elisp" "utils")
-            :filename "init") ; Needed by ':jerky'.
 
   (imp:load :feature  '(:jerky)
             :path     (imp:path:join innit:path:module "elisp" "jerky")

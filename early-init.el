@@ -32,28 +32,32 @@
       "early-init.el"
       (imp:path:current:dir)
 
+    (imp:load :feature  '(:elisp utils)
+              :path     (imp:path:join path-core-modules "elisp" "utils")
+              :filename "init")
+
     (imp:load :feature  '(:str)
-              :path     (imp:path:join path-core-modules "emacs/str")
+              :path     (imp:path:join path-core-modules "emacs" "str")
               :filename "init")
 
     (imp:load :feature  '(:alist)
-              :path     (imp:path:join path-core-modules "emacs/alist")
+              :path     (imp:path:join path-core-modules "emacs" "alist")
               :filename "init")
 
     (imp:load :feature  '(:path)
-              :path     (imp:path:join path-core-modules "emacs/path")
+              :path     (imp:path:join path-core-modules "emacs" "path")
               :filename "init")
 
     (imp:load :feature  '(:nub)
-              :path     (imp:path:join path-core-modules "output/nub")
+              :path     (imp:path:join path-core-modules "output" "nub")
               :filename "init")
 
     (imp:load :feature  '(:innit)
-              :path     (imp:path:join path-core-modules "emacs/innit")
+              :path     (imp:path:join path-core-modules "emacs" "innit")
               :filename "init")
 
     (imp:load :feature  '(:dlv)
-              :path     (imp:path:join path-core-modules "emacs/dlv")
+              :path     (imp:path:join path-core-modules "emacs" "dlv")
               :filename "init")))
 
 
