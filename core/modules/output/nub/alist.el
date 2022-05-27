@@ -15,6 +15,7 @@
 
 (require 'seq)
 (imp:require :nub 'internal)
+(imp:require :elisp 'utils 'types)
 
 
 ;;------------------------------------------------------------------------------
@@ -22,14 +23,18 @@
 ;;------------------------------------------------------------------------------
 
 (defun int<nub>:alist:alist? (item)
-  "Returns non-nil if ITEM is an alist.
+  "Return non-nil if ITEM is an alist.
 
-If ITEM is nil, returns `t', because:
+If ITEM is nil, return t, because:
   1. We cannot be sure it's /NOT/ an alist.
-  2. `nil' is a valid list, and an empty list is a valid alist."
+  2. nil is a valid list, and an empty list is a valid alist."
   ;; We'll consider `nil' a valid alist.
   (cond (nil
          t)
+
+        ;; An alist cannot be a cons.
+        ((elisp:cons? item)
+         nil)
 
         ;; An alist has to be a list.
         ((not (listp item))
@@ -39,6 +44,7 @@ If ITEM is nil, returns `t', because:
         ;; If this is truthy, we'll just return its truthiness.
         ((seq-every-p #'listp item))
 
+        ;; I don't know -> not an alist?
         (t
          nil)))
 
