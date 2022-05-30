@@ -538,6 +538,51 @@ a directory path.
 ;; (imp:path:current:file)
 
 
+(defun imp:path:current:file/relative (feature/base)
+  "Return the relative path of the file this function is called from.
+
+Path will be relative to FEATURE/BASE.
+
+Will raise an error if FEATURE/BASE does not have a path root.
+
+Will raise an error if `imp:path:current:file' (i.e. the absolute path)
+has no relation to FEATURE/BASE's root path.
+
+Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
+  ~/.config/emacs/foo/bar.el:
+    (imp:path:current:file)
+      -> \"/home/<username>/.config/emacs/foo/bar.el\"
+    (imp:path:current:file/relative :dot-emacs)
+      -> \"foo/bar.el\""
+  (let* ((path/root (file-name-as-directory (int<imp>:path:root/dir feature/base)))
+         (path/here (imp:path:current:file))
+         ;; Don't like `file-relative-name' as it can return wierd things when it
+         ;; goes off looking for actual directories and files...
+         (path/relative (replace-regexp-in-string
+                         ;; Make sure root dir has ending slash.
+                         path/root ;; Look for root directory path...
+                         ""        ;; Replace with nothing to get a relative path.
+                         path/here
+                         :fixedcase
+                         :literal)))
+    ;; End up with the same thing? Not a relative path - signal error.
+    (when (string= path/relative path/here)
+      (int<imp>:error "imp:path:current:file/relative"
+                      '("Current directory is not relative to FEATURE/BASE!\n"
+                        "  FEATURE/BASE: %S\n"
+                        "  root path:    %s\n"
+                        "  curr path:    %s\n"
+                        "---> result:    %s")
+                      feature/base
+                      path/root
+                      path/here
+                      path/relative))
+    ;; Return relative path.
+    path/relative))
+;; (imp:path:root :test (imp:path:current:dir))
+;; (imp:path:current:file/relative :test)
+
+
 (defun imp:file:current ()
   "Return the filename (no path, just filename) this is called from."
   (file-name-nondirectory (imp:path:current:file)))
@@ -551,13 +596,11 @@ a directory path.
 
 
 (defun imp:path:current:dir/relative (feature/base)
-  "Returns the relative path from feature's path root to the dir this is called.
+  "Return the relative path from feature's path root to the dir this is called.
 
-Could just return
+Will raise an error if FEATURE/BASE does not have a path root.
 
-Raises an error if FEATURE/BASE does not have a path root.
-
-Raises an error if `(imp:path:current:dir)' (i.e. the absolute path)
+Will raise an error if `(imp:path:current:dir)' (i.e. the absolute path)
 has no relation to FEATURE/BASE's root path.
 
 Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
