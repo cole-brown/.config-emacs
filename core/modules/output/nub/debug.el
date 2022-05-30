@@ -642,7 +642,7 @@ Only prints if debugging (`int<nub>:var:debugging') and if any tag in TAGS
 matches USER's active debugging tags (`int<nub>:var:debug:tags').
 
 CALLER (string) should be the calling function's name or calling file's path.
-If CALLER is `nil', uses relative path from `user-emacs-directory' to
+If CALLER is nil, uses relative path from `user-emacs-directory' to
 the caller's file (using `path:current:file' and `path:relative').
   Examples:
     - \"foo-function\"
@@ -656,31 +656,30 @@ MSG should be the `message' formatting string.
 ARGS should be the `message' arguments."
   (declare (indent 3))
 
-  (let ((caller (or caller
-                    (path:relative (path:current:file)
-                                   user-emacs-directory))))
+  `(let* ((int<nub>:macro:user      ,user)
+          (int<nub>:macro:caller    ,(or caller
+                                         (path:relative (path:current:file)
+                                                        user-emacs-directory)))
+          (int<nub>:macro:tags      ,tags)
+          (int<nub>:macro:func.name (nub:format:callers "nub:debug"
+                                                        int<nub>:macro:caller)))
+     (int<nub>:user:exists? int<nub>:macro:func.name
+                            int<nub>:macro:user
+                            :error)
+     (int<nub>:debug:tags:verify int<nub>:macro:func.name
+                                 int<nub>:macro:user
+                                 int<nub>:macro:tags
+                                 :error)
 
-    `(let* ((int<nub>:macro:user      ,user)
-            (int<nub>:macro:tags      ,tags)
-            (int<nub>:macro:caller    ,caller)
-            (int<nub>:macro:func.name (nub:format:callers "nub:debug"
-                                                          int<nub>:macro:caller)))
-       (int<nub>:user:exists? int<nub>:macro:func.name
-                              int<nub>:macro:user
-                              :error)
-       (int<nub>:debug:tags:verify int<nub>:macro:func.name
+     (when (int<nub>:debug:active? int<nub>:macro:func.name
                                    int<nub>:macro:user
-                                   int<nub>:macro:tags
-                                   :error)
+                                   int<nub>:macro:tags)
 
-       (when (int<nub>:debug:active? int<nub>:macro:func.name
-                                     int<nub>:macro:user
-                                     int<nub>:macro:tags)
-         (nub:output int<nub>:macro:user
-                     :debug
-                     int<nub>:macro:caller
-                     ,msg
-                     ,@args)))))
+       (nub:output int<nub>:macro:user
+                   :debug
+                   int<nub>:macro:caller
+                   ,msg
+                   ,@args))))
 ;; Make sure it only evals args when debugging:
 ;; (nub:debug :default "test-func" nil (message "test"))
 ;; (nub:debug :default "test-func" '(:derive) (message "test"))
