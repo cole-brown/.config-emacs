@@ -555,20 +555,37 @@ Returns DEFAULT if USER has no setting for LEVEL.
 ;; Debugging
 ;;------------------------------------------------------------------------------
 
-(defvar int<nub>:var:debugging nil
+(defvar int<nub>:var:debugging
+  (list (cons int<nub>:var:user:fallback t))
   "Alist of USER keyword to boolean debug flag. Non-nil means debugging is active.")
 
 
+;; TODO: Remove this flag, just use verbosity enabled for `:debug' level in `int<nub>:var:enabled?'.
 (defun int<nub>:var:debugging (user &optional default)
-  "Get debugging flag for USER.
+  "Get debugging bool for USER.
 
-Returns DEFAULT if not found."
+If DEFAULT is non-nil, return DEFAULT if not found for USER.
+Otherwise, return `:default' user's debug setting."
   ;; Ensure USER is ok.
   (int<nub>:user:exists? "int<nub>:var:debugging" user :error)
 
-  (int<nub>:alist:get/value user
-                            int<nub>:var:debugging
-                            default))
+  (let  ((debugging (int<nub>:alist:get/value user
+                                              int<nub>:var:debugging
+                                              :dne)))
+    ;; Return what we found or figure out fallback value.
+    (cond
+     ;; Found actual value.
+     ((not (eq :dne debugging))
+      debugging)
+
+     ;; Use whatever was provided.
+     ((not (null default))
+      default)
+
+     ;; Use default user's debugging setting.
+     (t
+      (int<nub>:alist:get/value int<nub>:var:user:fallback
+                                int<nub>:var:debugging)))))
 ;; (int<nub>:var:debugging :test)
 
 
@@ -595,8 +612,9 @@ the flag based on truthiness of VALUE."
 
 
 (defvar int<nub>:var:debug:tags nil
-  "Alist of USER keyword to list of active debugging keyword tags. Any
-keyword matched in the list will be printed out when debugging is active.
+  "Alist of USER keyword to list of active debugging keyword tags.
+
+Any keyword matched in the list will be printed out when debugging is active.
 
 If there are no tags in the list, or the list is nil, everything
 will be printed.")
@@ -616,7 +634,7 @@ Returns DEFAULT if not found."
 
 
 (defun int<nub>:var:debug:tags:set (user tags)
-  "Set list of all active TAGS for USER"
+  "Set list of all active TAGS for USER."
   ;; Ensure USER is ok.
   (int<nub>:user:exists? "int<nub>:var:debug:tags:set" user :error)
 
@@ -635,7 +653,7 @@ Returns DEFAULT if not found."
 
 
 (defun int<nub>:var:debug:tag:active? (user tag)
-  "Returns whether TAG is active for USER."
+  "Return whether TAG is active for USER."
   ;; Ensure USER is ok.
   (int<nub>:user:exists? "int<nub>:var:debug:tag:active?" user :error)
 
@@ -644,7 +662,7 @@ Returns DEFAULT if not found."
 
 
 (defun int<nub>:var:debug:tag:set (user tag value)
-  "Sets USER's debug TAG to VALUE (or togggles the tag).
+  "Set USER's debug TAG to VALUE (or togggles the tag).
 
 If VALUE is `:toggle', this will toggle TAG. Otherwise it will set/unset
 TAG based on truthiness of VALUE."
@@ -707,7 +725,7 @@ Any keyword can be used regardless of this list - these will be provided to
 (defun int<nub>:var:debug:tags/common (user)
   "Get common debug tags flag for USER.
 
-Returns `nil' if not found."
+Return nil if not found."
   ;; Ensure USER is ok.
   (int<nub>:user:exists? "int<nub>:var:debug:tags/common" user :error)
 
@@ -717,7 +735,7 @@ Returns `nil' if not found."
 
 
 (defun int<nub>:var:debug:tags/common:set (user tags)
-  "Sets USER's list of common debug TAGS."
+  "Set USER's list of common debug TAGS."
   ;; Ensure USER is ok.
   (int<nub>:user:exists? "int<nub>:var:debug:tags/common:set" user :error)
 
@@ -770,8 +788,9 @@ Returns DEFAULT if USER has no fill/padding strings.
 
 (defvar int<nub>:var:debug:fills/index
   (list (cons int<nub>:var:user:fallback 0))
-  "Alist of users to next fill/padding (index) to use from user's
-`int<nub>:var:debug:fills' alist entry.")
+  "Alist of USER to next fill/padding (index).
+
+Fill/padding index used for USER's `int<nub>:var:debug:fills' alist entry.")
 
 
 (defun int<nub>:var:debug:fills/index (user &optional default)
@@ -823,7 +842,7 @@ default user instead."
 
 ;; TODO: A `nub:register' function? Maybe just rename this?
 (defun nub:vars:init (user &optional list:debug:tags/common alist:prefixes alist:enabled? alist:sinks)
-  "Registers USER and sets their default settings for output levels.
+  "Register USER and set their default settings for output levels.
 
 LIST:DEBUG:TAGS/COMMON should be a list of debugging keyword tags.
 It is used for prompting end-users for debug tags to toggle.

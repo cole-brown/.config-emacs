@@ -17,7 +17,7 @@
 ;; Utility Functions & Such That Don't Really Fit Elsewhere
 ;;------------------------------------------------------------------------------
 
-(defun nub:format:callers (caller parents)
+(defun nub:format:callers (caller &optional parents)
   "Build a 'caller' string.
 
 Builds from CALLER (string) and PARENTS (string or nil).
