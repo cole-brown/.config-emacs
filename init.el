@@ -11,11 +11,13 @@
 ;;; Code:
 
 (let ((file/this (imp:file:current))
+      (tags/this '(:innit :standard))
       progress-reporter)
-  (nub:out :innit
-           :debug
-           file/this
-           "Sanity Checks, Etc.")
+  (nub:debug
+      :innit
+      file/this
+      tags/this
+    "Sanity Checks, Etc.")
 
   ;;------------------------------------------------------------------------------
   ;; Sanity Check: Has "early-init" run?
@@ -57,10 +59,11 @@
   ;;     - `no-littering' - direct other Emacs packages to not litter the `user-emacs-directory'.
   ;;     - etc
 
-  (nub:out :innit
-           :debug
-           file/this
-           "Boot Loader: 10 Early")
+  (nub:debug
+      :innit
+      file/this
+      tags/this
+    "Boot Loader: 10 Early")
   (setq progress-reporter (make-progress-reporter (format "[innit] %s: %s..."
                                                           file/this
                                                           "10-init")
@@ -74,10 +77,11 @@
   ;; Config
   ;;------------------------------
   ;; Standard Emacs set-up.
-  (nub:out :innit
-           :debug
-           file/this
-           "Boot Loader: 20 Config")
+  (nub:debug
+      :innit
+      file/this
+      tags/this
+    "Boot Loader: 20 Config")
   (setq progress-reporter (make-progress-reporter (format "[innit] %s: %s..."
                                                           file/this
                                                           "20-config")
@@ -91,10 +95,11 @@
   ;; Finalize
   ;;------------------------------
   ;; Last chance to do things.
-  (nub:out :innit
-           :debug
-           file/this
-           "Boot Loader: 99 Finalize")
+  (nub:debug
+      :innit
+      file/this
+      tags/this
+    "Boot Loader: 99 Finalize")
   (setq progress-reporter (make-progress-reporter (format "[innit] %s: %s..."
                                                           file/this
                                                           "99-finalize")
@@ -107,10 +112,11 @@
   ;;------------------------------------------------------------------------------
   ;; The End.
   ;;------------------------------------------------------------------------------
-  (nub:out :innit
-           :debug
-           file/this
-           '("Boot Loader: 100 Done"
-             :newline
-             "Now witness the firepower of this full armed and operational operating system.")))
+  (nub:debug
+      :innit
+      file/this
+      tags/this
+    '("Boot Loader: 100 Done"
+      :newline
+      "Now witness the firepower of this full armed and operational operating system.")))
 (imp:provide :root 'init 'standard)

@@ -143,10 +143,11 @@ Can be called earlier too, if you want..."
 
 `package-initialize' is called between \"early-init.el\" and \"init.el\", so
 this needs to be called during \"early-init.el\"."
-  (nub:out :innit
-           :debug
-           (imp:file:current)
-           "'package.el' early init...")
+  (nub:debug
+      :innit
+      "innit:package:init/early"
+      '(:innit :package :early)
+    "'package.el' early init...")
 
   ;;---
   ;; Set enabled package archives.
@@ -162,7 +163,7 @@ this needs to be called during \"early-init.el\"."
   (innit:package:init/paths))
 
 
-(defun innit:package:init/normal ()
+(defun innit:package:init/standard ()
   "Initialize Emacs 'package.el' after the `package-initialize' step.
 
 1. Download package metadata if needed.
@@ -171,57 +172,62 @@ this needs to be called during \"early-init.el\"."
 
 `package-initialize' is called between \"early-init.el\" and \"init.el\", so
 this needs to be called during \"init.el\"."
-  (nub:out :innit
-           :debug
-           (imp:file:current)
-           "'package.el' normal init...")
+  (let ((func/name "innit:package:init/standard")
+        (func/tags '(:innit :package :standard)))
+    (nub:debug
+        :innit
+        func/name
+        func/tags
+      "'package.el' standard init...")
 
-  ;;------------------------------
-  ;; `package.el'
-  ;;------------------------------
-  ;; Set 'package.el' paths again as 'package.el' overwrites them when it loads...
-  (innit:package:init/paths)
+    ;;------------------------------
+    ;; `package.el'
+    ;;------------------------------
+    ;; Set 'package.el' paths again as 'package.el' overwrites them when it loads...
+    (innit:package:init/paths)
 
-  ;; Update packages list if we are on a new install.
-  (unless (or (package-installed-p 'use-package)
-              package-archive-contents)
-    (nub:out :innit
-             :debug
-             (imp:file:current)
-             "Update packages list...")
-    (package-refresh-contents))
+    ;; Update packages list if we are on a new install.
+    (unless (or (package-installed-p 'use-package)
+                package-archive-contents)
+      (nub:debug
+          :innit
+          func/name
+          func/tags
+        "Update packages list...")
+      (package-refresh-contents))
 
-  ;;------------------------------
-  ;; `use-package'
-  ;;------------------------------
-  ;;---
-  ;; Install:
-  ;;---
-  (unless (package-installed-p 'use-package)
-    (nub:out :innit
-             :debug
-             (imp:file:current)
-             "Install `use-package'...")
-    (package-install 'use-package))
+    ;;------------------------------
+    ;; `use-package'
+    ;;------------------------------
+    ;;---
+    ;; Install:
+    ;;---
+    (unless (package-installed-p 'use-package)
+      (nub:debug
+          :innit
+          func/name
+          func/tags
+        "Install `use-package'...")
+      (package-install 'use-package))
 
-  (require 'use-package)
+    (require 'use-package)
 
-  ;;---
-  ;; Global Settings:
-  ;;---
-  ;; Automatically install package if not found.
-  ;;   https://github.com/jwiegley/use-package#package-installation
-  ;; NOTE: Does not keep anything up-to-date. For that you would use package
-  ;; `auto-package-update' or something similar.
-  (customize-set-variable 'use-package-always-ensure t)
+    ;;---
+    ;; Global Settings:
+    ;;---
+    ;; Automatically install package if not found.
+    ;;   https://github.com/jwiegley/use-package#package-installation
+    ;; NOTE: Does not keep anything up-to-date. For that you would use package
+    ;; `auto-package-update' or something similar.
+    (customize-set-variable 'use-package-always-ensure t)
 
-  ;;---
-  ;; Debugging Settings:
-  ;;---
-  (setq use-package-compute-statistics    innit:debug?
-        use-package-verbose               innit:debug?
-        use-package-minimum-reported-time (if innit:debug? 0 0.1)
-        use-package-expand-minimally      innit:interactive?))
+    ;;---
+    ;; Debugging Settings:
+    ;;---
+    (setq use-package-compute-statistics    innit:debug?
+          use-package-verbose               innit:debug?
+          use-package-minimum-reported-time (if innit:debug? 0 0.1)
+          use-package-expand-minimally      innit:interactive?)))
 
 
 

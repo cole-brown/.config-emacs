@@ -132,7 +132,9 @@ ARGS should be a list of args for formatting the STRING, or nil."
 ;;------------------------------------------------------------------------------
 
 (defun int<imp>:output:callers (this &optional callers)
-  "Builds a caller string from THIS & CALLERS strings."
+  "Build a caller string from THIS & CALLERS strings.
+
+`imp' users should use `nub:format:callers' instead of this."
   (let ((this (cond ((null this)
                      nil)
                     ((stringp this)
@@ -148,6 +150,10 @@ ARGS should be a list of args for formatting the STRING, or nil."
     (if callers
         (concat this " <-via- " callers)
       this)))
+;; (int<imp>:output:callers "bob" nil)
+;; (int<imp>:output:callers "bob" "alice")
+;; (int<imp>:output:callers "C" (nub:format:callers "B" "A"))
+;; (int<imp>:output:callers nil nil)
 
 
 (defun int<imp>:error (caller string &rest args)

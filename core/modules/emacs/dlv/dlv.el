@@ -70,30 +70,20 @@ SAFE must be a function or a member of `int<dlv>:const:safe/valid'.
 CALLER should be calling function's name (string).
 
 If ERROR? is non-nil, will signal an error if SAFE is invalid."
-  (let ((func.name (nub:format:callers "int<dlv>:validate:safe" caller))
-        (func.tags '(:safe :validate)))
-    (nub:debug:func/start
-        :dlv
-        func.name
-        func.tags
+  (let ((func/name (nub:format:callers "int<dlv>:validate:safe" caller))
+        (func/tags '(:safe :validate)))
+   (nub:debug:func/start
+        :innit
+        func/name
+        func/tags
       (list (cons 'caller caller)
             (cons 'safe   safe)
             (cons 'error? error?)))
-    (nub:debug
-        :dlv
-        func.name
-        func.tags
-      '("`safe' is:\n"
-        "  functionp: %s\n"
-        "  memq %S: %s")
-      (functionp safe)
-      int<dlv>:const:safe/valid
-      (memq safe int<dlv>:const:safe/valid))
 
     (nub:debug:func/return
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (cond ((or (functionp safe)
                  (memq safe int<dlv>:const:safe/valid))
              t)
@@ -505,23 +495,23 @@ This will set that DLV struct to:
   ((nil . (variable/00 . value/00)))
 
 If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
-  (let ((func.name "int<dlv>:clean:dlv")
-        (func.tags '(:clean))
+  (let ((func/name "int<dlv>:clean:dlv")
+        (func/tags '(:clean))
         (valid t))
     (nub:debug:func/start
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (list (cons 'directory directory)
             (cons 'error?    error?)))
 
     ;;------------------------------
     ;; Validate inputs.
     ;;------------------------------
-    (if (not (int<dlv>:validate:dir/path func.name directory error?))
+    (if (not (int<dlv>:validate:dir/path func/name directory error?))
         (if (not (null error?))
             (error "%s: DIRECTORY must be valid! Got: %S"
-                   func.name directory)
+                   func/name directory)
           (setq valid nil))
 
       ;;------------------------------
@@ -530,8 +520,8 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
       (let ((dirs-and-classes (int<dlv>:class:get directory)))
         (nub:debug
             :dlv
-            func.name
-            func.tags
+            func/name
+            func/tags
           '("[GET] Dirs & Classes:\n"
             "%s")
           (pp-to-string dirs-and-classes))
@@ -546,10 +536,10 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
                  cleaned/dlv.struct)
 
             ;; We got the dirs/classes from emacs, so we are expecting to have a valid dir path.
-            (if (not (int<dlv>:validate:emacs/dlv:dir/path func.name dlv.directory error? :dir/exists :dlv/exists))
+            (if (not (int<dlv>:validate:emacs/dlv:dir/path func/name dlv.directory error? :dir/exists :dlv/exists))
                 (if (not (null error?))
                     (error "%s: Cannot clean DLVs for directory; existing Emacs DLV was not found for it. directory: '%s'"
-                           func.name
+                           func/name
                            dlv.directory)
                   (setq valid nil))
 
@@ -562,7 +552,7 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
                                      "  expected class symbol: %S\n"
                                      "  directory:             %s\n"
                                      "  existing/dlv.struct:   %S"
-                                     func.name
+                                     func/name
                                      dlv.class
                                      dlv.directory
                                      existing/dlv.struct))
@@ -573,8 +563,8 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
                 ;;------------------------------
                 (nub:debug
                     :dlv
-                    func.name
-                    func.tags
+                    func/name
+                    func/tags
                   '("[CLEANING] Clean DLV class `%S'...\n"
                     "  DLV dir:    %s\n"
                     "  DLV class:  %S\n"
@@ -589,14 +579,14 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
                 ;;------------------------------
                 (dolist (kvp existing/dlv.struct)
                   ;; Is this a valid dlv mode->vars (or dir->(mode->vars, ...)) tuple?
-                  (if (or (int<dlv>:validate:dir/entry func.name kvp nil)
-                          (int<dlv>:validate:mode/entry func.name kvp nil))
+                  (if (or (int<dlv>:validate:dir/entry func/name kvp nil)
+                          (int<dlv>:validate:mode/entry func/name kvp nil))
                       ;; Valid, so we keep it. Push to `cleaned/dlv.struct'.
                       (progn
                         (nub:debug
                             :dlv
-                            func.name
-                            func.tags
+                            func/name
+                            func/tags
                           '("[CLEAN:keep] Valid dir or class entry:\n"
                             "%s")
                           (pp-to-string kvp))
@@ -606,8 +596,8 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
                     ;; It won't be in `cleaned/dlv.struct' so it will get lost when we set.
                     (nub:debug
                         :dlv
-                        func.name
-                        func.tags
+                        func/name
+                        func/tags
                       '("[CLEAN:DROP] Invalid dir or class entry:\n"
                         "%s")
                       (pp-to-string kvp))))
@@ -621,8 +611,8 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
                     (progn
                       (nub:debug
                           :dlv
-                          func.name
-                          func.tags
+                          func/name
+                          func/tags
                         "[CLEAN:no-op] Nothing changed for DLV class: %S"
                         dlv.class)
                       ;; Return something to indicate this state.
@@ -630,13 +620,13 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
 
                   ;; Set it to approximately the order it used to be.
                   (setq cleaned/dlv.struct (nreverse cleaned/dlv.struct))
-                  (int<dlv>:directory-class/update func.name
+                  (int<dlv>:directory-class/update func/name
                                                    dlv.class
                                                    cleaned/dlv.struct)
                   (nub:debug
                       :dlv
-                      func.name
-                      func.tags
+                      func/name
+                      func/tags
                     '("[CLEAN:UPDATE] Cleaned invalids out of DLV class:\n"
                       "  class:        %S\n"
                       "  clean struct:\n"
@@ -648,8 +638,8 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
 
     (nub:debug:func/return
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       valid)
     ;; Return valid/invalid state.
     valid))
@@ -670,12 +660,12 @@ If VALIDATION-PREDICATE is a member of `int<dlv>:const:safe/valid', do nothing.
 If VALIDATION-PREDICATE is something else, raise an error signal.
 
 CALLER should be calling function's name (string)."
-  (let ((func.name (nub:format:callers "int<dlv>:vars:safe" caller))
-        (func.tags '(:safe :validate)))
+  (let ((func/name (nub:format:callers "int<dlv>:vars:safe" caller))
+        (func/tags '(:safe :validate)))
     (nub:debug:func/start
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (list (cons 'caller caller)
             (cons 'symbol symbol)
             (cons 'validation-predicate validation-predicate)))
@@ -687,8 +677,8 @@ CALLER should be calling function's name (string)."
               ;; If it /is/ a member of `int<dlv>:const:safe/valid', we don't need to do anything.
               (nub:debug
                   :dlv
-                  func.name
-                  func.tags
+                  func/name
+                  func/tags
                 "symbol %S already safe: %S"
                 symbol
                 validation-predicate)
@@ -697,19 +687,18 @@ CALLER should be calling function's name (string)."
 
           (nub:debug
               :dlv
-              func.name
-              func.tags
+              func/name
+              func/tags
             "Setting symbol %S `safe-local-variable' slot to: %S"
             symbol
             validation-predicate)
           ;; Add the VALIDATION-PREDICATE function to the SYMBOL's `safe-local-variable' property.
           (prog1
               (put symbol 'safe-local-variable validation-predicate)
-
             (nub:debug
                 :dlv
-                func.name
-                func.tags
+                func/name
+                func/tags
               "Symbol %S `safe-local-variable' slot is now: %S"
               symbol
               (get symbol 'safe-local-variable))))
@@ -812,17 +801,17 @@ risky property quietly. Otherwise, `message' a warning.
 NOTE: if a symbol is considered risky for some reason other than the
 `risky-local-variable' property, REMOVE-RISKY will not work and will signal an
 error."
-  (let ((func.name "dlv:var:safe/predicate"))
+  (let ((func/name "dlv:var:safe/predicate"))
     ;; Check some errors first.
     (cond ((not (functionp predicate))
            (error "%s: Cannot mark SYMBOL (%S) as safe; PREDICATE is not a function? %S"
-                  func.name
+                  func/name
                   symbol
                   predicate))
           ((and (risky-local-variable-p symbol)
                 (null remove-risky))
-           (error ": Cannot mark SYMBOL (%S) as safe; It is considered risky: %S"
-                  func.name
+           (error "%s: Cannot mark SYMBOL (%S) as safe; It is considered risky: %S"
+                  func/name
                   symbol
                   (risky-local-variable-p symbol)))
           ;; Passed error checks; do it.
@@ -830,12 +819,11 @@ error."
            ;; Force to not risky?
            (when remove-risky
              ;; `message' if not quiet, `error' if cannot remove the riskiness.
-             (int<dlv>:var:risky/remove func.name
+             (int<dlv>:var:risky/remove func/name
                                         symbol
                                         remove-risky
                                         #'message
                                         #'error))
-
            ;; Set the safe predicate.
            (int<dlv>:vars:safe "dlv:var:safe/predicate" symbol predicate)))))
 
@@ -854,11 +842,11 @@ risky property quietly. Otherwise, `message' a warning.
 NOTE: if a symbol is considered risky for some reason other than the
 `risky-local-variable' property, REMOVE-RISKY will not work and will signal an
 error."
-  (let ((func.name "dlv:var:safe/value"))
+  (let ((func/name "dlv:var:safe/value"))
     ;; Force to not risky?
     (when remove-risky
       ;; `message' if not quiet, `error' if cannot remove the riskiness.
-      (int<dlv>:var:risky/remove func.name
+      (int<dlv>:var:risky/remove func/name
                                  symbol
                                  remove-risky
                                  #'message
@@ -882,24 +870,24 @@ error."
 Mark symbol as safe-for-DLV via predicate function if SAFE is a function.
 Do nothing if SAFE is a member of `int<dlv>:const:safe/valid'.
 Error otherwise."
-  (let ((func.name "int<dlv>:vars:pair/create")
-        (func.tags '(:create :set)))
+  (let ((func/name "int<dlv>:vars:pair/create")
+        (func/tags '(:create :set)))
     (nub:debug:func/start
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (list (cons 'symbol symbol)
             (cons 'value  value)
             (cons 'safe   safe)))
 
-    (if (not (and (int<dlv>:validate:var/symbol func.name symbol :error)
-                  (int<dlv>:validate:var/value func.name value :error)
-                  (int<dlv>:validate:safe func.name safe :error)))
+    (if (not (and (int<dlv>:validate:var/symbol func/name symbol :error)
+                  (int<dlv>:validate:var/value func/name value :error)
+                  (int<dlv>:validate:safe func/name safe :error)))
         (error "%s: Failed to validate SYMBOL, VALUE, and/or SAFE! %S %S %S"
-               func.name
+               func/name
                symbol value safe)
       ;; Mark SYMBOL with SAFE, then create/return the var pair.
-      (int<dlv>:vars:safe func.name symbol safe)
+      (int<dlv>:vars:safe func/name symbol safe)
       (cons symbol
             value))))
 ;; (int<dlv>:vars:pair/create 'jeff/var '(:ns-jeff 42 "docstr") :safe)
@@ -912,8 +900,8 @@ Error otherwise."
 ;;   "Get the symbol SYMBOL from the directory local variables DLV.VARS.
 ;;
 ;; If QUIET is not nil, signals error. Else returns nil on error."
-;;   (let ((func.name "int<dlv>:vars:pair/get"))
-;;     (unless (int<dlv>:validate:var/symbol func.name symbol :error)
+;;   (let ((func/name "int<dlv>:vars:pair/get"))
+;;     (unless (int<dlv>:validate:var/symbol func/name symbol :error)
 ;;       (error "%s: `symbol' failed validation! %S"
 ;;              "int<dlv>:pair/get" symbol))
 ;;     (alist-get symbol dlv.vars)))
@@ -927,21 +915,21 @@ PAIR should be a certain format, which `int<dlv>:pair/create' returns.
 
 Return the updated alist.
 NOTE: Caller should save return value back to their alist variable!"
-  (let ((func.name "int<dlv>:vars:pair/set")
-        (func.tags '(:create :update :set)))
+  (let ((func/name "int<dlv>:vars:pair/set")
+        (func/tags '(:create :update :set)))
     (nub:debug:func/start
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (list (cons 'pair     pair)
             (cons '->var    (if (listp pair) (car pair) "<invalid?>"))
             (cons '->value  (if (listp pair) (cdr pair) "<invalid?>"))
             (cons 'dlv.vars dlv.vars)))
 
-    (if (not (int<dlv>:validate:var/pair func.name pair :error))
+    (if (not (int<dlv>:validate:var/pair func/name pair :error))
         ;; Should have already errored, but just in case:
         (error "%s: `pair' failed validation! %S"
-               func.name pair)
+               func/name pair)
 
       ;; Valid - set/update the var in the alist.
       (if (null (assoc (car pair) dlv.vars)) ;; empty alist?
@@ -950,8 +938,8 @@ NOTE: Caller should save return value back to their alist variable!"
             (push pair dlv.vars)
             (nub:debug
                 :dlv
-                func.name
-                func.tags
+                func/name
+                func/tags
               '("Create `dlv.vars':\n"
                 "  pair: %S\n"
                 "  vars: %S")
@@ -963,8 +951,8 @@ NOTE: Caller should save return value back to their alist variable!"
               (cdr pair))
         (nub:debug
             :dlv
-            func.name
-            func.tags
+            func/name
+            func/tags
           '("Add-to/update `dlv.vars':\n"
             "  pair: %S\n"
             "  vars: %S")
@@ -974,8 +962,8 @@ NOTE: Caller should save return value back to their alist variable!"
       ;; Return the updated alist.
       (nub:debug:func/return
           :dlv
-          func.name
-          func.tags
+          func/name
+          func/tags
         (pp-to-string dlv.vars))
       dlv.vars)))
 ;; (let ((an-alist '((baz . qux)))) (int<dlv>:vars:pair/set '(foo . bar) an-alist))
@@ -991,7 +979,7 @@ TUPLES must be an alist of 3-tuples of: (symbol value safe).
   - SAFE must be a function or one of: (t :safe)
     + If a function, will set symbol's `safe-local-variable' slot to that
       function."
-  (let ((func.name "int<dlv>:vars:create"))
+  (let ((func/name "int<dlv>:vars:create"))
     (if tuples
         (let (dlv.vars)
           ;; Validate alist tuples and push valids to the output list.
@@ -1001,7 +989,7 @@ TUPLES must be an alist of 3-tuples of: (symbol value safe).
                 (error (concat "%s: `tuple' failed validation! "
                                "Must be a list of length 3: (symbol value safe). "
                                "Got: %S - list? %S length? %S")
-                       func.name tuple
+                       func/name tuple
                        (listp tuple)
                        (length tuple))
 
@@ -1018,7 +1006,7 @@ TUPLES must be an alist of 3-tuples of: (symbol value safe).
 
       ;; No alist at all? Don't know what to do with that other than error.
       (error "%s: `tuples' must be an alist of (symbol value safe) 3-tuples! %S"
-             func.name tuples))))
+             func/name tuples))))
 ;; (int<dlv>:vars:create '(one "one" :safe) '(two "two" boundp))
 
 
@@ -1030,15 +1018,15 @@ TUPLES must be an alist of 3-tuples of: (symbol value safe).
   "Create a MODE/VARS pair for the directory local variables list.
 
 MODE should be an Emacs mode symbol or nil for global mode (all modes)."
-  (let ((func.name "int<dlv>:mode:entry/create"))
-    (cond ((not (int<dlv>:validate:mode/symbol func.name mode :error))
+  (let ((func/name "int<dlv>:mode:entry/create"))
+    (cond ((not (int<dlv>:validate:mode/symbol func/name mode :error))
            (error "%s: `mode' must be a symbol! %S"
-                  func.name
+                  func/name
                   mode))
 
-          ((not (int<dlv>:validate:dlv/vars func.name vars :error))
+          ((not (int<dlv>:validate:dlv/vars func/name vars :error))
            (error "%s: `mode' must be a symbol! %S"
-                  func.name
+                  func/name
                   mode))
 
           ;; Valid - create the mode structure.
@@ -1051,10 +1039,10 @@ MODE should be an Emacs mode symbol or nil for global mode (all modes)."
 
 (defun int<dlv>:mode:vars/get (mode dlv-alist)
   "Get the MODE's alist of variables from the directory local variables DLV-ALIST."
-  (let ((func.name "int<dlv>:mode:vars/get"))
-    (if (not (int<dlv>:validate:mode/symbol func.name mode :error))
+  (let ((func/name "int<dlv>:mode:vars/get"))
+    (if (not (int<dlv>:validate:mode/symbol func/name mode :error))
         (error "%s: `mode' must be a symbol! %S"
-               func.name
+               func/name
                mode))
 
     (alist-get mode dlv-alist)))
@@ -1080,10 +1068,10 @@ returns.
 NOTE: May or may not change the input list!
 
 Return the updated DLV alist."
-  (let ((func.name "int<dlv>:mode:set"))
-    (cond ((not (int<dlv>:validate:mode/entry func.name mode-entry :error))
+  (let ((func/name "int<dlv>:mode:set"))
+    (cond ((not (int<dlv>:validate:mode/entry func/name mode-entry :error))
            (error "%s: `mode-entry' must be valid! %S"
-                  func.name
+                  func/name
                   mode-entry))
 
           ;; Not in DLV alist so just add it.
@@ -1106,20 +1094,20 @@ Return the updated DLV alist."
 
 (defun int<dlv>:dir:entry/create (directory dlv.modes)
   "Create a directory DLV entry for DIRECTORY with the DLV.MODES provided."
-  (let* ((func.name "int<dlv>:dir:entry/create")
-         (path (int<dlv>:validate:dir/path func.name directory :error)))
+  (let* ((func/name "int<dlv>:dir:entry/create")
+         (path (int<dlv>:validate:dir/path func/name directory :error)))
 
     (dolist (mode.entry dlv.modes)
-      (if (not (int<dlv>:validate:mode/entry func.name mode.entry :error))
+      (if (not (int<dlv>:validate:mode/entry func/name mode.entry :error))
           ;; Should have errored out but:
           (error "%s: `dlv.modes' must be valid! %S"
-                 func.name
+                 func/name
                  mode.entry)))
 
     (if (not path)
         ;; Should have errored out but:
         (error "%s: `directory' must be valid! %S"
-               func.name
+               func/name
                directory)
 
       ;; Valid - create the entry.
@@ -1135,11 +1123,11 @@ Return the updated DLV alist."
 
 (defun int<dlv>:struct:create (entry)
   "Create a DLV alist from the DLV (mode or dir) ENTRY."
-  (let ((func.name "int<dlv>:struct:create"))
-    (if (not (or (int<dlv>:validate:mode/entry func.name entry) ;; No erroring.
-                 (int<dlv>:validate:dir/entry func.name entry))) ;; No erroring.
+  (let ((func/name "int<dlv>:struct:create"))
+    (if (not (or (int<dlv>:validate:mode/entry func/name entry) ;; No erroring.
+                 (int<dlv>:validate:dir/entry func/name entry))) ;; No erroring.
         (error "%s: `entry' must be a valid mode or directory DLV entry! %S"
-               func.name
+               func/name
                entry)
       ;; Valid entry - turn it into an alist.
       (list entry))))
@@ -1170,12 +1158,12 @@ Return a list of paths (which are DIRECTORY) that have a DLV class already."
 CALLER should be calling function's name (string).
 
 Does no error checking/validation."
-  (let ((func.name (nub:format:callers "int<dlv>:directory-class/create" caller))
-        (func.tags '(:create :set)))
+  (let ((func/name (nub:format:callers "int<dlv>:directory-class/create" caller))
+        (func/tags '(:create :set)))
     (nub:debug:func/start
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (list (cons 'dlv.class     dlv.class)
             (cons 'dlv.directory dlv.directory)
             (cons 'dlv.struct    dlv.struct)))
@@ -1183,16 +1171,16 @@ Does no error checking/validation."
     ;; Set the class of dlv variables and apply it to the directory.
     (nub:debug
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       "Creating class variables `%S': %s"
       dlv.class dlv.struct)
     (dir-locals-set-class-variables dlv.class dlv.struct)
 
     (nub:debug
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       "Setting dir class `%S': %s"
       dlv.class
       dlv.directory)
@@ -1201,16 +1189,16 @@ Does no error checking/validation."
     ;; If debugging, get & print it to check that we set it.
     (nub:debug
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       "Getting dir class via `dir-locals-get-directory-class':\n  %S"
       (dir-locals-get-class-variables dlv.class))
 
     ;; Return something?
     (nub:debug:func/return
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       dlv.class)))
 
 
@@ -1220,35 +1208,35 @@ Does no error checking/validation."
 CALLER should be calling function's name (string).
 
 Does no error checking/validation."
-  (let ((func.name (nub:format:callers "int<dlv>:directory-class/create" caller))
-        (func.tags '(:update :set)))
+  (let ((func/name (nub:format:callers "int<dlv>:directory-class/create" caller))
+        (func/tags '(:update :set)))
     (nub:debug:func/start
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (list (cons 'dlv.class  dlv.class)
             (cons 'dlv.struct dlv.struct)))
 
     ;; Only set the class -> dlv variables. Directory -> class should already exist.
     (nub:debug
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       "Updating class variables `%S': %s"
       dlv.class dlv.struct)
     (dir-locals-set-class-variables dlv.class dlv.struct)
     (nub:debug
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       "Getting dir class via `dir-locals-get-directory-class':\n  %S"
       (dir-locals-get-class-variables dlv.class))
 
     ;; Return something?
     (nub:debug:func/return
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       dlv.class)))
 
 
@@ -1269,12 +1257,12 @@ TUPLES should be '(symbol value safe) tuples.
       for Directory Local Value use.
 
 Return a list of DLV class symbol(s)."
-  (let ((func.name "dlv:create")
-        (func.tags '(:create :set)))
+  (let ((func/name "dlv:create")
+        (func/tags '(:create :set)))
     (nub:debug:func/start
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (list (cons 'directory directory)
             (cons 'mode mode)
             (cons 'tuples tuples)))
@@ -1284,15 +1272,15 @@ Return a list of DLV class symbol(s)."
     ;;------------------------------
     ;; Some inputs will be validate when building the DLV structure, so just validate the rest.
 
-    (unless (int<dlv>:validate:dir/path func.name directory :error)
+    (unless (int<dlv>:validate:dir/path func/name directory :error)
       (error "%s: DIRECTORY must be valid! Got: %S"
-             func.name directory))
+             func/name directory))
 
     (let ((dirs-and-classes (int<dlv>:class:get directory)))
       (nub:debug
           :dlv
-          func.name
-          func.tags
+          func/name
+          func/tags
         '("Dirs & Classes:\n"
           "  %S")
         dirs-and-classes)
@@ -1300,13 +1288,13 @@ Return a list of DLV class symbol(s)."
       ;; Validate dlv class symbol and directory for each created.
       ;; Can have more than one for e.g. paths in $HOME.
       (dolist (dir-and-class dirs-and-classes)
-        (unless (int<dlv>:validate:class/symbol func.name (cdr dir-and-class) :error)
+        (unless (int<dlv>:validate:class/symbol func/name (cdr dir-and-class) :error)
           (error "%s: `dlv.class' must be valid! Got: %S for directory '%s'"
-                 func.name (cdr dir-and-class) (car dir-and-class)))
+                 func/name (cdr dir-and-class) (car dir-and-class)))
         ;; Creating, so don't allow if one already exists for the dir.
-        (unless (int<dlv>:validate:emacs/dlv:dir/path func.name (car dir-and-class) :error :dir/exists :dlv/dne)
+        (unless (int<dlv>:validate:emacs/dlv:dir/path func/name (car dir-and-class) :error :dir/exists :dlv/dne)
           (error "%s: Cannot create entry for directory; Emacs DLV already exists for it. DIRECTORY: '%s'"
-                 func.name
+                 func/name
                  (car dir-and-class))))
 
       ;; MODE, TUPLES validated in `let*', below.
@@ -1325,8 +1313,8 @@ Return a list of DLV class symbol(s)."
                  (dlv.struct (int<dlv>:struct:create dlv.mode)))
             (nub:debug
                 :dlv
-                func.name
-                func.tags
+                func/name
+                func/tags
               '("DLV'd:\n"
                 "  dlv.class:     %S\n"
                 "  dlv.directory: %S\n"
@@ -1340,11 +1328,11 @@ Return a list of DLV class symbol(s)."
               dlv.vars)
 
             ;; Set the class of dlv variables and apply it to the directory.
-            (push (int<dlv>:directory-class/create func.name dlv.class dlv.directory dlv.struct) created/dlv.classes)))
+            (push (int<dlv>:directory-class/create func/name dlv.class dlv.directory dlv.struct) created/dlv.classes)))
         (nub:debug:func/return
             :dlv
-            func.name
-            func.tags
+            func/name
+            func/tags
           created/dlv.classes)))))
 
 
@@ -1363,12 +1351,12 @@ TUPLES should be an alist of '(symbol value safe) tuples.
       slot for Emacs to use.
     + If t or `:safe', do nothing; symbol is assumed to be already marked safe
       for Directory Local Value use."
-  (let ((func.name "dlv:update")
-        (func.tags '(:update :set)))
+  (let ((func/name "dlv:update")
+        (func/tags '(:update :set)))
     (nub:debug:func/start
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (list (cons 'directory directory)
             (cons 'mode mode)
             (cons 'tuples tuples)))
@@ -1378,15 +1366,15 @@ TUPLES should be an alist of '(symbol value safe) tuples.
     ;;------------------------------
     ;; Some inputs will be validate when building the DLV structure, so just validate the rest.
 
-    (unless (int<dlv>:validate:dir/path func.name directory :error)
+    (unless (int<dlv>:validate:dir/path func/name directory :error)
       (error "%s: DIRECTORY must be valid! Got: %S"
-             func.name directory))
+             func/name directory))
 
     (let ((dirs-and-classes (int<dlv>:class:get directory)))
       (nub:debug
           :dlv
-          func.name
-          func.tags
+          func/name
+          func/tags
         '("[GET] Dirs & Classes:\n"
           "  %S")
         dirs-and-classes)
@@ -1396,8 +1384,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
       ;;---
       (nub:debug
           :dlv
-          func.name
-          func.tags
+          func/name
+          func/tags
         '("[VERIFY] DLV dir/class must pre-exist:\n"
           "  dir:                %S\n"
           "  dlv dirs & classes: %S")
@@ -1409,8 +1397,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
         ;; Debug about clean if debugging enabled.
         (nub:debug
             :dlv
-            func.name
-            func.tags
+            func/name
+            func/tags
           "[CLEAN] DLV dir/class clean returned: %S"
           cleaned))
 
@@ -1420,9 +1408,9 @@ TUPLES should be an alist of '(symbol value safe) tuples.
         (let* ((dir (car dir-and-class))
                (class (cdr dir-and-class))
                (existing/dlv.struct (dir-locals-get-class-variables class)))
-          (unless (int<dlv>:validate:emacs/dlv:dir/path func.name dir :error :dir/exists :dlv/exists)
+          (unless (int<dlv>:validate:emacs/dlv:dir/path func/name dir :error :dir/exists :dlv/exists)
             (error "%s: Cannot update entry for directory; directory failed validation. directory: '%s'"
-                   func.name
+                   func/name
                    dir))
 
           ;; Updating, so don't allow if one /does not/ exists for the dir.
@@ -1430,8 +1418,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
               ;; Allowed - found existing.
               (nub:debug
                   :dlv
-                  func.name
-                  func.tags
+                  func/name
+                  func/tags
                 '("[VERIFY:OK] DLV dir/class exists!\n"
                   "  dir:      %S\n"
                   "  class:    %S\n"
@@ -1446,7 +1434,7 @@ TUPLES should be an alist of '(symbol value safe) tuples.
                            "expected class symbol: %S, "
                            "directory: '%s', "
                            "existing/dlv.struct: %S"
-                           func.name
+                           func/name
                            class
                            dir
                            existing/dlv.struct)))))
@@ -1459,8 +1447,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
 
       (nub:debug
           :dlv
-          func.name
-          func.tags
+          func/name
+          func/tags
         "[UPDATE] Apply updates to DLV classes...")
 
       (let (updated/dlv.classes)
@@ -1476,8 +1464,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
                  dlv.mode)
             (nub:debug
                 :dlv
-                func.name
-                func.tags
+                func/name
+                func/tags
               '("[UPDATE] Apply update to:\n"
                 "  DLV dir:    %S\n"
                 "  DLV class:  %S\n"
@@ -1501,8 +1489,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
                 (progn
                   (nub:debug
                       :dlv
-                      func.name
-                      func.tags
+                      func/name
+                      func/tags
                     '("[UPDATE] Add/update vars to existing mode vars:\n"
                       "  DLV dir:   %S\n"
                       "  DLV class: %S\n"
@@ -1522,8 +1510,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
                           (int<dlv>:vars:pair/set kvp existing/dlv.vars))
                     (nub:debug
                         :dlv
-                        func.name
-                        func.tags
+                        func/name
+                        func/tags
                       '("[UPDATE] Updated `existing/dlv.vars':\n"
                         "  mode:         %S\n"
                         "  var:          %S\n"
@@ -1536,8 +1524,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
                   (setq dlv.mode (int<dlv>:mode:entry/create mode existing/dlv.vars))
                   (nub:debug
                       :dlv
-                      func.name
-                      func.tags
+                      func/name
+                      func/tags
                     '("[UPDATE] Updated `dlv.mode':\n"
                       "  dlv.mode: %S")
                     dlv.mode))
@@ -1548,8 +1536,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
               ;; No existing vars for the mode, so... Create the mode.
               (nub:debug
                   :dlv
-                  func.name
-                  func.tags
+                  func/name
+                  func/tags
                 '("[UPDATE] Create new mode:\n"
                   "  dir:       %S\n"
                   "  mode:      %S"
@@ -1562,8 +1550,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
               (setq dlv.mode (int<dlv>:mode:entry/create mode dlv.vars))
               (nub:debug
                   :dlv
-                  func.name
-                  func.tags
+                  func/name
+                  func/tags
                 '("[UPDATE] Created `dlv.mode':\n"
                   "  mode:     %S\n"
                   "  dlv.mode: %S")
@@ -1576,8 +1564,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
             ;; Set the new/updated mode entry into the dlv struct.
             (nub:debug
                 :dlv
-                func.name
-                func.tags
+                func/name
+                func/tags
               '("[UPDATE] Setting new `dlv.mode' in existing DLV:\n"
                 "  mode: %S\n"
                 "  DLV mode, UPDATED:\n"
@@ -1593,8 +1581,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
             (setq existing/dlv.struct (int<dlv>:mode:set dlv.mode existing/dlv.struct))
             (nub:debug
                 :dlv
-                func.name
-                func.tags
+                func/name
+                func/tags
               '("[UPDATE] Set new `dlv.mode'.\n"
                 "  mode: %S\n"
                 "  DLV struct (UPDATED):\n"
@@ -1603,14 +1591,14 @@ TUPLES should be an alist of '(symbol value safe) tuples.
               (pp-to-string existing/dlv.struct))
 
             ;; And now we can replace the DLV struct in Emacs.
-            (let ((updated/dlv.class (int<dlv>:directory-class/update func.name
+            (let ((updated/dlv.class (int<dlv>:directory-class/update func/name
                                                                       dlv.class
                                                                       existing/dlv.struct)))
               (push updated/dlv.class updated/dlv.classes)
               (nub:debug
                   :dlv
-                  func.name
-                  func.tags
+                  func/name
+                  func/tags
                 '("[UPDATE] Updated DLV classes for directory:\n"
                   "  dir:   %S\n"
                   "  class: %S\n"
@@ -1628,8 +1616,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
         ;;------------------------------
         (nub:debug:func/end
             :dlv
-            func.name
-            func.tags
+            func/name
+            func/tags
           (list (cons 'directory directory)
                 (cons 'updated/dlv.class (pp-to-string updated/dlv.classes))))
 
@@ -1651,20 +1639,20 @@ Each TUPLES parameter should be a list of '(symbol value safe) tuples.
       slot for Emacs to use.
     + If t or `:safe', do nothing; symbol is assumed to be already marked safe
       for Directory Local Value use."
-  (let ((func.name "dlv:set")
-        (func.tags '(:set)))
+  (let ((func/name "dlv:set")
+        (func/tags '(:set)))
     (nub:debug:func/start
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (list (cons 'directory directory)
             (cons 'mode      mode)
             (cons 'tuples    tuples)))
 
     (nub:debug:func/return
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
 
       ;;------------------------------
       ;; DLV Set: Create or Update the DLV.

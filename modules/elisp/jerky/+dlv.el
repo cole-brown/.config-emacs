@@ -31,17 +31,17 @@
 
 (defun jerky:dlv:namespace/set (directory namespace)
   "Set Jerky's local NAMESPACE for the DIRECTORY."
-  (let ((func.name "jerky:dlv:namespace/set")
-        (func.tags '(:dlv)))
+  (let ((func/name "jerky:dlv:namespace/set")
+        (func/tags '(:dlv)))
     (nub:debug:func/start :jerky
-                          func.name
-                          func.tags
+                          func/name
+                          func/tags
                           (list (cons 'directory directory)
                                 (cons 'namespace namespace)))
 
     (if (not (jerky:namespace:has namespace))
         (error "%s: No known namespace called '%s'"
-               func.name
+               func/name
                namespace)
 
       (dlv:set directory
@@ -51,8 +51,8 @@
                      :safe)))
 
     (nub:debug:func/end :jerky
-                        func.name
-                        func.tags)))
+                        func/name
+                        func/tags)))
 ;; (jerky:get 'path 'org 'journal :namespace :work)
 ;;   -> "d:/home/main/.org.d/logbook/work/"
 ;; (jerky:dlv:namespace/set "d:/home/main/.org.d/logbook/work/" :work)

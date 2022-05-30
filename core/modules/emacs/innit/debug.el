@@ -82,74 +82,79 @@ Checks:
   - `debug-on-error'
 
 Returns `innit:debug?'"
-  ;; Set our debug variable (`innit:debug?') and Emacs' variables based on inputs.
-  (cond
-   ;;---
-   ;; Environment Variable: DEBUG
-   ;;---
-   ((and (getenv-internal "DEBUG")
-         (not init-file-debug)
-         (not debug-on-error))
-    (setq innit:debug? (getenv-internal "DEBUG"))
+  (let ((func/name "innit:debug:init")
+        (func/tags '(:innit :debug :init)))
+    ;; Set our debug variable (`innit:debug?') and Emacs' variables based on inputs.
+    (cond
+     ;;---
+     ;; Environment Variable: DEBUG
+     ;;---
+     ((and (getenv-internal "DEBUG")
+           (not init-file-debug)
+           (not debug-on-error))
+      (setq innit:debug? (getenv-internal "DEBUG"))
 
-    ;; Also cascade into Emacs?
-    (setq init-file-debug t
-          debug-on-error t
-          jka-compr-verbose t)
+      ;; Also cascade into Emacs?
+      (setq init-file-debug t
+            debug-on-error t
+            jka-compr-verbose t)
 
-    (nub:out :innit
-             :debug
-             nil
-             "Enable `innit:debug?' from environment variable DEBUG: %S"
-             innit:debug?))
+      (nub:debug
+          :innit
+          func/name
+          func/tags
+        "Enable `innit:debug?' from environment variable DEBUG: %S"
+        innit:debug?))
 
-   ;;---
-   ;; CLI Flag: "--debug-init"
-   ;;---
-   (init-file-debug
-    (setq innit:debug? init-file-debug)
+     ;;---
+     ;; CLI Flag: "--debug-init"
+     ;;---
+     (init-file-debug
+      (setq innit:debug? init-file-debug)
 
-    ;; Also cascade into Emacs?
-    (setq debug-on-error t
-          jka-compr-verbose t)
+      ;; Also cascade into Emacs?
+      (setq debug-on-error t
+            jka-compr-verbose t)
 
-    (nub:out :innit
-             :debug
-             nil
-             "Enable `innit:debug?' from '--debug-init' CLI flag: %S"
-             innit:debug?))
+      (nub:debug
+          :innit
+          func/name
+          func/tags
+        "Enable `innit:debug?' from '--debug-init' CLI flag: %S"
+        innit:debug?))
 
-   ;;---
-   ;; Interactive Flag?
-   ;;---
-   ;; How did you get this set and not `init-file-debug'? Debugging some small
-   ;; piece of init, maybe?
-   (debug-on-error
-    (setq innit:debug? debug-on-error)
+     ;;---
+     ;; Interactive Flag?
+     ;;---
+     ;; How did you get this set and not `init-file-debug'? Debugging some small
+     ;; piece of init, maybe?
+     (debug-on-error
+      (setq innit:debug? debug-on-error)
 
-    ;; Also cascade into Emacs?
-    (setq jka-compr-verbose t)
-    ;; Don't set `init-file-debug'?
-    ;; (setq init-file-debug t)
+      ;; Also cascade into Emacs?
+      (setq jka-compr-verbose t)
+      ;; Don't set `init-file-debug'?
+      ;; (setq init-file-debug t)
 
-    (nub:out :innit
-             :debug
-             nil
-             "Enable `innit:debug?' from `debug-on-error' variable: %S"
-             innit:debug?))
+      (nub:debug
+          :innit
+          func/name
+          func/tags
+        "Enable `innit:debug?' from `debug-on-error' variable: %S"
+        innit:debug?))
 
-   ;;---
-   ;; _-NOT-_ Debugging
-   ;;---
-   (t
-    ;; Set everything to "no"?
-    (setq innit:debug?      nil
-          init-file-debug   nil
-          debug-on-error    nil
-          jka-compr-verbose nil)))
+     ;;---
+     ;; _-NOT-_ Debugging
+     ;;---
+     (t
+      ;; Set everything to "no"?
+      (setq innit:debug?      nil
+            init-file-debug   nil
+            debug-on-error    nil
+            jka-compr-verbose nil)))
 
-  ;; Return what the `innit:debug?' setting is now.
-  innit:debug?)
+    ;; Return what the `innit:debug?' setting is now.
+    innit:debug?))
 
 
 ;;------------------------------------------------------------------------------

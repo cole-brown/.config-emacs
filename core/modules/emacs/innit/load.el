@@ -17,7 +17,9 @@
 ;;; Code:
 
 
+(imp:require :nub)
 (imp:require :innit 'debug)
+
 
 ;;------------------------------------------------------------------------------
 ;; Ordered Loading (by file/dir name)
@@ -26,17 +28,19 @@
 (defun innit:load:ordered:files (root relative)
   "Load files in ROOT + RELATIVE directory in alphanumeric order."
   ;; Ensure absolute path...
-  (let* ((func/name "innit:load:ordered:files")
+  (let* ((func/name (nub:format:callers "innit:load:ordered:files" (imp:file:current)))
+         (func/tags '(:innit :load))
          (path/root/abs (path:canonicalize:absolute root))
          (path/dir/abs  (path:canonicalize:absolute root relative))
          (path/dir/rel  (path:canonicalize:relative path/dir/abs path/root/abs))
          (overall-result :init) ;; Start as something non-nil.
          file-result)
-    (nub:out :innit
-             :debug
-             (imp:file:current)
-             "innit:load:ordered:files: Load files at '%s/'..."
-             path/dir/rel)
+    (nub:debug:func/start
+        :innit
+        func/name
+        func/tags
+      "Load files at '%s/'..."
+      path/dir/rel)
 
     (if (not (path:exists? path/dir/abs :dir))
         ;;------------------------------
@@ -69,11 +73,12 @@
                     (let ((feature/name (list :innit path/load/rel)) ;; Fake out some feature name.
                           ;; Just `file:name', not `file:name:base', as we've already stripped the extension.
                           (load/name   (file:name path/load/rel)))
-                      (nub:out :innit
-                               :debug
-                               (imp:file:current)
-                               "innit:load:ordered:files: Load file '%s'..."
-                               load/name)
+                      (nub:debug
+                          :innit
+                          func/name
+                          func/tags
+                        "Load file '%s'..."
+                        path/load/rel)
                       (imp:timing
                           feature/name
                           load/name
@@ -101,10 +106,12 @@
       ;;------------------------------
       ;; Post-Loading
       ;;------------------------------
-      ;; Could put a message here if we want to be chatty?
-
       ;; Make sure we return the summarized result.
-      overall-result)))
+      (nub:debug:func/return
+          :innit
+          func/name
+          func/tags
+        overall-result))))
 
 
 (defun innit:load:ordered:dirs (root relative)
@@ -115,16 +122,19 @@ not recurse).
 
 NOTE: Uses `innit:load:ordered:files' for loading the files."
   ;; Ensure absolute path...
-  (let* ((path/root/abs (path:canonicalize:absolute root))
+  (let* ((func/name (nub:format:callers "innit:load:ordered:dirs" (imp:file:current)))
+         (func/tags '(:innit :load))
+         (path/root/abs (path:canonicalize:absolute root))
          (path/dir/abs  (path:canonicalize:absolute root relative))
          (path/dir/rel  (path:canonicalize:relative path/dir/abs path/root/abs))
          (feature/name   (list :innit path/dir/rel)) ;; Fake out some feature name...
          (overall-result :init)) ;; Start as something non-nil.
-    (nub:out :innit
-             :debug
-             (imp:file:current)
-             "innit:load:ordered:dirs: Load '%s'..."
-             path/dir/abs)
+    (nub:debug:func/start
+        :innit
+        func/name
+        func/tags
+      "Load dir '%s'..."
+      path/dir/rel)
     ;; Time everything...
     (imp:timing
         ;; Fake out some feature name...
@@ -137,11 +147,12 @@ NOTE: Uses `innit:load:ordered:files' for loading the files."
       ;;------------------------------
       ;; 1) Load our own files.
       ;;------------------------------
-      (nub:out :innit
-               :debug
-               (imp:file:current)
-               "innit:load:ordered:dirs: Load files in '%s/'..."
-               path/dir/rel)
+      (nub:debug
+          :innit
+          func/name
+          func/tags
+        "Load files in '%s/'..."
+        path/dir/rel)
       (setq overall-result (and overall-result
                                 (innit:load:ordered:files path/root/abs path/dir/rel)))
 
@@ -154,11 +165,12 @@ NOTE: Uses `innit:load:ordered:files' for loading the files."
           (let* ((child/path/abs (car child))
                  (child/path/rel (path:canonicalize:relative child/path/abs path/root/abs))
                  (child/attrs    (cdr child)))
-            (nub:out :innit
-                     :debug
-                     (imp:file:current)
-                     "innit:load:ordered:dirs: Load files in '%s/'..."
-                     child/path/rel)
+            (nub:debug
+                :innit
+                func/name
+                func/tags
+              "Load files in '%s/'..."
+              child/path/rel)
             ;; `t' is the attr type for directories. Ignore all the other file types.
             (when (and overall-result
                        ;; TODO-PATH: ...would also need this then.
@@ -168,7 +180,11 @@ NOTE: Uses `innit:load:ordered:files' for loading the files."
                                                                   child/path/rel)))))))
 
       ;; Return summarized result.
-      overall-result)))
+      (nub:debug:func/return
+          :innit
+          func/name
+          func/tags
+        overall-result))))
 
 
 (defun innit:load (caller step)
@@ -176,20 +192,33 @@ NOTE: Uses `innit:load:ordered:files' for loading the files."
 
 If loading isn't successful, signal an error using CALLER (e.g. \"init.el\") in
 error string."
-  (nub:out :innit
-           :debug
-           (imp:file:current)
-           "innit:load (@%s): %s"
-           caller
-           step)
-  (let ((result (innit:load:ordered:dirs innit:path:core/boot step)))
+  (let ((func/name (nub:format:callers "innit:load" (imp:file:current)))
+        (func/tags '(:innit :load))
+        result)
+    (nub:debug:func/start
+        :innit
+        func/name
+        func/tags
+      "Load step '%s'..."
+      step)
+
+    ;; Load dir's files for the step.
+    (setq result (innit:load:ordered:dirs innit:path:core/boot step))
+
+    ;; Update step w/ load result.
     (innit:status:set step result)
+
+    ;; Return step result or error.
     (unless result
       (error "[ERROR] innit:load:with-error: '%s' failed loading '%s' files. `innit:status': %S"
              caller
              step
              result))
-    result))
+    (nub:debug:func/return
+        :innit
+        func/name
+        func/tags
+      result)))
 
 
 ;;------------------------------------------------------------------------------

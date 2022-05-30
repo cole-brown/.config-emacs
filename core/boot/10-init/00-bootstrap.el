@@ -33,7 +33,7 @@
 ;; https://github.com/jwiegley/use-package
 
 ;; Finish `package.el' init; install & require `use-package'.
-(innit:package:init/normal)
+(innit:package:init/standard)
 
 
 ;;------------------------------

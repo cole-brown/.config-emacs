@@ -86,7 +86,8 @@
 (imp:path:root :module innit:path:module)
 
 
-(let ((file/this (imp:file:current)))
+(let ((file/this (imp:file:current))
+      (tags/this '(:innit :early)))
   ;;------------------------------------------------------------------------------
   ;; Settings & Overrides
   ;;------------------------------------------------------------------------------
@@ -108,11 +109,12 @@
   ;; Set up `nub' for use by `innit'.
   (innit:nub:init)
 
-  (nub:out :innit
-           :debug
-           file/this
-           ;; Is "Power On Self Test" a good term to steal?
-           "POST")
+  (nub:debug
+      :innit
+      file/this
+      tags/this
+    ;; Is "Power On Self Test" a good term to steal?
+    "POST")
 
   ;; Set up `innit' & Emacs' debug flags based on one another.
   (innit:debug:init)
@@ -122,10 +124,11 @@
   ;; Load Early-Init Files
   ;;------------------------------------------------------------------------------
 
-  (nub:out :innit
-           :debug
-           file/this
-           "Boot Loader: 00 Early")
+  (nub:debug
+      :innit
+      file/this
+      tags/this
+    "Boot Loader: 00 Early")
 
   (imp:timing
       '(:innit early-init load)

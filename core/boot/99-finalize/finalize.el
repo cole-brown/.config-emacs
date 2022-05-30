@@ -16,17 +16,19 @@
 ;;------------------------------------------------------------------------------
 
 ;; TODO: A random koan output by `mis' instead of `nub'.
-(nub:out :innit
-         :debug
-         (imp:file:current)
-         "TODO: a random koan")
+(nub:debug
+    :innit
+    (imp:file:current)
+    '(:innit :finalize)
+  "TODO: a random koan")
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(nub:out :innit
-         :debug
-         (imp:file:current)
-         "Boot Loader: 99 Finalize :: Every Has Been Done.")
+(nub:debug
+    :innit
+    (imp:file:current)
+    '(:innit :finalize)
+  "Boot Loader: 99 Finalize :: Every Has Been Done.")
 (imp:provide :core 'boot '99-finalize 'finalize)
