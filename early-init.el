@@ -58,6 +58,10 @@
 
     (imp:load :feature  '(:dlv)
               :path     (imp:path:join path-core-modules "emacs" "dlv")
+              :filename "init")
+
+    (imp:load :feature  '(:jerky)
+              :path     (imp:path:join path-core-modules "elisp" "jerky")
               :filename "init")))
 
 
