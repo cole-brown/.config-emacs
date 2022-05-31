@@ -67,6 +67,11 @@ Allows testing whether or not a parameter in a debug call is evaluated."
 ;; Tests: Debug Evaluations
 ;;------------------------------------------------------------------------------
 
+;; TODO: `int<nub>:var:debugging' is gone; remove from tests & replace.
+;; TODO: var getter: (int<nub>:var:enabled? :test :debug :default)
+;; TODO: var setter: (int<nub>:var:enabled?:set :test :debug t/nil/:toggle)
+;; TODO: debug helper is still: (int<nub>:debug:active? caller user tags)
+
 (ert-deftest test<nub/debug>::debug-evals ()
   "Test that the debug macros do not evaluate inputs unless debugging
 (w/ correct tags)."

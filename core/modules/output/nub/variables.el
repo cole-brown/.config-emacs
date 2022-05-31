@@ -255,7 +255,7 @@ Sets both current and backup values (backups generally only used for tests)."
 
 
 (defun int<nub>:var:enabled? (user level &optional default)
-  "Returns non-nil if output is enabled for USER at output LEVEL.
+  "Return non-nil if output is enabled for USER at output LEVEL.
 
 Returns DEFAULT if USER has no setting for LEVEL.
   - If DEFAULt is `:default', returns the standard/default/fallback for LEVEL."
@@ -288,18 +288,31 @@ Returns DEFAULT if USER has no setting for LEVEL.
 
 
 (defun int<nub>:var:enabled?:set (user level value)
-  "Set message prefix for USER at output LEVEL."
+  "Set enabled flag for USER at output LEVEL (or togggle the flag).
+
+If VALUE is `:toggle', this will toggle the flag. Otherwise it will set/unset
+the flag based on truthiness of VALUE."
   ;; Ensure USER and LEVEL are ok.
   (int<nub>:var:assert-user-level "int<nub>:var:enabled?:set" user level :error)
 
-  (let* ((alist/user (int<nub>:alist:get/value user int<nub>:var:enabled?))
+  (let* ((enabled?/value (cond ((eq :toggle value)
+                                (not (int<nub>:var:enabled? user level)))
+                               (value
+                                t)
+                               (t
+                                nil)))
+         (alist/user (int<nub>:alist:get/value user int<nub>:var:enabled?))
          (alist/updated (int<nub>:alist:update level
-                                               value
+                                               enabled?/value
                                                alist/user)))
     (int<nub>:alist:update user
                            alist/updated
                            int<nub>:var:enabled?)))
+;; (nub:vars:init :test)
+;; (int<nub>:var:enabled? :test :debug)
+;; (int<nub>:var:enabled? :test :debug :default)
 ;; (int<nub>:var:enabled?:set :test :debug 'foo)
+;; (int<nub>:var:enabled?:set :test :debug :toggle)
 ;; (int<nub>:var:enabled?:set :test :warn 'bar)
 
 
@@ -555,60 +568,9 @@ Returns DEFAULT if USER has no setting for LEVEL.
 ;; Debugging
 ;;------------------------------------------------------------------------------
 
-(defvar int<nub>:var:debugging
-  (list (cons int<nub>:var:user:fallback t))
-  "Alist of USER keyword to boolean debug flag. Non-nil means debugging is active.")
-
-
-;; TODO: Remove this flag, just use verbosity enabled for `:debug' level in `int<nub>:var:enabled?'.
-(defun int<nub>:var:debugging (user &optional default)
-  "Get debugging bool for USER.
-
-If DEFAULT is non-nil, return DEFAULT if not found for USER.
-Otherwise, return `:default' user's debug setting."
-  ;; Ensure USER is ok.
-  (int<nub>:user:exists? "int<nub>:var:debugging" user :error)
-
-  (let  ((debugging (int<nub>:alist:get/value user
-                                              int<nub>:var:debugging
-                                              :dne)))
-    ;; Return what we found or figure out fallback value.
-    (cond
-     ;; Found actual value.
-     ((not (eq :dne debugging))
-      debugging)
-
-     ;; Use whatever was provided.
-     ((not (null default))
-      default)
-
-     ;; Use default user's debugging setting.
-     (t
-      (int<nub>:alist:get/value int<nub>:var:user:fallback
-                                int<nub>:var:debugging)))))
-;; (int<nub>:var:debugging :test)
-
-
-(defun int<nub>:var:debugging:set (user value)
-  "Set debugging flag for USER (or togggles the flag).
-
-If VALUE is `:toggle', this will toggle the flag. Otherwise it will set/unset
-the flag based on truthiness of VALUE."
-  ;; Ensure USER is ok.
-  (int<nub>:user:exists? "int<nub>:var:debugging:set" user :error)
-
-  (let* ((debugging? (int<nub>:var:debugging user))
-         (debug-flag (cond ((eq :toggle value)
-                            (not debugging?))
-                           (value
-                            t)
-                           (t
-                            nil))))
-
-    (int<nub>:alist:update user
-                           debug-flag
-                           int<nub>:var:debugging)))
-;; (int<nub>:var:debugging :test)
+;; NOTE: For "is debugging active?", check `int<nub>:var:enabled?' for USER at `:debug' level.
+;; Example for default user:
+;;   (int<nub>:var:enabled? :default :debug)
 
 
 (defvar int<nub>:var:debug:tags nil
@@ -935,9 +897,6 @@ Sets both current and backup values (backups generally only used for tests)."
   ;; Delete user's debug settings.
   ;;---
   (int<nub>:alist:delete user
-                         int<nub>:var:debugging)
-
-  (int<nub>:alist:delete user
                          int<nub>:var:debug:tags)
 
   (int<nub>:alist:delete user
@@ -1011,14 +970,6 @@ Sets both current and backup values (backups generally only used for tests)."
   ;;---
   ;; Delete debug settings.
   ;;---
-  (message "  `int<nub>:var:debugging'")
-  (dolist (user-assoc int<nub>:var:debugging)
-    (let ((user (car user-assoc)))
-      (unless (eq user int<nub>:var:user:fallback)
-        (message "    - %S" user)
-        (int<nub>:alist:delete user
-                               int<nub>:var:debugging))))
-
   (message "  `int<nub>:var:debug:tags'")
   (dolist (user-assoc int<nub>:var:debug:tags)
     (let ((user (car user-assoc)))

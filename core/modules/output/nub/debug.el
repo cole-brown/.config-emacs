@@ -318,8 +318,8 @@ If tags are not valid:
 
 CALLER should be calling function's string name.
 
-Debugging when `int<nub>:var:debugging' is non-nil for USER and one of these
-is true:
+Debugging when `int<nub>:var:enabled?' is non-nil for USER at `:debug' level and
+one of these is true:
   - `int<nub>:var:debug:tags' for the user is nil
     + No specific debugging tags desired == all tags active.
   - `int<nub>:var:debug:tags' for the user is non-nil AND matches one or more
@@ -337,7 +337,7 @@ is true:
      ;; Not Debugging -> Never.
      ;;------------------------------
      ;; Debugging disabled is always a "no".
-     ((not (int<nub>:var:debugging user))
+     ((not (int<nub>:var:enabled? user :debug))
       nil)
 
      ;;------------------------------
@@ -379,7 +379,7 @@ PREFIX is an optional string to be printed first on its own line."
     (int<nub>:user:exists? func.name user :error)
 
     (let* ((tags/active      (int<nub>:debug:tags:sorted (int<nub>:var:debug:tags user)))
-           (debugging        (int<nub>:var:debugging user))
+           (debugging        (int<nub>:var:enabled? user :debug))
            (debugging:active (int<nub>:debug:active? func.name
                                                      user
                                                      tags)))
@@ -529,7 +529,7 @@ The answer depends on TAGS:
           nil)
 
       ;; Turn off debugging flag.
-      (int<nub>:var:debugging:set user nil)
+      (int<nub>:var:enabled?:set user :debug nil)
 
       ;; Wipe out the current active tags.
       (int<nub>:var:debug:tags:set user nil)
@@ -557,7 +557,9 @@ The answer depends on TAGS:
         nil)
 
     ;; Toggle debug flag and display status after toggle.
-    (int<nub>:var:debugging:set user :toggle)
+    (int<nub>:var:enabled?:set user
+                               :debug
+                               (not (int<nub>:var:enabled? user :debug)))
 
     ;; This also returns active tags, t, or nil.
     (int<nub>:debug:status/message (format "Nub: Toggled Debugging: %S" user)
@@ -638,7 +640,7 @@ The answer depends on TAGS:
 
 Will only evaluate MSG, and ARGS when debugging.
 
-Only prints if debugging (`int<nub>:var:debugging') and if any tag in TAGS
+Only prints if debugging (`int<nub>:var:enabled?') and if any tag in TAGS
 matches USER's active debugging tags (`int<nub>:var:debug:tags').
 
 CALLER (string) should be the calling function's name or calling file's path.
