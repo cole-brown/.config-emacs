@@ -39,6 +39,16 @@
         :innit
         func/name
         func/tags
+      (list (cons 'root root)
+            (cons 'relative relative)
+            (cons 'path/root/abs path/root/abs)
+            (cons 'path/dir/abs path/dir/abs)
+            (cons 'path/dir/rel path/dir/rel)))
+
+    (nub:debug
+        :innit
+        func/name
+        func/tags
       "Load files at '%s/'..."
       path/dir/rel)
 
@@ -133,8 +143,18 @@ NOTE: Uses `innit:load:ordered:files' for loading the files."
         :innit
         func/name
         func/tags
+      (list (cons 'root root)
+            (cons 'relative relative)
+            (cons 'path/root/abs path/root/abs)
+            (cons 'path/dir/abs path/dir/abs)
+            (cons 'path/dir/rel path/dir/rel)))
+    (nub:debug
+        :innit
+        func/name
+        func/tags
       "Load dir '%s'..."
       path/dir/rel)
+
     ;; Time everything...
     (imp:timing
         ;; Fake out some feature name...
@@ -199,8 +219,7 @@ error string."
         :innit
         func/name
         func/tags
-      "Load step '%s'..."
-      step)
+      (list (cons 'step step)))
 
     ;; Load dir's files for the step.
     (setq result (innit:load:ordered:dirs innit:path:core/boot step))
