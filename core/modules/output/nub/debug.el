@@ -748,8 +748,8 @@ ARGS should be the `message' arguments."
 ;; Debug Output
 ;;------------------------------------------------------------------------------
 
-(defun int<nub>:debug:func (caller user func/name func/tags start-or-end value)
-  "Print out start/end function message, with optional VALUE.
+(defun int<nub>:debug:func (caller user func/name func/tags start-or-end values)
+  "Print out start/end function message, with optional VALUES.
 
 CALLER (string) should be the calling function's name or calling file's path.
 
@@ -762,11 +762,11 @@ FUNC/TAGS should be nil or a list of debug tag keywords.
 Prints start message when START-OR-END is `:start'.
 Prints end message w/ optional return value when START-OR-END is `:end'.
 
-VALUEs are optional and should be:
+VALUES is optional and should be:
   - nil
-  - `cons' pairs of: '(name . value)"
+  - alist of symbol to value pairs: '((name . value) ...)"
   (let ((callers (nub:format:callers "int<nub>:debug:func" caller))
-        value/formatted)
+        values/formatted)
     (int<nub>:user:exists? callers user :error)
     (int<nub>:debug:tags:verify callers
                                 user
@@ -784,39 +784,39 @@ VALUEs are optional and should be:
                          "  func/name:    %S"
                          "  func/tags:    %S"
                          "  start-or-end: %S"
-                         "  value:        %S"))
+                         "  values:       %S"))
                       '(:start :end)
                       start-or-end
                       user
                       func/name
                       func/tags
                       start-or-end
-                      value))
+                      values))
 
     ;;------------------------------
     ;; Format output.
     ;;------------------------------
-    ;; No value alist - no output string.
-    (cond ((not value)
-           (setq value/formatted ""))
+    ;; No values alist - no output string.
+    (cond ((not values)
+           (setq values/formatted ""))
 
-          ;; Invalid value alist - error out.
-          ((not (int<nub>:alist:alist? value))
+          ;; Invalid values alist - error out.
+          ((not (int<nub>:alist:alist? values))
            (int<nub>:error callers
                            '(:newlines .
-                             ("VALUE is invalid for `%S'! Expecting `VALUE' to be an alist. Got: %S"
+                             ("VALUES is invalid for `%S'! Expecting `VALUES' to be an alist. Got: %S"
                               "  user:         %S"
                               "  func/name:    %S"
                               "  func/tags:    %S"
                               "  start-or-end: %S"
-                              "  value:        %S"))
+                              "  values:       %S"))
                            start-or-end
-                           value
+                           (type-of values)
                            user
                            func/name
                            func/tags
                            start-or-end
-                           value))
+                           values))
 
           ;; Format nicely into columns.
           (t
@@ -824,7 +824,7 @@ VALUEs are optional and should be:
                  values/print
                  fmt)
              ;; Convert names to strings, figure out print formatting.
-             (dolist (input value)
+             (dolist (input values)
                (let ((key (car input))
                      (value (cdr input)))
                  (if (eq :title key)
@@ -840,13 +840,13 @@ VALUEs are optional and should be:
 
              ;; Convert alist of strings to a single string.
              (dolist (input (nreverse values/print))
-               (setq value/formatted (concat value/formatted
-                                             (format fmt (car input) (cdr input))))))))
+               (setq values/formatted (concat values/formatted
+                                              (format fmt (car input) (cdr input))))))))
 
     ;;------------------------------
     ;; Start-of-function messages.
     ;;------------------------------
-    (cond ((and (null value/formatted)
+    (cond ((and (null values/formatted)
                 (eq :start start-or-end))
            (nub:debug
                user
@@ -855,7 +855,7 @@ VALUEs are optional and should be:
              '("\n"
                "---[BEGIN]------>\n")))
 
-          ;; VALUE exists and is valid; print it too.
+          ;; VALUES exists and is valid; print it too.
           ((eq :start start-or-end)
            ;; Print start w/ input vars.
            (nub:debug
@@ -866,13 +866,13 @@ VALUEs are optional and should be:
                "---[BEGIN]------>\n"
                "  ---[INPUTS]--->\n"
                "%s")
-             value/formatted))
+             values/formatted))
 
           ;;------------------------------
           ;; End-of-function messages.
           ;;------------------------------
-          ;; No value provided; just print end.
-          ((and (null value/formatted)
+          ;; No values provided; just print end.
+          ((and (null values/formatted)
                 (eq :end start-or-end))
            (nub:debug
                user
@@ -881,7 +881,7 @@ VALUEs are optional and should be:
              '("\n"
                "<--[END]-------\n")))
 
-          ;; `:end' + VALUE; print end w/ return VALUE.
+          ;; `:end' + VALUES; print end w/ return VALUES.
           ((eq :end start-or-end)
            (nub:debug
                user
@@ -891,7 +891,7 @@ VALUEs are optional and should be:
                "<--[END]-------\n"
                "  <--[RETURN]--\n"
                "%s")
-             value/formatted))
+             values/formatted))
 
           ;;------------------------------
           ;; Error: Bad START-OR-END
@@ -903,16 +903,16 @@ VALUEs are optional and should be:
                               "  user:      %S"
                               "  func/name: %S"
                               "  func/tags: %S"
-                              "  value:     %S"
-                              "  value/formatted:"
+                              "  values:    %S"
+                              "  values/formatted:"
                               "%S"))
                            '(:start :end)
                            start-or-end
                            user
                            func/name
                            func/tags
-                           value
-                           value/formatted)))))
+                           values
+                           values/formatted)))))
 
 
 ;;------------------------------------------------------------------------------

@@ -106,12 +106,12 @@ Example:
     -> '((nil) . \"/some/path/foo/bar\")"
   (let ((func.name "int<dlv>:path:multiplex")
         (func.tags '(:path)))
-    (nub:debug:func/start :dlv
-                          func.name
-                          func.tags
-                          (list
-                           (cons 'path      path)
-                           (cons 'as-dir    as-dir)))
+    (nub:debug:func/start
+        :dlv
+        func.name
+        func.tags
+      (cons 'path      path)
+      (cons 'as-dir    as-dir))
 
     ;;------------------------------
     ;; Error Checks

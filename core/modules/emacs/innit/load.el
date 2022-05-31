@@ -39,11 +39,11 @@
         :innit
         func/name
         func/tags
-      (list (cons 'root root)
-            (cons 'relative relative)
-            (cons 'path/root/abs path/root/abs)
-            (cons 'path/dir/abs path/dir/abs)
-            (cons 'path/dir/rel path/dir/rel)))
+      (cons 'root root)
+      (cons 'relative relative)
+      (cons 'path/root/abs path/root/abs)
+      (cons 'path/dir/abs path/dir/abs)
+      (cons 'path/dir/rel path/dir/rel))
 
     (nub:debug
         :innit
@@ -143,11 +143,11 @@ NOTE: Uses `innit:load:ordered:files' for loading the files."
         :innit
         func/name
         func/tags
-      (list (cons 'root root)
-            (cons 'relative relative)
-            (cons 'path/root/abs path/root/abs)
-            (cons 'path/dir/abs path/dir/abs)
-            (cons 'path/dir/rel path/dir/rel)))
+      (cons 'root root)
+      (cons 'relative relative)
+      (cons 'path/root/abs path/root/abs)
+      (cons 'path/dir/abs path/dir/abs)
+      (cons 'path/dir/rel path/dir/rel))
     (nub:debug
         :innit
         func/name
@@ -219,7 +219,7 @@ error string."
         :innit
         func/name
         func/tags
-      (list (cons 'step step)))
+      (cons 'step step))
 
     ;; Load dir's files for the step.
     (setq result (innit:load:ordered:dirs innit:path:core/boot step))

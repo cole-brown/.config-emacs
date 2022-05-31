@@ -76,9 +76,9 @@ If ERROR? is non-nil, will signal an error if SAFE is invalid."
         :innit
         func/name
         func/tags
-      (list (cons 'caller caller)
-            (cons 'safe   safe)
-            (cons 'error? error?)))
+     (cons 'caller caller)
+     (cons 'safe   safe)
+     (cons 'error? error?))
 
     (nub:debug:func/return
         :dlv
@@ -502,8 +502,8 @@ If ERROR? is non-nil, will signal an error if DIRECTORY is invalid."
         :dlv
         func/name
         func/tags
-      (list (cons 'directory directory)
-            (cons 'error?    error?)))
+      (cons 'directory directory)
+      (cons 'error?    error?))
 
     ;;------------------------------
     ;; Validate inputs.
@@ -666,9 +666,9 @@ CALLER should be calling function's name (string)."
         :dlv
         func/name
         func/tags
-      (list (cons 'caller caller)
-            (cons 'symbol symbol)
-            (cons 'validation-predicate validation-predicate)))
+      (cons 'caller caller)
+      (cons 'symbol symbol)
+      (cons 'validation-predicate validation-predicate))
 
     (if (int<dlv>:validate:safe caller validation-predicate :error)
         ;; If it /is/ a member of `int<dlv>:const:safe/valid', we don't need to do anything.
@@ -876,9 +876,9 @@ Error otherwise."
         :dlv
         func/name
         func/tags
-      (list (cons 'symbol symbol)
-            (cons 'value  value)
-            (cons 'safe   safe)))
+      (cons 'symbol symbol)
+      (cons 'value  value)
+      (cons 'safe   safe))
 
     (if (not (and (int<dlv>:validate:var/symbol func/name symbol :error)
                   (int<dlv>:validate:var/value func/name value :error)
@@ -921,10 +921,10 @@ NOTE: Caller should save return value back to their alist variable!"
         :dlv
         func/name
         func/tags
-      (list (cons 'pair     pair)
-            (cons '->var    (if (listp pair) (car pair) "<invalid?>"))
-            (cons '->value  (if (listp pair) (cdr pair) "<invalid?>"))
-            (cons 'dlv.vars dlv.vars)))
+      (cons 'pair     pair)
+      (cons '->var    (if (listp pair) (car pair) "<invalid?>"))
+      (cons '->value  (if (listp pair) (cdr pair) "<invalid?>"))
+      (cons 'dlv.vars dlv.vars))
 
     (if (not (int<dlv>:validate:var/pair func/name pair :error))
         ;; Should have already errored, but just in case:
@@ -1164,9 +1164,9 @@ Does no error checking/validation."
         :dlv
         func/name
         func/tags
-      (list (cons 'dlv.class     dlv.class)
-            (cons 'dlv.directory dlv.directory)
-            (cons 'dlv.struct    dlv.struct)))
+      (cons 'dlv.class     dlv.class)
+      (cons 'dlv.directory dlv.directory)
+      (cons 'dlv.struct    dlv.struct))
 
     ;; Set the class of dlv variables and apply it to the directory.
     (nub:debug
@@ -1214,8 +1214,8 @@ Does no error checking/validation."
         :dlv
         func/name
         func/tags
-      (list (cons 'dlv.class  dlv.class)
-            (cons 'dlv.struct dlv.struct)))
+      (cons 'dlv.class  dlv.class)
+      (cons 'dlv.struct dlv.struct))
 
     ;; Only set the class -> dlv variables. Directory -> class should already exist.
     (nub:debug
@@ -1263,9 +1263,9 @@ Return a list of DLV class symbol(s)."
         :dlv
         func/name
         func/tags
-      (list (cons 'directory directory)
-            (cons 'mode mode)
-            (cons 'tuples tuples)))
+      (cons 'directory directory)
+      (cons 'mode mode)
+      (cons 'tuples tuples))
 
     ;;------------------------------
     ;; Validate inputs.
@@ -1357,9 +1357,9 @@ TUPLES should be an alist of '(symbol value safe) tuples.
         :dlv
         func/name
         func/tags
-      (list (cons 'directory directory)
-            (cons 'mode mode)
-            (cons 'tuples tuples)))
+      (cons 'directory directory)
+      (cons 'mode mode)
+      (cons 'tuples tuples))
 
     ;;------------------------------
     ;; Validate inputs.
@@ -1618,8 +1618,8 @@ TUPLES should be an alist of '(symbol value safe) tuples.
             :dlv
             func/name
             func/tags
-          (list (cons 'directory directory)
-                (cons 'updated/dlv.class (pp-to-string updated/dlv.classes))))
+          (cons 'directory directory)
+          (cons 'updated/dlv.class (pp-to-string updated/dlv.classes)))
 
         updated/dlv.classes))))
 
@@ -1645,9 +1645,9 @@ Each TUPLES parameter should be a list of '(symbol value safe) tuples.
         :dlv
         func/name
         func/tags
-      (list (cons 'directory directory)
-            (cons 'mode      mode)
-            (cons 'tuples    tuples)))
+      (cons 'directory directory)
+      (cons 'mode      mode)
+      (cons 'tuples    tuples))
 
     (nub:debug:func/return
         :dlv

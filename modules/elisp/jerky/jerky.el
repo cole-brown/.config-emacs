@@ -660,13 +660,13 @@ If nothing found at key, return will be nil."
           ((&plist :namespace namespace :field field) kwargs)
           (func.name "jerky:get")
           (func.tags '(:get)))
-    (nub:debug:func/start :jerky
+    (nub:debug:func/start
+        :jerky
         func.name
         func.tags
-      (list
-       (cons 'key       key)
-       (cons 'kwargs    kwargs)
-       (cons 'namespace namespace)))
+      (cons 'key       key)
+      (cons 'kwargs    kwargs)
+      (cons 'namespace namespace))
 
     ;; Check field... is it a known value?
     (cond ((memq field '(:namespace :value :docstr))
@@ -692,11 +692,12 @@ If nothing found at key, return will be nil."
           ((eq field :docstr)
            (setq getter #'int<jerky>:record/docstr:get)))
 
-    (nub:debug:func :jerky
-                    func.name
-                    func.tags
-                    "ordered namespaces: %s"
-                    (int<jerky>:namespace/ordered namespace 'quiet))
+    (nub:debug
+        :jerky
+        func.name
+        func.tags
+      "ordered namespaces: %s"
+      (int<jerky>:namespace/ordered namespace 'quiet))
     ;; Return whatever the field-getter gets from the namespaced record.
     (let ((got (funcall getter
                         ;; Filter all down to the namespace we want.
@@ -705,7 +706,8 @@ If nothing found at key, return will be nil."
                          ;; Get the record.
                          (int<jerky>:repo/record:get (int<jerky>:repo:get key))))))
 
-      (nub:debug:func/end :jerky
+      (nub:debug:func/end
+          :jerky
           func.name
           func.tags
         (cons 'got got))
@@ -936,22 +938,22 @@ Example:
           ;; dash-let's plist match pattern to non-keys in ARGS.
           ((&plist :namespace namespace) kwargs)
           matches)
-    (nub:debug:func/start :jerky
+    (nub:debug:func/start
+        :jerky
         "jerky:has"
         '(:get)
-      (list
-       (cons "keys-and-options" keys-and-options)
-       (cons "->    key"           partial-key)
-       (cons "-> kwargs"        kwargs)
-       (cons "partial-key"      partial-key)
-       (cons "namespace"        namespace)))
+      (cons "keys-and-options" keys-and-options)
+      (cons "->    key"           partial-key)
+      (cons "-> kwargs"        kwargs)
+      (cons "partial-key"      partial-key)
+      (cons "namespace"        namespace))
     ;; Now we can search & filter.
     (setq matches (int<jerky>:search/filter partial-key namespace))
-    (nub:debug:func/end :jerky
+    (nub:debug:func/end
+        :jerky
         "jerky:has"
         '(:get)
-      (list
-       (cons 'matches matches)))
+      (cons 'matches matches))
     matches))
 ;; (jerky:has 'signature 'id)
 ;; (jerky:has "signature/id")

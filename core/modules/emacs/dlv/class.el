@@ -204,10 +204,11 @@ For example, if user's home is \"/home/jeff\":
                    (int<dlv>:class:symbol/create \"/home/jeff/foo/bar\")))"
   (let ((func.name "int<dlv>:class:get")
         (func.tags '(:class)))
-    (nub:debug:func/start :dlv
-                          func.name
-                          func.tags
-                          (list (cons 'dir dir)))
+    (nub:debug:func/start
+        :dlv
+        func.name
+        func.tags
+      (cons 'dir dir))
 
     (nub:debug:func/return
         :dlv
