@@ -5,9 +5,9 @@
 ;;--                 Dates, Times, Datetimes, Timedates...                    --
 ;;------------------------(just the formats though...)--------------------------
 
-(require 'dash)
+(imp:require :elisp 'utils)
 (imp:require :jerky)
-(imp:require :modules 'spy 'lisp)
+
 
 ;;------------------------------------------------------------------------------
 ;; Getters, Setters.
@@ -18,44 +18,51 @@
 ;;--------------------
 
 (defun spy:datetime/string.get (&rest args)
-  "Uses `spy:datetime/format.get' to get a datetime format and then calls
+  "Return a formatted datetime string based on ARGS.
+
+Use `spy:datetime/format.get' to get a datetime format and then calls
 `format-time-string' with format and options to get a time string.
 
-Splits ARGS out into a NAME and KEYWORD-ARGS.
-The NAME is everything that comes before any of our keywords.
+Splits ARGS out into a 'name' and a 'keyword-args' plist.
+The 'name' is everything that comes before any of our keywords.
 
-OPTIONAL keywords are:
+_Optional_ keywords are:
   :time - A time (compatible with `format-time-string') to use instead of now.
   :zone - A timezone to use instead of the local one.
 
-Returns string from `format-time-string'.
-"
-   (-let* (((name kwargs) (spy:lisp/func.args args :time :zone))
-          ((&plist :time :zone) kwargs))
+Return string from `format-time-string'."
+   (let* ((name-and-kwargs (elisp:parse:args+kwargs args :time :zone))
+          (name   (car name-and-kwargs))
+          (kwargs (cdr name-and-kwargs))
+          (time   (plist-get kwargs :time))
+          (zone   (plist-get kwargs :zone)))
      (format-time-string (apply #'spy:datetime/format.get name) time zone)))
 ;; (spy:datetime/string.get 'iso-8601 'long)
 
 
 (defun spy:datetime/format.get (&rest name)
-  "Returns a datetime format string by NAME - strings, symbols or list of such.
-Prepends '(datetime format) to the NAME.
-"
-  (apply #'jerky/get 'datetime 'format name))
+  "Return a datetime format string by NAME.
+
+NAME can be strings, symbols, or list(s) of such.
+
+Prepends '(datetime format) to the NAME before asking `jerky' so that all values
+are stored under that \"namespace\" or tree branch."
+  (apply #'jerky:get 'datetime 'format name))
 
 
 (defun spy:datetime/format.set (&rest args)
-  "Sets a datetime format string.
+  "Set a datetime format string.
 
-Splits ARGS out into a NAME and KEYWORD-ARGS.
+Splits ARGS out into a 'name' and 'keyword-args'.
 
-The NAME is everything that comes before any of our keywords.
-  - Prepends '(datetime format) to the NAME before saving to Jerky.
+The 'name' is everything that comes before any of our keywords. Prepends
+'(datetime format) to the 'name' before asking `jerky' so that all values are
+stored under that \"namespace\" or tree branch.
 
-Keywords are:
-  :value  - datetime format string
-  :docstr - documentation string
-"
-  (apply #'jerky/set 'datetime 'format args))
+'keywords-args' are:
+  `:value'  - datetime format string
+  `:docstr' - documentation string"
+  (apply #'jerky:set 'datetime 'format args))
 
 
 ;;------------------------------------------------------------------------------
@@ -63,51 +70,83 @@ Keywords are:
 ;;------------------------------------------------------------------------------
 
 (defun spy:datetime/init ()
-  "Set my datetime format strings into jerky.
-"
+  "Set the predefined datetime format strings into jerky."
   ;;--------------------
-  ;; ISO-8601 Formats
+  ;; ISO-8601 / RFC-3339 Formats
   ;;--------------------
 
-  ;; ISO-8601: short (no timestamp)
-  (spy:datetime/format.set 'iso-8601 'short
+  ;; ISO-8601: short (date only; no timestamp)
+  (spy:datetime/format.set 'iso-8601 'date ;; was: 'iso-8601 'short
                            :value  "%Y-%m-%d"
-                           :docstr "ISO-8601 without timestamp.")
+                           :docstr "ISO-8601/RFC-3339; date-only.")
+  ;; aka: 'rfc-3339 'date
+  (spy:datetime/format.set 'rfc-3339 'date
+                           :value  "%Y-%m-%d"
+                           :docstr "ISO-8601/RFC-3339; date-only.")
 
-  ;; ISO-8601: long (space separator)
-  (spy:datetime/format.set 'iso-8601 'long
+  ;; ISO-8601: But meh. No separators makes it much less useful to the brain.
+  (spy:datetime/format.set 'yyyymmdd
+                           :value  "%Y%m%d"
+                           :docstr "Why would you use this?! Give my eyes a break.")
+
+  ;; RFC-3339: full (space separator)
+  (spy:datetime/format.set 'rfc-3339 'datetime
                            :value  "%Y-%m-%d %H:%M:%S"
-                           :docstr "ISO-8601 with space separator for in text.")
+                           :docstr "RFC-3339; datetime with space separator for in text.")
 
-  ;; ISO-8601: long ('T' separator)
-  (spy:datetime/format.set 'iso-8601 'log
+  ;; ISO-8601: full ('T' separator; for logs, etc)
+  (spy:datetime/format.set 'iso-8601 'datetime
                            :value  "%Y-%m-%dT%T%z"
-                           :docstr "ISO-8601 with 'T' separator for in logs, etc.")
+                           :docstr "ISO-8601; full datetime with 'T' separator for in logs, etc.")
 
-  ;; ISO-8601: long (for filenames)
-  (spy:datetime/format.set 'iso-8601 'file
-                           :value  "%Y-%m-%d-T-%H-%M-%S"
-                           :docstr (concat "ISO 8601-ish format, but works on Windows. "
-                                           "Can strip hypens to get to ISO-8601 basic "
-                                           "format (YYYYMMDDThhmmssZ)."))
+  ;;--------------------
+  ;; Org-Mode Formats
+  ;;--------------------
+
+  ;; org-mode inactive: useful even when not in org-mode.
+  (spy:datetime/format.set 'org 'inactive 'date ;; was: 'org-inactive
+                           :value  "[%Y-%m-%d]"
+                           :docstr "org-time-stamp-inactive sans day name e.g.: [2022-06-01]")
+
+  ;; org-mode inactive: useful even when not in org-mode.
+  (spy:datetime/format.set 'org 'inactive 'date-day
+                           :value  "[%Y-%m-%d %a]"
+                           :docstr "org-time-stamp-inactive e.g.: [2022-06-01 Wed]")
+
+  ;; org-mode inactive: useful even when not in org-mode.
+  (spy:datetime/format.set 'org 'inactive 'rfc-3339
+                           :value  "[%Y-%m-%d %H:%M:%S]"
+                           :docstr "org-time-stamp-inactive but RFC-3339 e.g.: [2022-06-01 22:05:11]")
+
+  ;; org-mode inactive: useful even when not in org-mode.
+  (spy:datetime/format.set 'org 'inactive 'full
+                           :value  "[%Y-%m-%d %a %H:%M:%S]"
+                           :docstr "org-time-stamp-inactive with time e.g.: [2022-06-01 Wed 22:05:11]")
+
+  ;; Could do the same for active, but I use them less outside org files...
 
   ;;--------------------
   ;; Misc Formats
   ;;--------------------
 
-  ;; ISO-8601(ish): But meh. No separators makes it much less useful to the brain.
-  (spy:datetime/format.set 'yyyymmdd
-                           :value  "%Y%m%d"
-                           :docstr "Why would you use this?! Give my eyes a break.")
+  ;; Filename: full ('-T-' date/time separator & '-' time field separator; for filenames)
+  (spy:datetime/format.set 'file 'datetime
+                           :value  "%Y-%m-%d-T-%H-%M-%S"
+                           :docstr (concat "ISO-8601/RFC-3339...ish format, but works on Windows. "
+                                           "Can strip hypens to get to ISO-8601 basic "
+                                           "format (YYYYMMDDThhmmss)."))
 
-  ;; org-mode inactive: useful even when not in org-mode.
-  (spy:datetime/format.set 'org-inactive
-                           :value  "[%Y-%m-%d]"
-                           :docstr "org-time-stamp-inactive sans day name e.g.: [2019-09-19]")
-
-  ;; USA: pretty much worst format
-  (spy:datetime/format.set 'usa
+  ;; USA Date: Pretty much the worst format ever invented.
+  (spy:datetime/format.set 'usa 'date
                            :value  "%m-%d-%Y"
+                           :docstr (concat "Bad, US American format. "
+                                           "Just terrible - why do we use this? "
+                                           "I am ashamed."))
+
+  ;; USA Date w/ 24 hr time: Pretty much the worst format ever invented, plus
+  ;; extra confusion because no one understands 24 hour time over here...
+  (spy:datetime/format.set 'usa 'datetime
+                           :value  "%m-%d-%Y %H:%M:%S"
                            :docstr (concat "Bad, US American format. "
                                            "Just terrible - why do we use this? "
                                            "I am ashamed.")))
