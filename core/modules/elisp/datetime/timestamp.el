@@ -1,33 +1,52 @@
-;;; spy/datetime/timestamp.el -*- lexical-binding: t; -*-
+;;; elisp/datetime/timestamp.el -*- lexical-binding: t; -*-
 
-(imp:require :modules 'spy 'datetime 'format)
+(imp:require :datetime 'format)
 
-;;-----------------------------------who?---------------------------------------
+
+;;-------------------------------Stamping Time----------------------------------
 ;;--                 Dates, Times, Datetimes, Timedates...                    --
 ;;------------------------------------------------------------------------------
 
 
 ;;------------------------------------------------------------------------------
-;; Timestamp Functions (& Datestamp functions?)
+;; Timestamp Functions (Also Datestamp)
 ;;------------------------------------------------------------------------------
 
 ;;--------------------
 ;; Interactive: Insert Timestamp
 ;;--------------------
 
-(defun spy:cmd:timestamp/iso-8601.insert ()
-  "Produces and inserts a full ISO 8601 format timestamp (with ' '
-date/time separator) of current time.
-"
+
+(defun datetime:timestamp:insert (&rest name)
+  "Insert a timestamp NAME into current buffer at point.
+
+Timestamp is of current time and is inserted into current buffer at point."
   (interactive)
-  (insert (spy:datetime/string.get 'iso-8601 'long)))
+  (insert (apply #'datetime:string/get name)))
 
 
-(defun spy:cmd:timestamp/org.insert ()
-  "Produces and inserts a timestamp of [yyyy-mm-dd], similar to
-inactive ORG timestamp."
+(defun datetime:cmd:timestamp:insert/rfc-3339 ()
+  "Insert a full (date & time) rfc-3339 formatted timestamp.
+
+Timestamp is of current time and is inserted into current buffer at point."
   (interactive)
-  (insert (spy:datetime/string.get 'org-inactive)))
+  (datetime:timestamp:insert 'rfc-3339 'datetime))
+
+
+(defun datetime:cmd:timestamp:insert/iso-8601 ()
+  "Insert a full (date & time) ISO-8601 formatted timestamp.
+
+Timestamp is of current time and is inserted into current buffer at point."
+  (interactive)
+  (datetime:timestamp:insert 'iso-8601 'datetime))
+
+
+(defun datetime:cmd:timestamp:insert/org ()
+  "Insert a timestamp formatted \"[yyyy-mm-dd]\".
+
+Timestamp is of current time and is inserted into current buffer at point."
+  (interactive)
+  (datetime:timestamp:insert 'org 'inactive 'date))
 
 
 
@@ -35,11 +54,9 @@ inactive ORG timestamp."
 ;; Misc
 ;;--------------------
 
-;; Was used in an old weekly-status template
-(defun spy:timestamp/next-friday (format)
-  "Returns a string of next Friday's date formatted to the
-spy:datetime/timestamp FORMAT string.
-"
+;; Was used in an old weekly-status template; may be useful again some day?
+(defun datetime:timestamp:next-friday (format)
+  "Return next Friday's date as FORMAT `format-time-string' string."
   (let ((today (nth 6 (decode-time (current-time)))))
     (format-time-string
      format
@@ -54,4 +71,4 @@ spy:datetime/timestamp FORMAT string.
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'datetime 'timestamp)
+(imp:provide :datetime 'timestamp)

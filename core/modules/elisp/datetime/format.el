@@ -1,4 +1,4 @@
-;;; spy/datetime/format.el -*- lexical-binding: t; -*-
+;;; elisp/datetime/format.el -*- lexical-binding: t; -*-
 
 
 ;;------------------------------Formatting Time---------------------------------
@@ -75,6 +75,9 @@ stored under that \"namespace\" or tree branch.
   ;; ISO-8601 / RFC-3339 Formats
   ;;--------------------
 
+  ;;---
+  ;; Date Only
+  ;;---
   ;; ISO-8601: short (date only; no timestamp)
   (datetime:format/set 'iso-8601 'date ;; was: 'iso-8601 'short
                            :value  "%Y-%m-%d"
@@ -89,6 +92,9 @@ stored under that \"namespace\" or tree branch.
                            :value  "%Y%m%d"
                            :docstr "Why would you use this?! Give my eyes a break.")
 
+  ;;---
+  ;; Date & Time
+  ;;---
   ;; RFC-3339: full (space separator)
   (datetime:format/set 'rfc-3339 'datetime
                            :value  "%Y-%m-%d %H:%M:%S"
