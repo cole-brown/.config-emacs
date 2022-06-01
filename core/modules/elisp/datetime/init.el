@@ -14,10 +14,26 @@
 ;; Load our sub-module thingies.
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:datetime format)
-          :filename "format")
-(imp:load :feature  '(:datetime timestamp)
-          :filename "timestamp")
+(imp:timing
+    '(:elisp utils)
+    (imp:file:current)
+    (imp:path:current:dir)
+
+  (imp:load :feature  '(:datetime format)
+            :filename "format")
+  (imp:load :feature  '(:datetime timestamp)
+            :filename "timestamp")
+
+
+  ;;----------------------------------------------------------------------------
+  ;; Initialize our Common Formats
+  ;;----------------------------------------------------------------------------
+  (imp:timing
+      '(:elisp utils init)
+      (imp:file:current)
+      (imp:path:current:dir)
+
+    (datetime:init)))
 
 
 ;;------------------------------------------------------------------------------
