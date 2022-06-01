@@ -24,8 +24,8 @@ Lexically clears `file-name-handler-alist' for loading.
 Calls `load' with errors allowed and `nomessage' set.
 
 Returns result of `load' or signals error."
-  (let ((func.name "int<imp>:load:file"))
-    (int<imp>:debug func.name
+  (let ((func/name "int<imp>:load:file"))
+    (int<imp>:debug func/name
                     "load filepath '%s'..."
                     filepath)
 
@@ -34,7 +34,7 @@ Returns result of `load' or signals error."
         ;; then load and save result for return value.
         (let* (file-name-handler-alist
                (loaded (load filepath nil 'nomessage)))
-          (int<imp>:debug func.name
+          (int<imp>:debug func/name
                           "loaded '%s': %S"
                           filepath
                           loaded)
@@ -52,9 +52,9 @@ Returns or'd result of loading feature's files if feature is found;
 returns non-nil if feature's files were all loaded successfully.
 
 FEATURE is only for `imp:timing' use."
-  (let ((func.name "int<imp>:load:paths")
+  (let ((func/name "int<imp>:load:paths")
         (load-result t))
-    (int<imp>:debug func.name
+    (int<imp>:debug func/name
                     '("Inputs:\n"
                       "  feature:        %S\n"
                       "  path:root:      %s\n"
@@ -68,7 +68,7 @@ FEATURE is only for `imp:timing' use."
     ;; TODO: map/reduce instead of dolist?
     (dolist (relative paths:relative load-result)
       (let ((path:absolute (int<imp>:path:normalize path:root relative :file:load)))
-        (int<imp>:debug func.name
+        (int<imp>:debug func/name
                         '("loading:\n"
                           "  root:             %s\n"
                           "  relative:         %s\n"
@@ -119,7 +119,7 @@ Does nothing if:
      `(int<imp>:feature:normalize:imp->emacs FEATURE:BASE FEATURE)'
 
 Returns non-nil if loaded."
-  (let* ((func.name "int<imp>:load:feature")
+  (let* ((func/name "int<imp>:load:feature")
          (feature:normal (int<imp>:feature:normalize feature))
          (feature:base (car feature:normal))
          (feature:rest (cdr feature:normal))
@@ -128,7 +128,7 @@ Returns non-nil if loaded."
          (feature:emacs/rest (if feature:rest
                                  (int<imp>:feature:normalize:imp->emacs feature:rest)
                                nil)))
-    (int<imp>:debug func.name
+    (int<imp>:debug func/name
                     '("Inputs:\n"
                       "  - feature: %S\n"
                       "Normalized:\n"
@@ -158,14 +158,14 @@ Returns non-nil if loaded."
     ;; Load the features file?
     ;;------------------------------
     (unless (int<imp>:feature:locations feature:base)
-      (int<imp>:debug func.name
+      (int<imp>:debug func/name
                       "No feature locations for `%S'; looking for features file..."
                       feature:base)
       ;; `int<imp>:path:root/file/features' will error if no suitable file exists.
       (let ((path:features (int<imp>:path:root/file/features feature:base)))
         ;; This should error if file fails to load.
         (int<imp>:load:file path:features)
-        (int<imp>:debug func.name
+        (int<imp>:debug func/name
                         "Loaded features for `%S' from: %s"
                         feature:base
                         path:features)))
@@ -176,20 +176,20 @@ Returns non-nil if loaded."
      ;;------------------------------
      ;; Does imp already have the feature loaded?
      ((imp:provided? feature:normal)
-      (int<imp>:debug func.name
+      (int<imp>:debug func/name
                       "Feature is already provided by imp: %S"
                       feature:emacs)
       t)
      ;; Does Emacs already have full feature name?
      ((featurep feature:emacs)
-      (int<imp>:debug func.name
+      (int<imp>:debug func/name
                       "Feature is already provided by Emacs (not imp): %S"
                       feature:emacs)
       t)
      ;; Does Emacs already have `feature:base' with subfeature `feature:rest'?
      ((and feature:emacs/rest
            (featurep feature:emacs/base feature:emacs/rest))
-      (int<imp>:debug func.name
+      (int<imp>:debug func/name
                       "Feature & subfeature are already provided by Emacs (not imp): %S w/ %S"
                       feature:emacs/base
                       feature:emacs/rest)
@@ -203,7 +203,7 @@ Returns non-nil if loaded."
                 (paths:load (cdr paths:feature)))
           ;; Required path(s) present; try to load the feature.
           (progn
-            (int<imp>:debug func.name
+            (int<imp>:debug func/name
                             '("Found feature paths for `%S': \n"
                             "  - root: %s\n"
                             "  - load-paths: %S")
@@ -215,17 +215,17 @@ Returns non-nil if loaded."
                                                   path:root
                                                   paths:load)))
                 (progn
-                  (int<imp>:debug func.name
+                  (int<imp>:debug func/name
                                   "loaded `%S'"
                                   feature:normal)
                   result)
 
-              (int<imp>:debug func.name
+              (int<imp>:debug func/name
                               "failed loading `%S'"
                               feature:normal)
               result))
         ;; Required paths not present; can't load.
-        (int<imp>:debug func.name
+        (int<imp>:debug func/name
                         '("Required feature paths not found for `%S':\n"
                           "  - root: %s\n"
                           "  - load-paths: %S")
@@ -582,8 +582,8 @@ If SKIP is nil:
 
 Return nil for failure, non-nil for success."
   (let ((macro:path:current-dir (imp:path:current:dir)))
-    `(let* ((macro:func.name "imp:load")
-            (macro:parsed (int<imp>:load:parse macro:func.name
+    `(let* ((macro:func/name "imp:load")
+            (macro:parsed (int<imp>:load:parse macro:func/name
                                                ,macro:path:current-dir
                                                (upcase "load-args-plist")
                                                (list ,@load-args-plist)))
@@ -600,7 +600,7 @@ Return nil for failure, non-nil for success."
             file-name-handler-alist
             (macro:load-file? t)
             load-result)
-       (int<imp>:debug macro:func.name
+       (int<imp>:debug macro:func/name
                        '("parsed:\n"
                          "  path:      %s\n"
                          "    -> dir:  %s\n"
@@ -686,7 +686,7 @@ Return nil for failure, non-nil for success."
          ;;     the feature name for the actual loading.
          (when (not (imp:provided? macro:feature))
            (if macro:error?
-               (int<imp>:error macro:func.name
+               (int<imp>:error macro:func/name
                                '("Feature is still not defined after loading the file!\n"
                                  "  feature:       %S\n"
                                  "  path:          %S\n"

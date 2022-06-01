@@ -150,7 +150,7 @@ Always returns a backwards list.
       -> '(\"foo\")
     (int<imp>:feature:normalize '(:foo bar) 'baz)
       -> '(\"baz\" \"bar\" \"foo\")"
-  (let ((func.name "int<imp>:feature:normalize:string")
+  (let ((func/name "int<imp>:feature:normalize:string")
         output)
     (dolist (item (int<imp>:list:flatten input))
       (push (int<imp>:feature:name:normalize item)
@@ -158,7 +158,7 @@ Always returns a backwards list.
 
     ;; Return the list or raise an error.
     (if (null output)
-        (int<imp>:error func.name
+        (int<imp>:error func/name
                         "No normalized strings produced from INPUT: %S"
                         input))
     output))
@@ -178,7 +178,7 @@ First symbol in output list will be a keyword; rest will be symbols.
       -> '(:foo)
     (int<imp>:feature:normalize '(foo :bar) 'baz)
       -> '(:foo bar baz)"
-  (let ((func.name "int<imp>:feature:normalize")
+  (let ((func/name "int<imp>:feature:normalize")
         (strings:reversed (int<imp>:feature:normalize:string input))
         output)
     (while strings:reversed
@@ -194,7 +194,7 @@ First symbol in output list will be a keyword; rest will be symbols.
 
     ;; Return the list or raise an error.
     (if (null output)
-        (int<imp>:error func.name
+        (int<imp>:error func/name
                         "No normalized features produced from INPUT: %S"
                         input))
     output))
@@ -361,7 +361,7 @@ Returns list of: '(path:root . (paths:relative))
 Errors if:
   - No root path for FEATURE:BASE.
   - No paths found for input parameters."
-  (let ((func.name "int<imp>:feature:paths")
+  (let ((func/name "int<imp>:feature:paths")
         (check (int<imp>:feature:normalize feature:base feature)))
 
     ;;------------------------------
@@ -375,7 +375,7 @@ Errors if:
 
     ;; 2) Have registered a root path.
     (unless (int<imp>:path:root/contains? feature:base)
-      (int<imp>:error func.name
+      (int<imp>:error func/name
                       "Feature `%S' does not have a root path in imp."
                       feature:base))
 
@@ -387,7 +387,7 @@ Errors if:
            (paths (int<imp>:alist:get/value check
                                             feature:locations
                                             int<imp>:features:locate:equal)))
-      (int<imp>:debug func.name
+      (int<imp>:debug func/name
                       '("Get feature paths:\n"
                         "  - feature:base: %S\n"
                         "  - path:root:    %s\n"
@@ -402,19 +402,19 @@ Errors if:
       ;; Error Checks
       ;;---
       (unless feature:locations
-        (int<imp>:error func.name
+        (int<imp>:error func/name
                         "No feature locations found for: %S"
                         feature:base))
 
       (unless paths
-        (int<imp>:error func.name
+        (int<imp>:error func/name
                         "No feature paths found for: %S"
                         check))
 
       ;;---
       ;; Done; return.
       ;;---
-      (int<imp>:debug func.name
+      (int<imp>:debug func/name
                       '("Return feature paths for `%S':\n"
                         "  - path:root:    %s\n"
                         "  - paths: %S")
@@ -460,7 +460,7 @@ For example:
      \"multiple/subdir/baz.el\"
      \"multiple/subdir/qux.el\")
     ...)"
-  (let ((func.name "imp:feature:at")
+  (let ((func/name "imp:feature:at")
         features:at)
     ;;------------------------------
     ;; Verify Inputs.
@@ -470,15 +470,15 @@ For example:
     ;; FEATURE:BASE root path needs to exist already.
     ;;---
     (unless (keywordp feature:base)
-      (int<imp>:error func.name
+      (int<imp>:error func/name
                       "FEATURE:BASE must be a keyword! Got: %S"
                       feature:base))
     (if-let ((feature:base:path (int<imp>:path:root/dir feature:base)))
         (unless (stringp feature:base:path)
-          (int<imp>:error func.name
+          (int<imp>:error func/name
                           "Registered root path for FEATURE:BASE must be a string! Got: %S"
                           feature:base:path))
-      (int<imp>:error func.name
+      (int<imp>:error func/name
                       '("FEATURE:BASE must have a registered root path! "
                         "Did not find it in `imp:path:roots'.")))
 
@@ -494,7 +494,7 @@ For example:
                     (and (listp feature)
                          (keywordp (car feature))
                          (seq-each #'symbolp feature)))
-          (int<imp>:error func.name
+          (int<imp>:error func/name
                           '("FEATURE:ALIST entry `%S' has an invalid feature! "
                             "Must be a keyword or list of symbols (starting w/ keyword). "
                             "Got: %S")
@@ -504,7 +504,7 @@ For example:
         (unless (or (stringp paths)
                     (and (listp paths)
                          (seq-each #'stringp paths)))
-          (int<imp>:error func.name
+          (int<imp>:error func/name
                           '("FEATURE:ALIST entry `%S' has invalid path(s)! "
                             "Must be a path string or a list of path strings. "
                             "Got: %S")
@@ -518,7 +518,7 @@ For example:
 
     ;; We should have created something. Error if not.
     (unless features:at
-      (int<imp>:error func.name
+      (int<imp>:error func/name
                       '("Nothing created to be added.. No input? FEATURE:ALIST: %S -> `features:at': %S")
                       feature:alist
                       features:at))

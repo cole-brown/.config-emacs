@@ -104,12 +104,12 @@ Example:
 
   (int<dlv>:path:multiplex \"/some/path/foo/bar\")
     -> '((nil) . \"/some/path/foo/bar\")"
-  (let ((func.name "int<dlv>:path:multiplex")
-        (func.tags '(:path)))
+  (let ((func/name "int<dlv>:path:multiplex")
+        (func/tags '(:path)))
     (nub:debug:func/start
         :dlv
-        func.name
-        func.tags
+        func/name
+        func/tags
       (cons 'path      path)
       (cons 'as-dir    as-dir))
 
@@ -118,12 +118,12 @@ Example:
     ;;------------------------------
     (when (null path)
       (error "%s: PATH must not be nil! path: %S"
-             func.name
+             func/name
              path))
 
     (when (not (stringp path))
       (error "%s: PATH must be a string! path: %S %S"
-             func.name
+             func/name
              (type-of path)
              path))
 
@@ -136,8 +136,8 @@ Example:
 
       (nub:debug:func/return
           :dlv
-          func.name
-          func.tags
+          func/name
+          func/tags
         ;; If it's one of the home paths, output two paths.
         ;;   - "~" needs to be both "~" and the absolute/expanded path.
         ;;   - ...and vice versa.

@@ -438,8 +438,8 @@ It will still raise an error if:
 
 Always loads the file."
   (let ((macro:path:current-dir (imp:path:current:dir)))
-    `(let* ((macro:func.name "imp:test:load")
-            (macro:parsed (int<imp>:test/load:parse macro:func.name
+    `(let* ((macro:func/name "imp:test:load")
+            (macro:parsed (int<imp>:test/load:parse macro:func/name
                                                     ,macro:path:current-dir
                                                     (upcase "load-args-plist")
                                                     (list ,@load-args-plist)))
@@ -454,7 +454,7 @@ Always loads the file."
             file-name-handler-alist
             error-encountered
             load-result)
-       (int<imp>:debug macro:func.name
+       (int<imp>:debug macro:func/name
                        '("parsed:\n"
                          "  path: %s\n"
                          "    -> dir:     %s\n"
@@ -472,7 +472,7 @@ Always loads the file."
        ;;------------------------------
        ;; Feature Prereqs Check
        ;;------------------------------
-       (setq error-encountered (int<imp>:test/load:verify:feature macro:func.name
+       (setq error-encountered (int<imp>:test/load:verify:feature macro:func/name
                                                                   :feature:pre
                                                                   macro:feature:pre
                                                                   macro:feature:post
@@ -483,7 +483,7 @@ Always loads the file."
            (progn
              ;; Best we can do is debug? Or message maybe?
              ;; Try debug.
-             (int<imp>:debug macro:func.name
+             (int<imp>:debug macro:func/name
                              "Error during feature prereqs check:\n%s"
                              error-encountered)
              ;; Return nil for errors.
@@ -505,7 +505,7 @@ Always loads the file."
          ;;------------------------------
          ;; Feature Postreqs Check
          ;;------------------------------
-         (setq error-encountered (int<imp>:test/load:verify:feature macro:func.name
+         (setq error-encountered (int<imp>:test/load:verify:feature macro:func/name
                                                                     :feature:post
                                                                     macro:feature:pre
                                                                     macro:feature:post
@@ -515,7 +515,7 @@ Always loads the file."
              (progn
                ;; Best we can do is debug? Or message maybe?
                ;; Try debug.
-               (int<imp>:debug macro:func.name
+               (int<imp>:debug macro:func/name
                                "Error during feature postreq check:\n%s"
                                error-encountered)
                ;; Return nil for errors.

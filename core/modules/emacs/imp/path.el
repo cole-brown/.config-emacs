@@ -222,8 +222,8 @@ nil looks for the default init filename in the root directory.
 
 Raises an error signal if no init file exists.
 Or if NO-EXIST-CHECK is non-nil, skips file existance check."
-  (let ((func.name "int<imp>:path:root/file/init"))
-    (int<imp>:debug func.name
+  (let ((func/name "int<imp>:path:root/file/init"))
+    (int<imp>:debug func/name
                     '("inputs:\n"
                       "  - feature:base:   %S\n"
                       "  - no-exist-check: %S")
@@ -235,7 +235,7 @@ Or if NO-EXIST-CHECK is non-nil, skips file existance check."
               (verify-fn (if no-exist-check
                              #'int<imp>:path:strings?
                            #'int<imp>:path:file:exists?)))
-          (int<imp>:debug func.name
+          (int<imp>:debug func/name
                           '("paths: %S\n"
                             "  - root: %S\n"
                             "  - init: %S\n"
@@ -308,7 +308,7 @@ Or if NO-EXIST-CHECK is non-nil, skips file existance check."
 KWARGS should be a plist. All default to `t':
   - :exists - Path must exist.
   - :dir    - Path must be a directory (implies :exists)."
-  (let ((func.name "int<imp>:path:root/valid?")
+  (let ((func/name "int<imp>:path:root/valid?")
         (exists (if (and kwargs
                          (plist-member kwargs :exists))
                     (plist-get kwargs :exists)
@@ -319,24 +319,24 @@ KWARGS should be a plist. All default to `t':
                   t))
         (result t))
 
-    (int<imp>:debug func.name "caller:   %s" caller)
-    (int<imp>:debug func.name "path:     %s" path)
-    (int<imp>:debug func.name "kwargs:   %S" kwargs)
-    (int<imp>:debug func.name "  exists: - %S" exists)
-    (int<imp>:debug func.name "  dir:    - %S" dir)
+    (int<imp>:debug func/name "caller:   %s" caller)
+    (int<imp>:debug func/name "path:     %s" path)
+    (int<imp>:debug func/name "kwargs:   %S" kwargs)
+    (int<imp>:debug func/name "  exists: - %S" exists)
+    (int<imp>:debug func/name "  dir:    - %S" dir)
 
     ;;---
     ;; Validity Checks
     ;;---
     (if (not (or exists dir))  ; :dir implies :exists
-        (int<imp>:debug func.name
+        (int<imp>:debug func/name
                         "Existance not required. (or exists(%S) dir(%S)) -> %S"
                         exists
                         dir
                         (or exists dir))
 
       ;; Path is required to exist.
-      (int<imp>:debug func.name
+      (int<imp>:debug func/name
                       "Existance required! (or exists(%S) dir(%S)) -> %S"
                       exists
                       dir
@@ -355,23 +355,23 @@ KWARGS should be a plist. All default to `t':
              (setq result nil))
 
             (t
-             (int<imp>:debug func.name
+             (int<imp>:debug func/name
                              "Path exists!"
                              path)
              nil)))
 
     (if (not dir)
-        (int<imp>:debug func.name
+        (int<imp>:debug func/name
                         "Path can be any type. dir(%S)"
                         dir)
 
       ;; Make sure path is a directory.
-      (int<imp>:debug func.name
+      (int<imp>:debug func/name
                       "Path must be directory. dir(%S)"
                       dir)
 
       (if (file-directory-p path)
-          (int<imp>:debug func.name
+          (int<imp>:debug func/name
                           "  -> Path is a directory!")
 
         (int<imp>:error caller
@@ -382,7 +382,7 @@ KWARGS should be a plist. All default to `t':
     ;;---
     ;; Return valid
     ;;---
-    (int<imp>:debug func.name "->result: %S" result)
+    (int<imp>:debug func/name "->result: %S" result)
     result))
 
 
@@ -750,9 +750,9 @@ If SANS-EXTENSION is non-nil, returns a path without an extension
 (e.g. suitable for loading '.elc' or '.el' files.).
 
 Returns normalized path."
-  (let ((func.name "int<imp>:path:normalize")
+  (let ((func/name "int<imp>:path:normalize")
         (valid:assert-exists '(nil :file :file:load :dir)))
-    (int<imp>:debug func.name
+    (int<imp>:debug func/name
                     '("inputs:\n"
                       "  - root: %s\n"
                       "  - relative: %s\n"
@@ -767,15 +767,15 @@ Returns normalized path."
     ;; Error Check Inputs
     ;;------------------------------
     (unless (stringp root)
-      (int<imp>:error func.name
+      (int<imp>:error func/name
                       "ROOT must be a string; got: %S"
                       root))
     (unless (stringp relative)
-      (int<imp>:error func.name
+      (int<imp>:error func/name
                       "RELATIVE must be a string; got: %S"
                       relative))
     (unless (memq assert-exists valid:assert-exists)
-      (int<imp>:error func.name
+      (int<imp>:error func/name
                       "ASSERT-EXISTS must be one of %S; got: %S"
                       valid:assert-exists
                       relative))
@@ -784,7 +784,7 @@ Returns normalized path."
     ;; Normalize & check path.
     ;;------------------------------
     (let ((path (imp:path:join root relative))) ;; Assumes ROOT is already normalized.
-      (int<imp>:debug func.name
+      (int<imp>:debug func/name
                       "path: %s"
                       path)
 
@@ -796,7 +796,7 @@ Returns normalized path."
        ;; Sanity Check?
        ;;---
        ((not (stringp path))
-        (int<imp>:error func.name
+        (int<imp>:error func/name
                         '("Error creating path from inputs (expected a string result)! "
                           "'%s' & '%s' -> %S")
                         root
@@ -811,7 +811,7 @@ Returns normalized path."
         (if (and (file-regular-p path)
                  (file-readable-p path))
             path
-          (int<imp>:error func.name
+          (int<imp>:error func/name
                           "File does not exist: %s"
                           path)))
 
@@ -833,7 +833,7 @@ Returns normalized path."
                  path)
                 ;; Assert failed; signal error.
                 (t
-                 (int<imp>:error func.name
+                 (int<imp>:error func/name
                                  "No (readable) files exist to load: %s"
                                  path)))))
 
@@ -841,7 +841,7 @@ Returns normalized path."
         ;; Signal an error if directory doesn't exist.
         (if (file-directory-p path)
             path
-          (int<imp>:error func.name
+          (int<imp>:error func/name
                           "Directory does not exist: %s"
                           path)))
 
@@ -856,7 +856,7 @@ Returns normalized path."
       ;; Normalize/Canonicalize path.
       ;;------------------------------
       (if (not (file-name-absolute-p path))
-          (int<imp>:error func.name
+          (int<imp>:error func/name
                           "Path is not absolute: %s"
                           path)
         ;; Actually normalize it before returning.

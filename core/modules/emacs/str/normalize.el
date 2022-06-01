@@ -61,7 +61,7 @@ Returns a string."
   - If it's a function, call it with no parameters and use the output string.
 
 Returns a list of strings."
-  (let ((func.name "str:normalize:value->list")
+  (let ((func/name "str:normalize:value->list")
         (output nil))
     (dolist (item inputs output)
       ;; String? Direct to output.
@@ -76,11 +76,11 @@ Returns a list of strings."
                    (if (stringp result)
                        (push result output)
                      (error "%s: Function did not return a string: %S -> %S"
-                            func.name
+                            func/name
                             item
                             result)))
                (error (error "%s: Failed calling %S: %S"
-                             func.name
+                             func/name
                              item
                              err))))
 
@@ -91,17 +91,17 @@ Returns a list of strings."
                    (if (stringp result)
                        (push result output)
                      (error "%s: Symbol '%S' does not contain a string value: %S"
-                            func.name
+                            func/name
                             item
                             result)))
                (error (error "%s: Failed while trying to get symbol value of %S: %S"
-                             func.name
+                             func/name
                              item
                              err))))
 
             (t
              (error "%s: Don't know what to do with INPUT. Reason: '%s' Input: '%s'"
-                    func.name
+                    func/name
                     "Not a string, function, or symbol?"
                     input))))
     ;; `push' pushes to the front of the list, so reverse it for result.
@@ -139,7 +139,7 @@ If INPUT is a function, call it with no args and convert its string output
 to a keyword.
 If INPUT is a symbol, get its `symbol-name', and convert to a keyword.
 If INPUT is a string (leading ':' is optional), convert to a keyword."
-  (let ((func.name "str:normalize:name->keyword"))
+  (let ((func/name "str:normalize:name->keyword"))
     (cond ((null input)
            nil)
 
@@ -154,11 +154,11 @@ If INPUT is a string (leading ':' is optional), convert to a keyword."
                  (if (stringp result)
                      result
                    (error "%s: Function did not return a string: %S -> %S"
-                          func.name
+                          func/name
                           item
                           result)))
              (error (error "%s: Failed calling %S: %S"
-                           func.name
+                           func/name
                            item
                            err))))
 
@@ -178,7 +178,7 @@ If INPUT is a string (leading ':' is optional), convert to a keyword."
                        (symbol-name input))))))
           (t
            (error "%s: Unsupported INPUT type of '%S': %S"
-                  func.name
+                  func/name
                   (type-of input)
                   input)))))
 

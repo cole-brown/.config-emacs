@@ -9,6 +9,8 @@
 ;; │                                 Jerky.                                    │
 ;; └───────────────────────────────────────────────────────────────────────────┘
 
+(require 'seq)
+
 (imp:require :str)
 (imp:require :elisp 'utils)
 
@@ -656,8 +658,8 @@ Keyword key/value pairs only exist after the KEYS. The keywords are:
 If nothing found at key, return will be nil."
   ;; Some shenanigans to do to turn input into key/kwargs,
   ;; then kwargs into options.
-  (let* ((func.name "jerky:get")
-         (func.tags '(:get))
+  (let* ((func/name "jerky:get")
+         (func/tags '(:get))
          (key-and-kwargs (int<jerky>:parse keys-and-options
                                            '(:namespace :field)))
          (key       (car key-and-kwargs))
@@ -667,8 +669,8 @@ If nothing found at key, return will be nil."
          (getter nil))
     (nub:debug:func/start
         :jerky
-        func.name
-        func.tags
+        func/name
+        func/tags
       (cons 'key       key)
       (cons 'kwargs    kwargs)
       (cons 'namespace namespace))
@@ -699,8 +701,8 @@ If nothing found at key, return will be nil."
 
     (nub:debug
         :jerky
-        func.name
-        func.tags
+        func/name
+        func/tags
       "ordered namespaces: %s"
       (int<jerky>:namespace/ordered namespace 'quiet))
     ;; Return whatever the field-getter gets from the namespaced record.
@@ -713,8 +715,8 @@ If nothing found at key, return will be nil."
 
       (nub:debug:func/end
           :jerky
-          func.name
-          func.tags
+          func/name
+          func/tags
         (cons 'got got))
 
       got)))

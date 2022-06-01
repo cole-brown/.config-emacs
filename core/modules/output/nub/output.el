@@ -67,13 +67,13 @@
 
 Decide how to output LEVEL keyword (`int<nub>:output:enabled?') MSG and
 ARGS based on current verbosity for the level."
-  (let ((func.name "int<nub>:output:message"))
-    (int<nub>:user:exists? func.name user :error)
+  (let ((func/name "int<nub>:output:message"))
+    (int<nub>:user:exists? func/name user :error)
 
     (let ((sinks           (int<nub>:var:sink     user level int<nub>:var:user:fallback))
           (verbosity:level (int<nub>:var:enabled? user level int<nub>:var:user:fallback)))
       ;; Should complain about invalid sink function(s).
-      (int<nub>:var:sink:verify func.name
+      (int<nub>:var:sink:verify func/name
                                 sinks
                                 :error)
 
@@ -108,7 +108,7 @@ ARGS based on current verbosity for the level."
        ;;------------------------------
        (t
         ;; Don't know what to do with verbosity's value.
-        (int<nub>:error func.name
+        (int<nub>:error func/name
                         '("Verbosity for user '%S' at level '%S' is '%S', "
                           "and we don't know what to do with that.\n"
                           "Output Message:\n"

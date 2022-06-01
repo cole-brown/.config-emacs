@@ -126,9 +126,9 @@ the same index in SEQUENCE:EXPECTED."
 
 (defun test<imp/feature/at>:create (test-name root features paths)
   "Create PATHS files for FEATURES at ROOT path."
-  (let ((func.name "test<imp/feature/at>:create"))
-    (test<imp>:should:marker test-name func.name)
-    (int<imp>:debug func.name
+  (let ((func/name "test<imp/feature/at>:create"))
+    (test<imp>:should:marker test-name func/name)
+    (int<imp>:debug func/name
                     '("inputs:\n"
                       "  root:     %s\n"
                       "  features: %S\n"
@@ -145,7 +145,7 @@ the same index in SEQUENCE:EXPECTED."
         (let ((path:full (imp:path:join root path)))
           (test<imp>:should:marker:small (format "Create path '%s'..."
                                                  path:full))
-          (int<imp>:debug func.name
+          (int<imp>:debug func/name
                           "Create path '%s'..."
                           path:full)
           ;; Create the file at path.
@@ -217,12 +217,12 @@ Example:
                 \"multiple/subdir/init.el\"
                 \"multiple/subdir/multiple.el\")))
     -> \"/path/to/imp/test/features/feature\""
-  (let ((func.name "test<imp/feature/at>:init"))
+  (let ((func/name "test<imp/feature/at>:init"))
     ;;------------------------------
     ;; Sanity Check Params.
     ;;------------------------------
-    (test<imp>:should:marker test-name func.name)
-    (int<imp>:debug func.name
+    (test<imp>:should:marker test-name func/name)
+    (int<imp>:debug func/name
                     '("inputs:\n"
                       "  test-name:    %s\n"
                       "  path:root:    %s\n"

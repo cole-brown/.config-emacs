@@ -63,7 +63,7 @@ TYPE/FUNC should be:
   - :valid - returns the key validity checker function
 
 Signals an error if TYPE/FUNC doesn't exist in the functions plist."
-  (let ((func.name "int<alist>:type:func"))
+  (let ((func/name "int<alist>:type:func"))
 
     ;;------------------------------
     ;; Did we get a function passed in? Use that function.
@@ -79,7 +79,7 @@ Signals an error if TYPE/FUNC doesn't exist in the functions plist."
           (if (plist-member plist/preset type/func)
               (plist-get plist/preset type/func)
             ;; Error if preset has no function available.
-            (int<alist>:error func.name
+            (int<alist>:error func/name
                               '(:newlines
                                 "No known function type `%S' for alist preset type `%S'!"
                                 "Function types:"
@@ -95,7 +95,7 @@ Signals an error if TYPE/FUNC doesn't exist in the functions plist."
                 (plist-get plist/registered type/func)
 
               ;; Error if custom/user-registered doesn't have the function.
-              (int<alist>:error func.name
+              (int<alist>:error func/name
                                 '(:newlines
                                   "No known function type `%S' for alist registered type `%S'!"
                                   "Function types:"
@@ -105,7 +105,7 @@ Signals an error if TYPE/FUNC doesn't exist in the functions plist."
                                 (pp-to-string plist/registered)))
 
           ;; Also not in presets; error on unknown alist type.
-          (int<alist>:error func.name
+          (int<alist>:error func/name
                             '(:newlines
                               "Alist type '%S' is unknown! Register it with `(alist:type:register %S %s)'?"
                               "Known types:"

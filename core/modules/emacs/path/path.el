@@ -160,16 +160,16 @@ If TYPE is provided, PATH must exist and match."
 ;; TODO: Move to regex.el?
 (defun path:ignore? (path regexes)
   "Returns non-nil if PATH matches any of the REGEXES."
-  (let ((func.name "path:ignore?")
+  (let ((func/name "path:ignore?")
         (regex:list regexes) ;; Shallow copy so we can pop without possibly changing caller's list.
         ignore?)
     (unless (stringp path)
       (error "%s: PATH must be a string! Got: %S"
-             func.name
+             func/name
              path))
     (unless (listp regexes)
       (error "%s: REGEXES must be a list of regex strings! Got: %S"
-             func.name
+             func/name
              regexes))
 
     (while (and (not ignore?) ;; Found a reason to ignore already?
@@ -177,7 +177,7 @@ If TYPE is provided, PATH must exist and match."
       (let ((regex (pop regex:list)))
         (unless (stringp regex)
           (error "%s: Regex must be a string! Got: %S"
-                 func.name
+                 func/name
                  regex))
 
         (when (string-match regex path)
@@ -216,10 +216,10 @@ Else returns names of children."
     (dolist (type types)
       (int<path>:type:valid? "path:exists?" type))
 
-    (let ((func.name "path:children:types"))
+    (let ((func/name "path:children:types"))
       (unless (stringp path:dir)
         (error "%s: PATH:DIR must be a string! Got: %S"
-               func.name
+               func/name
                path:dir))
 
       (let ((path:root     (path:canonicalize:dir path:dir))
@@ -229,7 +229,7 @@ Else returns names of children."
             children)
         (unless (path:exists? path:root :dir)
           (error "%s: PATH:DIR does not exist: %s"
-                 func.name
+                 func/name
                  path:root))
 
         ;;------------------------------
@@ -267,7 +267,7 @@ Else returns names of children."
                   ;;---
                   (t
                    (error "%s: '%s': Unhandled file-attribute-type: %S"
-                          func.name
+                          func/name
                           child:path
                           (file-attribute-type child:attrs))))
 
