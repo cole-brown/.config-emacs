@@ -9,8 +9,6 @@
 ;; │                                 Jerky.                                    │
 ;; └───────────────────────────────────────────────────────────────────────────┘
 
-(require 'dash) ; `-let*', `-non-nil'
-
 (imp:require :str)
 (imp:require :elisp 'utils)
 
@@ -155,14 +153,16 @@ Returns a 2-tuple list of:
 
 If a keyword is requested but doesn't exist in the keys, their value in the
 output will be nil."
-  (-let* ((keywords (cond ((null keywords)   ; Must be supplied something.
+  (let* ((keywords (cond ((null keywords)   ; Must be supplied something.
                            (error "int<jerky>:parse: keywords cannot be null: %S" keywords))
                           ((listp keywords)  ; Given list? Use it.
                            keywords)
                           (t                 ; Use the defaults.
                            ;; Backwards so they'll end up forwards.
                            '(:docstr :value :namespace))))
-          ((args kwargs) (elisp:parse:args+kwargs args-list keywords))
+          (args-and-kwargs (elisp:parse:args+kwargs args-list keywords))
+          (args            (car args-and-kwargs))
+          (kwargs          (cdr args-and-kwargs))
           parsed)
 
     ;; If extra keywords, add first so they're at the end of the plist.
@@ -292,7 +292,8 @@ Return the created namespace entry."
   ;; Validation.
   ;;------------------------------
   (let ((verified-fallbacks nil))
-    (dolist (fb-ns (-non-nil fallbacks))
+    ;; Each non-nil "FallBack NameSpace"...
+    (dolist (fb-ns (seq-filter (lambda (x) (not (null x))) fallbacks))
       (cond ((eq fb-ns jerky:namespace/no-fallback)
              (push fb-ns verified-fallbacks))
 
@@ -365,10 +366,11 @@ a key is not found.
 If fallbacks is `jerky:namespace/no-fallback', no fallbacks will be
 used/allowed."
   ;; dash-let's plist match pattern to non-keys in ARGS.
-  (-let* (((&plist :docstr docstr :title title :fallbacks fallbacks) args)
-          ;; Make fallbacks a flat list of inputs or the default.
-          (fallbacks (elisp:list:flatten (or fallbacks
-                                             jerky:namespace/default))))
+  (let ((docstr    (plist-get args :docstr))
+        (title     (plist-get args :title))
+        ;; Make fallbacks a flat list of inputs or the default.
+        (fallbacks (elisp:list:flatten (or (plist-get args :fallbacks)
+                                           jerky:namespace/default))))
 
     ;; Set new entry.
     (int<jerky>:namespace:set
@@ -654,12 +656,15 @@ Keyword key/value pairs only exist after the KEYS. The keywords are:
 If nothing found at key, return will be nil."
   ;; Some shenanigans to do to turn input into key/kwargs,
   ;; then kwargs into options.
-  (-let* (((key kwargs) (int<jerky>:parse keys-and-options
-                                          '(:namespace :field)))
-          (getter nil)
-          ((&plist :namespace namespace :field field) kwargs)
-          (func.name "jerky:get")
-          (func.tags '(:get)))
+  (let* ((func.name "jerky:get")
+         (func.tags '(:get))
+         (key-and-kwargs (int<jerky>:parse keys-and-options
+                                           '(:namespace :field)))
+         (key       (car key-and-kwargs))
+         (kwargs    (cdr key-and-kwargs))
+         (namespace (plist-get kwargs :namespace))
+         (field     (plist-get kwargs :field))
+         (getter nil))
     (nub:debug:func/start
         :jerky
         func.name
@@ -849,9 +854,12 @@ Keyword key/value pairs only exist after the keys. The keywords are:
 If not provided, they will be nil."
   ;; Some shenanigans to do to turn input into args/kwargs into a key
   ;; and values.
-  (-let* (((key kwargs) (int<jerky>:parse keys-and-options t))
-          ;; dash-let's plist match pattern to non-keys in ARGS.
-          ((&plist :docstr :value :namespace) kwargs))
+  (let* ((key-and-kwargs (int<jerky>:parse keys-and-options t))
+         (key            (car key-and-kwargs))
+         (kwargs         (cdr key-and-kwargs))
+         (docstr         (plist-get kwargs :docstr))
+         (value          (plist-get kwargs :value))
+         (namespace      (plist-get kwargs :namespace)))
 
     ;; Get/update/create entries, set hash to key in repo.
     (int<jerky>:repo/update key
@@ -934,10 +942,11 @@ Example:
     (\"path/to/jill\" :default \"42\"))"
   ;; Some shenanigans to do to turn input into args/kwargs into a key
   ;; and a namespace.
-  (-let* (((partial-key kwargs) (int<jerky>:parse keys-and-options '(:namespace)))
-          ;; dash-let's plist match pattern to non-keys in ARGS.
-          ((&plist :namespace namespace) kwargs)
-          matches)
+  (let* ((key-and-kwargs (int<jerky>:parse keys-and-options '(:namespace)))
+         (partial-key    (car key-and-kwargs))
+         (kwargs         (cdr key-and-kwargs))
+         (namespace      (plist-get kwargs :namespace))
+         matches)
     (nub:debug:func/start
         :jerky
         "jerky:has"

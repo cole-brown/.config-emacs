@@ -12,7 +12,8 @@
 ;;
 ;;; Commentary:
 ;;
-;; tree/value store
+;; Tree/value store, sort of.
+;; Fancy hash table, technically.
 ;;
 ;; Store values at the leaf nodes of a tree.
 ;;
