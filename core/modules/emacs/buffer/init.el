@@ -22,37 +22,28 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Load our sub-module thingies.
+;; Load files.
 ;;------------------------------------------------------------------------------
 
-(let ((path/parent (imp:path:current:dir)))
+(imp:timing
+    '(:buffer)
+    (imp:file:current)
+    (imp:path:current:dir)
 
-  (imp:timing
-      '(:buffer)
-      (imp:file:current)
-      path/parent
-
-    (imp:load :feature  '(:buffer delete)
-              :path     path/parent
-              :filename "delete")
-    (imp:load :feature  '(:buffer eval)
-              :path     path/parent
-              :filename "eval")
-    (imp:load :feature  '(:buffer line)
-              :path     path/parent
-              :filename "line")
-    (imp:load :feature  '(:buffer manage)
-              :path     path/parent
-              :filename "manage")
-    (imp:load :feature  '(:buffer name)
-              :path     path/parent
-              :filename "name")
-    (imp:load :feature  '(:buffer point)
-              :path     path/parent
-              :filename "point")
-    (imp:load :feature  '(:buffer search)
-              :path     path/parent
-              :filename "search")))
+  (imp:load :feature  '(:buffer delete)
+            :filename "delete")
+  (imp:load :feature  '(:buffer eval)
+            :filename "eval")
+  (imp:load :feature  '(:buffer line)
+            :filename "line")
+  (imp:load :feature  '(:buffer manage)
+            :filename "manage")
+  (imp:load :feature  '(:buffer name)
+            :filename "name")
+  (imp:load :feature  '(:buffer point)
+            :filename "point")
+  (imp:load :feature  '(:buffer search)
+            :filename "search"))
 
 
 ;;------------------------------------------------------------------------------
