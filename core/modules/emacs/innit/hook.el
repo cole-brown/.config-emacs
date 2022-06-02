@@ -38,6 +38,81 @@
 ;; Helpers for Hooks...
 ;;------------------------------------------------------------------------------
 
+(defun innit:hook:func-name (name hook-var)
+  "Return a hook function name string for NAME & HOOK-VAR.
+
+NAME must be nil or a string.
+
+HOOK-VAR must be nil or a quote hook variable.
+
+NAME and HOOK-VAR cannot both be nil - an error will be signaled.
+
+Hook function name returned will be a string:
+  (concat innit:hook:func-name/prefix '<hook-name>')
+If no NAME, '<hook-name>' will be `(symbol-name HOOK-VAR)' sans \"-hook\" suffix."
+  ;; Check for errors.
+  (cond ((and (null hook-var)
+              (null name))
+         (nub:error
+             :innit
+             "innit:hook:func-name"
+           '("HOOK-VAR and NAME cannot both be nil! "
+             "HOOK-VAR: %S, "
+             "NAME: %S")
+           hook-var
+           name))
+
+        ;; If we have a NAME, it must be a string.
+        ((and (not (null name))
+              (not (stringp name)))
+         (nub:error
+             :innit
+             "innit:hook:func-name"
+           '("NAME must be nil or a string! "
+             "NAME: %S")
+           name))
+
+        ;; If we have a HOOK-VAR, it must be a quoted symbol.
+        ((and (not (null hook-var))
+              (not (symbolp hook-var)))
+         (nub:error
+             :innit
+             "innit:hook:func-name"
+           '("HOOK-VAR must be nil or a quoted symbol! "
+             "HOOK-VAR: %S")
+           hook-var))
+
+        ;; Ok; continue on to making the name.
+        (t nil))
+
+  ;; Build hook function's name.
+  (let ((name (or name
+                  (symbol-name hook-var))))
+    (concat innit:hook:func-name/prefix
+            (if (not (null name))
+                name
+              ;; Remove "-hook"?
+              (string-remove-suffix "-hook" (symbol-name hook-var))))))
+;; (innit:hook:func-name nil 'jeff)
+;; (innit:hook:func-name "jeff" nil)
+;; (innit:hook:func-name "jill" 'jeff)
+
+
+(defun innit:hook:func-symbol (name hook-var)
+  "Return a hook function name symbol for NAME & HOOK-VAR.
+
+NAME must be nil or a string.
+
+HOOK-VAR must be nil or a quote hook variable.
+
+NAME and HOOK-VAR cannot both be nil - an error will be signaled.
+
+Hook function name returned will be an interned symbol from
+`innit:hook:func-name' string return."
+  (intern (innit:hook:func-name name hook-var)))
+;; (innit:hook:func-symbol nil 'jeff)
+
+
 ;; Originally from here:
 ;; https://www.reddit.com/r/emacs/comments/1m7fqv/avoid_lambda_in_hooks_use_defun_instead/cc83axz/
 (defmacro innit:hook:defun-and-add (hook-var options &rest body)
@@ -46,8 +121,8 @@
 OPTIONS is a plist of optional vars:
   :name     - Hook function will be named:
                 (concat innit:hook:func-name/prefix '<hook-name>')
-              If no `:name', '<hook-name>' will be `(symbol-name HOOK-VAR)' sans
-              \"-hook\" suffix.
+              If no `:name', '<hook-name>' will be `(hook-var-name HOOK-VAR)'
+              sans \"-hook\" suffix.
 
   :quiet    - Do not output the 'Running hook [...]' message.
 
@@ -67,12 +142,8 @@ OPTIONS is a plist of optional vars:
          (macro<innit>:postpend  (plist-get macro<innit>:options :postpend))
          (macro<innit>:file      (plist-get macro<innit>:options :file))
          (macro<innit>:docstr    (plist-get macro<innit>:options :docstr))
-         (macro<innit>:hook-name (concat innit:hook:func-name/prefix
-                                         (if macro<innit>:name
-                                             macro<innit>:name
-                                           ;; Remove "-hook"?
-                                           (string-remove-suffix "-hook" (symbol-name macro<innit>:hook)))))
-         (macro<innit>:hook-fn (intern macro<innit>:hook-name)))
+         (macro<innit>:hook-name (innit:hook:func-name macro<innit>:name macro<innit>:hook))
+         (macro<innit>:hook-fn   (intern macro<innit>:hook-name)))
 
     `(progn
        ;; Create function...
@@ -113,8 +184,8 @@ OPTIONS is a plist of optional vars:
 OPTIONS is a plist of optional vars:
   :name     - Hook function will be named:
                 (concat innit:hook:func-name/prefix '<hook-name>')
-              If no `:name', '<hook-name>' will be `(symbol-name HOOK-VAR)' sans
-              \"-hook\" suffix.
+              If no `:name', '<hook-name>' will be `(symbol-name HOOK-VAR)'
+              sans \"-hook\" suffix.
 
   :quiet    - Do not output the 'Running hook [...]' message.
 
@@ -133,12 +204,8 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
          (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
          (macro<innit>:file      (plist-get macro<innit>:options :file))
          (macro<innit>:docstr    (plist-get macro<innit>:options :docstr))
-         (macro<innit>:hook-name (concat innit:hook:func-name/prefix
-                                         (if macro<innit>:name
-                                             macro<innit>:name
-                                           ;; Remove "-hook"?
-                                           (string-remove-suffix "-hook" (symbol-name macro<innit>:hook)))))
-         (macro<innit>:hook-fn (intern macro<innit>:hook-name)))
+         (macro<innit>:hook-name (innit:hook:func-name macro<innit>:name macro<innit>:hook))
+         (macro<innit>:hook-fn   (intern macro<innit>:hook-name)))
 
     `(defun ,macro<innit>:hook-fn ()
        ,macro<innit>:docstr
