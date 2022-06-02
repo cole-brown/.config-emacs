@@ -50,4 +50,4 @@ If MAX-CHARS is nil, use `int<buffer>:search:header:max/default'."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :emacs 'buffer 'search)
+(imp:provide :buffer 'search)

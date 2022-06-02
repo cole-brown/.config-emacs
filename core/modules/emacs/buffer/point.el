@@ -35,4 +35,4 @@ Result depends on syntax table's comment character."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :emacs 'buffer 'point)
+(imp:provide :buffer 'point)

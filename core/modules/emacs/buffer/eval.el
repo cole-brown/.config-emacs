@@ -17,4 +17,4 @@ and `defcustom' forms reset their default values."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :emacs 'buffer 'eval)
+(imp:provide :buffer 'eval)

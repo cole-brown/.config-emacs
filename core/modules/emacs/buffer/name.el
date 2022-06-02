@@ -5,13 +5,6 @@
 ;;--                    And Things to Make Them Better.                      --
 ;;-----------------------------------------------------------------------------
 
-(defgroup buffer:group nil
-  "General group namespace for the defcustoms in my emacs init."
-  :prefix "buffer:"
-  ;; Not really sure where to stick it..?
-  :group 'files)
-
-
 (defcustom buffer:format:bookend/normal
   '("§-" "-§")
   "Start/end strings for special-name formats."
@@ -234,4 +227,4 @@ Return an absolute path string."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :emacs 'buffer 'name)
+(imp:provide :buffer 'name)
