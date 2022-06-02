@@ -1,4 +1,20 @@
-;;; ccconfig/org-mode.el -*- lexical-binding: t; -*-
+;;; mantle/config/org-mode.el -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2022-06-02
+;; Modified:   2022-06-02
+;; URL:        https://github.com/cole-brown/.config-emacs
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;  Configure Org-Mode and Friends.
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------
@@ -8,12 +24,12 @@
 ;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;;------------------------------------------------------------------------------
 
+(imp:require :datetime)
+(imp:require :innit)
 (imp:require :jerky)
 (imp:require :path)
-(imp:require :modules 'spy 'hook)
-(imp:require :modules 'spy 'buffer 'search)
-(imp:require :modules 'spy 'buffer 'name)
-(imp:require :modules 'spy 'datetime 'format)
+(imp:require :buffer 'search)
+(imp:require :buffer 'name)
 
 
 ;;------------------------------------------------------------------------------
@@ -22,97 +38,168 @@
 
 ;; Could move out of org-mode setup if we get more doc mode setups.
 
-(jerky/set 'docs 'tab 'short
+(jerky:set 'docs 'tab 'short
            :namespace :default
            :value 2
            :docstr "Short tab width is 2 spaces.")
+(jerky:set 'docs 'tab 'long
+           :namespace :default
+           :value 4
+           :docstr "Long tab width is 4 spaces.")
 
 
 ;;------------------------------------------------------------------------------
 ;; Org-Mode
 ;;------------------------------------------------------------------------------
 
-;;--------------------
-;; MUST PROCEED ORG SETUP?
-;;--------------------
-
-;; DOOM-NOTE:
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
-(if-let (lily (jerky/get 'path 'lily))
-    ;; Set org to use lily dir if we have it.
-    (setq org-directory lily)
-  ;; Otherwise not sure... This is fine until something is figured out.
-  (setq org-directory "~/org/"))
+;; TODO: delete this lil block:
+;; ;;--------------------
+;; ;; MUST PROCEED ORG SETUP?
+;; ;;--------------------
+;;
+;; ;; DOOM-NOTE:
+;; ;; If you use `org' and don't want your org files in the default location below,
+;; ;; change `org-directory'. It must be set before org loads!
+;; (if-let (lily (jerky:get 'path 'lily))
+;;     ;; Set org to use lily dir if we have it.
+;;     (setq org-directory lily)
+;;   ;; Otherwise not sure... This is fine until something is figured out.
+;;   (setq org-directory "~/org/"))
 
 
 ;;--------------------
 ;; Org-Mode Set-Up
 ;;--------------------
-(use-package! org
+(imp:use-package org
   ;;--------------------
   :init
   ;;--------------------
 
   ;; Define org-mode hooks.
-  (spy:hook/defun org-jump-to-now-hook
+  (innit:hook:defun org-jump-to-now-hook
     '(:name "org/jump-to-now-target"
-      :file ".doom.d/config/org-mode.el"
+      :file (path:relative (path:current:file) user-emacs-directory)
       :docstr "Jump point to \"now\" link, if it's in the first part of the file."
-      :quiet t)
-    (spy:cmd:buffer/search.header "[[--now"))
+      :quiet nil) ;; TODO: t)
+    (buffer:cmd:search:header "[[--now"))
 
-  (spy:hook/defun org-local-settings-hook
+  (innit:hook:defun org-local-settings-hook
     '(:name "org/local-settings"
-      :file ".doom.d/config/org-mode.el"
+      :file (path:relative (path:current:file) user-emacs-directory)
       :docstr "Set up buffer local vars."
-      :quiet t)
+      :quiet nil) ;; TODO: t)
+    (setq-local yas-indent-line 'auto)
     ;; Automatically becomes buffer local.
-    (setq tab-width (jerky/get 'docs 'tab 'short))
+    (setq tab-width (jerky:get 'docs 'tab 'short)))
 
-    (setq-local yas-indent-line 'auto))
 
   ;;--------------------
   :hook
   ;;--------------------
 
   ;; Connect my hooks up.
-  ((org-mode . sss:hook/org/jump-to-now-target)
-   (org-mode . sss:hook/org/local-settings))
+  ((org-mode . (innit:hook:func-symbol "org/jump-to-now-target"))
+   (org-mode . (innit:hook:func-symbol "org/local-settings")))
 
 
   ;;--------------------
-  :config
-  ;;--------------------
-
-  ;;--------------------
-  ;; customization: org-mode
+  :custom
   ;;--------------------
 
   ;; Doom or someone already sets this to org-directory/"notes.org".
   ;; (org-default-notes-file (path:abs:file org-directory "notes.org"))
   ;;   (mis0/init/message "config for org vars... <org-startup-folded: %S" org-startup-folded)
-  (customize-set-variable 'org-startup-folded t
-                          "Change org back to opening a file with all the headers collapsed.")
+  (org-startup-folded t
+                      "Change org back to opening a file with all the headers collapsed.")
 
-  (customize-set-variable 'org-log-done t
-                          "auto-timestamp when TODOs are turned to DONE state")
+  (org-log-done t
+                "auto-timestamp when TODOs are turned to DONE state")
 
   ;; Leave headings to figure out if they want a newline or not.
   ;; But change plain-list-item to not try to be clever - it's annoying more
   ;; than it's helpful.
-  (customize-set-variable 'org-blank-before-new-entry
-                          '((heading . auto) (plain-list-item . nil))
-                          "No auto newline in plain list items.")
+  (org-blank-before-new-entry
+   '((heading . auto)
+     (plain-list-item . nil))
+   "No auto newline in plain list items.")
 
-  ;; Doom has this set to true already.
-  ;; ;; Well structured indentation. Freehand notes/text stay indented to
-  ;; ;; headline level.
-  ;; (org-startup-indented t "I'm starting to like this. Leave globally on.")
-  ;; ;; Note 1: This changes how it /looks/, not how the raw text is formatted.
-  ;; ;; Note 2: This also hides leading stars for headlines.
+  ;; Well structured indentation. Freehand notes/text stay indented to
+  ;; headline level.
+  (org-startup-indented t)
+  ;; Note 1: This changes how it /looks/, not how the raw text is formatted.
+  ;; Note 2: This also hides leading stars for headlines.
 
-  ;; Adjust sequences to be more nicer...
+  ;; `Drawer' to log to. (Property/subheading thing). "LOGBOOK" is default if
+  ;; this is set to `t'. This is for the place org-mode puts those todo
+  ;; timestamps, state change notes, and user notes just under the headline.
+  (org-log-into-drawer "LOGBOOK"
+                       "See my comment or emacs help for more details.")
+
+  ;; Don't allow accidental edits of invisible regions in org files.
+  ;; https://yiufung.net/post/org-mode-hidden-gems-pt1/
+  (org-catch-invisible-edits 'show-and-error ;; Doom had `smart'...
+                             "Never allow edits of invisible regions.")
+
+  ;; Hide extra newlines between (sub)trees.
+  ;; https://yiufung.net/post/org-mode-hidden-gems-pt1/
+  ;; Really useful because I tend to like the bonus whitespace for visually
+  ;; separating one tree from the next...
+  (org-cycle-separator-lines 0
+                             "Hide extra newlines between (sub)trees")
+
+  ;; [[link:tag]] becomes something else.
+  ;; e.g.: [[google:test]] becomes link:
+  ;;       'https://www.google.com/search?q=test' when clicked
+  ;;   - '%s' in link-alist replaced with link's 'tag'
+  ;;   - '%h' in link-alist replaced with link's (html encoded) 'tag'
+  ;; https://yiufung.net/post/org-mode-hidden-gems-pt4/
+  (org-link-abbrev-alist
+   '(("google" . "https://www.google.com/search?q=%h")
+     ("map"    . "https://maps.google.com/maps?q=%h")
+     ("image"  . "https://google.com/images?q=%s")
+     ;; Stolen from Doom:
+     ("wolfram" . "https://wolframalpha.com/input/?i=%s")
+     ("wikipedia" . "https://en.wikipedia.org/wiki/%s")
+     ("duckduckgo" . "https://duckduckgo.com/?q=%s")
+     ("youtube" . "https://youtube.com/watch?v=%s")
+     ("github" . "https://github.com/%s"))
+   "Shortcuts for links. Translates [[link:tag]] (and [[link:tag][desc]]) into searches.")
+
+  ;; TODO: Not sure if works well with evil.
+  ;; ;; Enable Speed Keys as per my speed-commands predicate function.
+  ;; (org-use-speed-commands
+  ;;  #'spy:custom/org-mode/speed-commands-p
+  ;;  "Allow speed keys when at any headline *, not just beginning of line.")
+
+  (org-indent-indentation-per-level
+   (jerky:get 'docs 'tab 'short)
+   "Set indent to tab-width.")
+
+  ;; Not sure exactly what this is, since Doom sets
+  ;; `org-src-preserve-indentation' to t and the documentation for this variable
+  ;; isn't super clear. I think it indents /everything/ inside a src block,
+  ;; maybe? Or maybe it's only related to exported stuff?
+  ;;
+  ;; Oh. The correct explanation for /this/ variable is in the
+  ;; `org-src-preserve-indentation' variable's documentation. Because of course
+  ;; it is. :eyeroll:
+  ;;
+  ;;   > When this variable is nil, after editing with M-x org-edit-src-code,
+  ;;   > the minimum (across-lines) number of leading whitespace characters
+  ;;   > are removed from all lines, and the code block is uniformly indented
+  ;;   > according to the value of org-edit-src-content-indentation.
+  ;;
+  ;; So yeah, doesn't really matter.
+  ;; (org-edit-src-content-indentation
+  ;;  (jerky:get 'code 'tab 'normal)
+  ;;  "Set indent to tab-width.")
+
+  (org-src-preserve-indentation t)
+
+
+  ;;--------------------
+  :config
+  ;;--------------------
 
   (let ((wrap "├─┤")
         ;; (wrap "[ ]")
@@ -188,83 +275,6 @@
     ;; So yay.
     )
 
-  ;; Old sequences:
-  ;; ;; TODO sequence to pop up shortcuts to on running `C-c C-t' on a headline
-  ;; ;;   (n) - n key will be shortcut into this state
-  ;; ;;    @  - timestamp on enter
-  ;; ;;    !  - prompt for note w/ timestamp on enter
-  ;; ;;   /!  - prompt for note w/ timestamp on exit if none for next state
-  ;; ;;    |  - separates "need action" states from "finished" states
-  ;; (org-todo-keywords
-  ;;  '((sequence "TODO(t)"
-  ;;              "STARTED(s!)"
-  ;;              "WAITING(w@/!)"
-  ;;              "|"
-  ;;              ;; Done/cancelled for task progression.
-  ;;              "DONE(d!)"
-  ;;              "CANCELLED(c@)"
-  ;;              ;; Failure/success for bug hunt or investigations.
-  ;;              ;; E.g.: Where you're done exploring a possible solution thing,
-  ;;              ;; but it's a dead path that shouldn't be paid attention to:
-  ;;              ;; mark it a FAILURE.
-  ;;              "FAILURE(f@)"
-  ;;              "SUCCESS(.@)"))
-  ;;  "Custom sequence of keywords & actions.")
-
-  ;; `Drawer' to log to. (Property/subheading thing). "LOGBOOK" is default if
-  ;; this is set to `t'. This is for the place org-mode puts those todo
-  ;; timestamps, state change notes, and user notes just under the headline.
-  (customize-set-variable 'org-log-into-drawer "LOGBOOK"
-                          "See my comment or emacs help for more details.")
-
-  ;; Trying out 'smart for invisible edits...
-  ;; ;; Don't allow accidental edits of invisible regions in org files.
-  ;; ;; https://yiufung.net/post/org-mode-hidden-gems-pt1/
-  ;; (org-catch-invisible-edits 'show-and-error
-  ;;                            "Never allow edits of invisible regions.")
-
-  ;; Hide extra newlines between (sub)trees.
-  ;; https://yiufung.net/post/org-mode-hidden-gems-pt1/
-  ;; Really useful because I tend to like the bonus whitespace for visually
-  ;; separating one tree from the next...
-  (customize-set-variable 'org-cycle-separator-lines 0
-                          "Hide extra newlines between (sub)trees")
-
-  ;; Doom already has good abbrevs.
-  ;; ;; [[link:tag]] becomes something else.
-  ;; ;; e.g.: [[google:test]] becomes link:
-  ;; ;;       'https://www.google.com/search?q=test' when clicked
-  ;; ;;   - '%s' in link-alist replaced with link's 'tag'
-  ;; ;;   - '%h' in link-alist replaced with link's (html encoded) 'tag'
-  ;; ;; https://yiufung.net/post/org-mode-hidden-gems-pt4/
-  ;; (org-link-abbrev-alist
-  ;;  '(("google" . "https://www.google.com/search?q=%h")
-  ;;    ("map" . "https://maps.google.com/maps?q=%h"))
-  ;; "Shortcuts for links. Translates [[link:tag]] (and [[link:tag][desc]]).")
-
-  ;; TODO: Not sure if works well with evil.
-  ;; ;; Enable Speed Keys as per my speed-commands predicate function.
-  ;; (org-use-speed-commands
-  ;;  #'spy:custom/org-mode/speed-commands-p
-  ;;  "Allow speed keys when at any headline *, not just beginning of line.")
-
-  ;;---
-  ;; Indentation
-  ;;---
-
-  (customize-set-variable 'org-indent-indentation-per-level
-                          (jerky/get 'docs 'tab 'short)
-                          "Set indent to tab-width.")
-
-  ;; This should really depend on the source code language...
-  ;; (customize-set-variable 'org-edit-src-content-indentation
-  ;;                         (jerky/get 'docs 'code 'short)
-  ;;                         "Set indent to tab-width.")
-
-  ;;--------------------
-  ;; configuration: org-mode
-  ;;--------------------
-
   ;; Put .org.txt into the mode list for org-mode. Useful for org-mode files in
   ;; dropbox - dropbox website/app doesn't know how to read ".org", but it can
   ;; do ".txt".
@@ -307,7 +317,7 @@
   ;; customization: org-agenda
   ;;--------------------
 
-  (when-let ((agenda-files (jerky/get 'path 'org 'agenda)))
+  (when-let ((agenda-files (jerky:get 'path 'org 'agenda)))
     (customize-set-variable 'org-agenda-files
                             agenda-files
                             "My paths to search for agenda items."))
@@ -367,9 +377,9 @@
 Sets (lexical context) all org-journal custom vars related to NAMESPACE.
 Then runs COMMAND interactively with ARGS."
   (interactive)
-  (let ((org-journal-file-format (jerky/get 'org-journal 'file 'format
+  (let ((org-journal-file-format (jerky:get 'org-journal 'file 'format
                                             :namespace namespace))
-        (org-journal-dir (jerky/get 'path 'org 'journal
+        (org-journal-dir (jerky:get 'path 'org 'journal
                                     :namespace namespace)))
     (apply #'funcall-interactively command args)))
 ;; (sss:org.journal/namespaced :home #'message "%s %s" org-journal-file-format org-journal-dir)
@@ -389,7 +399,7 @@ Then runs COMMAND interactively with ARGS."
   ;;---
   ;; "Home" Domain
   ;;---
-  (jerky/set 'org-journal 'file 'format
+  (jerky:set 'org-journal 'file 'format
              :namespace :home
              :value (concat (spy:datetime/format.get 'iso-8601 'short)
                             ;; TODO: 'notebook' not quickest to
@@ -400,7 +410,7 @@ Then runs COMMAND interactively with ARGS."
   ;;---
   ;; "Work" Domain
   ;;---
-  (jerky/set 'org-journal 'file 'format
+  (jerky:set 'org-journal 'file 'format
              :namespace :work
              :value (concat (spy:datetime/format.get 'iso-8601 'short)
                             ;; TODO: 'logbook' not quickest to
@@ -428,8 +438,8 @@ Then runs COMMAND interactively with ARGS."
   ;; This is only the path to the default namespace, so multi-namespace
   ;; shenanigans have to constantly mess with this, I think?
   (customize-set-variable 'org-journal-dir
-                          (jerky/get 'path 'org 'journal
-                                     :namespace (jerky/get 'namespace 'system)))
+                          (jerky:get 'path 'org 'journal
+                                     :namespace (jerky:get 'namespace 'system)))
   (unless (dlv:var:safe/predicate? 'org-journal-dir)
     ;; It's marked as risky - force it to safe?
     (dlv:var:safe.predicate 'org-journal-dir #'file-directory-p :quiet))
@@ -454,8 +464,8 @@ Then runs COMMAND interactively with ARGS."
   ;; so we'll go to this:
   ;;   - betterer:  yyyy-mm-dd.journal.org
   (customize-set-variable 'org-journal-file-format
-                          (jerky/get 'org-journal 'file 'format
-                                     :namespace (jerky/get 'namespace 'system)))
+                          (jerky:get 'org-journal 'file 'format
+                                     :namespace (jerky:get 'namespace 'system)))
 
   ;;--------------------
   ;; configuration
@@ -514,7 +524,7 @@ It uses TITLE and the current timestamp to form a unique title.
 ;; the org-roam ecosystem.
 ;; So: everything in lily.
 (customize-set-variable 'org-roam-directory
-                        (jerky/get 'path 'lily))
+                        (jerky:get 'path 'lily))
 
 
 ;;--------------------
@@ -623,7 +633,7 @@ It uses TITLE and the current timestamp to form a unique title.
 ;;  ;;   - Con: This doesn't update until point has moved off the line... Possibly
 ;;  ;;     interacting with my highlight row thing/mode?
 ;;  ;; Nice lil search for symbols: http://www.unicode.org/charts/
-;;  (spy:hook/defun org-mode-hook t
+;;  (innit:hook:defun org-mode-hook t
 ;;      nil "checkboxes" "init/config/configure-org-mode.el"
 ;;    "Beautify Org Checkbox Symbol"
 ;;    (setq prettify-symbols-alist
@@ -652,7 +662,7 @@ It uses TITLE and the current timestamp to form a unique title.
 ;;----------
 ;;  ;; Show list markers with a middle dot instead of the
 ;;  ;; original character.
-;;  (spy:hook/defun org-mode-hook t
+;;  (innit:hook:defun org-mode-hook t
 ;;      nil "simple-list" "init/config/configure-org-mode.el"
 ;;    "Nice up simple lists - replacing hypen with a unicode middle dot."
 ;;    (font-lock-add-keywords
