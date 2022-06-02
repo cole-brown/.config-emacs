@@ -19,10 +19,19 @@
 ;;   - "core/core-lib.el"
 
 
-(require 'dash)
 (imp:require :path)
-
+(imp:require :nub)
 (imp:require :innit 'error)
+
+
+;;------------------------------------------------------------------------------
+;; Customs
+;;------------------------------------------------------------------------------
+
+(defcustom innit:hook:func-name/prefix "mantle:hook:"
+  "Prefix to use for hook function names created by `innit:hook/defun-and-hooker'."
+  :group 'innit:group
+  :type  '(string))
 
 
 ;;------------------------------------------------------------------------------
@@ -31,130 +40,131 @@
 
 ;; Originally from here:
 ;; https://www.reddit.com/r/emacs/comments/1m7fqv/avoid_lambda_in_hooks_use_defun_instead/cc83axz/
-(defmacro spy:hook/defun-and-hooker (hook-var options &rest body)
-  "Macro that `defun's a function called 'sss:hook/<hook-name>'
-and adds the hook function to HOOK-VAR.
+(defmacro innit:hook:defun-and-add (hook-var options &rest body)
+  "`defun' a hook function (which will run BODY) and add it to HOOK-VAR.
 
 OPTIONS is a plist of optional vars:
-  :name     - Hook function will be named 'sss:hook/<name>'.
-              If no `:name', name will be set to `(symbol-name HOOK-VAR)'.
+  :name     - Hook function will be named:
+                (concat innit:hook:func-name/prefix '<hook-name>')
+              If no `:name', '<hook-name>' will be `(symbol-name HOOK-VAR)' sans
+              \"-hook\" suffix.
 
-  :quiet    - Do not output 'Running hook' message.
+  :quiet    - Do not output the 'Running hook [...]' message.
 
   :postpend - Passed on to `add-hook'. If non-nil, hook will be postpended to
               the list of hooks. If nil, hook will be prepended.
 
   :file     - Filename where your macro is called from... in case you happen
-              to lose your hook.
+              to lose your hook and need to find it.
 
-  :docstr   - A string to use as the defined function's docstring.
-
-BODY is the code to run in the hook.
-"
-  (declare (indent 1))
+  :docstr   - A string to use as the defined function's docstring."
+  (declare (indent 2))
   ;; Eval inputs once.
-  (-let* ((_m//hook hook-var)
-          ;; dash-let's plist match pattern to non-keys in ARGS.
-          ((&plist :name _m//name
-                   :quiet _m//quiet
-                   :postpend _m//postpend
-                   :file _m//file
-                   :docstr _m//docstr)
-           (eval options))
-          (_m//hook-name (concat "sss:hook/"
-                                  (if _m//name
-                                      _m//name
-                                    ;; Remove "-hook"?
-                                    (s-chop-suffix "-hook" (symbol-name _m//hook)))))
-          (_m//hook-fn (intern _m//hook-name)))
+  (let* ((macro<innit>:hook      hook-var)
+         (macro<innit>:options   (eval options))
+         (macro<innit>:name      (plist-get macro<innit>:options :name))
+         (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
+         (macro<innit>:postpend  (plist-get macro<innit>:options :postpend))
+         (macro<innit>:file      (plist-get macro<innit>:options :file))
+         (macro<innit>:docstr    (plist-get macro<innit>:options :docstr))
+         (macro<innit>:hook-name (concat innit:hook:func-name/prefix
+                                         (if macro<innit>:name
+                                             macro<innit>:name
+                                           ;; Remove "-hook"?
+                                           (string-remove-suffix "-hook" (symbol-name macro<innit>:hook)))))
+         (macro<innit>:hook-fn (intern macro<innit>:hook-name)))
 
     `(progn
-       (defun ,_m//hook-fn () ,_m//docstr
-              (unless ,_m//quiet
-                ;; Nice info message maybe?
-                (message
-                 "Running hook `%s'%s..."
-                 ,_m//hook-name
-                 (if (not (stringp ,_m//file))
-                     ""
-                   (concat " from "
-                           (path:relative ,_m//file)))))
-
-              ,@body)
-       (add-hook ',_m//hook #',_m//hook-fn ',_m//postpend))))
+       ;; Create function...
+       (defun ,macro<innit>:hook-fn ()
+         ,macro<innit>:docstr
+         (unless ,macro<innit>:quiet
+           ;; Nice info message maybe?
+           (nub:out
+            :innit
+            :info
+            ,macro<innit>:hook-name
+            "Running hook `%s'%s..."
+            ,macro<innit>:hook-name
+            (if (not (stringp ,macro<innit>:file))
+                ""
+              (concat " from "
+                      (path:relative ,macro<innit>:file)))))
+         ;; And run the actual hook.
+         ,@body)
+       ;; ...add the new hook  function to the hook variable.
+       (add-hook ',macro<innit>:hook #',macro<innit>:hook-fn ',macro<innit>:postpend))))
 ;; (setq test-hook nil)
-;; (makunbound sss:hook/test)
-;; (spy:hook/defun-and-hooker test-hook nil (message "Hello there."))
-;; (spy:hook/defun-and-hooker test-hook nil (message "Hello there."))
+;; (makunbound mantle:hook:test)
+;; (innit:hook:defun-and-add test-hook nil (message "Hello there."))
+;; (innit:hook:defun-and-add test-hook nil (message "Hello there."))
 ;; test-hook
 ;; (run-hooks 'test-hook)
 ;; (setq debug-on-error t)
 ;; (setq test-hook nil)
-;; (spy:hook/defun-and-hooker test-hook '(:name "jeff/mcjefferson" :file "here") (message "Hello there."))
+;; (innit:hook:defun-and-add test-hook '(:name "jeff/mcjefferson" :file (path:current:file) (message "Hello there."))
 ;; test-hook
 ;; (run-hooks 'test-hook)
 
 
-(defmacro spy:hook/defun (hook-var options &rest body)
-  "Macro that `defun's a function called 'sss:hook/<hook-name>'.
-
-HOOK-VAR isn't use; currently here for consistency with `spy:hook/defun-and-hooker'.
-TODO: Remove HOOK-VAR.
+(defmacro innit:hook:defun (hook-var options &rest body)
+  "`defun' a hook function (which will run BODY).
 
 OPTIONS is a plist of optional vars:
-  :name     - Hook function should be named 'sss:hook/<name>'.
-              If no `:name', name will be set to `(symbol-name HOOK-VAR)'
-              minus any '-hook' suffix.
+  :name     - Hook function will be named:
+                (concat innit:hook:func-name/prefix '<hook-name>')
+              If no `:name', '<hook-name>' will be `(symbol-name HOOK-VAR)' sans
+              \"-hook\" suffix.
 
-  :quiet    - Do not output 'Running hook' message.
+  :quiet    - Do not output the 'Running hook [...]' message.
 
   :file     - Filename where your macro is called from... in case you happen
-              to lose your hook.
+              to lose your hook and need to find it.
 
   :docstr   - A string to use as the defined function's docstring.
 
-BODY is the code to run in the hook.
-
-Use this over `spy:hook/defun-and-hooker' only in cases where you aren't
-`add-hook'ing directly (e.g. for use-package's ':hook').
-"
-  (declare (indent 1))
+Use this over `innit:hook:defun-and-add' only in cases where you aren't
+`add-hook'ing directly (e.g. for use-package's ':hook')."
+  (declare (indent 2))
   ;; Eval inputs once.
-  (-let* ((_m//hook hook-var)
-          ;; dash-let's plist match pattern to non-keys in ARGS.
-          ((&plist :name _m//name
-                   :quiet _m//quiet
-                   :postpend _m//postpend
-                   :file _m//file
-                   :docstr _m//docstr)
-           (eval options))
-          (_m//hook-name (concat "sss:hook/"
-                                 (if _m//name
-                                     _m//name
-                                   ;; Remove "-hook"?
-                                   (s-chop-suffix "-hook" (symbol-name _m//hook)))))
-          (_m//hook-fn (intern _m//hook-name)))
+  (let* ((macro<innit>:hook      hook-var)
+         (macro<innit>:options   (eval options))
+         (macro<innit>:name      (plist-get macro<innit>:options :name))
+         (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
+         (macro<innit>:file      (plist-get macro<innit>:options :file))
+         (macro<innit>:docstr    (plist-get macro<innit>:options :docstr))
+         (macro<innit>:hook-name (concat innit:hook:func-name/prefix
+                                         (if macro<innit>:name
+                                             macro<innit>:name
+                                           ;; Remove "-hook"?
+                                           (string-remove-suffix "-hook" (symbol-name macro<innit>:hook)))))
+         (macro<innit>:hook-fn (intern macro<innit>:hook-name)))
 
-    `(defun ,_m//hook-fn () ,_m//docstr
-            (unless ,_m//quiet
-              ;; Nice info message maybe?
-              (message
-               "Running hook `%s'%s..."
-               ,_m//hook-name
-               (if (not (stringp ,_m//file))
-                   ""
-                 (concat " from "
-                         (path:relative ,_m//file)))))
-
-            ,@body)
-    ))
+    `(defun ,macro<innit>:hook-fn ()
+       ,macro<innit>:docstr
+       (unless ,macro<innit>:quiet
+         ;; Nice info message maybe?
+         (nub:out
+          :innit
+          :info
+          ,macro<innit>:hook-name
+          "Running hook `%s'%s..."
+          ,macro<innit>:hook-name
+          (if (not (stringp ,macro<innit>:file))
+              ""
+            (concat " from "
+                    (path:relative ,macro<innit>:file)))))
+       ;; And run the actual hook.
+       ,@body)))
 ;; (setq test-hook nil)
-;; (spy:hook/defun test-hook nil (message "Hello there."))
-;; (add-hook 'test-hook 'sss:hook/test)
+;; (makunbound mantle:hook:test)
+;; (innit:hook:defun test-hook nil (message "Hello there."))
+;; (add-hook 'test-hook 'mantle:hook:test)
 ;; test-hook
 ;; (run-hooks 'test-hook)
 ;; (setq test-hook nil)
-;; (spy:hook/defun test-hook '(:name "captain-hook" :file "here") (message "hi."))
+;; (makunbound mantle:hook:captain)
+;; (innit:hook:defun test-hook '(:name "captain-hook" :file "here") (message "hi."))
 ;; (add-hook 'test-hook 'sss:hook/captain)
 ;; test-hook
 ;; (run-hooks 'test-hook)
