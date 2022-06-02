@@ -94,10 +94,6 @@
       (imp:file:current)
       (imp:path:current:dir)
 
-    (imp:load :feature  '(:emacs buffer)
-              :path     (imp:path:join innit:path:module "emacs" "buffer")
-              :filename "init") ; Needed by ':mode/org'.
-
     (imp:load :feature  '(:mode org)
               :path     (imp:path:join innit:path:module "mode" "org")
               :filename "init")) ; Needed by ':mantle/theme/init'.
