@@ -11,34 +11,13 @@
 ;;; Code:
 
 
-(let ((file/this (imp:file:current))
+(let ((file/this (imp:path:current:file/relative :root))
       (tags/this '(:innit :mantle :init)))
   (nub:debug
       :innit
       file/this
       tags/this
     "[BEGIN]")
-
-  ;; TODO: delete?
-  ;; ;;------------------------------------------------------------------------------
-  ;; ;; "init.el" and "config.el"
-  ;; ;;------------------------------------------------------------------------------
-  ;; ;; Add `imp' feature lists to be loaded if correct file is present at
-  ;; ;; imp root path.
-  ;; ;;   - "init.el" will be checked for after core init is run.
-  ;; ;;   - "config.el" will be checked for after core config is run.
-  ;; ;;
-  ;; ;; (innit:feature:mantle:add "core/10-init/20-load.el" :foo)
-  ;; ;; (innit:feature:mantle:add "core/10-init/20-load.el" :zort narf)
-  ;; ;; TODO: delete those functions from innit and just do things KISS here...
-  ;;
-  ;; ;;------------------------------------------------------------------------------
-  ;; ;; Order of User Init
-  ;; ;;------------------------------------------------------------------------------
-  ;;
-  ;; ;; TODO: something like `doom!' so user can define a load order easily?
-
-
 
 
   ;;------------------------------------------------------------------------------
@@ -84,7 +63,6 @@
          (dash-register-info-lookup))))
 
 
-
   ;;------------------------------
   ;; [EARLY] User Modules: Utils, etc for use in rest of `mantle'.
   ;;------------------------------
@@ -106,24 +84,29 @@
             :path     innit:theme:path
             :filename "init")
 
-  ;; ;;------------------------------
-  ;; ;; TODO: <other stuff>
-  ;; ;;------------------------------
-  ;; ;; Group this stuff under a separate timing.
-  ;; (imp:timing
-  ;;     '(:mantle modules init)
-  ;;     (imp:file:current)
-  ;;     (imp:path:current:dir)
-  ;;   ...
-  ;; )
-  ;;
-  ;; ;; Group this stuff under a separate timing.
-  ;; (imp:timing
-  ;;     '(:mantle packages init)
-  ;;     (imp:file:current)
-  ;;     (imp:path:current:dir)
-  ;;   ...
-  ;; )
+
+  ;;------------------------------
+  ;; User Configuration
+  ;;------------------------------
+  ;; Group this stuff under a separate timing.
+  (let ((mantle/path/config (imp:path:join innit:path:mantle "config")))
+    (imp:timing
+        '(:mantle config)
+        (imp:file:current)
+        (imp:path:current:dir)
+
+      (imp:load :feature  '(:mantle config org-mode)
+                :path     mantle/path/config
+                :filename "org-mode"))
+
+    ;; ;; Group this stuff under a separate timing.
+    ;; (imp:timing
+    ;;     '(:mantle packages init)
+    ;;     (imp:file:current)
+    ;;     (imp:path:current:dir)
+    ;;   ...
+    ;; )
+    )
 
 
   ;;------------------------------------------------------------------------------
