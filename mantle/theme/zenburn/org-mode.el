@@ -255,96 +255,60 @@
   ;; org-todo
 
 
-   ;; TODO:
-   ;; TODO:
-   ;; TODO: YOU ARE HERE!
-   ;; TODO:
-   ;; TODO:
+   ;;------------------------------
+   ;; Org TODO Sequence Keywords
+   ;;------------------------------
+   ;; Nicer TODO sequence for org headlines:
+   ;;   1. More states!
+   ;;   2. Use `mode:org:todo/keyword' to make all states the same length so they look beautiful in the org file.
+   ;;   3. Update the faces to make them stand out from their surroundings better. They should:
+   ;;      a. Have a slightly different background to make them pop out a bit.
+   ;;      b. Have different foregrounds based on type of state (success/failure, todo/in-progress/done, etc).
+   ;;      c. Not have a similar colors to the headline colors.
+   (let ((wrap "├─┤")
+        ;; (wrap "[ ]")
+        ;; (wrap "「 」")
+        )
+    (setq org-todo-keywords
+          `((sequence  ;; Big Words sequence.
+             ,(mode:org:todo/keyword "TODO"    wrap "t")             ; A task that needs doing & is ready to do
+             ,(mode:org:todo/keyword "PROJECT" wrap "p")             ; A project, which usually contains other tasks
+             ,(mode:org:todo/keyword "CURRENT" wrap "c" :timestamp)  ; A task that is in progress
+             ,(mode:org:todo/keyword "WAITING" wrap "w" :timestamp)  ; Something external is holding up this task
+             ,(mode:org:todo/keyword "HOLDING" wrap "h" :timestamp)  ; This task is paused/on hold because of me
+             "|"
+             ,(mode:org:todo/keyword "───────" wrap "n" :timestamp) ; No one cares.
+             ,(mode:org:todo/keyword "INFO"    wrap "i" :timestamp) ; Info.
+             ,(mode:org:todo/keyword "MEETING" wrap "e" :timestamp) ; Meeting Notes.
+             ,(mode:org:todo/keyword "MOVED"   wrap "m" :timestamp) ; Moved somewhere else; no further action here.
+             ,(mode:org:todo/keyword "DONE"    wrap "d" :timestamp) ; Task completed... whatever.
+             ,(mode:org:todo/keyword "SUCCESS" wrap "s" :notes)     ; Task completed successfully!!!
+             ,(mode:org:todo/keyword "FAILURE" wrap "f" :notes)     ; Task was completed the bad way.
+             ,(mode:org:todo/keyword "KILLED"  wrap "k" :notes)))   ; Task was cancelled, aborted, or is no longer applicable.
 
+          ;; And set some faces for these. strings.
+          org-todo-keyword-faces
+          (list (list (mode:org:todo/keyword "TODO" wrap)    'mantle:theme:face:org.todo.keyword:todo)
+                (list (mode:org:todo/keyword "PROJECT" wrap) 'mantle:theme:face:org.todo.keyword:project)
 
-  ;;  ;;------------------------------
-  ;;  ;; TODO Sequence Keywords
-  ;;  ;;------------------------------
-  ;;  ;; Adjust sequences to be more nicer...
-  ;;  ;;   - Enforce all to be the same width.
-  ;;  ;;   - Make them stand out from their surroundings better.
-  ;;  ;;     - This includes making sure none of them are similar colors to the headline colors.
+                (list (mode:org:todo/keyword "CURRENT" wrap) 'mantle:theme:face:org.todo.keyword:active)
 
-  ;; (let ((wrap "├─┤")
-  ;;       ;; (wrap "[ ]")
-  ;;       ;; (wrap "「 」")
-  ;;       )
-  ;;   (setq org-todo-keywords
-  ;;         `((sequence  ;; Big Words sequence.
-  ;;            ,(sss:org/todo.keyword "TODO"    wrap "t")  ; A task that needs doing & is ready to do
-  ;;            ,(sss:org/todo.keyword "PROJECT" wrap "p")  ; A project, which usually contains other tasks
-  ;;            ,(sss:org/todo.keyword "CURRENT" wrap "c" 'timestamp)  ; A task that is in progress
-  ;;            ,(sss:org/todo.keyword "WAITING" wrap "w" 'timestamp)  ; Something external is holding up this task
-  ;;            ,(sss:org/todo.keyword "HOLDING" wrap "h" 'timestamp)  ; This task is paused/on hold because of me
-  ;;            "|"
-  ;;            ,(sss:org/todo.keyword "───────" wrap "n" 'timestamp) ; No one cares.
-  ;;            ,(sss:org/todo.keyword "INFO"    wrap "i" 'timestamp) ; Info.
-  ;;            ,(sss:org/todo.keyword "MEETING" wrap "e" 'timestamp) ; Meeting Notes.
-  ;;            ,(sss:org/todo.keyword "MOVED"   wrap "m" 'timestamp) ; Moved somewhere else; no further action here.
-  ;;            ,(sss:org/todo.keyword "DONE"    wrap "d" 'timestamp) ; Task completed... whatever.
-  ;;            ,(sss:org/todo.keyword "SUCCESS" wrap "s" 'notes)     ; Task completed successfully!!!
-  ;;            ,(sss:org/todo.keyword "FAILURE" wrap "f" 'notes)     ; Task was completed the bad way.
-  ;;            ,(sss:org/todo.keyword "KILLED"  wrap "k" 'notes))    ; Task was cancelled, aborted, or is no longer applicable.
-  ;;           (sequence ;; Checkboxes sequence.
-  ;;            ,(sss:org/todo.keyword "_" wrap "T")    ; A task that needs doing
-  ;;            ,(sss:org/todo.keyword "▶" wrap "C" 'timestamp)    ; Task is in progress
-  ;;            ;; ,(sss:org/todo.keyword "-" wrap "C" 'timestamp) ; Task is in progress
-  ;;            ;; ,(sss:org/todo.keyword "?" wrap "W" 'timestamp) ; Task is being held up or paused
-  ;;            ,(sss:org/todo.keyword "…" wrap "W" 'timestamp)    ; Task is being held up or paused
-  ;;            ,(sss:org/todo.keyword "⁈" wrap "H" 'timestamp)    ; Task is on hold
-  ;;            "|"
-  ;;            ,(sss:org/todo.keyword "ⓘ" wrap "I" 'timestamp)    ; Info.
-  ;;            ,(sss:org/todo.keyword "♫" wrap "E" 'timestamp)    ; Meeting Notes.
-  ;;            ,(sss:org/todo.keyword "∅" wrap "N" 'timestamp)    ; Null/No one cares.
-  ;;            ,(sss:org/todo.keyword "☇" wrap "M" 'timestamp)    ; Moved somewhere else; no further action here.
-  ;;            ,(sss:org/todo.keyword "X" wrap "D" 'timestamp)    ; Task completed... whatever.
-  ;;            ,(sss:org/todo.keyword "X" wrap "S" 'notes)        ; Task completed successfully!
-  ;;            ,(sss:org/todo.keyword "✘" wrap "F" 'notes)        ; Task completed the bad way.
-  ;;            ,(sss:org/todo.keyword "÷" wrap "K" 'notes)))      ; Task was cancelled, aborted, or is no longer applicable.
+                (list (mode:org:todo/keyword "WAITING" wrap) 'mantle:theme:face:org.todo.keyword:holding)
+                (list (mode:org:todo/keyword "HOLDING" wrap) 'mantle:theme:face:org.todo.keyword:holding)
+                (list (mode:org:todo/keyword "INFO" wrap)    'mantle:theme:face:org.todo.keyword:info)
+                (list (mode:org:todo/keyword "MEETING" wrap) 'mantle:theme:face:org.todo.keyword:info)
 
-  ;;         ;; And set some faces for these. strings.
-  ;;         org-todo-keyword-faces
-  ;;         (list (list (sss:org/todo.keyword "TODO" wrap)    'mantle:theme:face:org.todo.keyword:todo)
-  ;;               (list (sss:org/todo.keyword "PROJECT" wrap) 'mantle:theme:face:org.todo.keyword:project)
+                (list (mode:org:todo/keyword "MOVED" wrap)   'mantle:theme:face:org.todo.keyword:info)
+                (list (mode:org:todo/keyword "DONE" wrap)    'mantle:theme:face:org.todo.keyword:done/good)
+                (list (mode:org:todo/keyword "SUCCESS" wrap) 'mantle:theme:face:org.todo.keyword:done/good)
+                (list (mode:org:todo/keyword "FAILURE" wrap) 'mantle:theme:face:org.todo.keyword:done/bad)
+                (list (mode:org:todo/keyword "KILLED" wrap)  'mantle:theme:face:org.todo.keyword:done/bad)))
 
-  ;;               (list (sss:org/todo.keyword "CURRENT" wrap) 'mantle:theme:face:org.todo.keyword:active)
-  ;;               (list (sss:org/todo.keyword "▶" wrap)       'mantle:theme:face:org.todo.keyword:active)
-
-  ;;               (list (sss:org/todo.keyword "WAITING" wrap) 'mantle:theme:face:org.todo.keyword:holding)
-  ;;               (list (sss:org/todo.keyword "HOLDING" wrap) 'mantle:theme:face:org.todo.keyword:holding)
-  ;;               (list (sss:org/todo.keyword "INFO" wrap)    'mantle:theme:face:org.todo.keyword:info)
-  ;;               (list (sss:org/todo.keyword "MEETING" wrap) 'mantle:theme:face:org.todo.keyword:info)
-  ;;               (list (sss:org/todo.keyword "ⓘ" wrap)       'mantle:theme:face:org.todo.keyword:info)
-  ;;               (list (sss:org/todo.keyword "♫" wrap)       'mantle:theme:face:org.todo.keyword:info)
-  ;;               (list (sss:org/todo.keyword "─" wrap)       'mantle:theme:face:org.todo.keyword:null)
-  ;;               (list (sss:org/todo.keyword "∅" wrap)       'mantle:theme:face:org.todo.keyword:null)
-  ;;               (list (sss:org/todo.keyword "?" wrap)       'mantle:theme:face:org.todo.keyword:holding)
-  ;;               (list (sss:org/todo.keyword "…" wrap)       'mantle:theme:face:org.todo.keyword:holding)
-  ;;               (list (sss:org/todo.keyword "⁈" wrap)       'mantle:theme:face:org.todo.keyword:holding)
-
-  ;;               (list (sss:org/todo.keyword "MOVED" wrap)   'mantle:theme:face:org.todo.keyword:info)
-  ;;               (list (sss:org/todo.keyword "☇" wrap)       'mantle:theme:face:org.todo.keyword:info)
-  ;;               (list (sss:org/todo.keyword "DONE" wrap)    'mantle:theme:face:org.todo.keyword:done/good)
-  ;;               (list (sss:org/todo.keyword "X" wrap)       'mantle:theme:face:org.todo.keyword:done/good)
-  ;;               (list (sss:org/todo.keyword "SUCCESS" wrap) 'mantle:theme:face:org.todo.keyword:done/good)
-  ;;               (list (sss:org/todo.keyword "X" wrap)       'mantle:theme:face:org.todo.keyword:done/good)
-  ;;               (list (sss:org/todo.keyword "FAILURE" wrap) 'mantle:theme:face:org.todo.keyword:done/bad)
-  ;;               (list (sss:org/todo.keyword "✘" wrap)       'mantle:theme:face:org.todo.keyword:done/bad)
-  ;;               (list (sss:org/todo.keyword "KILLED" wrap)  'mantle:theme:face:org.todo.keyword:done/bad)
-  ;;               (list (sss:org/todo.keyword "÷" wrap)       'mantle:theme:face:org.todo.keyword:done/bad)))
-
-  ;;   ;; I guess this guy is covered by `hl-todo' instead of `org'?
-  ;;   ;; (push `(,(sss:org/todo.keyword "TODO" wrap) warning bold) hl-todo-keyword-faces)
-  ;;   ;; ...but `hl-todo' cannot do things that start/end with non-letters...
-  ;;   ;; So yay.
-  ;;   )
-
-   ))
+    ;; I guess this guy is covered by `hl-todo' instead of `org'?
+    ;; (push `(,(mode:org:todo/keyword "TODO" wrap) warning bold) hl-todo-keyword-faces)
+    ;; ...but `hl-todo' cannot do things that start/end with non-letters...
+    ;; So yay.
+    )))
 
 
 ;;------------------------------------------------------------------------------

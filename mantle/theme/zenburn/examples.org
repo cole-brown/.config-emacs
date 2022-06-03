@@ -227,26 +227,26 @@ org-todo-keyword-faces
 
 (let ((wrap "├─┤"))
   (setq org-todo-keyword-faces
-        (list (list (sss:org/todo.keyword "TODO" wrap)    'sss:zenburn/face/org/todo.keyword/todo)
-              (cons (sss:org/todo.keyword "PROJECT" wrap) '+org-todo-project)
+        (list (list (mode:org:todo/keyword "TODO" wrap)    'sss:zenburn/face/org/todo.keyword/todo)
+              (cons (mode:org:todo/keyword "PROJECT" wrap) '+org-todo-project)
 
-              (cons (sss:org/todo.keyword "CURRENT" wrap) '+org-todo-active)
-              (cons (sss:org/todo.keyword "▶" wrap)       '+org-todo-active)
+              (cons (mode:org:todo/keyword "CURRENT" wrap) '+org-todo-active)
+              (cons (mode:org:todo/keyword "▶" wrap)       '+org-todo-active)
 
-              (cons (sss:org/todo.keyword "WAITING" wrap) '+org-todo-onhold)
-              (cons (sss:org/todo.keyword "HOLDING" wrap) '+org-todo-onhold)
-              (cons (sss:org/todo.keyword "?" wrap)       '+org-todo-onhold)
-              (cons (sss:org/todo.keyword "…" wrap)       '+org-todo-onhold)
-              (cons (sss:org/todo.keyword "⁈" wrap)       '+org-todo-onhold)
+              (cons (mode:org:todo/keyword "WAITING" wrap) '+org-todo-onhold)
+              (cons (mode:org:todo/keyword "HOLDING" wrap) '+org-todo-onhold)
+              (cons (mode:org:todo/keyword "?" wrap)       '+org-todo-onhold)
+              (cons (mode:org:todo/keyword "…" wrap)       '+org-todo-onhold)
+              (cons (mode:org:todo/keyword "⁈" wrap)       '+org-todo-onhold)
 
-              (cons (sss:org/todo.keyword "DONE" wrap)    'org-done)
-              (cons (sss:org/todo.keyword "X" wrap)       'org-done)
-              (cons (sss:org/todo.keyword "SUCCESS" wrap) 'org-done)
-              (cons (sss:org/todo.keyword "X" wrap)       'org-done)
-              (cons (sss:org/todo.keyword "FAILURE" wrap) 'org-done)
-              (cons (sss:org/todo.keyword "✘" wrap)       'org-done)
-              (cons (sss:org/todo.keyword "KILLED" wrap)  'org-done)
-              (cons (sss:org/todo.keyword "÷" wrap)       'org-done))))
+              (cons (mode:org:todo/keyword "DONE" wrap)    'org-done)
+              (cons (mode:org:todo/keyword "X" wrap)       'org-done)
+              (cons (mode:org:todo/keyword "SUCCESS" wrap) 'org-done)
+              (cons (mode:org:todo/keyword "X" wrap)       'org-done)
+              (cons (mode:org:todo/keyword "FAILURE" wrap) 'org-done)
+              (cons (mode:org:todo/keyword "✘" wrap)       'org-done)
+              (cons (mode:org:todo/keyword "KILLED" wrap)  'org-done)
+              (cons (mode:org:todo/keyword "÷" wrap)       'org-done))))
 
 "hello there"
 #+END_SRC

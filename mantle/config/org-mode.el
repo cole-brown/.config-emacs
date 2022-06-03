@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-06-02
-;; Modified:   2022-06-02
+;; Modified:   2022-06-03
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -30,6 +30,7 @@
 (imp:require :path)
 (imp:require :buffer 'search)
 (imp:require :buffer 'name)
+(imp:require :mode 'org)
 
 
 ;;------------------------------------------------------------------------------
@@ -75,7 +76,9 @@
   :init
   ;;--------------------
 
-  ;; Define org-mode hooks.
+  ;;---
+  ;; Create Org-Mode Hooks
+  ;;---
   (innit:hook:defun org-jump-to-now-hook
     '(:name "org/jump-to-now-target"
       :file (path:relative (path:current:file) user-emacs-directory)
@@ -97,7 +100,6 @@
   :hook
   ;;--------------------
 
-  ;; Connect my hooks up.
   ((org-mode . (innit:hook:func-symbol "org/jump-to-now-target"))
    (org-mode . (innit:hook:func-symbol "org/local-settings")))
 
@@ -168,7 +170,7 @@
   ;; TODO: Not sure if works well with evil.
   ;; ;; Enable Speed Keys as per my speed-commands predicate function.
   ;; (org-use-speed-commands
-  ;;  #'spy:custom/org-mode/speed-commands-p
+  ;;  #'mode:org:speed-commands?
   ;;  "Allow speed keys when at any headline *, not just beginning of line.")
 
   (org-indent-indentation-per-level
@@ -201,94 +203,32 @@
   :config
   ;;--------------------
 
-  (let ((wrap "├─┤")
-        ;; (wrap "[ ]")
-        ;; (wrap "「 」")
-        )
-    (setq org-todo-keywords
-          `((sequence  ;; Big Words sequence.
-             ,(sss:org/todo.keyword "TODO"    wrap "t")  ; A task that needs doing & is ready to do
-             ,(sss:org/todo.keyword "PROJECT" wrap "p")  ; A project, which usually contains other tasks
-             ,(sss:org/todo.keyword "CURRENT" wrap "c" 'timestamp)  ; A task that is in progress
-             ,(sss:org/todo.keyword "WAITING" wrap "w" 'timestamp)  ; Something external is holding up this task
-             ,(sss:org/todo.keyword "HOLDING" wrap "h" 'timestamp)  ; This task is paused/on hold because of me
-             "|"
-             ,(sss:org/todo.keyword "───────" wrap "n" 'timestamp) ; No one cares.
-             ,(sss:org/todo.keyword "INFO"    wrap "i" 'timestamp) ; Info.
-             ,(sss:org/todo.keyword "MEETING" wrap "e" 'timestamp) ; Meeting Notes.
-             ,(sss:org/todo.keyword "MOVED"   wrap "m" 'timestamp) ; Moved somewhere else; no further action here.
-             ,(sss:org/todo.keyword "DONE"    wrap "d" 'timestamp) ; Task completed... whatever.
-             ,(sss:org/todo.keyword "SUCCESS" wrap "s" 'notes)     ; Task completed successfully!!!
-             ,(sss:org/todo.keyword "FAILURE" wrap "f" 'notes)     ; Task was completed the bad way.
-             ,(sss:org/todo.keyword "KILLED"  wrap "k" 'notes))    ; Task was cancelled, aborted, or is no longer applicable.
-            (sequence ;; Checkboxes sequence.
-             ,(sss:org/todo.keyword "_" wrap "T")    ; A task that needs doing
-             ,(sss:org/todo.keyword "▶" wrap "C" 'timestamp)    ; Task is in progress
-             ;; ,(sss:org/todo.keyword "-" wrap "C" 'timestamp) ; Task is in progress
-             ;; ,(sss:org/todo.keyword "?" wrap "W" 'timestamp) ; Task is being held up or paused
-             ,(sss:org/todo.keyword "…" wrap "W" 'timestamp)    ; Task is being held up or paused
-             ,(sss:org/todo.keyword "⁈" wrap "H" 'timestamp)    ; Task is on hold
-             "|"
-             ,(sss:org/todo.keyword "ⓘ" wrap "I" 'timestamp)    ; Info.
-             ,(sss:org/todo.keyword "♫" wrap "E" 'timestamp)    ; Meeting Notes.
-             ,(sss:org/todo.keyword "∅" wrap "N" 'timestamp)    ; Null/No one cares.
-             ,(sss:org/todo.keyword "☇" wrap "M" 'timestamp)    ; Moved somewhere else; no further action here.
-             ,(sss:org/todo.keyword "X" wrap "D" 'timestamp)    ; Task completed... whatever.
-             ,(sss:org/todo.keyword "X" wrap "S" 'notes)        ; Task completed successfully!
-             ,(sss:org/todo.keyword "✘" wrap "F" 'notes)        ; Task completed the bad way.
-             ,(sss:org/todo.keyword "÷" wrap "K" 'notes)))      ; Task was cancelled, aborted, or is no longer applicable.
+  ;;--------------------
+  ;; conditional customization: org-agenda
+  ;;--------------------
 
-          ;; And set some faces for these. strings.
-          org-todo-keyword-faces
-          (list (list (sss:org/todo.keyword "TODO" wrap)    'spy:theme.face/org.todo.keyword/todo)
-                (list (sss:org/todo.keyword "PROJECT" wrap) '+org-todo-project)
+  (when-let ((agenda-files (jerky:get 'path 'org 'agenda)))
+    (customize-set-variable 'org-agenda-files
+                            agenda-files
+                            "My paths to search for agenda items."))
 
-                (list (sss:org/todo.keyword "CURRENT" wrap) '+org-todo-active)
-                (list (sss:org/todo.keyword "▶" wrap)       '+org-todo-active)
+  ;;--------------------
+  ;; configuration
+  ;;--------------------
 
-                (list (sss:org/todo.keyword "WAITING" wrap) '+org-todo-onhold)
-                (list (sss:org/todo.keyword "HOLDING" wrap) '+org-todo-onhold)
-                (list (sss:org/todo.keyword "INFO" wrap)    'spy:theme.face/org.todo.keyword/info)
-                (list (sss:org/todo.keyword "MEETING" wrap) 'spy:theme.face/org.todo.keyword/info)
-                (list (sss:org/todo.keyword "ⓘ" wrap)       'spy:theme.face/org.todo.keyword/info)
-                (list (sss:org/todo.keyword "♫" wrap)       'spy:theme.face/org.todo.keyword/info)
-                (list (sss:org/todo.keyword "─" wrap)       'spy:theme.face/org.todo.keyword/null)
-                (list (sss:org/todo.keyword "∅" wrap)       'spy:theme.face/org.todo.keyword/null)
-                (list (sss:org/todo.keyword "?" wrap)       '+org-todo-onhold)
-                (list (sss:org/todo.keyword "…" wrap)       '+org-todo-onhold)
-                (list (sss:org/todo.keyword "⁈" wrap)       '+org-todo-onhold)
+  ;; NOTE: Keybinds are in: TODO: WHERE ARE KEYBINDS IN sn-004??? Previously: config/keybinds/org-mode.el
 
-                (list (sss:org/todo.keyword "MOVED" wrap)   'spy:theme.face/org.todo.keyword/info)
-                (list (sss:org/todo.keyword "☇" wrap)       'spy:theme.face/org.todo.keyword/info)
-                (list (sss:org/todo.keyword "DONE" wrap)    'spy:theme.face/org.todo.keyword/done.good)
-                (list (sss:org/todo.keyword "X" wrap)       'spy:theme.face/org.todo.keyword/done.good)
-                (list (sss:org/todo.keyword "SUCCESS" wrap) 'spy:theme.face/org.todo.keyword/done.good)
-                (list (sss:org/todo.keyword "X" wrap)       'spy:theme.face/org.todo.keyword/done.good)
-                (list (sss:org/todo.keyword "FAILURE" wrap) 'spy:theme.face/org.todo.keyword/done.bad)
-                (list (sss:org/todo.keyword "✘" wrap)       'spy:theme.face/org.todo.keyword/done.bad)
-                (list (sss:org/todo.keyword "KILLED" wrap)  'spy:theme.face/org.todo.keyword/done.bad)
-                (list (sss:org/todo.keyword "÷" wrap)       'spy:theme.face/org.todo.keyword/done.bad)))
+  ;; NOTE: Theme tweaks are in: mantle/theme/zenburn/org-mode.el
 
-    ;; I guess this guy is covered by `hl-todo' instead of `org'?
-    ;; (push `(,(sss:org/todo.keyword "TODO" wrap) warning bold) hl-todo-keyword-faces)
-    ;; ...but `hl-todo' cannot do things that start/end with non-letters...
-    ;; So yay.
-    )
-
-  ;; Put .org.txt into the mode list for org-mode. Useful for org-mode files in
-  ;; dropbox - dropbox website/app doesn't know how to read ".org", but it can
-  ;; do ".txt".
+  ;; Put '.org.txt' into the mode list for org-mode. Useful for org-mode files
+  ;; in dropbox - dropbox website/app doesn't know how to read ".org", but it
+  ;; can do ".txt".
   (add-to-list 'auto-mode-alist '("\\.org.txt$" . org-mode))
-
-  ;; Keybinds are in: config/keybinds/org-mode.el
-
-  ;; Theme tweaks are in: config/theme/
-
 
   ;; TODO: whitespace-mode fix for org-mode... still needed?
   ;;   ;; This does double the work on the org-indent-strings array, but meh.
   ;;   (require 'cl-lib)
-  ;;   (defun spy:advice/org-indent/prefix-munger ()
+  ;;   (defun org:advice/org-indent/prefix-munger ()
   ;;     "Initialize the indentation strings so the motherfucking
   ;; `org-indent-boundary-char' is set with a proper face you god damn
   ;; savages."
@@ -301,8 +241,8 @@
   ;;         ;; Text line prefixes.
   ;;         (aset org-indent--text-line-prefixes
   ;;               n
-  ;;               ;; spy change: concat org-indent-boundary-char inside
-  ;;               ;;   of org-add-props, not outside.
+  ;;               ;; NOTE: changed to concat org-indent-boundary-char inside
+  ;;               ;; of org-add-props, not outside.
   ;;               (org-add-props (concat
   ;;                               (make-string (+ n indentation) ?\s)
   ;;                               (and (> n 0)
@@ -310,43 +250,28 @@
   ;;                   nil 'face 'org-indent)
   ;;               ))))
   ;;   (advice-add 'org-indent--compute-prefixes
-  ;;               :after #'spy:advice/org-indent/prefix-munger)
-
-
-  ;;--------------------
-  ;; customization: org-agenda
-  ;;--------------------
-
-  (when-let ((agenda-files (jerky:get 'path 'org 'agenda)))
-    (customize-set-variable 'org-agenda-files
-                            agenda-files
-                            "My paths to search for agenda items."))
-
-
-  ;;--------------------
-  ;; configuration: org-agenda
-  ;;--------------------
-
-
+  ;;               :after #'org:advice/org-indent/prefix-munger)
   )
 
-;;------------------------------
-;; Undo Doom hacks to Org-Mode
-;;------------------------------
-(after! evil-org
-  ;; Make [TAB] cycle through all (sub)tree visibilities (the default behavior) instead of just current tree.
-  ;;   - https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/org/README.org#hacks
-  (remove-hook 'org-tab-first-hook #'+org-cycle-only-current-subtree-h)
 
-  ;; Make 'open link' open file in other window like org-mode defaults to doing.
-  ;; Doom changes this to #'find-file.
-  (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window))
+;; TODO: Delete after checking org-mode to see if these can be deleted.
+;; ;;------------------------------
+;; ;; Undo Doom hacks to Org-Mode
+;; ;;------------------------------
+;; (after! evil-org
+;;   ;; Make [TAB] cycle through all (sub)tree visibilities (the default behavior) instead of just current tree.
+;;   ;;   - https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/org/README.org#hacks
+;;   (remove-hook 'org-tab-first-hook #'+org-cycle-only-current-subtree-h)
+
+;;   ;; Make 'open link' open file in other window like org-mode defaults to doing.
+;;   ;; Doom changes this to #'find-file.
+;;   (setf (alist-get 'file org-link-frame-setup) #'find-file-other-window))
 
 
 ;;------------------------------
 ;; TODO: Do these work well with Evil?
 ;;------------------------------
-
+;; TODO: Move to `:mode/org' module?
 ;;----------
 ;; Speed Keys
 ;;----------
@@ -359,7 +284,7 @@
 ;;  ;;   https://zzamboni.org/post/my-emacs-configuration-with-commentary/
 ;;  ;; Manual:
 ;;  ;;   https://orgmode.org/manual/Speed-keys.html
-;;  (defun spy:custom/org-mode/speed-commands-p ()
+;;  (defun mode:org:speed-commands? ()
 ;;    "Allow speed keys when at any headline *, not just beginning of line."
 ;;    (and (looking-at org-outline-regexp) (looking-back "^\**")))
 
@@ -371,25 +296,27 @@
 ;;------------------------------
 ;; Namespaced Commands
 ;;------------------------------
-(defun sss:org.journal/namespaced (namespace command &rest args)
+;; TODO: Move to `:mode/org' module?
+(defun mode:org/journal:namespaced (namespace command &rest args)
   "Run an org-journal COMMAND in NAMESPACE.
 
 Sets (lexical context) all org-journal custom vars related to NAMESPACE.
 Then runs COMMAND interactively with ARGS."
+  ;; TODO: Why is this interative? If it needs to be, add a way to actually set the params interactively...
   (interactive)
-  (let ((org-journal-file-format (jerky:get 'org-journal 'file 'format
+  (let ((org-journal-file-format (jerky:get 'org 'journal 'file 'format
                                             :namespace namespace))
         (org-journal-dir (jerky:get 'path 'org 'journal
                                     :namespace namespace)))
     (apply #'funcall-interactively command args)))
-;; (sss:org.journal/namespaced :home #'message "%s %s" org-journal-file-format org-journal-dir)
-;; (sss:org.journal/namespaced :work #'message "%s %s" org-journal-file-format org-journal-dir)
+;; (mode:org/journal:namespaced :home #'message "%s %s" org-journal-file-format org-journal-dir)
+;; (mode:org/journal:namespaced :work #'message "%s %s" org-journal-file-format org-journal-dir)
 
 
 ;;------------------------------
 ;; Org-Journal Set-Up
 ;;------------------------------
-(use-package! org-journal
+(imp:use-package org-journal
   :after org
 
   ;;--------------------
@@ -399,7 +326,7 @@ Then runs COMMAND interactively with ARGS."
   ;;---
   ;; "Home" Domain
   ;;---
-  (jerky:set 'org-journal 'file 'format
+  (jerky:set 'org 'journal 'file 'format
              :namespace :home
              :value (concat (spy:datetime/format.get 'iso-8601 'short)
                             ;; TODO: 'notebook' not quickest to
@@ -410,7 +337,7 @@ Then runs COMMAND interactively with ARGS."
   ;;---
   ;; "Work" Domain
   ;;---
-  (jerky:set 'org-journal 'file 'format
+  (jerky:set 'org 'journal 'file 'format
              :namespace :work
              :value (concat (spy:datetime/format.get 'iso-8601 'short)
                             ;; TODO: 'logbook' not quickest to
@@ -419,12 +346,35 @@ Then runs COMMAND interactively with ARGS."
              :docstr "`org-journal-file-format' for :work")
 
 
+  ;;--------------------
+  :custom
+  ;;--------------------
 
-  ;; ;;--------------------
-  ;; :custom
-  ;; ;;--------------------
-  ;; Doom doesn't fucking bother with `:custom' section, so they all have to go
-  ;; in `:config'. *sigh*
+  (org-journal-dir (jerky:get 'path 'org 'journal
+                              :namespace (jerky:get 'namespace 'system)))
+
+  ;; Tack (full) day name onto our format for the org-journal headline.
+  (org-journal-date-format (concat (datetime:format/get 'iso-8601 'date)
+                                   ", %A"))
+  ;; This can be a function if more is wanted. E.g. inserting new header text
+  ;; into empty files.
+  ;;  - https://github.com/bastibe/org-journal#journal-file-content
+  ;; TODO: Do stuff when file is empty.
+
+  ;; A year per file. Could do monthly if too big. Weekly and daily are also
+  ;; options. Daily is the default.
+  ;; [2019-12-03] - A month per file. Year is getting too big...
+  (org-journal-file-type 'monthly)
+
+  ;; org-journal-file-format: Make it a bit more ISO-ish (yyyy-mm-dd).
+  ;;   - default:   yyyymmdd
+  ;;   - better:    yyyy-mm-dd.org
+  ;; But those both are difficult to switch to when various other buffers open,
+  ;; so we'll go to this:
+  ;;   - betterer:  yyyy-mm-dd.journal.org
+  ;; Or, even better, leave it up to someone else to decide and get it from a jerky key:
+  (org-journal-file-format (jerky:get 'org 'journal 'file 'format
+                                      :namespace (jerky:get 'namespace 'system)))
 
 
   ;;--------------------
@@ -437,41 +387,16 @@ Then runs COMMAND interactively with ARGS."
 
   ;; This is only the path to the default namespace, so multi-namespace
   ;; shenanigans have to constantly mess with this, I think?
-  (customize-set-variable 'org-journal-dir
-                          (jerky:get 'path 'org 'journal
-                                     :namespace (jerky:get 'namespace 'system)))
   (unless (dlv:var:safe/predicate? 'org-journal-dir)
     ;; It's marked as risky - force it to safe?
     (dlv:var:safe.predicate 'org-journal-dir #'file-directory-p :quiet))
 
-  ;; Tack day name onto our format for the org-journal headline.
-  (customize-set-variable 'org-journal-date-format
-                          (concat (spy:datetime/format.get 'iso-8601 'short)
-                                  ", %A"))
-  ;; This can be a function if more is wanted. E.g. inserting new header text
-  ;; into empty files.
-  ;;  - https://github.com/bastibe/org-journal#journal-file-content
-
-  ;; A year per file. Could do monthly if too big. Weekly and daily are also
-  ;; options. Daily is the default.
-  ;; [2019-12-03] - A month per file. Year is getting too big...
-  (customize-set-variable 'org-journal-file-type 'monthly)
-
-  ;; org-journal-file-format: Make it a bit more ISO-ish (yyyy-mm-dd).
-  ;;   - default:   yyyymmdd
-  ;;   - better:    yyyy-mm-dd.org
-  ;; But those both are difficult to switch to when various other buffers open,
-  ;; so we'll go to this:
-  ;;   - betterer:  yyyy-mm-dd.journal.org
-  (customize-set-variable 'org-journal-file-format
-                          (jerky:get 'org-journal 'file 'format
-                                     :namespace (jerky:get 'namespace 'system)))
 
   ;;--------------------
   ;; configuration
   ;;--------------------
 
-  ;; Keybinds are in: config/keybinds/org-mode.el
+  ;; Keybinds are in: TODO: WHERE ARE KEYBINDS IN sn-004??? Previously: config/keybinds/org-mode.el
   )
 
 
@@ -482,95 +407,145 @@ Then runs COMMAND interactively with ARGS."
 ;;------------------------------
 ;; Org Exporter: GitHub-Flavored Markdown
 ;;------------------------------
-(use-package! ox-gfm
+(imp:use-package ox-gfm
   :after org)
 
 
+;; TODO: delete this if not using org-roam
+;; ;;------------------------------
+;; ;; Org-Roam Funcs
+;; ;;------------------------------
+;; ;; Zettelkasten Note-Taking with Org-Mode
+
+;; (defun mode:org/roam:file/name:timestamp/title (title)
+;;   "Return a file name (without extension) for new files.
+
+;; It uses TITLE and the current timestamp to form a unique title."
+;;   (let ((timestamp (datetime:string/get 'file 'datetime))
+;;         (slug (org-roam--title-to-slug title)))
+;;     (format "%s_%s" timestamp slug)))
+
+
+;; (defun mode:org/roam:buffer/deactivate ()
+;;   "Like `org-roam-buffer-deactivate' but don't delete the window."
+;;   (interactive)
+
+;;   (setq org-roam-last-window (get-buffer-window))
+;;   ;; (delete-window (get-buffer-window org-roam-buffer)
+;;   ;; (kill-buffer org-roam-buffer)
+;;   )
+
+
+;; ;;---
+;; ;; NOTE!
+;; ;;---
+;; ;; This must be before Doom's org-roam packages' `use-package' `:config' section!
+;; ;; ---
+;; ;; Doom's .emacs.d/modules/lang/org/contrib/roam.el wants org-roam to be in a
+;; ;; subdirectory of `org-directory', so they do a lot to try to make that happen
+;; ;; and the only out is to put this in early...
+;; ;;---
+;; ;; Every org file within this directory tree root is part of the org-roam
+;; ;; ecosystem.
+;; ;; So: everything in lily.
+;; (customize-set-variable 'org-roam-directory
+;;                         (jerky:get 'path 'lily))
+
+
+;; ;;------------------------------
+;; ;; Org-Roam
+;; ;;------------------------------
+;; (imp:use-package org-roam
+;;   :after org
+
+;;   ;;--------------------
+;;   :custom
+;;   ;;--------------------
+
+;;   (org-roam-buffer (buffer:name:special "lily" nil :info))
+
+;;   ;; ;; Doom is a little pesky about keeping the org-roam buffer open.
+;;   ;; ;; It even does it when you close a file and an org buffer is in any visible frame.
+;;   ;; (+org-roam-open-buffer-on-find-file nil)
+
+;;   ;; TODO: Do I want/need these?
+;;   ;; ;; Org-Roam filenames need to be uniquely named, but name doesn't matter much?
+;;   ;; ;; Or so they say... So they can just gen file names from the current time.
+;;   ;; (org-roam-filename-noconfirm t)
+;;   ;; (org-roam-file-name-function #'mode:org/roam:file/name:timestamp/title)
+
+;;   ;; If 'right isn't desirable:
+;;   ;; (org-roam-position 'left)
+
+;;   ;; What % of total frame width to use.
+;;   ;; (org-roam-buffer-width 0.4)
+
+;;   ;; By default, links are inserted with the title as the link description. This
+;;   ;; can make them hard to distinguish from external links. If you wish, you may
+;;   ;; choose add special indicators for Org-roam links by tweaking
+;;   ;; this, for example:
+;;   (org-roam-link-title-format "r://%s")
+
+;;   ;; `right' (default) is probably correct? But trying out `bottom'.
+;;   (org-roam-buffer-position 'bottom)
+
+
+;;   ;;--------------------
+;;   :config
+;;   ;;--------------------
+
+;;   ;;--------------------
+;;   ;; conditional customization
+;;   ;;--------------------
+
+;;   ;; Mitigate annoyance of org-roam (on Windows) throwing "Selecting deleted
+;;   ;; buffer" errors every other time it runs `org-roam-build-cache'.
+;;   (when (eq system-type 'windows-nt)
+;;     ;; default value: 'idle-timer
+;;     (customize-set-variable 'org-roam-db-update-method 'immediate))
+
+;;   ;;--------------------
+;;   ;; configuration
+;;   ;;--------------------
+;;   ;; none
+;;   )
+
+
+;; TODO: Get org-contacts actually working like it never really was on vanilla?
 ;;------------------------------
-;; Org-Roam Funcs
+;; Org Contacts
 ;;------------------------------
-;; Zettelkasten Note-Taking with Org-Mode
-
-(defun sss:org-roam/file-name/timestamp-title (title)
-  "Return a file name (without extension) for new files.
-
-It uses TITLE and the current timestamp to form a unique title.
-"
-  (let ((timestamp (spy:datetime/string.get 'iso-8601 'file))
-        (slug (org-roam--title-to-slug title)))
-    (format "%s_%s" timestamp slug)))
-
-
-(defun sss:org-roam/buffer/deactivate ()
-  "Like `org-roam-buffer-deactivate' but don't delete the window."
-  (interactive)
-
-  (setq org-roam-last-window (get-buffer-window))
-  ;; (delete-window (get-buffer-window org-roam-buffer)
-  ;; (kill-buffer org-roam-buffer)
-  )
-
-
-;;---
-;; NOTE!
-;;---
-;; This must be before Doom's org-roam packages' `use-package' `:config' section!
-;; ---
-;; Doom's .emacs.d/modules/lang/org/contrib/roam.el wants org-roam to be in a
-;; subdirectory of `org-directory', so they do a lot to try to make that happen
-;; and the only out is to put this in early...
-;;---
-;; Every org file within this directory tree root is part of
-;; the org-roam ecosystem.
-;; So: everything in lily.
-(customize-set-variable 'org-roam-directory
-                        (jerky:get 'path 'lily))
+;; (imp:use-package org-contacts
+;;   :after org
+;;   :disabled ;; is this making things slow?
+;;   :ensure nil
+;;   :demand t
+;;
+;;   :custom
+;;   (org-contacts-files (path:abs:file
+;;                        (spy:dirky/path :secrets :secrets/org)
+;;                        "contacts.org"))
+;;
+;;   :config
+;;   ;; https://github.com/tkf/org-mode/blob/master/contrib/lisp/org-contacts.el
+;;   (add-to-list 'org-capture-templates
+;;                `("c" "Contacts" entry
+;;                   (file+headline org-contacts-files
+;;                                  "INBOX")
+;;                   ,(concat "* %(org-contacts-template-name)\n"
+;;                            ":PROPERTIES:\n"
+;;                            ":EMAIL: %(org-contacts-template-email)\n"
+;;                            ":END:\n"))))
 
 
-;;--------------------
-;; Org-Roam
-;;--------------------
-(after! org-roam
-  (customize-set-variable 'org-roam-buffer
-                          (spy:buffer/special-name "lily" nil :info))
-
-  ;; Doom is a little pesky about keeping the org-roam buffer open.
-  ;; It even does it when you close a file and an org buffer is in any visible frame.
-  (customize-set-variable '+org-roam-open-buffer-on-find-file
-                          nil)
-
-  ;; TODO: Do I want/need these?
-  ;; ;; Org-Roam filenames need to be uniquely named, but name doesn't matter much?
-  ;; ;; Or so they say... So they can just gen file names from the current time.
-  ;; (org-roam-filename-noconfirm t)
-  ;; (org-roam-file-name-function #'spy:org-roam/file-name/timestamp-title)
-
-  ;; If 'right isn't desirable:
-  ;; (org-roam-position 'left)
-
-  ;; What % of total frame width to use.
-  ;; (org-roam-buffer-width 0.4)
-
-  ;; By default, links are inserted with the title as the link description. This
-  ;; can make them hard to distinguish from external links. If you wish, you may
-  ;; choose add special indicators for Org-roam links by tweaking
-  ;; this, for example:
-  (customize-set-variable 'org-roam-link-title-format "r://%s")
-
-  ;; `right' (default) is probably correct? But trying out `bottom'.
-  (customize-set-variable 'org-roam-buffer-position 'bottom)
-
-  ;; Mitigate annoyance of org-roam (on Windows) throwing "Selecting deleted
-  ;; buffer" errors every other time it runs `org-roam-build-cache'.
-  (when (eq system-type 'windows-nt)
-    ;; default value: 'idle-timer
-    (customize-set-variable 'org-roam-db-update-method 'immediate)))
-
+;;------------------------------------------------------------------------------
+;; WANT!, but... slow. :(
+;;------------------------------------------------------------------------------
 
 ;; TODO: This probably slows stuff down too much, yeah? :(
-;; ;;------------------------------
-;; ;; Org-Mode Headline Bullets: (Making Org-Mode Pretty)
-;; ;;------------------------------
+;;------------------------------
+;; Org-Mode Headline Bullets: (Making Org-Mode Pretty)
+;;------------------------------
 ;;
 ;; ;; Display the titles with nice unicode bullets instead of the text ones.
 ;; (use-package org-bullets
@@ -590,42 +565,9 @@ It uses TITLE and the current timestamp to form a unique title.
 ;;   )
 
 
-;; TODO: Get org-contacts actually working like it never really was on vanilla?
-;;
-;; ;;------------------------------
-;; ;; Org Contacts
-;; ;;------------------------------
-;; (use-package org-contacts
-;;   :disabled ;; is this making things slow?
-;;   :ensure nil
-;;   :after org
-;;   :demand t
-;;
-;;   :custom
-;;   (org-contacts-files (path:abs:file
-;;                        (spy:dirky/path :secrets :secrets/org)
-;;                        "contacts.org"))
-;;
-;;   :config
-;;   ;; §-TODO-§ [2019-10-14]: get Org-Contacts working...
-;;   ;; https://github.com/tkf/org-mode/blob/master/contrib/lisp/org-contacts.el
-;;   (add-to-list 'org-capture-templates
-;;                `("c" "Contacts" entry
-;;                   (file+headline org-contacts-files
-;;                                  "INBOX")
-;;                   ,(concat "* %(org-contacts-template-name)\n"
-;;                            ":PROPERTIES:\n"
-;;                            ":EMAIL: %(org-contacts-template-email)\n"
-;;                            ":END:\n"))))
-
-
-;;------------------------------------------------------------------------------
-;; WANT!, but... slow. :(
-;;------------------------------------------------------------------------------
-
-;;----------
+;;------------------------------
 ;; Pretty Checkboxes in Unicode
-;;----------
+;;------------------------------
 ;;  ;; Check box visual upgrade.
 ;;  ;;   empty, indeterminate, marked: [ ], [-], [X] -> ☐, ▣, ☒
 ;;  ;;     aka 'unchecked', 'mixed checked/unchecked children', 'checked'
@@ -657,9 +599,10 @@ It uses TITLE and the current timestamp to form a unique title.
 ;;            ))
 ;;    (prettify-symbols-mode 1))
 
-;;----------
+
+;;------------------------------
 ;; Pretty List Bullet in Unicode
-;;----------
+;;------------------------------
 ;;  ;; Show list markers with a middle dot instead of the
 ;;  ;; original character.
 ;;  (innit:hook:defun org-mode-hook t
@@ -677,4 +620,4 @@ It uses TITLE and the current timestamp to form a unique title.
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :dot-emacs 'config 'org-mode)
+(imp:provide :mantle 'config 'org-mode)
