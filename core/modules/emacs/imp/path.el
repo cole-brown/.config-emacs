@@ -127,8 +127,8 @@
      nil))
   "Alist of regexs to replace and their replacement strings.
 
-Used symbol-by-symbol in `int<imp>:feature:normalize:imp->emacs' when translating an imp symbol
-chain into one symbol for Emacs.
+Used symbol-by-symbol in `int<imp>:feature:normalize:imp->emacs' when
+translating an imp symbol chain into one symbol for Emacs.
 
 Alist format in `defcustom' language:
   :type '(alist :key-type (choice (string :tag \"Regex String\")
@@ -140,7 +140,7 @@ Alist format in `defcustom' language:
 
 
 (defvar imp:path:roots nil
-  "alist of require/provide root keywords to a cons of: (root-dir . root-file).
+  "Alist of require/provide root keywords to a cons of: (root-dir . root-file).
 
 Example:
   `:imp' entry is: '(:imp \"/path/to/imp/\" \"/path/to/imp/init.el\")")
@@ -160,11 +160,24 @@ Example:
 ;; Canonical / Normalized Paths
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:path:canonical (path &optional root)
+(defun imp:path:canonical (path &optional root)
   "Expand PATH to a full/absolute/canonical path, based off of ROOT if relative.
 
-If ROOT is `nil', `default-directory' is used if needed."
+If ROOT is nil, `default-directory' is used if needed."
   (expand-file-name path root))
+
+
+(defun imp:path:join:canonical (&rest path)
+  "Combines PATH elements together into an absolute/canonical path.
+
+If PATH is relative, canonicalizes to be under `default-directory'.
+
+(imp:path:join \"/foo/bar/\" \"jeff\" \"jill.el\")
+  ->\"/foo/bar/jeff/jill.el\"
+
+(imp:path:join \"/foo/bar/\" \"jeff\" \"jill.el\" \"..\")
+  ->\"/foo/bar/jeff\""
+  (imp:path:canonical (apply #'imp:path:join path)))
 
 
 ;;------------------------------------------------------------------------------
@@ -174,11 +187,11 @@ If ROOT is `nil', `default-directory' is used if needed."
 (defun int<imp>:path:root/dir (feature:base &optional no-error)
   "Get the root directory from `imp:path:roots' for FEATURE:BASE.
 
-If NO-ERROR is `nil' and FEATURE:BASE is not in `imp:path:roots',
+If NO-ERROR is nil and FEATURE:BASE is not in `imp:path:roots',
 signals an error."
   (if-let ((dir (nth 0 (int<imp>:alist:get/value feature:base
                                                  imp:path:roots))))
-      (int<imp>:path:canonical "" dir)
+      (imp:path:canonical "" dir)
     (if no-error
         nil
       (int<imp>:error "int<imp>:path:root/dir"
@@ -190,14 +203,14 @@ signals an error."
 
 
 (defun int<imp>:path:file:exists? (root &rest paths)
-  "Returns canonical path to file if it exists, else nil.
+  "Return canonical path to file if it exists, else nil.
 
 Join ROOT and PATHS together into a filepath and canonicalize (normalize) it.
 Then checks that:
   1) It exists as a file.
   2) The file is readable."
   ;; Join PATHS, canonicalize at ROOT.
-  (let ((filepath (int<imp>:path:canonical (imp:path:join paths) root)))
+  (let ((filepath (imp:path:canonical (imp:path:join paths) root)))
     ;; Check that it exists.
     (if (and (file-regular-p  filepath)
              (file-readable-p filepath))
@@ -207,10 +220,10 @@ Then checks that:
 
 
 (defun int<imp>:path:strings? (root &rest paths)
-  "Returns canonical path to file if ROOT and PATHS are strings, else nil."
+  "Return canonical path to file if ROOT and PATHS are strings, else nil."
   (if (and (stringp root)
            (seq-every-p #'stringp paths))
-      (int<imp>:path:canonical (imp:path:join paths) root)
+      (imp:path:canonical (imp:path:join paths) root)
     nil))
 
 
@@ -298,14 +311,16 @@ Or if NO-EXIST-CHECK is non-nil, skips file existance check."
 
 
 (defun int<imp>:path:root/contains? (feature:base)
-  "Returns bool based on if `imp:path:roots' contains FEATURE:BASE."
+  "Return bool based on if `imp:path:roots' contains FEATURE:BASE."
   (not (null (int<imp>:alist:get/value feature:base imp:path:roots))))
 
 
 (defun int<imp>:path:root/valid? (caller path &rest kwargs)
-  "Checks that PATH is a vaild root path.
+  "Check that PATH is a vaild root path.
 
-KWARGS should be a plist. All default to `t':
+CALLER should be a string of calling function's name or file's path.
+
+KWARGS should be a plist. All default to t:
   - :exists - Path must exist.
   - :dir    - Path must be a directory (implies :exists)."
   (let ((func/name "int<imp>:path:root/valid?")
@@ -391,8 +406,9 @@ KWARGS should be a plist. All default to `t':
 ;;------------------------------------------------------------------------------
 
 (defun int<imp>:path:normalize:string (symbol-or-string)
-  "Translate the FEATURE (a single symbol) to a path string using
-`int<imp>:path:replace:rx' translations."
+  "Translate SYMBOL-OR-STRING to a path string.
+
+Use `int<imp>:path:replace:rx' translations."
   (let ((name (if (symbolp symbol-or-string)
                   (symbol-name symbol-or-string)
                 symbol-or-string))
@@ -489,7 +505,7 @@ Returns the list of normalized string."
 
 
 (defun int<imp>:path:filename (path &optional dirname?)
-  "Returns the filename component of PATH.
+  "Return the filename component of PATH.
 
 If DIRNAME? is nil, returns \"\" for the filename of a directory path.
   example:
@@ -660,7 +676,7 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
 
 
 (defun int<imp>:path:platform-agnostic (path)
-  "Converts PATH string into a standardized path for the platform.
+  "Convert PATH string into a standardized path for the platform.
 
 Replaces backslash with forward slash.
 Downcases path on case-insensitive OSes."
@@ -683,8 +699,7 @@ Downcases path on case-insensitive OSes."
 
 
 (defun int<imp>:path:append (parent next)
-  "Append NEXT element as-is to PARENT, adding dir separator between them if
-needed.
+  "Append NEXT element as-is to PARENT, adding dir separator if needed.
 
 NEXT and PARENT are expected to be strings."
   ;; Error checks first.
@@ -711,13 +726,13 @@ NEXT and PARENT are expected to be strings."
 
 
 (defun imp:path:join (&rest path)
-  "Combines PATH elements together into a path.
+  "Combine PATH elements together into a path.
 
 (imp:path:join \"jeff\" \"jill.el\")
   ->\"jeff/jill.el\""
-  (seq-reduce #'int<imp>:path:append
-              (int<imp>:list:flatten path)
-              nil))
+   (seq-reduce #'int<imp>:path:append
+               (int<imp>:list:flatten path)
+               nil))
 ;; (imp:path:join "/foo" "bar.el")
 ;; (imp:path:join '("/foo" ("bar.el")))
 ;; (imp:path:join "foo" "bar.el")
@@ -725,7 +740,7 @@ NEXT and PARENT are expected to be strings."
 
 
 (defun int<imp>:path:sans-extension (&rest path)
-  "Combinse PATH elements together and then removes any extension.
+  "Join PATH elements together and then remove any extension.
 
 (int<imp>:path:sans-extension \"jeff\" \"jill.el\")
   ->\"jeff/jill\""
@@ -735,7 +750,7 @@ NEXT and PARENT are expected to be strings."
 
 
 (defun int<imp>:path:normalize (root relative &optional assert-exists sans-extension)
-  "Joins ROOT and RELATIVE paths, normalizes, and returns the path string.
+  "Join ROOT and RELATIVE paths, normalize, and return the path string.
 
 If ASSERT-EXISTS is `:file', raises an error if normalized path is not an
 existing, readable file.
@@ -747,7 +762,7 @@ If ASSERT-EXISTS is `:dir', raises an error if normalized path is not an
 existing directory.
 
 If SANS-EXTENSION is non-nil, returns a path without an extension
-(e.g. suitable for loading '.elc' or '.el' files.).
+\(e.g. suitable for loading '.elc' or '.el' files.).
 
 Returns normalized path."
   (let ((func/name "int<imp>:path:normalize")
@@ -860,7 +875,7 @@ Returns normalized path."
                           "Path is not absolute: %s"
                           path)
         ;; Actually normalize it before returning.
-        (int<imp>:path:canonical (if sans-extension
+        (imp:path:canonical (if sans-extension
                                      ;; Take out the extension if requested.
                                      (file-name-sans-extension path)
                                    path))))))
