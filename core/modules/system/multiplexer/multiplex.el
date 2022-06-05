@@ -1,4 +1,4 @@
-;;; spy/system/multiplex.el -*- lexical-binding: t; -*-
+;;; system/multiplexer/multiplex.el -*- lexical-binding: t; -*-
 
 
 ;;------------------Init & Config Help for Multiple Systems.--------------------
@@ -10,39 +10,36 @@
 (imp:require :jerky)
 (imp:require :str)
 (imp:require :path)
+(imp:require :buffer)
 
 
 ;;------------------------------------------------------------------------------
-;; Constants & Variables
+;; Getter/Setter for Multiplexer keys in Jerky.
 ;;------------------------------------------------------------------------------
 
-
-;;------------------------------------------------------------------------------
-;; Getter/Setter for jerky system keys.
-;;------------------------------------------------------------------------------
-
-(defun sss:systems/add (hash)
+(defun int<system/multiplexer>:add (hash)
   "Add HASH to the list of system hashes if not already present."
-  (let ((hashes (jerky/get 'system 'hashes)))
+  (let ((hashes (jerky:get 'system 'hashes)))
     (when (not (member hash hashes))
-      (jerky/set 'system 'hashes
+      (jerky:set 'system 'hashes
                  :value (cons hash hashes)
                  :docstr "List of all system hashes."))))
 
 
-(defun sss:systems/hashes ()
+(defun int<system/multiplexer>:system/hashes ()
   "Get a list of all system hashes."
-  (jerky/get 'system 'hashes))
-;; (sss:systems/hashes)
+  (jerky:get 'system 'hashes))
+;; (int<system/multiplexer>:system/hashes)
 
 
-(defun spy:system/set (&rest plist)
+(defun system:multiplexer:set (&rest plist)
   "For setting a system's multiplex settings.
 
 PLIST is a plist with keys:
   - REQUIRED:
     + `:hash'  - This system's hash string.
-    + `:keys'  - A list of keys to use for storing setting (will be prepended with (:system hash).
+    + `:keys'  - A list of keys to use for storing setting
+               - Will be prepended with `:system hash'.
     + `:value' - The value to store.
   - OPTIONAL:
     + `:docstr' - Documentation string."
@@ -54,10 +51,10 @@ PLIST is a plist with keys:
 
     ;; Check for required plist keys:
     (cond ((not hash)
-           (error "`spy:system/set' must have a `:hash' in params: %S"
+           (error "`system:multiplexer:set' must have a `:hash' in params: %S"
                   plist))
           ((not value)
-           (error "`spy:system/set' must have a `:value' in params: %S"
+           (error "`system:multiplexer:set' must have a `:value' in params: %S"
                   plist))
 
           ;; Special case: save value as this system's hash if `hash' and
@@ -69,39 +66,39 @@ PLIST is a plist with keys:
                 (stringp hash)
                 (stringp value)
                 (string= hash value))
-           (sss:systems/add hash)
-           (jerky/set 'system 'hash
+           (int<system/multiplexer>:add hash)
+           (jerky:set 'system 'hash
                       :value value))
 
           ;; Check for required plist keys:
           ((not keys)
-           (error "`spy:system/set' must have a `:keys' list in params: %S"
+           (error "`system:multiplexer:set' must have a `:keys' list in params: %S"
                   plist))
 
           ;; Check validitiy:
           ((not (listp keys))
-           (error "`spy:system/set': Keys must be a list; got: %S" keys))
+           (error "`system:multiplexer:set': Keys must be a list; got: %S" keys))
           ((and docstr
                 (not (stringp docstr)))
-           (error "`spy:system/set': Docstr must be a string; got: %S" docstr))
+           (error "`system:multiplexer:set': Docstr must be a string; got: %S" docstr))
 
           ;; Valid - save it.
           (t
-           (sss:systems/add hash)
+           (int<system/multiplexer>:add hash)
            (if docstr
-               (jerky/set 'system hash keys
+               (jerky:set 'system hash keys
                           :value value
                           :docstr docstr)
-             (jerky/set 'system hash keys
+             (jerky:set 'system hash keys
                         :value value))))))
-;; (spy:system/set :hash "foo" :keys '(bar) :value 42 :docstr "hello there")
-;; (spy:system/set :hash "jeff" :value "jeff")
-;; (jerky/get 'system 'hash)
-;; (spy:system/set :hash "5730ce-91e149" :value "5730ce-91e149")
-;; (jerky/get 'system 'hash)
+;; (system:multiplexer:set :hash "foo" :keys '(bar) :value 42 :docstr "hello there")
+;; (system:multiplexer:set :hash "jeff" :value "jeff")
+;; (jerky:get 'system 'hash)
+;; (system:multiplexer:set :hash "5730ce-91e149" :value "5730ce-91e149")
+;; (jerky:get 'system 'hash)
 
 
-(defun spy:system/get (&optional hash &rest keys)
+(defun system:multiplexer:get (&optional hash &rest keys)
   "For getting a system's multiplex settings.
 
 HASH should be the system's hash used when saving the setting.
@@ -113,42 +110,43 @@ KEYS will be prepended with `:system' and the HASH."
   ;; Special case: get saved hash.
   (cond ((and (null hash)
               (null keys))
-         (jerky/get 'system 'hash))
+         (jerky:get 'system 'hash))
 
         ;; Check validitiy:
         ((not keys)
-         (error "`spy:system/get' must have `keys' in params; got: %S"
+         (error "`system:multiplexer:get' must have `keys' in params; got: %S"
                 keys))
 
         ;; Try to get it.
         (t
          (let ((hash/get (or hash
-                             (jerky/get 'system 'hash))))
+                             (jerky:get 'system 'hash))))
            ;; Check `hash/get' validity, finally.
            (if (not hash/get)
-               (error (concat "`spy:system/get': No hash provided and could "
+               (error (concat "`system:multiplexer:get': No hash provided and could "
                               "not find a saved hash... "
                               "provided: %S, saved: %S")
-                      hash (jerky/get 'system 'hash))
-             (jerky/get 'system hash/get keys))))))
-;; (spy:system/get nil)
-;; (spy:system/get nil 'path 'secret 'emacs)
-;; (spy:system/get (jerky/get 'system 'hash) 'path 'secret 'emacs)
-;; (spy:system/get "foo" 'bar)
-;; (jerky//parse '(system "foo" (bar)) t)
-;; (jerky/get 'system "foo" '(bar))
+                      hash (jerky:get 'system 'hash))
+             (jerky:get 'system hash/get keys))))))
+;; (system:multiplexer:get nil)
+;; (system:multiplexer:get nil 'path 'secret 'emacs)
+;; (system:multiplexer:get (jerky:get 'system 'hash) 'path 'secret 'emacs)
+;; (system:multiplexer:get "foo" 'bar)
+;; (jerky:/parse '(system "foo" (bar)) t)
+;; (jerky:get 'system "foo" '(bar))
 
 
 ;;------------------------------------------------------------------------------
 ;; System UID
 ;;------------------------------------------------------------------------------
 
-(defun spy:system/hash ()
+(defun system:multiplexer:hash/this ()
   "Return /this/ system's hash.
 
 If a system hash has been saved, return the saved hash.
 
-Else, generate a system hash from `system-name' and `system-type'."
+Else, generate a system hash from function `system-name' and
+variable `system-type'."
   ;; TODO: Why does a system have a different hash at start of init compared
   ;; to after doom/emacs is running? Is it intentional? Cuz it's confusing to
   ;; me when adding a new system.
@@ -157,89 +155,105 @@ Else, generate a system hash from `system-name' and `system-type'."
   ;;          (str:hash:pretty (list (system-name) system-type)))
   ;;
   ;; Band-aid solution: check if we've got a saved hash.
-  (if-let ((saved-hash (spy:system/get nil)))
+  (if-let ((saved-hash (system:multiplexer:get nil)))
       saved-hash
     (let ((hash (str:hash:pretty (list (system-name) system-type))))
-      (spy:system/set :hash hash :value hash)
+      (system:multiplexer:set :hash hash :value hash)
       hash)))
-;; (spy:system/hash)
+;; (system:multiplexer:hash/this)
 ;; (str:hash:pretty (list (system-name) system-type))
 
 
-(defun spy:system/unique-id (domain date name)
-  "Generate a system UID from the specified DOMAIN, DATE and NAME, with
-`system-name' and `system-type' as additional information.
-"
+(defun system:multiplexer:hash:uid (domain date name)
+  "Generate a system UID from parameters.
+
+DOMAIN, DATE, and NAME should be strings. They can be anything, but are named
+after how my system names are (currently) created:
+  - DOMAIN:
+    - \"work\", \"home\", ...
+  - DATE:
+    - Just the year, usually.
+      -  \"2020\", \"2022\", etc.
+  - NAME:
+    - Some unimaginative name like \"desk\", \"lap\", etc...
+
+Return a system UID string from the specified DOMAIN, DATE and NAME, with
+function `system-name' and variable `system-type' as additional information."
   (str:hash (list domain date name)
             (list (system-name) system-type)))
-;; (spy:system/unique-id "jeff" "2020" "compy")
+;; (system:multiplexer:hash:uid "jeff" "2020" "compy")
 
 
-(defun spy:system:path/rel (&optional unique-id)
-  "Convert system's UNIQUE-ID to a safe directory path.
+(defun system:multiplexer:path/rel (&optional unique-id)
+  "Convert system's UNIQUE-ID to a safe (relative) directory path.
 
 If UNIQUE-ID is nil, use this system's ID."
   (let ((unique-id (or unique-id
-                       (spy:system/get nil 'id))))
+                       (system:multiplexer:get nil 'id))))
     (replace-regexp-in-string "::" "_"
                               (replace-regexp-in-string "/" "-"
                                                         unique-id))))
-;; (spy:system:path/rel)
-;; (spy:system:path/rel (spy:system/unique-id "jeff" "2020" "compy"))
+;; (system:multiplexer:path/rel)
+;; (system:multiplexer:path/rel (system:multiplexer:hash:uid "jeff" "2020" "compy"))
 
 
-(defun spy:system:path/abs (root unique-id)
-  "Generate a path to where the secrets file should be, based
-on the UNIQUE-ID of the system and the ROOT path.
-"
-  (path:abs:dir root (spy:system:path/rel unique-id)))
-;; (spy:system:path/abs "c:/foo" ":bar")
+(defun system:multiplexer:path/abs (root unique-id)
+  "Convert system's UNIQUE-ID to a safe (absolute) directory path.
+
+ROOT must be an absolute path string.
+
+If UNIQUE-ID is nil, use this system's ID."
+  (path:abs:dir root
+                (system:multiplexer:path/rel unique-id)))
+;; (system:multiplexer:path/abs "c:/foo" ":bar")
+;; (system:multiplexer:path/abs "/foo" ":bar")
 
 
 ;;------------------------------------------------------------------------------
 ;; Define a System
 ;;------------------------------------------------------------------------------
 
-(cl-defun spy:system/define (&key hash
-                                  domain
-                                  date
-                                  type
-                                  description
-                                  (path/secret/root "~/.config/secret")
-                                  (path/secret/init "emacs/doom")
-                                  (debug nil))
-  "Defines a system based on the keywords.
+(cl-defun system:multiplexer:define (&key hash
+                                          domain
+                                          date
+                                          type
+                                          description
+                                          (path/secret/root "~/.config/secret")
+                                          (path/secret/init "emacs/sn004")
+                                          (debug nil))
+  "Define a system based on the arguments plist.
 
-HASH - /MUST/ be a static string of a system's hash from `spy:system/hash',
-       not a return value from dynamically calling `spy:system/hash'.
+HASH - /Must/ be a static string of a system's hash from
+       `system:multiplexer:hash/this', not a return value from dynamically
+       calling `system:multiplexer:hash/this'.
+TODO: Why can't we call `system:multiplexer:hash/this' in the function call?
 
-DOMAIN - A string/symbol of \"home\", \"work\", or whatever domain names you use.
+DOMAIN - A string/symbol of \"home\", \"work\", or other domain name.
 
-DATE - A string/symbol of the year, or year-month-day, to identify similar systems.
+DATE - A string/symbol of the year, or year-month-day.
 
 TYPE - Another string/symbol for identifying the system.
-       \"desk\", \"desktop\", \"lap\", etc.
+     - \"desk\", \"desktop\", \"lap\", etc.
 
 DOMAIN, DATE, and TYPE are combined with forward slashes to create the
-human-readable part of the system's ID. The HASH is applied after these:
-  id = \"<domain>/<date>/<type>::<hash>\"
-    e.g. \"home/2021/desk::12345-abcdef\"
-  - See `str:hash:recreate'
+human-readable part of the system's ID. The HASH is applied after these: id =
+\"<domain>/<date>/<type>::<hash>\" e.g. \"home/2021/desk::12345-abcdef\" - See
+`str:hash:recreate'
 
 DESCRIPTION - A short string for the 'docstr' of the ID and the path.
 
 PATH/SECRET/ROOT - Absolute path to the specified system's secret folder.
 
 PATH/SECRET/INIT - Relative path from PATH/SECRET/ROOT to the Emacs init files
-                   for this system.
-                 - NOTE: Can be the init for the specified system, or for all
-                         systems, depending on how your secret's init is itself
-                         set up.
+                   for this system. - NOTE: Can be the init for the specified
+                   system, or for all systems, depending on how your secret's
+                   init is itself set up.
 
-DEBUG - if non-nil, just print out stuff instead of setting it into Jerky."
+DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
+  ;; TODO: nub debug
   (when debug
     (message (mapconcat #'identity
-                        '("spy:system/define:"
+                        '("system:multiplexer:define:"
                           "  hash:   %S"
                           "  domain: %S"
                           "  date:   %S"
@@ -302,7 +316,7 @@ DEBUG - if non-nil, just print out stuff instead of setting it into Jerky."
             errors))
 
     (when errors
-        (error (concat "spy:system/define: Invalid parameter"
+        (error (concat "system:multiplexer:define: Invalid parameter"
                        (when (!= 1 (length errors))
                          "s")
                        ": "
@@ -335,15 +349,15 @@ DEBUG - if non-nil, just print out stuff instead of setting it into Jerky."
       ;; Define the System.
       ;;------------------------------
 
-      (spy:system/set :hash hash
+      (system:multiplexer:set :hash hash
                       :keys (list 'path 'secret 'root)
                       :value path/secret/root
                       :docstr "Root for .secret.d")
-      (spy:system/set :hash hash
+      (system:multiplexer:set :hash hash
                       :keys (list 'path 'secret 'emacs)
                       :value path/secret/init.abs
                       :docstr "Root for Per-Computer Set-Up of Emacs")
-      (spy:system/set :hash hash
+      (system:multiplexer:set :hash hash
                       :keys (list 'id)
                       :value id
                       :docstr description)
@@ -351,50 +365,30 @@ DEBUG - if non-nil, just print out stuff instead of setting it into Jerky."
       ;; Have to set path per-system since work comps have restrictions on where
       ;; things can be, and home comps tend to have a random number of hard drives
       ;; just wherever.
-      (spy:system/set :hash hash
+      (system:multiplexer:set :hash hash
                       :keys (list 'path 'secret 'system)
-                      :value  (spy:system:path/abs path/secret/init.abs id)
+                      :value  (system:multiplexer:path/abs path/secret/init.abs id)
                       :docstr description))))
-;; (spy:system/define :debug t
-;;                    :hash "123456-abcdef"
-;;                    :domain "home"
-;;                    :date "2021"
-;;                    :type "desk"
-;;                    :description "test description"
-;;                    :path/secret/root "~/.config/spydez/secret"
-;;                    :path/secret/init "path/emacs/doom")
+;; (system:multiplexer:define :debug t
+;;                            :hash "123456-abcdef"
+;;                            :domain "home"
+;;                            :date "2021"
+;;                            :type "desk"
+;;                            :description "test description"
+;;                            :path/secret/root "~/.config/secret"
+;;                            :path/secret/init "emacs/sn004")
 
 
-(defun spy:system/show (&optional hash)
-  "Displays system info for system identified by HASH.
+(defun int<system/multiplexer>:show (hash buffer)
+  "Display system multiplexer info for system identified by HASH in BUFFER.
 
-If HASH is nil, displays all systems' infos."
-  (interactive)
-  ;;------------------------------
-  ;; Error Checking
-  ;;------------------------------
-  (unless (or (null hash)
-              (stringp hash))
-    (error "spy:system/show: HASH must be a string or nil. Got type %S: %S"
-           (type-of hash)
-           hash))
+HASH should be a string from e.g. `system:multiplexer:hash/this'.
 
-  ;; Show each system, or just the matching system.
-  (let ((buffer (spy:buffer/special-name "Systems" nil :info)))
-    (if hash
-        (sss:system/show hash buffer)
-
-      (dolist (hash/system (sss:systems/hashes))
-        (sss:system/show hash/system buffer)))))
-;; (spy:system/show)
-
-
-(defun sss:system/show (hash buffer)
-  "Displays system info for system identified by HASH."
+BUFFER should be a buffer or buffer name string."
   (with-current-buffer (get-buffer-create buffer)
     (goto-char (point-max))
-    (let* ((current (string= hash (spy:system/hash)))
-           (id (spy:system/get hash 'id))
+    (let* ((current (string= hash (system:multiplexer:hash/this)))
+           (id (system:multiplexer:get hash 'id))
            ;; Split ID up into domain, date, and type.
            (prefixes (nth 0 (if id
                                 (str:hash:split id)
@@ -402,10 +396,10 @@ If HASH is nil, displays all systems' infos."
            (domain   (nth 0 prefixes))
            (date     (nth 1 prefixes))
            (type     (nth 2 prefixes))
-           (description (jerky/get 'system hash 'id
+           (description (jerky:get 'system hash 'id
                                    :field :docstr))
-           (path/root (spy:system/get hash 'path 'secret 'root))
-           (path/init (spy:system/get hash 'path 'secret 'emacs)))
+           (path/root (system:multiplexer:get hash 'path 'secret 'root))
+           (path/init (system:multiplexer:get hash 'path 'secret 'emacs)))
       (insert
        (format (concat "\n\n"
                        "System %s:\n"
@@ -425,7 +419,31 @@ If HASH is nil, displays all systems' infos."
                path/root path/init)))))
 
 
+(defun system:cmd:multiplexer:show (&optional hash)
+  "Display system info for system identified by HASH.
+
+If HASH is nil, displays all systems' infos."
+  (interactive)
+  ;;------------------------------
+  ;; Error Checking
+  ;;------------------------------
+  (unless (or (null hash)
+              (stringp hash))
+    (error "system:cmd:multiplexer:show: HASH must be a string or nil. Got type %S: %S"
+           (type-of hash)
+           hash))
+
+  ;; Show each system, or just the matching system.
+  (let ((buffer (buffer:name:special "Systems" nil :info)))
+    (if hash
+        (int<system/multiplexer>:show hash buffer)
+
+      (dolist (hash/system (int<system/multiplexer>:system/hashes))
+        (int<system/multiplexer>:show hash/system buffer)))))
+;; (system:cmd:multiplexer:show)
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'system 'multiplex)
+(imp:provide :system 'multiplexer 'multiplex)
