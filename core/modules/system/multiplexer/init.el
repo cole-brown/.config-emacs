@@ -1,4 +1,20 @@
 ;; -*- mode: emacs-lisp; lexical-binding: t -*-
+;;
+;; Author:   Cole Brown <code@brown.dev>
+;; URL:      https://github.com/cole-brown/.config-emacs
+;; Created:  2020-08-28
+;; Modified: 2022-06-05
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Allow multiple systems (computers) to use the same init with small
+;; differences.
+;;
+;;; Code:
 
 
 ;;------------------Init & Config Help for Multiple Systems.--------------------
@@ -6,33 +22,37 @@
 ;;--------------------------(probably the wrong one)----------------------------
 
 
-
 ;;------------------------------------------------------------------------------
-;; Namespaces
+;; Set-Up.
 ;;------------------------------------------------------------------------------
 
-;; Set-up Jerky namespaces for systems.
-(imp:load :feature  '(:modules spy system namespaces)
-          :filename "namespaces")
+(imp:path:root :system
+               (imp:path:join (imp:path:current:dir) ".."))
 
 
 ;;------------------------------------------------------------------------------
-;; Multiple systems (computers) able to use this same Doom Config.
+;; Load our files.
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:modules spy system multiplex)
-          :filename "multiplex")
+(imp:timing
+    '(:system multiplexer)
+    (imp:file:current)
+    (imp:path:current:dir)
 
+  ;; Set-up Jerky namespaces for systems.
+  (imp:load :feature  '(:system multiplexer namespaces)
+            :filename "namespaces")
 
-;;------------------------------------------------------------------------------
-;; Loading Helpers.
-;;------------------------------------------------------------------------------
+  ;; Multiple systems (computers) able to use this same init.
+  (imp:load :feature  '(:system multiplexer multiplex)
+            :filename "multiplex")
 
-(imp:load :feature  '(:modules spy system dlv)
-          :filename "dlv")
+  ;; Directory Local Variables
+  (imp:load :feature  '(:system multiplexer dlv)
+            :filename "dlv"))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'system)
+(imp:provide :system 'multiplexer)
