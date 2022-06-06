@@ -7,6 +7,7 @@
 
 (require 'cl-lib) ;; cl-defun for '&keys'
 
+(imp:require :nub)
 (imp:require :jerky)
 (imp:require :str)
 (imp:require :path)
@@ -44,18 +45,25 @@ PLIST is a plist with keys:
   - OPTIONAL:
     + `:docstr' - Documentation string."
 
-  (let ((hash   (plist-get plist :hash))
+  (let ((func/name "system:multiplexer:set")
+        (hash   (plist-get plist :hash))
         (keys   (plist-get plist :keys))
         (value  (plist-get plist :value))
         (docstr (plist-get plist :docstr)))
 
     ;; Check for required plist keys:
     (cond ((not hash)
-           (error "`system:multiplexer:set' must have a `:hash' in params: %S"
-                  plist))
+           (nub:error
+               :system/multiplexer
+               func/name
+             "Must have a `:hash' in plist params: %S"
+             plist))
           ((not value)
-           (error "`system:multiplexer:set' must have a `:value' in params: %S"
-                  plist))
+           (nub:error
+               :system/multiplexer
+               func/name
+             "Must have a `:value' in plist params: %S"
+             plist))
 
           ;; Special case: save value as this system's hash if `hash' and
           ;; `value' are equal and there are no `keys' or `docstr'.
@@ -72,15 +80,26 @@ PLIST is a plist with keys:
 
           ;; Check for required plist keys:
           ((not keys)
-           (error "`system:multiplexer:set' must have a `:keys' list in params: %S"
-                  plist))
+           (nub:error
+               :system/multiplexer
+               func/name
+             "Must have a `:keys' in plist params: %S"
+             plist))
 
           ;; Check validitiy:
           ((not (listp keys))
-           (error "`system:multiplexer:set': Keys must be a list; got: %S" keys))
+           (nub:error
+               :system/multiplexer
+               func/name
+             "`:keys' must be a list; got: %S"
+             keys))
           ((and docstr
                 (not (stringp docstr)))
-           (error "`system:multiplexer:set': Docstr must be a string; got: %S" docstr))
+           (nub:error
+               :system/multiplexer
+               func/name
+             "`:docstr' must be a string; got: %S"
+             docstr))
 
           ;; Valid - save it.
           (t
@@ -107,27 +126,35 @@ HASH should be the system's hash used when saving the setting.
   - If HASH is nil, it will use /this/ system's hash.
 
 KEYS will be prepended with `:system' and the HASH."
-  ;; Special case: get saved hash.
-  (cond ((and (null hash)
-              (null keys))
-         (jerky:get 'system 'hash))
+  (let ((func/name "system:multiplexer:get"))
+    ;; Special case: get saved hash.
+    (cond ((and (null hash)
+                (null keys))
+           (jerky:get 'system 'hash))
 
-        ;; Check validitiy:
-        ((not keys)
-         (error "`system:multiplexer:get' must have `keys' in params; got: %S"
-                keys))
+          ;; Check validitiy:
+          ((not keys)
+           (nub:error
+               :system/multiplexer
+               func/name
+             "Must have `keys' in params; got: %S"
+             keys))
 
-        ;; Try to get it.
-        (t
-         (let ((hash/get (or hash
-                             (jerky:get 'system 'hash))))
-           ;; Check `hash/get' validity, finally.
-           (if (not hash/get)
-               (error (concat "`system:multiplexer:get': No hash provided and could "
-                              "not find a saved hash... "
-                              "provided: %S, saved: %S")
-                      hash (jerky:get 'system 'hash))
-             (jerky:get 'system hash/get keys))))))
+          ;; Try to get it.
+          (t
+           (let ((hash/get (or hash
+                               (jerky:get 'system 'hash))))
+             ;; Check `hash/get' validity, finally.
+             (if (not hash/get)
+                 (nub:error
+                     :system/multiplexer
+                     func/name
+                   '("No hash provided and could "
+                     "not find a saved hash... "
+                     "provided: %S, saved: %S")
+                   hash
+                   (jerky:get 'system 'hash))
+               (jerky:get 'system hash/get keys)))))))
 ;; (system:multiplexer:get nil)
 ;; (system:multiplexer:get nil 'path 'secret 'emacs)
 ;; (system:multiplexer:get (jerky:get 'system 'hash) 'path 'secret 'emacs)
@@ -250,27 +277,19 @@ PATH/SECRET/INIT - Relative path from PATH/SECRET/ROOT to the Emacs init files
                    init is itself set up.
 
 DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
-  ;; TODO: nub debug
-  (when debug
-    (message (mapconcat #'identity
-                        '("system:multiplexer:define:"
-                          "  hash:   %S"
-                          "  domain: %S"
-                          "  date:   %S"
-                          "  desc:   %S"
-                          "  root:   %S"
-                          "  init:   %S"
-                          "  debug:  %S"
-                          )
-                        "\n")
-             hash
-             domain
-             date
-             type
-             description
-             path/secret/root
-             path/secret/init
-             debug))
+  (let ((func/name "system:multiplexer:define"))
+    (nub:debug:func/start
+        :system/multiplexer
+        func/name
+        '(:system :multiplex)
+      (cons 'hash hash)
+      (cons 'domain domain)
+      (cons 'date date)
+      (cons 'type type)
+      (cons 'description description)
+      (cons 'path/secret/root path/secret/root)
+      (cons 'path/secret/init path/secret/init)
+      (cons 'debug debug))
 
   ;;------------------------------
   ;; Error Checking
@@ -316,14 +335,16 @@ DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
             errors))
 
     (when errors
-        (error (concat "system:multiplexer:define: Invalid parameter"
-                       (when (!= 1 (length errors))
-                         "s")
-                       ": "
-                       (mapconcat #'identity
-                                  errors
-                                  "\n")))))
-
+      (nub:error
+          :system/multiplexer
+          func/name
+        (concat "Invalid parameter"
+                (when (/= 1 (length errors))
+                  "s")
+                ":\n"
+                (mapconcat #'identity
+                           errors
+                           "\n")))))
 
   (let* ((id (str:hash:recreate (list domain date type) hash))
          (path/secret/init.abs (path:abs:dir path/secret/root path/secret/init)))
@@ -331,19 +352,27 @@ DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
     ;; Debug?
     ;;------------------------------
     (if debug
-        (message (concat "System:\n"
-                         "  -> hash:          %S\n"
-                         "  -> domain:        %S\n"
-                         "  -> date:          %S\n"
-                         "  -> type:          %S\n"
-                         "  -> description:   %S\n"
-                         "  -> path/root:     %S\n"
-                         "  -> path/init:     %S\n"
-                         "  <- id:            %S\n"
-                         "  <- path/init.abs: %S")
-                 hash domain date type description
-                 path/secret/root path/secret/init
-                 id path/secret/init.abs)
+        (message (mapconcat #'identity
+                            '("System:"
+                              "  -> hash:          %S"
+                              "  -> domain:        %S"
+                              "  -> date:          %S"
+                              "  -> type:          %S"
+                              "  -> description:   %S"
+                              "  -> path/root:     %S"
+                              "  -> path/init:     %S"
+                              "  <- id:            %S"
+                              "  <- path/init.abs: %S")
+                            "\n")
+                 hash
+                 domain
+                 date
+                 type
+                 description
+                 path/secret/root
+                 path/secret/init
+                 id
+                 path/secret/init.abs)
 
       ;;------------------------------
       ;; Define the System.
@@ -368,7 +397,14 @@ DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
       (system:multiplexer:set :hash hash
                       :keys (list 'path 'secret 'system)
                       :value  (system:multiplexer:path/abs path/secret/init.abs id)
-                      :docstr description))))
+                      :docstr description))
+
+    (nub:debug:func/end
+        :system/multiplexer
+        func/name
+        '(:system :multiplex)
+      (cons 'id id)
+      (cons 'path path/secret/init.abs)))))
 ;; (system:multiplexer:define :debug t
 ;;                            :hash "123456-abcdef"
 ;;                            :domain "home"
@@ -401,22 +437,28 @@ BUFFER should be a buffer or buffer name string."
            (path/root (system:multiplexer:get hash 'path 'secret 'root))
            (path/init (system:multiplexer:get hash 'path 'secret 'emacs)))
       (insert
-       (format (concat "\n\n"
-                       "System %s:\n"
-                       "%s"
-                       "    -> hash:          %s\n"
-                       "    -> domain:        %s\n"
-                       "    -> date:          %s\n"
-                       "    -> type:          %s\n"
-                       "    -> description:   %s\n"
-                       "    -> path/root:     %s\n"
-                       "    -> path/init:     %s")
+       (format (mapconcat #'identity
+                          '("\n"
+                            "System %s:%s"
+                            "    -> hash:          %s"
+                            "    -> domain:        %s"
+                            "    -> date:          %s"
+                            "    -> type:          %s"
+                            "    -> description:   %s"
+                            "    -> path/root:     %s"
+                            "    -> path/init:     %s")
+                          "\n")
                id
                (if current
-                   "  --> THIS SYSTEM! <--\n"
+                   "\n  --> THIS SYSTEM! <--"
                  "")
-               hash domain date type description
-               path/root path/init)))))
+               hash
+               domain
+               date
+               type
+               description
+               path/root
+               path/init)))))
 
 
 (defun system:cmd:multiplexer:show (&optional hash)
@@ -429,7 +471,10 @@ If HASH is nil, displays all systems' infos."
   ;;------------------------------
   (unless (or (null hash)
               (stringp hash))
-    (error "system:cmd:multiplexer:show: HASH must be a string or nil. Got type %S: %S"
+    (nub:error
+        :system/multiplexer
+        "system:cmd:multiplexer:show"
+        "HASH must be a string or nil. Got type %S: %S"
            (type-of hash)
            hash))
 
