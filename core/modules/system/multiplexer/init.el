@@ -49,6 +49,12 @@
     (imp:file:current)
     (imp:path:current:dir)
 
+  ;; Debugging!
+  (imp:load :feature  '(:system multiplexer debug)
+            :filename "debug")
+  ;; Initialize debugging before going any further.
+  (int<system/multiplexer>:nub:init)
+
   ;; Set-up Jerky namespaces for systems.
   (imp:load :feature  '(:system multiplexer namespaces)
             :filename "namespaces")
