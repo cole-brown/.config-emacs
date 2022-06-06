@@ -12,6 +12,16 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Optional: Jerky DLV
+;;------------------------------------------------------------------------------
+
+;; Add jerky's DLV namespace setter function to the system multiplexer.
+;; It will then be called for any multiplexer DLV path/domain registered.
+(when (functionp #'jerky:dlv:namespace/set)
+  (add-hook 'system:multiplexer:dlv/functions #'jerky:dlv:namespace/set))
+
+
+;;------------------------------------------------------------------------------
 ;; Initialize!
 ;;------------------------------------------------------------------------------
 ;; TODO: This doesn't go here. This goes in mantle

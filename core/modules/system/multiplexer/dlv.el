@@ -13,6 +13,9 @@
 
 Hook functions will set Dir Local Variables for DOMAIN-KEYWORD in DIR-PATH.
 
+Hook functions should be registered with `add-hook'.
+  (add-hook 'system:multiplexer:dlv/functions #'func-name)
+
 Function signature must be:
   (defun func-name (DIR-PATH DOMAIN-KEYWORD)
     ...)
