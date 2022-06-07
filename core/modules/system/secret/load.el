@@ -1,27 +1,25 @@
-;;; spy/secret/load.el -*- lexical-binding: t; -*-
+;;; system/secret/load.el -*- lexical-binding: t; -*-
 ;;
 ;;; Code:
 
 
 ;; ┌───────────────────────────────────────────────────────────────────────────┐
-;; │                        What's the Secret Word?                            │
+;; │                            Load the Secret.                               │
 ;; └───────────────────────────────────────────────────────────────────────────┘
 
 
+(imp:require :nub)
 (imp:require :jerky)
 (imp:require :path)
-
-(require 'mis0/message)
 
 
 ;;------------------------------------------------------------------------------
 ;; Helper Functions for Loading Files
 ;;------------------------------------------------------------------------------
 
-;; TODO: Move to nub or mis or str?
-;;   - Probably str?
-(defun int<spy>:secret:plist:pretty-string (plist)
-  "Pretty print plist to string."
+;; TODO: Move to nub or mis or str or plist/collection?
+(defun int<system/secret>:plist:pretty-string (plist)
+  "Pretty print PLIST to string and return the string."
   (let ((plist-too (copy-sequence plist))
         (width/key 0)
         output)
@@ -47,11 +45,11 @@
     (mapconcat #'identity
                (nreverse output)
                "\n")))
-;; (spy:secret:validate :load "init")
-;; (int<spy>:secret:plist:pretty-string (spy:secret:validate :load "init"))
+;; (system:secret:validate :load "init")
+;; (int<system/secret>:plist:pretty-string (system:secret:validate :load "init"))
 
 
-(defun int<spy>:secret:validate-and-load (caller feature file)
+(defun int<system/secret>:validate-and-load (caller feature file)
   "Load FEATURE from FILE for CALLER function.
 
 FEATURE should be list of keyword/symbols for `imp:load'.
@@ -61,8 +59,8 @@ FILE should be filepath relative to secret's load directory.
 CALLER should be a string of calling function's name.
 
 Returns nil/non-nil for loading success.
-Outputs warning to `mis0' warning buffer if secret fail validation."
-  (let* ((plist (spy:secret:validate :load file)))
+Outputs warning to 'nub' warning buffer if secret fail validation."
+  (let* ((plist (system:secret:validate :load file)))
     (if-let* ((plist plist)
               (success   (plist-get plist :success))
               (path/load (plist-get plist :path/file/load)))
@@ -72,15 +70,16 @@ Outputs warning to `mis0' warning buffer if secret fail validation."
                   :path     path/load)
 
       ;; Failure Message.
-      (mis0/init/warning caller
-                             (mapconcat #'identity
-                                        '("%s: Cannot load secret '%s'; invalid system secrets."
-                                          "Validation Result:"
-                                          "%s")
-                                        "\n")
-                             "[SKIP]"
-                             file
-                             (int<spy>:secret:plist:pretty-string plist))
+      (nub:warning
+          :system/secret
+          caller
+        '(:newlines
+          "%s: Cannot load secret '%s'; invalid system secrets."
+          "Validation Result:"
+          "%s")
+        "[SKIP]"
+        file
+        (int<system/secret>:plist:pretty-string plist))
       ;; Failure Return Value
       nil)))
 
@@ -88,27 +87,31 @@ Outputs warning to `mis0' warning buffer if secret fail validation."
 ;; Initialization
 ;;------------------------------------------------------------------------------
 
-(defun spy:secret:init ()
-  "Load secret's root init.el."
-  (int<spy>:secret:validate-and-load "spy:secret:init"
-                                     '(:dot-secret init)
-                                      "init"))
-;; (spy:secret:init)
+(defun system:secret:init (&rest feature)
+  "Load secret's root init.el.
+
+FEATURE must be the imp feature name (keyword and symbols)."
+  (int<system/secret>:validate-and-load "system:secret:init"
+                                        feature
+                                        "init"))
+;; (system:secret:init)
 
 
 ;;------------------------------------------------------------------------------
 ;; Configuration
 ;;------------------------------------------------------------------------------
 
-(defun spy:secret:config ()
-  "Configure this system's secrets."
-  (int<spy>:secret:validate-and-load "spy:secret:config"
-                                     '(:dot-secret config)
-                                      "config"))
-;; (spy:secret:config)
+(defun system:secret:config (&rest feature)
+  "Configure this system's secrets.
+
+FEATURE must be the imp feature name (keyword and symbols)."
+  (int<system/secret>:validate-and-load "system:secret:config"
+                                        feature
+                                        "config"))
+;; (system:secret:config)
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'secret 'load)
+(imp:provide :system 'secret 'load)
