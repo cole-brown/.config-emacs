@@ -1,14 +1,13 @@
-;;; spy/secret/functions.el -*- lexical-binding: t; -*-
+;;; system/secret/functions.el -*- lexical-binding: t; -*-
 
 ;; ┌───────────────────────────────────────────────────────────────────────────┐
 ;; │                        What's the Secret Word?                            │
 ;; └───────────────────────────────────────────────────────────────────────────┘
 
 
-(imp:require :jerky)
+(imp:require :nub)
 (imp:require :path)
-
-(require 'mis0/message)
+(imp:require :system 'multiplexer)
 
 
 ;;------------------------------------------------------------------------------
@@ -19,45 +18,45 @@
 ;; Identity
 ;;------------------------------
 
-(defun spy:secret:hash ()
+(defun system:secret:hash ()
   "Get this system's secret hash, which is the same as the system's hash."
-  (spy:system/hash))
-;; (spy:secret:hash)
-;; (string= (spy:secret:hash) (spy:system/hash))
+  (system:multiplexer:hash/this))
+;; (system:secret:hash)
+;; (string= (system:secret:hash) (system:multiplexer:hash/this))
 
 
-(defun spy:secret:id ()
+(defun system:secret:id ()
   "Get this system's secrets ID.
 
 Returns nil if no secrets ID for this system."
-  (spy:system/get (spy:system/hash) 'id))
-;; (spy:secret:id)
+  (system:multiplexer:get (system:multiplexer:hash/this) 'id))
+;; (system:secret:id)
 
 
 ;;------------------------------
 ;; Paths
 ;;------------------------------
 
-(defun spy:secret:path/root ()
+(defun system:secret:path/root ()
   "Get secrets' base root dir for all systems."
-  (spy:system/get (spy:secret:hash) 'path 'secret 'root))
+  (system:multiplexer:get 'system (system:secret:hash) 'path 'secret 'root))
 
 
-(defun spy:secret:path/load ()
+(defun system:secret:path/load ()
   "Get secrets' load root dir for all systems."
-  (spy:system/get (spy:secret:hash) 'path 'secret 'emacs))
+  (system:multiplexer:get 'system (system:secret:hash) 'path 'secret 'emacs))
 
 
-(defun spy:secret:path/system ()
+(defun system:secret:path/system ()
   "Get this system's secrets' load dir."
-  (spy:system/get (spy:secret:hash) 'path 'secret 'system))
+  (system:multiplexer:get 'system (system:secret:hash) 'path 'secret 'system))
 
 
 ;;------------------------------------------------------------------------------
 ;; Validation
 ;;------------------------------------------------------------------------------
 
-(defun spy:secret:validate (path/type filepath)
+(defun system:secret:validate (path/type filepath)
   "Validate that secrets exist for this system.
 
 PATH/TYPE should be one of:
@@ -74,11 +73,11 @@ Validate that:
   - FILEPATH exists"
   (let* ((success t)
          reason
-         (hash           (spy:secret:hash))
-         (id             (spy:secret:id))
-         (path/root      (spy:secret:path/root))
-         (path/load      (spy:secret:path/load))
-         (path/system    (spy:secret:path/system))
+         (hash           (system:secret:hash))
+         (id             (system:secret:id))
+         (path/root      (system:secret:path/root))
+         (path/load      (system:secret:path/load))
+         (path/system    (system:secret:path/system))
          path/file/load
          path/file/name)
 
@@ -196,82 +195,100 @@ Validate that:
           :path/dir/system path/system
           :path/file/load  path/file/load
           :path/file/name  path/file/name)))
-;; (spy:secret:validate :load "init")
+;; (system:secret:validate :load "init")
 
 
 ;;------------------------------------------------------------------------------
 ;; Helpers
 ;;------------------------------------------------------------------------------
 
-(defun spy:secret/has ()
-  "Returns non-nil if this system has secrets.
+(defun system:secret:has ()
+  "Return non-nil if this system has secrets.
 
 The system is considered to have secrets if:
   - It has a hash.
   - It has an ID.
   - And it has a secrets 'init.el' file."
   (condition-case _
-      (not (null (plist-get (spy:secret:validate :load "init") :success)))
+      (not (null (plist-get (system:secret:validate :load "init") :success)))
     (error nil)))
-;; (spy:secret/has)
+;; (system:secret:has)
 
 
-(defmacro spy:secret/if (func-or-place messages &rest body)
+(defmacro system:secret:if (caller messages &rest body)
   "Do BODY if this system has secrets.
 
 Used to guard config blocks that depend on secrets.
 
-FUNC-OR-PLACE and MESSAGES are used only for printing mis0 message/warning.
+CALLER and MESSAGES are used only for printing 'nub' message/warning.
   - MESSAGES should be nil, or a plist with `:skip' and/or `:eval' keys.
-    - Values should be either a string or a list to pass to `format'.
+    - Values should be either a string or a list of format string & args.
+    - Messages will be prefixed with \"[SKIP] \" or \"[EVAL] \"
 
-If skipping, FUNC-OR-PLACE and skip message (if present) are formatted
-into a `mis0/init/warning' for info about skipped config.
+If skipping (and a `:skip' message is present in MESSAGES), the `:skip' MESSAGE
+and CALLER are formatted into a 'nub' `:warning' level message for info about
+skipped config.
 
-If not skipping and an 'eval message' is present, FUNC-OR-PLACE and eval message
-are formatted into a `mis0/init/warning' for info about skipped config."
+If not skipping (and an `:eval' message is present in MESSAGES), the `:eval'
+MESSAGE and CALLER are formatted into a 'nub' `:warning' level for info about
+skipped config."
   (declare (indent 2))
   ;; Only eval inputs once.
-  `(let ((mmm:func-or-place ,func-or-place)
-         (mmm:messages ,messages))
-     (if (spy:secret/has)
+  `(let ((macro<system/secret>:caller (or ,caller
+                                          (nub:format:callers "system:secret:if" "unlabeled-caller")))
+         (macro<system/secret>:messages ,messages))
+     (if (system:secret:has)
+         ;;------------------------------
+         ;; Evaluate
+         ;;------------------------------
          (progn
-           ;; Only display this message if it exists.
-           (let ((mmm:message (plist-get mmm:messages :eval)))
-             ;; (message "eval msg: %S" mmm:message)
-             (cond ((and (stringp mmm:message)
-                         (string= "" mmm:message))
+           ;; Only display the `:eval' MESSAGE if it exists.
+           (let ((macro<system/secret>:message (plist-get macro<system/secret>:messages :eval)))
+             ;; (message "eval msg: %S" macro<system/secret>:message)
+             (cond ((and (stringp macro<system/secret>:message)
+                         (string= "" macro<system/secret>:message))
                     ;; Just an empty string for a "message" - don't display.
                     nil)
 
-                   ((stringp mmm:message)
-                    (mis0/init/message mmm:message))
+                   ((stringp macro<system/secret>:message)
+                    (nub:warning
+                        :system/secret
+                        caller
+                      macro<system/secret>:message))
 
-                   ((listp mmm:message)
-                    (apply #'mis0/init/message mmm:message))
+                   ((listp macro<system/secret>:message)
+                    (nub:warning
+                        :system/secret
+                        caller
+                      (apply #'format macro<system/secret>:message)))
 
                    (t
                     nil)))
 
+           ;; Annnd... Run the BODY forms.
            ,@body)
 
-       (let ((mmm:message (plist-get mmm:messages :skip)))
-         ;; (message "skip msg: %S" mmm:message)
-         ;; Always display a warning.
-         (mis0/init/warning (or mmm:func-or-place
-                                "spy:secret/if_(caller/unlabeled)")
-                            (concat "[SKIP]: %s")
-                            (cond ((listp mmm:message)
-                                   (apply #'format mmm:message))
-                                  ((stringp mmm:message)
-                                   mmm:message)
-                                  (t
-                                   "Skipping...")))))))
-;; (spy:secret/if "testing" "skip string" (message "I should not see this."))
-;; (spy:secret/if nil "skip string" (message "I should not see this."))
+       ;;------------------------------
+       ;; Skip
+       ;;------------------------------
+       (let ((macro<system/secret>:message (plist-get macro<system/secret>:messages :skip)))
+         ;; (message "skip msg: %S" macro<system/secret>:message)
+         ;; Always display a warning; use a default message if none supplied.
+         (nub:warning
+             :system/secret
+             caller
+           (concat "[SKIP]: %s")
+           (cond ((listp macro<system/secret>:message)
+                  (apply #'format macro<system/secret>:message))
+                 ((stringp macro<system/secret>:message)
+                  macro<system/secret>:message)
+                 (t
+                  "Skipping...")))))))
+;; (system:secret:if "testing" "skip string" (message "I should not see this."))
+;; (system:secret:if nil "skip string" (message "I should not see this."))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'secret 'functions)
+(imp:provide :system 'secret 'functions)
