@@ -1,4 +1,4 @@
-;; -*- mode: emacs-lisp; lexical-binding: t -*-
+;; system/multiplexer/init.el -*- mode: emacs-lisp; lexical-binding: t -*-
 ;;
 ;; Author:   Cole Brown <code@brown.dev>
 ;; URL:      https://github.com/cole-brown/.config-emacs
@@ -20,14 +20,6 @@
 ;;------------------Init & Config Help for Multiple Systems.--------------------
 ;;--                     What computer is this anyways?                       --
 ;;--------------------------(probably the wrong one)----------------------------
-
-
-;;------------------------------------------------------------------------------
-;; Set-Up.
-;;------------------------------------------------------------------------------
-
-(imp:path:root :system
-               (imp:path:join (imp:path:current:dir) ".."))
 
 
 ;;------------------------------------------------------------------------------

@@ -68,8 +68,16 @@
               :path     (imp:path:join path-core-modules "elisp" "jerky")
               :filename "init")
 
+    (imp:load :feature  '(:system)
+              :path     (imp:path:join path-core-modules "system")
+              :filename "init")
+
     (imp:load :feature  '(:system multiplexer)
               :path     (imp:path:join path-core-modules "system" "multiplexer")
+              :filename "init")
+
+    (imp:load :feature  '(:system secret)
+              :path     (imp:path:join path-core-modules "system" "secret")
               :filename "init")))
 
 
