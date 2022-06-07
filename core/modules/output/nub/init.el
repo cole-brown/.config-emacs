@@ -53,11 +53,10 @@
             :filename "debug")
   (imp:load :feature  '(:nub debug format)
             :filename "debug-format")
+  (imp:load :feature  '(:nub warning)
+            :filename "warning")
   (imp:load :feature  '(:nub error)
-            :filename "error")
-
-  ;; End load timing.
-  )
+            :filename "error"))
 
 
 ;;------------------------------------------------------------------------------
