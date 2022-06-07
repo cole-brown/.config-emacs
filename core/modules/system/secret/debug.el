@@ -1,4 +1,4 @@
-;;; system/multiplexer/debug.el --- Debugging/error help. -*- lexical-binding: t; -*-
+;;; system/secret/debug.el --- Debugging/error help. -*- lexical-binding: t; -*-
 
 
 (imp:require :nub)
@@ -8,10 +8,10 @@
 ;; Initialization
 ;;------------------------------------------------------------------------------
 
-(defun int<system/multiplexer>:nub:init ()
-  "Initialize nub user & settings for multiplexer."
+(defun int<system/secret>:nub:init ()
+  "Initialize nub user & settings for secret."
   ;; Defaults for all the settings.
-  (nub:vars:init :system/multiplexer))
+  (nub:vars:init :system/secret))
 
 
 
@@ -19,10 +19,10 @@
 ;; Debugging Toggle
 ;;------------------------------------------------------------------------------
 
-(defun system:multiplexer:debug:toggle ()
+(defun system:secret:debug:toggle ()
   "Toggle debugging for dlv."
   (interactive)
-  (nub:debug:toggle :system/multiplexer))
+  (nub:debug:toggle :system/secret))
 
 
 ;;------------------------------------------------------------------------------
@@ -38,4 +38,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :system 'multiplexer 'debug)
+(imp:provide :system 'secret 'debug)

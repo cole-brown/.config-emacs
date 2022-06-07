@@ -46,6 +46,8 @@
     (imp:file:current)
     (imp:path:current:dir)
 
+  (imp:load :feature  '(:system secret debug)
+            :filename "debug")
   (imp:load :feature  '(:system secret functions)
             :filename "functions")
   (imp:load :feature  '(:system secret load)
