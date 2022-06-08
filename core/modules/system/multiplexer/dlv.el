@@ -2,6 +2,7 @@
 
 
 (imp:require :dlv)
+(imp:require :path)
 
 
 ;;------------------------------------------------------------------------------
@@ -54,9 +55,29 @@ so that user has a chance to add functions to the hook variable."
 (defcustom system:multiplexer:dlv/args nil
   "Hook arguments to use for `system:multiplexer:dlv:domain/all'.
 
-This should be a list of list of args to `system:multiplexer:dlv:domain'."
+This should be a list of list of args to `system:multiplexer:dlv:domain'.
+
+Each list of args should be:
+  '(\"/path/to/directory/\" :domain-namespace-keyword)"
   :group 'system:multiplexer:group
-  :type  '(repeat (list string (restricted-sexp :match-alternatives (keywordp)))))
+  :type  '(repeat (cons string (restricted-sexp :match-alternatives (keywordp)))))
+
+
+(defun system:multiplexer:dlv:add (dir-path domain-keyword)
+  "Add DIR-PATH as a DOMAIN-KEYWORD directory.
+
+DIR-PATH should be a path string; it will get normalized by `path:abs:dir'.
+
+DOMAIN-KEYWORD should be a keyword of the system's domain.
+Examples: `:work', `:home', `:etc'
+
+Appends to the `system:multiplexer:dlv/args' variable, which is used by the
+`system:multiplexer:dlv:domain/all' function
+TODO: near the end of init.
+TODO: between user's init and config."
+  (push (cons (path:abs:dir dir-path)
+              domain-keyword)
+        system:multiplexer:dlv/args))
 
 
 (defun system:multiplexer:dlv:domain/all ()
@@ -68,7 +89,7 @@ Run `system:multiplexer:dlv/functions' for each list of args in
 NOTE: This must be run after user's config so that user has a chance to add
 functions to the hook variable & args to the arg variable."
   (dolist (args system:multiplexer:dlv/args)
-    (apply system:multiplexer:dlv/args args)))
+    (apply system:multiplexer:dlv:domain args)))
 
 
 ;;------------------------------------------------------------------------------
