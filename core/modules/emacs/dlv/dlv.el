@@ -73,7 +73,7 @@ If ERROR? is non-nil, will signal an error if SAFE is invalid."
   (let ((func/name (nub:format:callers "int<dlv>:validate:safe" caller))
         (func/tags '(:safe :validate)))
    (nub:debug:func/start
-        :innit
+        :dlv
         func/name
         func/tags
      (cons 'caller caller)
