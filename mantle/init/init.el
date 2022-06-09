@@ -9,26 +9,46 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Initialize User Stuff
+;;  Initialize User Stuff in This Order
 ;;
 ;;; Code:
 
 
 ;;------------------------------------------------------------------------------
-;; Run User's Init Files in This Order
+;; Init: Systems & Secrets?
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
-;; Init: Modules
+;; Systems
 ;;------------------------------
+
+(imp:load :feature  '(:mantle init system)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "system")
+
+
+;;------------------------------
+;; Secrets
+;;------------------------------
+
+(imp:load :feature  '(:mantle init secret)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "secret")
+
+
+;;------------------------------------------------------------------------------
+;; Init: Modules
+;;------------------------------------------------------------------------------
+
 (imp:load :feature  '(:mode org)
           :path     (imp:path:join innit:path:module "mode" "org")
           :filename "init") ; Needed by ':mantle/theme/init'.
 
 
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; Init: Theme
-;;------------------------------
+;;------------------------------------------------------------------------------
+
 (imp:load :feature  '(:mantle theme init)
           :path     innit:theme:path
           :filename "init")

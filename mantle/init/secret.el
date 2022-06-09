@@ -1,7 +1,7 @@
 ;;; init/secrets.el -*- lexical-binding: t; -*-
 
 
-(imp:require :modules 'spy 'secret)
+(imp:require :system 'secret)
 
 
 ;;--------------------------Initialize Our Secrets.-----------------------------
@@ -9,12 +9,15 @@
 ;;---------------------------------(shhh...)------------------------------------
 
 
-;; Go get our Secrets if we have the system set up for it.
+;; Go get our secrets if we have the system set up for it.
 ;; Only do this if we have:
 ;;   - A hash & id for this computer.
 ;;   - A valid root init.el for secrets.
 ;; secrets/init.el will do the per-computer stuff.
-(spy:secret:init)
+(system:secret:init :secret 'init)
 
 
-(imp:provide :dot-emacs 'init 'secrets)
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
+(imp:provide :mantle 'init 'user 'secret)
