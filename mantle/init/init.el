@@ -1,4 +1,4 @@
-;;; config.el --- User-Level Emacs Configuration -*- lexical-binding: t; -*-
+;;; init/init.el --- Initialize User Stuff -*- lexical-binding: t; -*-
 ;;
 ;; Author: Cole Brown <code@brown.dev>
 ;; URL:    https://github.com/cole-brown/.config-emacs
@@ -9,22 +9,32 @@
 ;;
 ;;; Commentary:
 ;;
-;; User-Level Emacs Configuration
+;;  Initialize User Stuff
 ;;
 ;;; Code:
 
 
 ;;------------------------------------------------------------------------------
-;; User Config
+;; Run User's Init Files in This Order
 ;;------------------------------------------------------------------------------
 
-;; Give user a folder & files to do with whatever they want.
-(imp:load :feature  '(:mantle config user)
-          :path     (imp:path:join innit:path:mantle "config")
+;;------------------------------
+;; Init: Modules
+;;------------------------------
+(imp:load :feature  '(:mode org)
+          :path     (imp:path:join innit:path:module "mode" "org")
+          :filename "init") ; Needed by ':mantle/theme/init'.
+
+
+;;------------------------------
+;; Init: Theme
+;;------------------------------
+(imp:load :feature  '(:mantle theme init)
+          :path     innit:theme:path
           :filename "init")
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'base)
+(imp:provide :mantle 'init 'user)

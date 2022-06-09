@@ -55,28 +55,15 @@
 
 
 ;;------------------------------
-;; [EARLY] User Modules: Utils, etc for use in rest of `mantle'.
+;; User Init: Utils, etc for use in rest of `mantle'.
 ;;------------------------------
-;; Group the early stuff under a separate timing.
-(imp:timing
-    '(:mantle modules early)
-    (imp:file:current)
-    (imp:path:current:dir)
-
-  (imp:load :feature  '(:mode org)
-            :path     (imp:path:join innit:path:module "mode" "org")
-            :filename "init")) ; Needed by ':mantle/theme/init'.
-
-
-;;------------------------------
-;; Theme
-;;------------------------------
-(imp:load :feature  '(:mantle theme init)
-          :path     innit:theme:path
+;; Give user a folder & files to do with whatever they want.
+(imp:load :feature  '(:mantle init user)
+          :path     (imp:path:join innit:path:mantle "init")
           :filename "init")
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'init)
+(imp:provide :mantle 'init 'base)
