@@ -22,7 +22,7 @@
 ;; Systems
 ;;------------------------------
 
-(imp:load :feature  '(:mantle init system)
+(imp:load :feature  '(:mantle init user system)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "system")
 
@@ -31,7 +31,7 @@
 ;; Secrets
 ;;------------------------------
 
-(imp:load :feature  '(:mantle init secret)
+(imp:load :feature  '(:mantle init user secret)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "secret")
 

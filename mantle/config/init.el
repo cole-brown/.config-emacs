@@ -20,7 +20,11 @@
 
 (let ((path/dir (imp:path:current:dir)))
 
-  (imp:load :feature  '(:mantle config org-mode)
+  (imp:load :feature  '(:mantle config user secret)
+            :path     path/dir
+            :filename "secret")
+
+  (imp:load :feature  '(:mantle config user org-mode)
             :path     path/dir
             :filename "org-mode"))
 
