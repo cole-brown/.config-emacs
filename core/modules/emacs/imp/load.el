@@ -676,7 +676,10 @@ Return nil for failure, non-nil for success."
            (setq load-result
                  (load macro:path:load
                        (not macro:error?)
-                       'nomessage)))
+                       ;; Error message always gets truncated, so try this for being able to actually see what failed to load?
+                       (if (int<imp>:debug:enabled?)
+                           nil
+                         'nomessage))))
 
          ;;---
          ;; Post-Load Sanity Check: (obey ERROR flag though)
