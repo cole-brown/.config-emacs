@@ -14,8 +14,8 @@
 ;; Debugging Toggle
 ;;------------------------------------------------------------------------------
 
-(defvar int<imp>:debug:flag nil
-  "Debug flag.")
+(defvar int<imp>:debugging? nil
+  "Debug flag boolean.")
 
 
 (defun imp:debug (enabled?)
@@ -23,14 +23,14 @@
 
 Turns on debugging if ENABLED? is non-nil.
 Turns off debugging if ENABLED? is nil."
-  (setq int<imp>:debug:flag (not (null enabled?))))
+  (setq int<imp>:debugging? (not (null enabled?))))
 
 
 (defun imp:debug:toggle ()
   "Toggle debugging for imp."
   (interactive)
-  (setq int<imp>:debug:flag (not int<imp>:debug:flag))
-  (imp:debug:status (if int<imp>:debug:flag
+  (setq int<imp>:debugging? (not int<imp>:debugging?))
+  (imp:debug:status (if int<imp>:debugging?
                         "Enabled debug flag."
                       "Disabled debug flag.")))
 
@@ -44,7 +44,7 @@ If MSG is non-nil, it is output just before the status but in the same
 
   (let* ((line "────────────────────────────────")
          (status (list "Debug Feature Flag:    %s"
-                   "`int<imp>:debug:flag': %s"
+                   "`int<imp>:debugging?': %s"
                    line
                    " %s")))
     ;;---
@@ -76,7 +76,7 @@ If MSG is non-nil, it is output just before the status but in the same
                       (featurep! +debug))
                  "[FEATURE]"
                "[-------]")
-             (if int<imp>:debug:flag
+             (if int<imp>:debugging?
                  "[FLAGGED]"
                "[-------]")
              (if (int<imp>:debug:enabled?)
@@ -90,8 +90,67 @@ If MSG is non-nil, it is output just before the status but in the same
 ;; Debugging Functions
 ;;------------------------------------------------------------------------------
 
+(defun int<imp>:debug:init ()
+  "Initialize `imp' debugging based on Emacs' variables.
+
+Checks:
+  - `init-file-debug'
+  - `debug-on-error'
+
+Return non-nil if debugging."
+  (let ((func/name "int<imp>:debug:init"))
+    ;; Set our debug variable based on inputs.
+    (cond
+     ;;---
+     ;; Environment Variable: DEBUG
+     ;;---
+     ((and (getenv-internal "DEBUG")
+           (not init-file-debug)
+           (not debug-on-error))
+      (setq int<imp>:debugging? (getenv-internal "DEBUG"))
+
+      (int<imp>:debug
+       func/name
+       "Enable `int<imp>:debugging?' from environment variable DEBUG: %S"
+       int<imp>:debugging?))
+
+     ;;---
+     ;; CLI Flag: "--debug-init"
+     ;;---
+     (init-file-debug
+      (setq int<imp>:debugging? init-file-debug)
+
+      (int<imp>:debug
+       func/name
+       "Enable `int<imp>:debugging?' from '--debug-init' CLI flag: %S"
+       int<imp>:debugging?))
+
+     ;;---
+     ;; Interactive Flag?
+     ;;---
+     ;; How did you get this set and not `init-file-debug'? Debugging some small
+     ;; piece of init, maybe?
+     (debug-on-error
+      (setq int<imp>:debugging? debug-on-error)
+
+      (int<imp>:debug
+       func/name
+       "Enable `int<imp>:debugging?' from `debug-on-error' variable: %S"
+       int<imp>:debugging?))
+
+     ;;---
+     ;; _-NOT-_ Debugging
+     ;;---
+     (t
+      ;; Do nothing.
+      ))
+
+    ;; Return what the `int<imp>:debugging?' setting is now.
+    int<imp>:debugging?))
+
+
 (defun int<imp>:debug:enabled? ()
-  "Returns true if one or more debug flags are enabled.
+  "Return non-nil if one or more debug flags are enabled.
 
 Flags:
   - `+debug' feature flag in `doom!' macro in user's \"<doom-dir>/init.el\".
@@ -105,8 +164,8 @@ Flags:
          (featurep! +debug))
     t)
 
-   ;; `:imp' debugging toggle:
-   (int<imp>:debug:flag)
+   ;; `:imp' debugging boolean: Return its value if not nil.
+   (int<imp>:debugging?)
 
    ;; Fallthrough: debugging is not enabled.
    (t

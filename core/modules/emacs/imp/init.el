@@ -78,7 +78,7 @@
 ;; Debug ASAP!..
 ;;------------------------------
 (int<imp>:init:load "debug")
-
+(int<imp>:debug:init)
 
 ;;------------------------------
 ;; Order matters.
