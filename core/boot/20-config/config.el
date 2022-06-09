@@ -11,9 +11,26 @@
 ;;; Code:
 
 
+(imp:require :system 'multiplexer 'dlv)
+
+
 ;;------------------------------------------------------------------------------
-;; Configure?
+;; Configure: Pre-Mantle (Before User's Config)
 ;;------------------------------------------------------------------------------
+
+;;------------------------------
+;; This System's Domain DLVs
+;;------------------------------
+;; Set DLV system domain for all registered functions & args lists.
+(system:multiplexer:dlv:domain/all)
+
+
+;;------------------------------------------------------------------------------
+;; Configure: 'mantle/' (User's Config)
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config)
+          :filename "config")
 
 
 ;;------------------------------------------------------------------------------

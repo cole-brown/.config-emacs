@@ -1,4 +1,4 @@
-;;; init.el --- User-level Emacs Initialization -*- lexical-binding: t; -*-
+;;; init.el --- User-Level Emacs Initialization -*- lexical-binding: t; -*-
 ;;
 ;; Author: Cole Brown <code@brown.dev>
 ;; URL:    https://github.com/cole-brown/.config-emacs
@@ -26,32 +26,32 @@
 
   ;; https://github.com/magnars/dash.el
   (imp:use-package dash
-                   ;; Make sure this loads ASAP. It's used for init/config of things just after this.
-                   :demand t
+    ;; Make sure this loads ASAP. It's used for init/config of things just after this.
+    :demand t
 
-                   ;;--------------------
-                   :config
-                   ;;--------------------
+    ;;--------------------
+    :config
+    ;;--------------------
 
-                   ;;---
-                   ;; Fontification of Special Variables
-                   ;;---
-                   ;; Font lock of special Dash variables (it, acc, etc.) in Emacs Lisp buffers
-                   ;; can optionally be enabled with the autoloaded minor mode
-                   ;; `dash-fontify-mode'.
-                   ;;
-                   ;; Automatically enable the minor mode in all Emacs Lisp buffers:
-                   (global-dash-fontify-mode)
+    ;;---
+    ;; Fontification of Special Variables
+    ;;---
+    ;; Font lock of special Dash variables (it, acc, etc.) in Emacs Lisp buffers
+    ;; can optionally be enabled with the autoloaded minor mode
+    ;; `dash-fontify-mode'.
+    ;;
+    ;; Automatically enable the minor mode in all Emacs Lisp buffers:
+    (global-dash-fontify-mode)
 
-                   ;;---
-                   ;; Info Symbol Lookup
-                   ;;---
-                   ;; While editing Elisp files, you can use C-h S (info-lookup-symbol) to look
-                   ;; up Elisp symbols in the relevant Info manuals (see (emacs) Info Lookup).
-                   ;;
-                   ;; Enable this for Dash symbols:
-                   (with-eval-after-load 'info-look
-                     (dash-register-info-lookup))))
+    ;;---
+    ;; Info Symbol Lookup
+    ;;---
+    ;; While editing Elisp files, you can use C-h S (info-lookup-symbol) to look
+    ;; up Elisp symbols in the relevant Info manuals (see (emacs) Info Lookup).
+    ;;
+    ;; Enable this for Dash symbols:
+    (with-eval-after-load 'info-look
+      (dash-register-info-lookup))))
 
 
 ;;------------------------------
@@ -73,15 +73,6 @@
 ;;------------------------------
 (imp:load :feature  '(:mantle theme init)
           :path     innit:theme:path
-          :filename "init")
-
-
-;;------------------------------------------------------------------------------
-;; User Configs: Run in This Order
-;;------------------------------------------------------------------------------
-
-(imp:load :feature  '(:mantle config)
-          :path     (imp:path:join innit:path:mantle "config")
           :filename "init")
 
 
