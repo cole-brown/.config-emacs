@@ -672,14 +672,19 @@ Return nil for failure, non-nil for success."
              macro:feature
              macro:name:load
              macro:path:parent
+           ;; Error message always gets truncated, so try this for being able to actually see what failed to load?
+           ;; But if we try to just let `load` do it's messaging, we don't get any message for the erroring file...
+           ;; So just a message ourself. But don't use `int<imp>:debug' as that doesn't output to stdout during the
+           ;; pre-gui stages of init.
+           (when (int<imp>:debug:enabled?)
+             (message "[imp:debug] %s: '%s'"
+                      macro:func/name
+                      macro:path:load))
            ;; Actually do the load.
            (setq load-result
                  (load macro:path:load
                        (not macro:error?)
-                       ;; Error message always gets truncated, so try this for being able to actually see what failed to load?
-                       (if (int<imp>:debug:enabled?)
-                           nil
-                         'nomessage))))
+                       'nomessage)))
 
          ;;---
          ;; Post-Load Sanity Check: (obey ERROR flag though)
