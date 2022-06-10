@@ -120,7 +120,7 @@ Usage:
 
     ;; Invalid User: Message about it.
     (unless (int<nub>:user:exists? func/name choice.keyword nil)
-      (message (int<nub>:format:message :newlines
+      (message (int<nub>:format:message :line:each
                                         func/name
                                         "Input/chosen user isn't a registered `nub' user."
                                         "--choice: %s -> %S"
@@ -270,7 +270,7 @@ If tags are not valid:
     (cond ((null tags)
            (if error?
                (int<nub>:error func/name
-                               '(:newlines .
+                               '(:line:each .
                                  ("This debug message has not been tagged!"
                                   "  user:   %S"
                                   "  caller: %S"
@@ -283,7 +283,7 @@ If tags are not valid:
           ((not (listp tags))
            (if error?
                (int<nub>:error func/name
-                               '(:newlines .
+                               '(:line:each .
                                  ("Debug message's tags are not a list?"
                                   "  user:   %S"
                                   "  caller: %S"
@@ -296,7 +296,7 @@ If tags are not valid:
           ((not (seq-every-p #'keywordp tags))
            (if error?
                (int<nub>:error func/name
-                               '(:newlines .
+                               '(:line:each .
                                  ("Debug message's tags must all be keywords!"
                                   "  user:   %S"
                                   "  caller: %S"
@@ -383,7 +383,7 @@ PREFIX is an optional string to be printed first on its own line."
            (debugging:active (int<nub>:debug:active? func/name
                                                      user
                                                      tags)))
-      (message (int<nub>:format:message :newlines
+      (message (int<nub>:format:message :line:each
                                         "%s  %s"
                                         "    user:         %s"
                                         "    debugging?:   %s"
@@ -593,7 +593,7 @@ The answer depends on TAGS:
     (if (or (not user)
             (not tag))
         (progn
-          (message (int<nub>:format:message :newlines
+          (message (int<nub>:format:message :line:each
                                             "Cannot toggle tag without user and tag."
                                             "  user: %S"
                                             "  tag:  %S")
@@ -780,7 +780,7 @@ VALUES is optional and should be:
     ;;------------------------------
     (unless (memq start-or-end '(:start :end))
       (int<nub>:error callers
-                      '(:newlines .
+                      '(:line:each .
                         ("START-OR-END must be one of: %S; got: %S."
                          "  user:         %S"
                          "  func/name:    %S"
@@ -805,7 +805,7 @@ VALUES is optional and should be:
           ;; Invalid values alist - error out.
           ((not (int<nub>:alist:alist? values))
            (int<nub>:error callers
-                           '(:newlines .
+                           '(:line:each .
                              ("VALUES is invalid for `%S'! Expecting `VALUES' to be an alist. Got: %S"
                               "  user:         %S"
                               "  func/name:    %S"
@@ -900,7 +900,7 @@ VALUES is optional and should be:
           ;;------------------------------
           (t
            (int<nub>:error callers
-                           '(:newlines .
+                           '(:line:each .
                              ("Invalid start/end tag! Must be one of: %S; got: %S."
                               "  user:      %S"
                               "  func/name: %S"

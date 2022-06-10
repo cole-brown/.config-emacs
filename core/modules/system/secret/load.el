@@ -73,7 +73,7 @@ Outputs warning to 'nub' warning buffer if secret fail validation."
       (nub:warning
           :system/secret
           caller
-        '(:newlines
+        '(:line:each
           "%s: Cannot load secret '%s'; invalid system secrets."
           "Validation Result:"
           "%s")

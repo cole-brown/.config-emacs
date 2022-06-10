@@ -80,7 +80,7 @@ Signals an error if TYPE/FUNC doesn't exist in the functions plist."
               (plist-get plist/preset type/func)
             ;; Error if preset has no function available.
             (int<alist>:error func/name
-                              '(:newlines
+                              '(:line:each
                                 "No known function type `%S' for alist preset type `%S'!"
                                 "Function types:"
                                 "%s")
@@ -96,7 +96,7 @@ Signals an error if TYPE/FUNC doesn't exist in the functions plist."
 
               ;; Error if custom/user-registered doesn't have the function.
               (int<alist>:error func/name
-                                '(:newlines
+                                '(:line:each
                                   "No known function type `%S' for alist registered type `%S'!"
                                   "Function types:"
                                   "%s")
@@ -106,7 +106,7 @@ Signals an error if TYPE/FUNC doesn't exist in the functions plist."
 
           ;; Also not in presets; error on unknown alist type.
           (int<alist>:error func/name
-                            '(:newlines
+                            '(:line:each
                               "Alist type '%S' is unknown! Register it with `(alist:type:register %S %s)'?"
                               "Known types:"
                               "  Presets:"

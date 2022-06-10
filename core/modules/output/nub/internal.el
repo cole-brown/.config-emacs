@@ -13,8 +13,11 @@
 ;; Formatting
 ;;------------------------------------------------------------------------------
 
-(defun int<nub>:format:message (&rest msg)
+(defun int<nub>:format:message (indent &rest msg)
   "Format MSG into a message formatting string.
+
+INDENT should be nil or a string. Any newline formatting will prepend INDENT to
+the next line.
 
 MSG should be string(s), and maybe some keyword(s):
 
@@ -29,6 +32,8 @@ Replacements happen before concatenations."
         (keywords/valid/car '(:line:each :eachline
                               :line:new  :newline))
         (keywords/valid/cdr '(:line:new  :newline))
+        (line/new (concat "\n" (or indent
+                                   "")))
         msg/replaced)
 
     ;; Null MSG is valid; it formats to an empty string.
@@ -78,7 +83,7 @@ Replacements happen before concatenations."
         ;; Replace `:line:new' with its string equivalent.
         (cond ((and (keywordp element)
                     (memq element '(:line:new :newline)))
-               (push "\n" msg/replaced))
+               (push line/new msg/replaced))
 
               ;; Keep everything else as-is.
               (t
@@ -99,18 +104,21 @@ Replacements happen before concatenations."
            ;; Concat strings w/ newline separator.
            (mapconcat #'identity
                       (cdr msg/replaced)
-                      "\n"))
+                      line/new))
 
           ;; 2) String concat (no separator).
           (t
            ;; Glue all the strings together.
            (apply #'concat msg/replaced)))))
-;; (int<nub>:format:message nil)
-;; (int<nub>:format:message "hello there")
-;; (int<nub>:format:message "hello, " "there")
-;; (int<nub>:format:message :line:each "Hi." "  -> Line 2")
-;; (int<nub>:format:message :line:new "All" "Line 2")
-;; (int<nub>:format:message :line:each "Hi." :line:new "  -> Line 4")
+;; (int<nub>:format:message nil nil)
+;; (int<nub>:format:message nil "hello there")
+;; (int<nub>:format:message nil "hello, " "there")
+;; (int<nub>:format:message nil :line:each "Hi." "  -> Line 2")
+;; (int<nub>:format:message nil :line:new "All" "Line 2")
+;; (int<nub>:format:message nil :line:each "Hi." :line:new "  -> Line 4")
+;;
+;; (int<nub>:format:message ">>" :line:each "Hi." "  -> Line 2")
+;; (int<nub>:format:message ">>" :line:each "Hi." :line:new "  -> Line 4")
 
 
 ;;------------------------------------------------------------------------------
@@ -129,7 +137,7 @@ CALLER should be a string.
 MSG should be:
   - a string
   - a list of strings to `concat'
-  - a cons of: '(:newlines . (string-00 ...))
+  - a cons of: '(:line:each . (string-00 ...))
     + This will concat the list-of-strings with a newline between each string.
 
 ARGS will be passed to `format' with the finalized message string."
@@ -144,7 +152,7 @@ ARGS will be passed to `format' with the finalized message string."
          args))
 ;; (int<nub>:error "test-function-name" "hello there")
 ;; (int<nub>:error "test-function-name" '("hello, " "there"))
-;; (int<nub>:error "test-function-name" '(:newlines . ("Hi." "  -> Line 2")))
+;; (int<nub>:error "test-function-name" '(:line:each . ("Hi." "  -> Line 2")))
 
 
 ;;------------------------------------------------------------------------------

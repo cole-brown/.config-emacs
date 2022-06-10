@@ -53,7 +53,7 @@
         ;; Anything else is an error.
         (t
          (int<nub>:error "int<nub>:output:sink"
-                         '(:newlines
+                         '(:line:each
                            "Unknown sink? %S"
                            "Output Message:"
                            "───────────────"
@@ -154,15 +154,11 @@ Alternative/direct use:
                   ": "))
          (indent (make-string (length prefix) ?\s))
          message)
-    (apply #'concat
+    ;; TODO: send in the indent for the newlines...
+    (apply #'int<nub>:format:message
+           indent
            prefix
-           ;; Replace `:newline' with properly indented newline.
-           (dolist (entry message-format (nreverse message))
-             (cond ((eq :newline entry)
-                    (push "\n" message)
-                    (push indent message))
-                   (t
-                    (push entry message)))))))
+           message-format)))
 
 
 (defun int<nub>:output (user level/prefix level/sink caller msg args)
@@ -180,7 +176,7 @@ use, or the prefix string itself.
 LEVEL/SINK should be a level keyword for determining what sink function to use,
 or the function itself.
 
-If CALLER is `nil', uses relative path from `user-emacs-directory' to
+If CALLER is nil, uses relative path from `user-emacs-directory' to
 the caller's file (using `path:current:file' and `path:relative').
   Examples:
     - \"init.el\"

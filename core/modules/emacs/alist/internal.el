@@ -24,9 +24,7 @@ MSG should be:
   - a keyword followed by string(s)
 
 The acceptable keywords are:
-  - :newline
-    + Alias for `:newlines'.
-  - :newlines
+  - `:line:each', `:eachline'
     + Concatenate all strings with newlines separator."
   ;;------------------------------
   ;; Formatted message based on what we got passed in.
@@ -34,8 +32,8 @@ The acceptable keywords are:
   (cond ((null msg)
          "")
 
-        ;; 1) Newline concat? `:newline' or `:newlines' first, then strings.
-        ((and (memq (car msg) '(:newline :newlines))
+        ;; 1) Newline concat? `:line:each' or `:eachline' first, then strings.
+        ((and (memq (car msg) '(:line:each :eachline))
               (seq-reduce (lambda (reduction element)
                             "Require all strings."
                             (and reduction
@@ -66,7 +64,7 @@ The acceptable keywords are:
 ;; (int<alist>:string:format nil)
 ;; (int<alist>:string:format "hello there")
 ;; (int<alist>:string:format "hello, " "there")
-;; (int<alist>:string:format :newlines "Hi." "  -> Line 2")
+;; (int<alist>:string:format :line:each "Hi." "  -> Line 2")
 
 
 (defun int<alist>:callers:format (this callers)
@@ -119,7 +117,7 @@ CALLER should be a string.
 MSG should be:
   - a string
   - a list of strings to `concat'
-  - a cons of: '(:newlines . (string-00 ...))
+  - a cons of: '(:line:each . (string-00 ...))
     + This will concat the list-of-strings with newlines.
 
 ARGS will be passed to `format' with the finalized message string."
@@ -134,7 +132,7 @@ ARGS will be passed to `format' with the finalized message string."
          args))
 ;; (int<alist>:error "test-function-name" "hello there")
 ;; (int<alist>:error "test-function-name" '("hello, " "there"))
-;; (int<alist>:error "test-function-name" '(:newlines . ("Hi." "  -> Line 2")))
+;; (int<alist>:error "test-function-name" '(:line:each . ("Hi." "  -> Line 2")))
 
 
 ;;------------------------------------------------------------------------------
