@@ -8,10 +8,10 @@
   "A list of `:error' output messages if we are stealing `:error' verbosity.")
 
 
-(defvar example:output:warn nil
-  "A list of `:warn' output messages if we are stealing `:warn' verbosity.")
-;; example:output:warn
-;; (length example:output:warn)
+(defvar example:output:warning nil
+  "A list of `:warning' output messages if we are stealing `:warning' verbosity.")
+;; example:output:warning
+;; (length example:output:warning)
 
 
 (defvar example:output:debug nil
@@ -26,11 +26,11 @@ into `example:output:error' list instead."
   (push (apply #'format msg args) example:output:error))
 
 
-(defun example:redirect/output:warn (msg &rest args)
-  "Steals all calls to `int<nub>:output' for `:warn' level and puts them
-into `example:output:warn' list instead."
-  (push (apply #'format msg args) example:output:warn))
-;; (example:redirect/output:warn "hello %s" "there")
+(defun example:redirect/output:warning (msg &rest args)
+  "Steals all calls to `int<nub>:output' for `:warning' level and puts them
+into `example:output:warning' list instead."
+  (push (apply #'format msg args) example:output:warning))
+;; (example:redirect/output:warning "hello %s" "there")
 
 
 (defun example:redirect/output:debug (msg &rest args)
@@ -52,20 +52,20 @@ into `example:output:debug' list instead."
     ;; Custom
     ;; ------------------------------
     ;; Output to our functions and allow to output as usual.
-    (:verbose . ((:error . (example:redirect/output:error :default))
-                 (:warn  . (example:redirect/output:warn  :default))
-                 (:debug . (example:redirect/output:debug :default))))
+    (:verbose . ((:error   . (example:redirect/output:error   :default))
+                 (:warning . (example:redirect/output:warning :default))
+                 (:debug   . (example:redirect/output:debug   :default))))
 
     ;; Always output to our functions.
     ;; Allow errors out to default; squelch warning & debugs.
-    (:errors . ((:error . (example:redirect/output:error :default))
-                (:warn  . example:redirect/output:warn)
-                (:debug . example:redirect/output:debug)))
+    (:errors . ((:error   . (example:redirect/output:error :default))
+                (:warning . example:redirect/output:warning)
+                (:debug   . example:redirect/output:debug)))
 
     ;; Only output to our functions.
-    (:quiet . ((:error . example:redirect/output:error)
-               (:warn  . example:redirect/output:warn)
-               (:debug . example:redirect/output:debug))))
+    (:quiet . ((:error   . example:redirect/output:error)
+               (:warning . example:redirect/output:warning)
+               (:debug   . example:redirect/output:debug))))
   "Direct the `nub' output messages based on `example:redirect/output:type'.")
 #+end_src
 
@@ -102,7 +102,7 @@ Or if you don't need that alist and always want the same sinks:
 (nub:vars:init example:nub:user
                nil
                nil
-               '((:error . example:redirect/output:error)
-                 (:warn  . example:redirect/output:warn)
-                 (:debug . example:redirect/output:debug)))
+               '((:error   . example:redirect/output:error)
+                 (:warning . example:redirect/output:warning)
+                 (:debug   . example:redirect/output:debug)))
 #+end_src

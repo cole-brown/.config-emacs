@@ -20,10 +20,10 @@
   (nub:vars:init :dlv
                  nil
                  nil
-                 (list (cons :error t)
-                       (cons :warn  t)
-                       (cons :info  (imp:flag? :dlv +debug))
-                       (cons :debug (imp:flag? :dlv +debug)))
+                 (list (cons :error   t)
+                       (cons :warning t)
+                       (cons :info    (imp:flag? :dlv +debug))
+                       (cons :debug   (imp:flag? :dlv +debug)))
                  nil))
 
 

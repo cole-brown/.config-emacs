@@ -208,7 +208,7 @@ ARGS should be a list (or nil)."
     (unless (stringp caller)
       (int<nub>:output:message
        user
-       :warn
+       :warning
        "%s: Invalid CALLER parameter! Should be a string, got: type: %S, value: %S, stringp?: %S"
        (list func/name
              (type-of caller)
@@ -219,7 +219,7 @@ ARGS should be a list (or nil)."
     (unless (or (keywordp level/prefix) (stringp level/prefix))
       (int<nub>:output:message
        user
-       :warn
+       :warning
        "%s: invalid LEVEL/PREFIX parameter! Should be a keyword or a string, got: type: %S, value: %S, keyword/string?: %S"
        (list func/name
              (type-of level/prefix)
@@ -229,7 +229,7 @@ ARGS should be a list (or nil)."
     (unless (or (keywordp level/sink) (stringp level/sink))
       (int<nub>:output:message
        user
-       :warn
+       :warning
        "%s: invalid LEVEL/SINK parameter! Should be a keyword or a string, got: type: %S, value: %S, keyword/string?: %S"
        (list func/name
              (type-of level/sink)
@@ -239,7 +239,7 @@ ARGS should be a list (or nil)."
     (unless (or (stringp msg) (listp msg))
       (int<nub>:output:message
        user
-       :warn
+       :warning
        "%s: invalid MSG parameter! Should be a list or a string, got: type: %S, value: %S, string/list?: %S"
        (list func/name
              (type-of msg)
@@ -249,7 +249,7 @@ ARGS should be a list (or nil)."
     (unless (listp args) ;; nil or a list
       (int<nub>:output:message
        user
-       :warn
+       :warning
        "%s: invalid ARGS parameter! Should be a list or nil, got: type: %S, value: %S, string/list?: %S"
        (list func/name
              (type-of args)
@@ -309,7 +309,7 @@ current verbosity (e.g. #'error for `:error' verbosity normally).
 
 For valid levels, see `nub:output:levels' keywords.
 
-If CALLER is `nil', uses relative path from `user-emacs-directory' to
+If CALLER is nil, uses relative path from `user-emacs-directory' to
 the caller's file (using `path:current:file' and `path:relative').
   Examples:
     - \"init.el\"

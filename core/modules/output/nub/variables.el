@@ -23,7 +23,7 @@
  Used when actual user not found so that output can still happen.")
 
 
-(defconst nub:output:levels  '(:error :warn :info :debug)
+(defconst nub:output:levels  '(:error :warning :info :debug)
   "All of nub's output levels.")
 
 
@@ -141,11 +141,11 @@ Returns DEFAULT if not found.
 ;;------------------------------
 
 (defvar int<nub>:var:prefix:backup
-  (list (cons int<nub>:var:user:fallback '((:error . "[ERROR   ]: ")
-                                           (:warn  . "[WARN    ]: ")
-                                           (:info  . "[INFO    ]: ")
+  (list (cons int<nub>:var:user:fallback '((:error   . "[ERROR   ]: ")
+                                           (:warning . "[WARNING ]: ")
+                                           (:info    . "[INFO    ]: ")
                                            ;; Noticibly different so when debugging any error/warning messages stand out if all sent to the same buffer?
-                                           (:debug . "[   debug]: "))))
+                                           (:debug   . "[   debug]: "))))
   "Prefix strings for the verbosity levels.
 
 alist of USER keyword
@@ -201,10 +201,10 @@ Sets both current and backup values (backups generally only used for tests)."
 ;;------------------------------
 
 (defvar int<nub>:var:enabled?:backup
-  (list (cons int<nub>:var:user:fallback '((:error . t)
-                                           (:warn  . t)
-                                           (:info  . t)
-                                           (:debug . t))))
+  (list (cons int<nub>:var:user:fallback '((:error   . t)
+                                           (:warning . t)
+                                           (:info    . t)
+                                           (:debug   . t))))
   "Alist of USER keyword to verbosity of various log levels for the user.
 
 Valid values:
@@ -313,7 +313,7 @@ the flag based on truthiness of VALUE."
 ;; (int<nub>:var:enabled? :test :debug :default)
 ;; (int<nub>:var:enabled?:set :test :debug 'foo)
 ;; (int<nub>:var:enabled?:set :test :debug :toggle)
-;; (int<nub>:var:enabled?:set :test :warn 'bar)
+;; (int<nub>:var:enabled?:set :test :warning 'bar)
 
 
 ;;------------------------------
@@ -321,10 +321,10 @@ the flag based on truthiness of VALUE."
 ;;------------------------------
 
 (defvar int<nub>:var:sink:backup
-  (list (cons int<nub>:var:user:fallback '((:error . error)
-                                           (:warn  . warn)
-                                           (:info  . message)
-                                           (:debug . message))))
+  (list (cons int<nub>:var:user:fallback '((:error   . error)
+                                           (:warning . warn)
+                                           (:info    . message)
+                                           (:debug   . message))))
   "Alist of USER keyword to an alist of output level keyword to sink function.")
 
 
@@ -347,10 +347,10 @@ Valid sinks:
 
 
 (defvar int<nub>:var:inhibit-message
-  (list (cons int<nub>:var:user:fallback '((:error . nil)
-                                           (:warn  . nil)
-                                           (:info  . nil)
-                                           (:debug . t))))
+  (list (cons int<nub>:var:user:fallback '((:error   . nil)
+                                           (:warning . nil)
+                                           (:info    . nil)
+                                           (:debug   . t))))
   "`inhibit-message' setting per user per output level.
 
 Alist of USER keyword to an alist of output level keyword to `inhibit-message'
@@ -533,7 +533,7 @@ Return DEFAULT if USER has no output sink for LEVEL.
                            int<nub>:var:sink)))
 ;; (nub:vars:init :test)
 ;; (int<nub>:var:sink:set :test :debug 'ignore)
-;; (int<nub>:var:sink:set :test :warn 'warn)
+;; (int<nub>:var:sink:set :test :warning 'warning)
 
 
 (defun int<nub>:var:inhibit-message? (user level &optional default)

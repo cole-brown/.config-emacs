@@ -47,7 +47,7 @@ Only used in `innit:nub:sink-fn'."
 nil means use nub's defaults."
   :group 'innit:group
   :type  '(alist :key-type (choice (const :error)
-                                   (const :warn)
+                                   (const :warning)
                                    (const :info)
                                    (const :debug))
                  :value-type string))
@@ -59,7 +59,7 @@ nil means use nub's defaults."
 nil means use nub's defaults."
   :group 'innit:group
   :type  '(alist :key-type (choice (const :error)
-                                   (const :warn)
+                                   (const :warning)
                                    (const :info)
                                    (const :debug))
                 :value-type boolean))
@@ -73,10 +73,10 @@ nil means use nub's defaults."
 
 
 (defcustom innit:nub:sinks
-  (list (cons :error (list innit:nub:sink-fn :default))
-        (cons :warn  (list innit:nub:sink-fn :default))
-        (cons :info  (list innit:nub:sink-fn :default))
-        (cons :debug (list innit:nub:sink-fn :default)))
+  (list (cons :error   (list innit:nub:sink-fn :default))
+        (cons :warning (list innit:nub:sink-fn :default))
+        (cons :info    (list innit:nub:sink-fn :default))
+        (cons :debug   (list innit:nub:sink-fn :default)))
   "`nub` output level sink functions.
 
 Add our sink to all so that they get collected there as well as output by
@@ -85,7 +85,7 @@ default funcs.
 nil means use nub's defaults."
   :group 'innit:group
   :type  '(alist :key-type (choice (const :error)
-                                   (const :warn)
+                                   (const :warning)
                                    (const :info)
                                    (const :debug))
                  :value-type (repeat function

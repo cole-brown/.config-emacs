@@ -42,9 +42,9 @@
       nil
 
     ;; Make sure that they at least simply work.
-    (let ((test-data '((:error . "error output")
-                       (:warn  . "Warn Output")
-                       (:debug . "DEBUG OUTPUT"))))
+    (let ((test-data '((:error   . "error output")
+                       (:warning . "Warning Output")
+                       (:debug   . "DEBUG OUTPUT"))))
       (dolist (data test-data)
         (nub:output test<nub>:user
                     (car data)
@@ -96,9 +96,9 @@
       nil
 
     ;; Each verbosity level should go to its separate list of intercepted messages.
-    (let ((msg.error "[ERROR   ]: Hello there.")
-          (msg.warn  "[WARN    ]: Hello there.")
-          (msg.debug "[   debug]: Hello there."))
+    (let ((msg.error   "[ERROR   ]: Hello there.")
+          (msg.warning "[WARNING ]: Hello there.")
+          (msg.debug   "[   debug]: Hello there."))
 
       ;;------------------------------
       ;; Test Error
@@ -110,19 +110,19 @@
       ;; Testing error messages sink should have its message.
       (test<nub>:assert:output test-name :error msg.error)
 
-      ;; Warn and debug should have nothing so far.
-      (test<nub>:assert:output test-name :warn  nil)
-      (test<nub>:assert:output test-name :debug nil)
+      ;; Warning and debug should have nothing so far.
+      (test<nub>:assert:output test-name :warning nil)
+      (test<nub>:assert:output test-name :debug   nil)
 
       ;;------------------------------
       ;; Test Warning
       ;;------------------------------
-      (should (int<nub>:output:message test<nub>:user :warn msg.warn nil))
+      (should (int<nub>:output:message test<nub>:user :warning msg.warning nil))
 
-      ;; Error & Warn should have their messages now.
-      (test<nub>:assert:output test-name :error msg.error)
+      ;; Error & Warning should have their messages now.
+      (test<nub>:assert:output test-name :error   msg.error)
+      (test<nub>:assert:output test-name :warning msg.warning)
       ;; Debug should still have nothing.
-      (test<nub>:assert:output test-name :warn  msg.warn)
       (test<nub>:assert:output test-name :debug nil)
 
       ;;------------------------------
@@ -131,9 +131,9 @@
       (should (int<nub>:output:message test<nub>:user :debug msg.debug nil))
 
       ;; All three should have their messages.
-      (test<nub>:assert:output test-name :error msg.error)
-      (test<nub>:assert:output test-name :warn  msg.warn)
-      (test<nub>:assert:output test-name :debug msg.debug))))
+      (test<nub>:assert:output test-name :error   msg.error)
+      (test<nub>:assert:output test-name :warning msg.warning)
+      (test<nub>:assert:output test-name :debug   msg.debug))))
 
 
 ;;------------------------------
@@ -141,7 +141,7 @@
 ;;------------------------------
 
 (ert-deftest test<nub/output>::int<nub>:output:format ()
-  "Test that `int<nub>:output:format' creates a formatting message for error/warn/debug outputs."
+  "Test that `int<nub>:output:format' creates a formatting message for error/warning/debug outputs."
 
   ;; Squelch the actual output; still save to the test's output lists.
   (setq test<nub>:redirect/output:type nil)
@@ -209,18 +209,18 @@
                              (list (list test-name "Hello there... You have a minor case of severe erroring.")))
 
     ;;------------------------------
-    ;; Test Warn Level
+    ;; Test Warning Level
     ;;------------------------------
     (nub:output test<nub>:user
-                :warn
+                :warning
                 test-name
                 "Hello %s; %s."
                 "there"
                 "this is your final warning")
 
     (test<nub>:assert:output test-name
-                             :warn
-                             ;; Expect one warn message with:
+                             :warning
+                             ;; Expect one warning message with:
                              ;;   - test-name
                              ;;   - formatted output message
                              (list (list test-name "Hello there; this is your final warning.")))

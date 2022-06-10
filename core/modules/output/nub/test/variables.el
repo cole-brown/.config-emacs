@@ -157,17 +157,17 @@
     ;;------------------------------
     ;; Test getting nil.
     ;;------------------------------
-    (let* ((alist/user '((:error . nil)
-                         (:warn  . nil)
-                         (:info  . t)
-                         (:debug . t)))
-           (alist/default '((:error . :test:default)
-                            (:warn  . :test:default)
-                            (:info  . :test:default)
-                            (:debug . :test:default)))
+    (let* ((alist/user '((:error   . nil)
+                         (:warning . nil)
+                         (:info    . t)
+                         (:debug   . t)))
+           (alist/default '((:error   . :test:default)
+                            (:warning . :test:default)
+                            (:info    . :test:default)
+                            (:debug   . :test:default)))
            (alist (list (cons test<nub>:user             alist/user)
                         (cons int<nub>:var:user:fallback alist/default))))
-      ;; Want `nil' for `:error' & `:warn'.
+      ;; Want `nil' for `:error' & `:warning'.
       (should (eq nil
                   (int<nub>:var:user-at-level test<nub>:user
                                               :error
@@ -176,7 +176,7 @@
                                               )))
       (should (eq nil
                   (int<nub>:var:user-at-level test<nub>:user
-                                              :warn
+                                              :warning
                                               alist
                                               ;; No default.
                                               )))
@@ -239,10 +239,10 @@
 
       ;; Create some prefixes.
       (int<nub>:init:prefix test<nub>:user
-                            '((:error . "[TEST: ERROR   ]: ")
-                              (:warn  . "[TEST: WARN    ]: ")
-                              (:info  . "[TEST: INFO    ]: ")
-                              (:debug . "[TEST:    debug]: ")))
+                            '((:error   . "[TEST: ERROR   ]: ")
+                              (:warning . "[TEST: WARNING ]: ")
+                              (:info    . "[TEST: INFO    ]: ")
+                              (:debug   . "[TEST:    debug]: ")))
 
       ;; Should still have fallback user's, unchanged.
       (should (stringp (int<nub>:var:prefix int<nub>:var:user:fallback :error)))
@@ -262,8 +262,8 @@
       ;;------------------------------
       ;; Test the other levels too...
       ;;------------------------------
-      (should (string="[TEST: WARN    ]: "
-                      (int<nub>:var:prefix test<nub>:user :warn)))
+      (should (string="[TEST: WARNING ]: "
+                      (int<nub>:var:prefix test<nub>:user :warning)))
       (should (string="[TEST: INFO    ]: "
                       (int<nub>:var:prefix test<nub>:user :info)))
       (should (string="[TEST:    debug]: "
@@ -292,8 +292,8 @@
            (enabled-fn (lambda (level default)
                          "Just return `enabled-locally?'."
                          enabled-locally?))
-           (enabled? (list '(:error . :error) ;; truthy value to check for
-                           '(:warn . nil)     ;; nil value to check for
+           (enabled? (list '(:error   . :error) ;; truthy value to check for
+                           '(:warning . nil)     ;; nil value to check for
                            ;; no :info - use default (should be `t').
                            (cons :debug enabled-fn)))) ;; Use predicate.
 
@@ -312,9 +312,9 @@
            (should (eq :error
                        (int<nub>:var:enabled? test<nub>:user :error :default)))
 
-           ;; `:warn' Level: Should have enabled? set to `nil'.
+           ;; `:warning' Level: Should have enabled? set to `nil'.
            (should (eq nil
-                       (int<nub>:var:enabled? test<nub>:user :warn :default)))
+                       (int<nub>:var:enabled? test<nub>:user :warning :default)))
 
            ;; `:info' Level: Should get fallback of `t'.
            (should (eq t
@@ -364,7 +364,7 @@
                            "Output sink for `:info' level."
                            (push (format msg args) sink:info)))
            (sinks (list (cons :error t) ;; `t'   == Use default.
-                        '(:warn . nil)  ;; `nil' == Do nothing.
+                        '(:warning . nil)  ;; `nil' == Do nothing.
                         (cons :info (list sink:info:fn t))))) ;; Can also have a list of things.
 
            ;;------------------------------
@@ -382,7 +382,7 @@
                        (int<nub>:var:sink test<nub>:user :error :default)))
 
            (should (eq nil
-                       (int<nub>:var:sink test<nub>:user :warn :default)))
+                       (int<nub>:var:sink test<nub>:user :warning :default)))
 
            (should (equal (list sink:info:fn t)
                           (int<nub>:var:sink test<nub>:user :info :default)))

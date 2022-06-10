@@ -35,10 +35,10 @@
   "A list of `:error' output messages if we are stealing `:error' verbosity.")
 
 
-(defvar test<nub>:output:warn nil
-  "A list of `:warn' output messages if we are stealing `:warn' verbosity.")
-;; test<nub>:output:warn
-;; (length test<nub>:output:warn)
+(defvar test<nub>:output:warning nil
+  "A list of `:warning' output messages if we are stealing `:warning' verbosity.")
+;; test<nub>:output:warning
+;; (length test<nub>:output:warning)
 
 
 (defvar test<nub>:output:debug nil
@@ -204,11 +204,11 @@ into `test<nub>:output:error' list instead."
   (push (apply #'format msg args) test<nub>:output:error))
 
 
-(defun test<nub>:redirect/output:warn (msg &rest args)
-  "Steals all calls to `int<nub>:output' for `:warn' level and puts them
-into `test<nub>:output:warn' list instead."
-  (push (apply #'format msg args) test<nub>:output:warn))
-;; (test<nub>:redirect/output:warn "hello %s" "there")
+(defun test<nub>:redirect/output:warning (msg &rest args)
+  "Steals all calls to `int<nub>:output' for `:warning' level and puts them
+into `test<nub>:output:warning' list instead."
+  (push (apply #'format msg args) test<nub>:output:warning))
+;; (test<nub>:redirect/output:warning "hello %s" "there")
 
 
 (defun test<nub>:redirect/output:debug (msg &rest args)
@@ -222,19 +222,19 @@ into `test<nub>:output:debug' list instead."
   ;; Always direct to the test output sink lists!
   ;;------------------------------
   '(;; Allow to output as usual.
-    (t   . ((:error . (test<nub>:redirect/output:error :default))
-            (:warn  . (test<nub>:redirect/output:warn  :default))
-            (:debug . (test<nub>:redirect/output:debug :default))))
+    (t   . ((:error   . (test<nub>:redirect/output:error   :default))
+            (:warning . (test<nub>:redirect/output:warning :default))
+            (:debug   . (test<nub>:redirect/output:debug   :default))))
 
     ;; Allow errors; squelch warning & debugs.
-    (:errors . ((:error . (test<nub>:redirect/output:error :default))
-                (:warn  . test<nub>:redirect/output:warn)
-                (:debug . test<nub>:redirect/output:debug)))
+    (:errors . ((:error   . (test<nub>:redirect/output:error :default))
+                (:warning . test<nub>:redirect/output:warning)
+                (:debug   . test<nub>:redirect/output:debug)))
 
     ;; Squelch messages (only save to our lists).
-    (nil . ((:error . test<nub>:redirect/output:error)
-            (:warn  . test<nub>:redirect/output:warn)
-            (:debug . test<nub>:redirect/output:debug))))
+    (nil . ((:error   . test<nub>:redirect/output:error)
+            (:warning . test<nub>:redirect/output:warning)
+            (:debug   . test<nub>:redirect/output:debug))))
   "Direct the `nub' output messages based on `test<nub>:redirect/output:type'.")
 
 
@@ -265,7 +265,7 @@ Can also allow the normal output based on `test<nub>:redirect/output:type'"
 (defun test<nub>:assert:output (caller level should-be)
   "Assert that LEVEL outputs were/were not issued during the test.
 
-LEVEL should be one of: (:error :warn :debug)
+LEVEL should be one of: (:error :warning :debug)
 
 SHOULD-BE can be:
   - a number
@@ -281,9 +281,9 @@ SHOULD-BE can be:
   - nil/falsy
     + LEVEL should have no output messages."
   (let* ((outputs (pcase level
-                    (:error test<nub>:output:error)
-                    (:warn  test<nub>:output:warn)
-                    (:debug test<nub>:output:debug)
+                    (:error   test<nub>:output:error)
+                    (:warning test<nub>:output:warning)
+                    (:debug   test<nub>:output:debug)
                     (_
                      (error "test<nub>:assert:output: Unknown level '%S'. Caller: %S"
                             level caller))))
@@ -355,7 +355,7 @@ SHOULD-BE can be:
      ;;---
      (t
       (error "test<nub>:assert:output: Unknown SHOULD-BE: %S" should-be)))))
-;; (test<nub>:assert:output "test" :warn nil)
+;; (test<nub>:assert:output "test" :warning nil)
 
 
 ;;------------------------------------------------------------------------------
@@ -389,9 +389,9 @@ FUNC/TEARDOWN will run as first step in tear-down."
 (defun test<nub>:setup/vars ()
   "Any setup of consts/vars needed per test."
   ;; Reset these at start of test so they can be manually inspected after a test is run.
-  (setq test<nub>:output:error nil)
-  (setq test<nub>:output:warn  nil)
-  (setq test<nub>:output:debug nil)
+  (setq test<nub>:output:error   nil)
+  (setq test<nub>:output:warning nil)
+  (setq test<nub>:output:debug   nil)
   (setq test<nub>:should:marker/counter 0))
 
 
