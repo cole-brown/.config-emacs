@@ -120,14 +120,14 @@ Usage:
 
     ;; Invalid User: Message about it.
     (unless (int<nub>:user:exists? func/name choice.keyword nil)
-      (message (int<nub>:format :newlines
-                                func/name
-                                "Input/chosen user isn't a registered `nub' user."
-                                "--choice: %s -> %S"
-                                "--users:"
-                                "%s"
-                                "--history:"
-                                "%s")
+      (message (int<nub>:format:message :newlines
+                                        func/name
+                                        "Input/chosen user isn't a registered `nub' user."
+                                        "--choice: %s -> %S"
+                                        "--users:"
+                                        "%s"
+                                        "--history:"
+                                        "%s")
                choice.string choice.keyword
                (pp-to-string int<nub>:var:users)
                (pp-to-string int<nub>:debug:user/history))
@@ -170,8 +170,8 @@ Usage:
     (if (null (int<nub>:user:exists? func/name user nil))
         ;; Invalid - message about it and return nil.
         (progn
-          (message (int<nub>:format func/name
-                                    ": USER param isn't a registered `nub' user: %S")
+          (message (int<nub>:format:message func/name
+                                            ": USER param isn't a registered `nub' user: %S")
                    user)
           nil)
 
@@ -204,8 +204,8 @@ nil/empty input only."
     (if (null (int<nub>:user:exists? func/name user nil))
         ;; Invalid - message about it and return nil.
         (progn
-          (message (int<nub>:format func/name
-                                    ": USER param isn't a registered `nub' user: %S")
+          (message (int<nub>:format:message func/name
+                                            ": USER param isn't a registered `nub' user: %S")
                    user)
           nil)
       ;; Configure our quit keywords.
@@ -383,13 +383,13 @@ PREFIX is an optional string to be printed first on its own line."
            (debugging:active (int<nub>:debug:active? func/name
                                                      user
                                                      tags)))
-      (message (int<nub>:format :newlines
-                                "%s  %s"
-                                "    user:         %s"
-                                "    debugging?:   %s"
-                                "    desired tags: %s"
-                                "    active tags:  %s"
-                                "    matched tags: %s")
+      (message (int<nub>:format:message :newlines
+                                        "%s  %s"
+                                        "    user:         %s"
+                                        "    debugging?:   %s"
+                                        "    desired tags: %s"
+                                        "    active tags:  %s"
+                                        "    matched tags: %s")
                ;;---
                ;; Prefix: On its own line or does not exist.
                ;;---
@@ -593,10 +593,10 @@ The answer depends on TAGS:
     (if (or (not user)
             (not tag))
         (progn
-          (message (int<nub>:format :newlines
-                                    "Cannot toggle tag without user and tag."
-                                    "  user: %S"
-                                    "  tag:  %S")
+          (message (int<nub>:format:message :newlines
+                                            "Cannot toggle tag without user and tag."
+                                            "  user: %S"
+                                            "  tag:  %S")
                    user tag)
           nil)
 
@@ -851,24 +851,24 @@ VALUES is optional and should be:
     (cond ((and (null values/formatted)
                 (eq :start start-or-end))
            (nub:debug
-               user
-               func/name
-               func/tags
-             '("\n"
-               "---[BEGIN]------>\n")))
+            user
+            func/name
+            func/tags
+            '("\n"
+              "---[BEGIN]------>\n")))
 
           ;; VALUES exists and is valid; print it too.
           ((eq :start start-or-end)
            ;; Print start w/ input vars.
            (nub:debug
-               user
-               func/name
-               func/tags
-             '("\n"
-               "---[BEGIN]------>\n"
-               "  ---[INPUTS]--->\n"
-               "%s")
-             values/formatted))
+            user
+            func/name
+            func/tags
+            '("\n"
+              "---[BEGIN]------>\n"
+              "  ---[INPUTS]--->\n"
+              "%s")
+            values/formatted))
 
           ;;------------------------------
           ;; End-of-function messages.
@@ -877,23 +877,23 @@ VALUES is optional and should be:
           ((and (null values/formatted)
                 (eq :end start-or-end))
            (nub:debug
-               user
-               func/name
-               func/tags
-             '("\n"
-               "<--[END]-------\n")))
+            user
+            func/name
+            func/tags
+            '("\n"
+              "<--[END]-------\n")))
 
           ;; `:end' + VALUES; print end w/ return VALUES.
           ((eq :end start-or-end)
            (nub:debug
-               user
-               func/name
-               func/tags
-             '("\n"
-               "<--[END]-------\n"
-               "  <--[RETURN]--\n"
-               "%s")
-             values/formatted))
+            user
+            func/name
+            func/tags
+            '("\n"
+              "<--[END]-------\n"
+              "  <--[RETURN]--\n"
+              "%s")
+            values/formatted))
 
           ;;------------------------------
           ;; Error: Bad START-OR-END

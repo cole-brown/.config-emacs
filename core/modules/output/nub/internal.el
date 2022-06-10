@@ -13,7 +13,7 @@
 ;; Formatting
 ;;------------------------------------------------------------------------------
 
-(defun int<nub>:format (&rest msg)
+(defun int<nub>:format:message (&rest msg)
   "Format MSG into a message formatting string.
 
 MSG should be:
@@ -58,12 +58,12 @@ The acceptable keywords are:
         ;; Error: invalid MSG.
         ;;---
         (t
-         (error "int<nub>:format: Don't know how to format: %S"
+         (error "int<nub>:format:message: Don't know how to format: %S"
                 msg))))
-;; (int<nub>:format nil)
-;; (int<nub>:format "hello there")
-;; (int<nub>:format "hello, " "there")
-;; (int<nub>:format :newlines "Hi." "  -> Line 2")
+;; (int<nub>:format:message nil)
+;; (int<nub>:format:message "hello there")
+;; (int<nub>:format:message "hello, " "there")
+;; (int<nub>:format:message :newlines "Hi." "  -> Line 2")
 
 
 ;;------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ ARGS will be passed to `format' with the finalized message string."
                          ;; Formatted message based on what we got passed in.
                          ;; Use `flatten-list' to make MSG a list if it's just a string.
                          ;; It also converts cons to lists, but that's ok here.
-                         (apply #'int<nub>:format (flatten-list msg)))
+                         (apply #'int<nub>:format:message (flatten-list msg)))
          ;; Just pass ARGS directly to error - it will do final format.
          args))
 ;; (int<nub>:error "test-function-name" "hello there")
