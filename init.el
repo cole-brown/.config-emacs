@@ -117,6 +117,6 @@
       file/this
       tags/this
     '("Boot Loader: 100 Done"
-      :newline
+      :line:new
       "Now witness the firepower of this full armed and operational operating system.")))
 (imp:provide :root 'init 'standard)
