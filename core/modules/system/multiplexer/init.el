@@ -43,20 +43,24 @@
 
   ;; Debugging!
   (imp:load :feature  '(:system multiplexer debug)
+            :path     (imp:path:current:dir/relative :system)
             :filename "debug")
   ;; Initialize debugging before going any further.
   (int<system/multiplexer>:nub:init)
 
   ;; Set-up Jerky namespaces for systems.
   (imp:load :feature  '(:system multiplexer namespaces)
+            :path     (imp:path:current:dir/relative :system)
             :filename "namespaces")
 
   ;; Multiple systems (computers) able to use this same init.
   (imp:load :feature  '(:system multiplexer multiplex)
+            :path     (imp:path:current:dir/relative :system)
             :filename "multiplex")
 
   ;; Directory Local Variables
   (imp:load :feature  '(:system multiplexer dlv)
+            :path     (imp:path:current:dir/relative :system)
             :filename "dlv"))
 
 

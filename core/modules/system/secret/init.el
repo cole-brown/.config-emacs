@@ -49,10 +49,13 @@
     (imp:path:current:dir)
 
   (imp:load :feature  '(:system secret debug)
+            :path     (imp:path:current:dir/relative :system)
             :filename "debug")
   (imp:load :feature  '(:system secret functions)
+            :path     (imp:path:current:dir/relative :system)
             :filename "functions")
   (imp:load :feature  '(:system secret load)
+            :path     (imp:path:current:dir/relative :system)
             :filename "load"))
 
 
