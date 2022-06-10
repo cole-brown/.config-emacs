@@ -55,7 +55,7 @@ ARGS should be the `message' arguments."
          (func/name (nub:format:callers "nub:warning" caller)))
 
     (int<nub>:user:exists? func/name user :warning)
-    (apply #'int<nub>:output
+    (apply #'nub:output
            user
            :warning
            caller
