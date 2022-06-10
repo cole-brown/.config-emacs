@@ -152,13 +152,15 @@ Alternative/direct use:
                   (int<nub>:var:prefix user level)
                   caller
                   ": "))
-         (indent (make-string (length prefix) ?\s))
-         message)
-    ;; TODO: send in the indent for the newlines...
-    (apply #'int<nub>:format:message
-           indent
-           prefix
-           message-format)))
+         (indent (make-string (length prefix) ?\s)))
+    ;; Tack the prefix onto the message separately! Need to allow callers full
+    ;; control over what gets sent into `int<nub>:format:message` in what
+    ;; ordering.
+    (concat prefix
+            ;; Build message.
+            (apply #'int<nub>:format:message
+                   indent
+                   message-format))))
 
 
 (defun int<nub>:output (user level/prefix level/sink caller msg args)

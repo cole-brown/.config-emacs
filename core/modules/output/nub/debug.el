@@ -120,7 +120,8 @@ Usage:
 
     ;; Invalid User: Message about it.
     (unless (int<nub>:user:exists? func/name choice.keyword nil)
-      (message (int<nub>:format:message :line:each
+      (message (int<nub>:format:message nil
+                                        :line:each
                                         func/name
                                         "Input/chosen user isn't a registered `nub' user."
                                         "--choice: %s -> %S"
@@ -170,7 +171,8 @@ Usage:
     (if (null (int<nub>:user:exists? func/name user nil))
         ;; Invalid - message about it and return nil.
         (progn
-          (message (int<nub>:format:message func/name
+          (message (int<nub>:format:message nil
+                                            func/name
                                             ": USER param isn't a registered `nub' user: %S")
                    user)
           nil)
@@ -204,7 +206,8 @@ nil/empty input only."
     (if (null (int<nub>:user:exists? func/name user nil))
         ;; Invalid - message about it and return nil.
         (progn
-          (message (int<nub>:format:message func/name
+          (message (int<nub>:format:message nil
+                                            func/name
                                             ": USER param isn't a registered `nub' user: %S")
                    user)
           nil)
@@ -383,7 +386,8 @@ PREFIX is an optional string to be printed first on its own line."
            (debugging:active (int<nub>:debug:active? func/name
                                                      user
                                                      tags)))
-      (message (int<nub>:format:message :line:each
+      (message (int<nub>:format:message nil
+                                        :line:each
                                         "%s  %s"
                                         "    user:         %s"
                                         "    debugging?:   %s"
@@ -593,7 +597,8 @@ The answer depends on TAGS:
     (if (or (not user)
             (not tag))
         (progn
-          (message (int<nub>:format:message :line:each
+          (message (int<nub>:format:message nil
+                                            :line:each
                                             "Cannot toggle tag without user and tag."
                                             "  user: %S"
                                             "  tag:  %S")

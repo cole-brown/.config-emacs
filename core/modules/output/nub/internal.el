@@ -147,7 +147,9 @@ ARGS will be passed to `format' with the finalized message string."
                          ;; Formatted message based on what we got passed in.
                          ;; Use `flatten-list' to make MSG a list if it's just a string.
                          ;; It also converts cons to lists, but that's ok here.
-                         (apply #'int<nub>:format:message (flatten-list msg)))
+                         (apply #'int<nub>:format:message
+                                nil ;; No indent.
+                                (flatten-list msg)))
          ;; Just pass ARGS directly to error - it will do final format.
          args))
 ;; (int<nub>:error "test-function-name" "hello there")
