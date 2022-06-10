@@ -25,9 +25,14 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Loading.
+;;------------------------------------------------------------------------------
+
+;; Currently don't load any of the `:system' modules.
+;; TODO: Should we change that and load them all in here?
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-;; NOTE: Don't provide the root `:system' namespace since we aren't loading all
-;; `:system' modules.
-;;
-;; (imp:provide :system)
+(imp:provide :system)
