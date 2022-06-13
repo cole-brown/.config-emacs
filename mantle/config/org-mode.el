@@ -100,8 +100,8 @@
   :hook
   ;;--------------------
 
-  ((org-mode . (innit:hook:func-symbol "org/jump-to-now-target"))
-   (org-mode . (innit:hook:func-symbol "org/local-settings")))
+  ((org-mode . mantle:hook:org/jump-to-now-target) ;; (innit:hook:func-symbol "org/jump-to-now-target" 'org-mode-hook)
+   (org-mode . mantle:hook:org/local-settings)) ;; (innit:hook:func-symbol "org/local-settings" 'org-mode-hook)
 
 
   ;;--------------------
