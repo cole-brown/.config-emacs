@@ -620,4 +620,4 @@ Then runs COMMAND interactively with ARGS."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'org-mode)
+(imp:provide :mantle 'config 'user 'org-mode)
