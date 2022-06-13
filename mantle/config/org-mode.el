@@ -328,7 +328,7 @@ Then runs COMMAND interactively with ARGS."
   ;;---
   (jerky:set 'org 'journal 'file 'format
              :namespace :home
-             :value (concat (spy:datetime/format.get 'iso-8601 'short)
+             :value (concat (datetime:format/get 'iso-8601 'date)
                             ;; TODO: 'notebook' not quickest to
                             ;; auto-complete to. Find better.
                             ".notebook.org")
@@ -339,7 +339,7 @@ Then runs COMMAND interactively with ARGS."
   ;;---
   (jerky:set 'org 'journal 'file 'format
              :namespace :work
-             :value (concat (spy:datetime/format.get 'iso-8601 'short)
+             :value (concat (datetime:format/get 'iso-8601 'date)
                             ;; TODO: 'logbook' not quickest to
                             ;; auto-complete to. Find better.
                             ".logbook.org")
