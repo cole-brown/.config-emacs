@@ -95,39 +95,43 @@ Else returns nil if things are not ok."
        (int<nub>:level:exists? caller level error?)))
 
 
-(defun int<nub>:var:user-at-level (user level alist &optional default)
+(defun int<nub>:var:user-at-level (user level alist &optional no-fallback?)
   "Get value from ALIST for USER at output LEVEL.
 
-Returns DEFAULT if not found.
-  - If DEFAULT is `int<nub>:var:user:fallback', returns the value for that
-    user at LEVEL from ALIST."
-  ;; Ensure USER and LEVEL are ok.
-  (int<nub>:var:assert-user-level "int<nub>:var:user-at-level" user level :error)
+Return value from `int<nub>:var:user:fallback' user if USER is not found.
+  - If NO-FALLBACK? is non-nil, just return `:does-not-exist' when USER not found."
+  (let ((func/name "int<nub>:var:user-at-level")
+        value)
+    ;; Ensure USER and LEVEL are ok.
+    (int<nub>:var:assert-user-level func/name user level :error)
 
-  ;; Assert ALIST.
-  (if (not (int<nub>:alist:alist? alist))
-      (int<nub>:error "int<nub>:var:user-at-level"
-                      "ALIST must be an alist! Got: %S"
-                      alist)
-    ;; Try to get the value for USER at LEVEL - we'll fall back if they've requested it.
-    (let ((value (int<nub>:alist:get/value level
-                                           (int<nub>:alist:get/value user alist)
-                                           default)))
+    ;; Assert ALIST.
+    (if (not (int<nub>:alist:alist? alist))
+        (int<nub>:error func/name
+                        "ALIST must be an alist! Got: %S"
+                        alist)
+
+      ;; Try to get the value for USER at LEVEL - we'll fall back if they've requested it.
+      (setq value (int<nub>:alist:get/value level
+                                            (int<nub>:alist:get/value user alist)
+                                            :does-not-exist))
+
       ;; Do we need to get the fallback/default value?
-      (when (and (eq default int<nub>:var:user:fallback)
-                 (eq value default))
+      (when (and (null no-fallback?)
+                 (eq value :does-not-exist))
         (setq value (int<nub>:alist:get/value level
                                               (int<nub>:alist:get/value int<nub>:var:user:fallback alist)
                                               :does-not-exist))
         ;; If it's still not found then we should error on the level, probably?
         (when (eq value :does-not-exist)
-          (int<nub>:error "int<nub>:var:user-at-level"
-                          "User %S at level %S had no value and no fallback/default. Invalid level?"
-                          user level)))
+          (int<nub>:error func/name
+                          "User %S at level %S had no value and neither does fallback/default user %S. Invalid level?"
+                          user level int<nub>:var:user:fallback)))
 
       ;; Done; return the value.
       value)))
-;; (int<nub>:var:user-at-level :jeff :dne nil :does-not-exist)
+;; (int<nub>:var:user-at-level :jeff :dne nil :no-fallback)
+;; (int<nub>:var:user-at-level :jeff :dne nil :no-fallback)
 
 
 ;;------------------------------------------------------------------------------
@@ -167,7 +171,7 @@ alist of USER keyword
   ;; Ensure USER and LEVEL are ok.
   (int<nub>:var:assert-user-level "int<nub>:var:prefix" user level :error)
 
-  (int<nub>:var:user-at-level user level int<nub>:var:prefix int<nub>:var:user:fallback))
+  (int<nub>:var:user-at-level user level int<nub>:var:prefix))
 ;; (int<nub>:var:prefix :fallback :debug)
 
 
@@ -210,10 +214,10 @@ Sets both current and backup values (backups generally only used for tests)."
 Valid values:
   non-nil     - output level enabled
   nil         - output level disabled
-  <predicate> - Call <predicate> (w/ LEVEL & DEFAULT) to get nil/non-nil value.
+  <predicate> - Call <predicate> (w/ level keyword) to get nil/non-nil value.
 
 Predicate's signature should be:
-  (defun enabled-predicate-for-my-user (level &optional default) ...)
+  (defun enabled-predicate-for-my-user (level) ...)
     - It should return nil/non-nil.")
 
 
@@ -224,7 +228,7 @@ Predicate's signature should be:
 Valid values:
   t   - output level enabled
   nil - output level disabled
-  <predicate> - Call <predicate> (w/ LEVEL & DEFAULT) to get nil/non-nil value.")
+  <predicate> - Call <predicate> (w/ level keyword) to get nil/non-nil value.")
 
 
 ;; TODO: verify function for `int<nub>:var:enabled?'?
@@ -254,37 +258,29 @@ Sets both current and backup values (backups generally only used for tests)."
    int<nub>:var:enabled?))
 
 
-(defun int<nub>:var:enabled? (user level &optional default)
+(defun int<nub>:var:enabled? (user level &optional no-fallback?)
   "Return non-nil if output is enabled for USER at output LEVEL.
 
-Returns DEFAULT if USER has no setting for LEVEL.
-  - If DEFAULt is `:default', returns the standard/default/fallback for LEVEL."
+If USER at LEVEL is not found, return nil/non-nil for fallback/default user at
+LEVEL.
+  - If NO-FALLBACK? is non-nil, skip the fallback/default user check."
   ;; Ensure USER and LEVEL are ok.
   (int<nub>:var:assert-user-level "int<nub>:var:enabled?" user level :error)
 
   (let ((enabled? (int<nub>:var:user-at-level user
                                               level
                                               int<nub>:var:enabled?
-                                              default)))
+                                              no-fallback?)))
 
-    ;; User not found in `int<nub>:var:enabled?'? Use fallback.
-    (cond ((and (eq default int<nub>:var:user:fallback)
-                (eq enabled? default))
-           ;; Didn't find it - get the fallback.
-           (int<nub>:var:user-at-level int<nub>:var:user:fallback
-                                       level
-                                       int<nub>:var:enabled?
-                                       default))
+    ;; Found a function - call w/ level to get enabled value.
+    (cond ((functionp enabled?)
+           (funcall enabled? level))
 
-          ;; Found a function - call w/ level to get enabled value.
-          ((functionp enabled?)
-           (funcall enabled? level default))
-
-          ;; Default: Found nil or non-nil - return that.
+          ;; Default: Just have something to return.
           (t
            enabled?))))
 ;; (int<nub>:var:enabled? :default :error)
-;; (int<nub>:var:enabled? :test<nub/utils>::int<nub>:var:enabled? :info :default)
+;; (int<nub>:var:enabled? :test<nub/utils>::int<nub>:var:enabled? :info)
 
 
 (defun int<nub>:var:enabled?:set (user level value)
@@ -310,7 +306,7 @@ the flag based on truthiness of VALUE."
                            int<nub>:var:enabled?)))
 ;; (nub:vars:init :test)
 ;; (int<nub>:var:enabled? :test :debug)
-;; (int<nub>:var:enabled? :test :debug :default)
+;; (int<nub>:var:enabled? :test :debug :no-fallback)
 ;; (int<nub>:var:enabled?:set :test :debug 'foo)
 ;; (int<nub>:var:enabled?:set :test :debug :toggle)
 ;; (int<nub>:var:enabled?:set :test :warning 'bar)
@@ -334,9 +330,9 @@ the flag based on truthiness of VALUE."
 
 Valid sinks:
   `int<nub>:var:user:fallback' (aka `:default')
-  `t' (alias for `int<nub>:var:user:fallback' / `:default')
+  t (alias for `int<nub>:var:user:fallback' / `:default')
     - output normally (use default/fallback output sink)
-  `nil'
+  nil
     - do not output
   <function>
     - Use <function> to output instead.
@@ -490,29 +486,20 @@ Set both current and backup values (backups generally only used for tests)."
 ;; (int<nub>:init:sink :test '((:error . message)) '((:message . t)))
 
 
-(defun int<nub>:var:sink (user level &optional default)
+(defun int<nub>:var:sink (user level &optional no-fallback?)
   "Return output sink for USER at output LEVEL.
 
-Return DEFAULT if USER has no output sink for LEVEL.
-  - If DEFAULt is `:default', returns the default/fallback sink for LEVEL."
+If USER at LEVEL is not found, return value for fallback/default user at LEVEL.
+  - If NO-FALLBACK? is non-nil, skip the fallback/default user check."
   ;; Ensure USER and LEVEL are ok.
   (int<nub>:var:assert-user-level "int<nub>:var:sink" user level :error)
 
-  (let ((sink (int<nub>:var:user-at-level user
-                                          level
-                                          int<nub>:var:sink
-                                          default)))
-    (if (and (eq default int<nub>:var:user:fallback)
-             (eq sink default))
-        ;; Either didn't find it, or the user has the default/fallback as an explicit sink.
-        ;; Get the fallback.
-        (int<nub>:var:user-at-level int<nub>:var:user:fallback
-                                    level
-                                    int<nub>:var:sink
-                                    default)
-      sink)))
+  (int<nub>:var:user-at-level user
+                              level
+                              int<nub>:var:sink
+                              no-fallback?))
 ;; (int<nub>:var:sink :test :error)
-;; (int<nub>:var:sink :test<nub/debug>::nub:debug :debug :default)
+;; (int<nub>:var:sink :test<nub/debug>::nub:debug :debug)
 
 
 (defun int<nub>:var:sink:set (user level sink)
@@ -536,32 +523,23 @@ Return DEFAULT if USER has no output sink for LEVEL.
 ;; (int<nub>:var:sink:set :test :warning 'warning)
 
 
-(defun int<nub>:var:inhibit-message? (user level &optional default)
+(defun int<nub>:var:inhibit-message? (user level &optional no-fallback?)
   "Return `inhibit-message' boolean value for USER at output LEVEL.
 
-Returns DEFAULT if USER has no setting for LEVEL.
-  - If DEFAULt is `:default', returns the standard/default/fallback for LEVEL."
+If USER at LEVEL is not found, return value for fallback/default user at LEVEL.
+  - If NO-FALLBACK? is non-nil, skip the fallback/default user check."
   ;; Ensure USER and LEVEL are ok.
   (int<nub>:var:assert-user-level "int<nub>:var:sink" user level :error)
 
-  (let ((inhibit? (int<nub>:var:user-at-level user
-                                              level
-                                              int<nub>:var:inhibit-message
-                                              default)))
-    (if (and (eq default int<nub>:var:user:fallback)
-             (eq inhibit? default))
-        ;; Either didn't find it, or the user has the default/fallback as an explicit inhibit.
-        ;; Get the fallback.
-        (int<nub>:var:user-at-level int<nub>:var:user:fallback
-                                    level
-                                    int<nub>:var:inhibit-message
-                                    default)
-      inhibit?)))
+  (int<nub>:var:user-at-level user
+                              level
+                              int<nub>:var:inhibit-message
+                              no-fallback?))
 ;; (nub:vars:init :test)
 ;; (int<nub>:var:inhibit-message? :test :error)
 ;; (int<nub>:var:inhibit-message? :test :debug)
-;; (int<nub>:var:inhibit-message? :test :debug :default)
-;; (int<nub>:var:inhibit-message? :test<nub/debug>::nub:debug :debug :default)
+;; (int<nub>:var:inhibit-message? :test :debug :no-fallback)
+;; (int<nub>:var:inhibit-message? :test<nub/debug>::nub:debug :debug :no-fallback)
 
 
 ;;------------------------------------------------------------------------------
@@ -582,16 +560,15 @@ If there are no tags in the list, or the list is nil, everything
 will be printed.")
 
 
-(defun int<nub>:var:debug:tags (user &optional default)
+(defun int<nub>:var:debug:tags (user)
   "Get current debug tags flag for USER.
 
-Returns DEFAULT if not found."
+Return nil if not found."
   ;; Ensure USER is ok.
   (int<nub>:user:exists? "int<nub>:var:debug:tags" user :error)
 
   (int<nub>:alist:get/value user
-                            int<nub>:var:debug:tags
-                            default))
+                            int<nub>:var:debug:tags))
 ;; (int<nub>:var:debug:tags :test)
 
 
@@ -717,18 +694,17 @@ Return nil if not found."
   "Alist of users to list of strings to use for alternating fill/padding strings.")
 
 
-(defun int<nub>:var:debug:fills (user &optional default)
+(defun int<nub>:var:debug:fills (user)
   "Get debug fill/padding strings for USER.
 
-Returns DEFAULT if USER has no fill/padding strings.
-  - If DEFAULt is `:default', returns the standard/default/fallback strings."
+Return value from `int<nub>:var:user:fallback' user if USER is not found."
   ;; Ensure USER is ok.
   (int<nub>:user:exists? "int<nub>:var:debug:fills" user :error)
 
   (let ((fills (int<nub>:alist:get/value user
-                                         int<nub>:var:debug:fills)))
-    (if (and (eq default int<nub>:var:user:fallback)
-             (eq fills default))
+                                         int<nub>:var:debug:fills
+                                         :does-not-exist)))
+    (if (eq fills :does-not-exist)
         ;; Didn't find it - get the fallback.
         (int<nub>:alist:get/value int<nub>:var:user:fallback
                                   int<nub>:var:debug:fills)
@@ -738,7 +714,7 @@ Returns DEFAULT if USER has no fill/padding strings.
 
 
 (defun int<nub>:var:debug:fills:set (user fill-strings)
-  "Sets USER's list of fill/padding strings."
+  "Set USER's list of FILL-STRINGS."
   ;; Ensure USER is ok.
   (int<nub>:user:exists? "int<nub>:var:debug:fills:set" user :error)
 
@@ -755,19 +731,15 @@ Returns DEFAULT if USER has no fill/padding strings.
 Fill/padding index used for USER's `int<nub>:var:debug:fills' alist entry.")
 
 
-(defun int<nub>:var:debug:fills/index (user &optional default)
-  "Get current index into debug fill/padding strings for USER.
-
-Returns DEFAULT if USER has no index.
-  - If DEFAULt is `:default', returns the (shared)
-    standard/default/fallback index."
+(defun int<nub>:var:debug:fills/index (user)
+  "Get current index into debug fill/padding strings for USER."
   ;; Ensure USER is ok.
   (int<nub>:user:exists? "int<nub>:var:debug:fills/index" user :error)
 
   (let ((fills/index (int<nub>:alist:get/value user
-                                               int<nub>:var:debug:fills/index)))
-    (if (and (eq default int<nub>:var:user:fallback)
-             (eq fills/index default))
+                                               int<nub>:var:debug:fills/index
+                                               :does-not-exist)))
+    (if (eq fills/index :does-not-exist)
         ;; Didn't find it - get the fallback.
         (int<nub>:alist:get/value int<nub>:var:user:fallback
                                   int<nub>:var:debug:fills/index)
@@ -777,7 +749,7 @@ Returns DEFAULT if USER has no index.
 
 
 (defun int<nub>:var:debug:fills/index:set (user index &optional create)
-  "Sets USER's index into the list of fill/padding strings.
+  "Set USER's index into the list of fill/padding strings.
 
 If CREATE is nil and USER doesn't exist in index alist, sets the
 default user instead."
@@ -813,7 +785,8 @@ ALIST:PREFIXES should be an alist of verbosity level to strings.
 
 ALIST:ENABLED? should be an alist of verbosity level to t/nil.
 
-ALIST:SINKS should be an alist of verbosity level to t/nil/function/list-of-functions.
+ALIST:SINKS should be an alist of verbosity level to
+t/nil/function/list-of-functions.
 
 Alists should have all output levels in them; for valid levels, see
 `nub:output:levels'.

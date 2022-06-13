@@ -353,7 +353,7 @@ one of these is true:
      ;; If user is debugging for specific tags, but TAGS is nil, it is also a yes.
      ;; Return something other than `t' in case this case should be checked?
      ((null tags/input)
-      ;; Try returning active tags? If that's not good, return `:tags/other' or something.
+      ;; Try returning active tags?
       tags/active)
 
      ;; The intersection of the sets `tags' and `int<nub>:var:debug:tags' will be
@@ -630,7 +630,7 @@ The answer depends on TAGS:
         (message "%s: Unknown user: %S" func/name user)
         nil)
 
-    (int<nub>:var:debug:tags user nil)
+    (int<nub>:var:debug:tags:set user nil)
     ;; This also returns active tags, t, or nil.
     (int<nub>:debug:status/message (format "nub: Cleared all debug tags: %S" user)
                                    user)))

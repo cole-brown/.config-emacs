@@ -97,8 +97,8 @@ will always align the fill strings at the end.
   (when restart?
     (int<nub>:var:debug:fills/index:set user 0))
 
-  (let ((index (int<nub>:var:debug:fills/index user int<nub>:var:user:fallback))
-        (fills (int<nub>:var:debug:fills       user int<nub>:var:user:fallback))
+  (let ((index (int<nub>:var:debug:fills/index user))
+        (fills (int<nub>:var:debug:fills       user))
         fill-output)
     ;; Increment index to prep for next time.
     (int<nub>:var:debug:fills/index:set user

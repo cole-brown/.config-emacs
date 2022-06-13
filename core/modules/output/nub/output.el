@@ -21,7 +21,7 @@
 (defun int<nub>:output:sinks (user level sinks msg args)
   "Output USER's MSG with ARGS to any/all LEVEL SINKS."
   ;; Inhibit minibuffer message if output sink function is `message'?
-  (let ((inhibit-message (int<nub>:var:inhibit-message? user level int<nub>:var:user:fallback)))
+  (let ((inhibit-message (int<nub>:var:inhibit-message? user level)))
     ;; List of sinks to output to?
     (if (and sinks
              (listp sinks))
@@ -70,8 +70,8 @@ ARGS based on current verbosity for the level."
   (let ((func/name "int<nub>:output:message"))
     (int<nub>:user:exists? func/name user :error)
 
-    (let ((sinks           (int<nub>:var:sink     user level int<nub>:var:user:fallback))
-          (verbosity:level (int<nub>:var:enabled? user level int<nub>:var:user:fallback)))
+    (let ((sinks           (int<nub>:var:sink     user level))
+          (verbosity:level (int<nub>:var:enabled? user level)))
       ;; Should complain about invalid sink function(s).
       (int<nub>:var:sink:verify func/name
                                 sinks
