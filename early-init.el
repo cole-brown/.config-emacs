@@ -68,6 +68,10 @@
               :path     (imp:path:join path-core-modules "elisp" "jerky")
               :filename "init")
 
+    (imp:load :feature  '(:datetime)
+              :path     (imp:path:join path-core-modules "elisp" "datetime")
+              :filename "init")
+
     (imp:load :feature  '(:system)
               :path     (imp:path:join path-core-modules "system")
               :filename "init")

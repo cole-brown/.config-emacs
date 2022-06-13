@@ -83,7 +83,7 @@ Output to '*Messages*' buffer."
              (get symbol 'safe-local-variable)
              (assoc symbol safe-local-variable-values))))
 ;; (let* ((dir "~/dlv-test/")
-;;        (filename (format "locals-%S.txt" (spy:datetime/string.get 'iso-8601 'file)))
+;;        (filename (format "locals-%S.txt" (datetime:string/get 'iso-8601 'file)))
 ;;        (filepath (concat dir filename))
 ;;        (class 'int<dlv>:test:class)
 ;;        (mode nil)

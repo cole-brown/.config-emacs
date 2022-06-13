@@ -76,8 +76,8 @@
     ;; Can be ISO-8601 or RFC-3339 date or datetime.
     ;; Will get smashed down to just digits.
     :revision "2022-04-27"
-    ;; (spy:datetime/string.get 'iso-8601 'short)
-    ;; (spy:datetime/string.get 'yyyymmdd)
+    ;; (datetime:string/get 'iso-8601 'short)
+    ;; (datetime:string/get 'yyyymmdd)
     )
   "Plist version data for this Emacs config.")
 
