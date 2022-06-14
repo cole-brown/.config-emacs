@@ -38,18 +38,18 @@ Returns nil if no secrets ID for this system."
 ;;------------------------------
 
 (defun system:secret:path/root ()
-  "Get secrets' base root dir for all systems."
-  (system:multiplexer:get 'system (system:secret:hash) 'path 'secret 'root))
+  "Get secrets' root dir for all systems."
+  (system:multiplexer:get 'path 'system 'secret 'root))
 
 
 (defun system:secret:path/load ()
-  "Get secrets' load root dir for all systems."
-  (system:multiplexer:get 'system (system:secret:hash) 'path 'secret 'emacs))
+  "Get secrets' Emacs Lisp load dir for all systems."
+  (system:multiplexer:get 'path 'system 'secret 'emacs))
 
 
 (defun system:secret:path/system ()
-  "Get this system's secrets' load dir."
-  (system:multiplexer:get 'system (system:secret:hash) 'path 'secret 'system))
+  "Get this specific system's secrets' load dir."
+  (system:multiplexer:get 'path 'system 'secret 'system))
 
 
 ;;------------------------------------------------------------------------------

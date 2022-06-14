@@ -246,7 +246,7 @@ If UNIQUE-ID is nil, use this system's ID."
                                           type
                                           description
                                           (path/secret/root "~/.config/secret")
-                                          (path/secret/init "emacs/sn004")
+                                          (path/secret/init "emacs/2022-03-23_sn004")
                                           (debug nil))
   "Define a system based on the arguments plist.
 
@@ -334,6 +334,10 @@ DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
                       path/secret/init)
               errors))
 
+      ;; NOTE: Cannot check paths' validity now as we define all systems and
+      ;; then figure out which one we are later. So the path validity will have
+      ;; to be checked once we know which we are.
+
       (when errors
         (nub:error
          :system/multiplexer
@@ -379,11 +383,11 @@ DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
         ;;------------------------------
 
         (system:multiplexer:set :hash hash
-                                :keys (list 'path 'secret 'root)
+                                :keys (list 'path 'system 'secret 'root)
                                 :value path/secret/root
                                 :docstr "Root for .secret.d")
         (system:multiplexer:set :hash hash
-                                :keys (list 'path 'secret 'emacs)
+                                :keys (list 'path 'system 'secret 'emacs)
                                 :value path/secret/init.abs
                                 :docstr "Root for Per-Computer Set-Up of Emacs")
         (system:multiplexer:set :hash hash
@@ -391,11 +395,11 @@ DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
                                 :value id
                                 :docstr description)
 
-        ;; Have to set path per-system since work comps have restrictions on where
-        ;; things can be, and home comps tend to have a random number of hard drives
-        ;; just wherever.
+        ;; Have to set path per-system since some work comps have restrictions
+        ;; on where things can be, and home comps tend to have a random number
+        ;; of hard drives just wherever.
         (system:multiplexer:set :hash hash
-                                :keys (list 'path 'secret 'system)
+                                :keys (list 'path 'system 'secret 'system)
                                 :value  (system:multiplexer:path/abs path/secret/init.abs id)
                                 :docstr description))
 
