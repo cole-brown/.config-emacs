@@ -43,11 +43,14 @@
   ;; Initialize debugging before going any further.
   (int<jerky>:debug:init)
 
+  (imp:load :feature  '(:jerky utils)
+            :filename "utils")
+
   (imp:load :feature  '(:jerky jerky)
             :filename "jerky")
 
   ;; Always load `dlv' unless specifically removed.
-  (unless (imp:flag? :jerky -dlv)
+  (when (int<jerky>:using:dlv?)
     (imp:load :feature  '(:jerky +dlv)
               :filename "+dlv")))
 

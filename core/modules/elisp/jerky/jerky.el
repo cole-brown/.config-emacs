@@ -56,8 +56,13 @@ For `int<jerky>:repo/test/string=' (`define-hash-table-test')."
   'int<jerky>:repo/test/string=:hash)
 
 
-(defvar int<jerky>:repo (make-hash-table :test 'int<jerky>:repo/test/string=
-                                         :weakness nil)
+(defun int<jerky>:repo:create ()
+  "Create a new jerky repository hash table."
+  (make-hash-table :test 'int<jerky>:repo/test/string=
+                   :weakness nil))
+
+
+(defvar int<jerky>:repo (int<jerky>:repo:create)
   "A key-path/value store, basically.
 
 Each hash table key/value is a plist 2-tuple of `:key' and `:record'
@@ -193,12 +198,16 @@ output will be nil."
 ;; Namespaces
 ;;------------------------------------------------------------------------------
 
-(defvar int<jerky>:namespaces
+(defun int<jerky>:namespaces:create ()
+  "Create a new namespace alist for `int<jerky>:namespaces'."
   (list (list jerky:namespace/default
               "Default/Fallback Namespace"
               (concat "Default namespace for jerky. Other namespaces "
                       "default to this for fallbacks.")
-              (list jerky:namespace/no-fallback)))
+              (list jerky:namespace/no-fallback))))
+
+
+(defvar int<jerky>:namespaces (int<jerky>:namespaces:create)
   "Alist of namespace keywords with titles, docstrs, and fallback namespaces.
 So an entry would be, for example:
   '(:namespace-name \"Title\" \"docstring\" (:fallback-name-0 :fallback-name-1))
@@ -856,18 +865,34 @@ Keyword key/value pairs only exist after the keys. The keywords are:
 If not provided, they will be nil."
   ;; Some shenanigans to do to turn input into args/kwargs into a key
   ;; and values.
-  (let* ((key-and-kwargs (int<jerky>:parse keys-and-options t))
+  (let* ((func/name "jerky:set")
+         (func/tags '(:set))
+         (key-and-kwargs (int<jerky>:parse keys-and-options t))
          (key            (car key-and-kwargs))
          (kwargs         (cdr key-and-kwargs))
          (docstr         (plist-get kwargs :docstr))
          (value          (plist-get kwargs :value))
          (namespace      (plist-get kwargs :namespace)))
 
-    ;; Get/update/create entries, set hash to key in repo.
-    (int<jerky>:repo/update key
-                            (or namespace jerky:namespace/default)
-                            value
-                            docstr)))
+    (nub:debug:func/start
+        :jerky
+        func/name
+        func/tags
+      (cons 'key       key)
+      (cons 'kwargs    kwargs)
+      (cons 'namespace namespace)
+      (cons 'value     value)
+      (cons 'docstr    docstr))
+
+    (nub:debug:func/return
+        :jerky
+        func/name
+        func/tags
+      ;; Get/update/create entries, set hash to key in repo.
+      (int<jerky>:repo/update key
+                              (or namespace jerky:namespace/default)
+                              value
+                              docstr))))
 ;; (jerky:set '(path to thing) :value "hello there")
 ;; (jerky:set '(:test :jeff) :value "jeffe" :docstr "I am a comment.")
 ;; (jerky:set :test "jeff" :value "jeffe overwrite" :docstr "I am not a comment.")
