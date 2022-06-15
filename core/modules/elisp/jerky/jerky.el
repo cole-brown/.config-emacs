@@ -160,8 +160,14 @@ Returns a 2-tuple list of:
 
 If a keyword is requested but doesn't exist in the keys, their value in the
 output will be nil."
-  (let* ((keywords (cond ((null keywords)   ; Must be supplied something.
-                           (error "int<jerky>:parse: keywords cannot be null: %S" keywords))
+  (let* ((func/name "int<jerky>:parse")
+         (func/tags '(:set :get :parse))
+         (keywords (cond ((null keywords)   ; Must be supplied something.
+                          (nub:error
+                              :jerky
+                              func/name
+                            "keywords cannot be null: %S"
+                            keywords))
                           ((listp keywords)  ; Given list? Use it.
                            keywords)
                           (t                 ; Use the defaults.
@@ -171,6 +177,17 @@ output will be nil."
           (args            (car args-and-kwargs))
           (kwargs          (cdr args-and-kwargs))
           parsed)
+    (nub:debug:func/start
+        :jerky
+        func/name
+        func/tags
+      (cons 'args-list args-list)
+      (cons 'keywords keywords)
+      (cons 'extra-keywords extra-keywords)
+      (cons 'split-inputs '-)
+      (cons '--args-and-kwargs args-and-kwargs)
+      (cons '--args args)
+      (cons '--kwargs kwargs))
 
     ;; If extra keywords, add first so they're at the end of the plist.
     (when (not (null extra-keywords))
@@ -186,8 +203,13 @@ output will be nil."
       (push (plist-get kwargs key) parsed)
       (push key parsed))
 
-    ;; And build our tuple output.
-    (list (int<jerky>:key:normalize args) parsed)))
+    ;; Done...
+    (nub:debug:func/return
+        :jerky
+        func/name
+        func/tags
+      ;; And build our tuple output.
+      (list (int<jerky>:key:normalize args) parsed))))
 ;; (int<jerky>:parse '(foo bar baz :namespace qux :value 1) t)
 ;; (int<jerky>:parse '(foo bar baz :namespace qux :value 1 :baz "hello") t :baz :DNE)
 ;; (int<jerky>:parse '(foo bar baz :namespace nil :value 1) t)
