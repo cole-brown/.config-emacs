@@ -278,48 +278,51 @@ NAME:TYPE should be a string, generally \"START\" or \"END\"."
          (padding:right (make-string (floor width:padding:centered)   ? ))
          ;; Top/Bottom with room for connection to Type
          (border:fill:top/bottom (make-string (- width:header 3) ?═ :multibyte)))
-    (int<jerky>:debug caller
-                      '("\n\n" ;; decent amount of space from previous output
-                        ;; "" or top type - no hard-coded "\n" in case of "".
-                        "%s"
-                        ;; "═" or "╧" and border:fill:top/bottom
-                        "╔%s%s╗\n"
-                        ;; left border, left padding, name (truncated?), right padding, right border: 5 "%s" fields
-                        "%s%s%s%s%s\n"
-                        ;; "═" or "╧" and border:fill:top/bottom
-                        "╚%s%s╝\n"
-                        ;; "" or bottom type - no hard-coded "\n" in case of "".
-                        "%s")
-                      ;; Top: Type
-                      (if (eq type :top)
-                          (format  " ┌──┤ %s\n" name:type)
-                        "")
-                      ;; Top: Border
-                      ;;   - Connect to top type or no.
-                      (if (eq type :top)
-                          "╧"
-                        "═")
-                      ;;   - Rest of border.
-                      border:fill:top/bottom
-                      ;; Middle: Name
-                      border:left
-                      padding:left
-                      name:truncated
-                      padding:right
-                      border:right
-                      ;; Bottom: Border
-                      ;;   - Connect to bottom type or no.
-                      (if (eq type :bottom)
-                          "╤"
-                        "═")
-                      ;;   - Rest of border.
-                      border:fill:top/bottom
-                      ;; Bottom: Type
-                      (if (eq type :bottom)
-                          (format  " └──┤ %s\n" name:type)
-                        "")
-                      ;;   - Leave to caller to fill.
-                      "%s")))
+    (nub:debug
+        :jerky
+        caller
+        '(:test)
+      '("\n\n" ;; decent amount of space from previous output
+        ;; "" or top type - no hard-coded "\n" in case of "".
+        "%s"
+        ;; "═" or "╧" and border:fill:top/bottom
+        "╔%s%s╗\n"
+        ;; left border, left padding, name (truncated?), right padding, right border: 5 "%s" fields
+        "%s%s%s%s%s\n"
+        ;; "═" or "╧" and border:fill:top/bottom
+        "╚%s%s╝\n"
+        ;; "" or bottom type - no hard-coded "\n" in case of "".
+        "%s")
+      ;; Top: Type
+      (if (eq type :top)
+          (format  " ┌──┤ %s\n" name:type)
+        "")
+      ;; Top: Border
+      ;;   - Connect to top type or no.
+      (if (eq type :top)
+          "╧"
+        "═")
+      ;;   - Rest of border.
+      border:fill:top/bottom
+      ;; Middle: Name
+      border:left
+      padding:left
+      name:truncated
+      padding:right
+      border:right
+      ;; Bottom: Border
+      ;;   - Connect to bottom type or no.
+      (if (eq type :bottom)
+          "╤"
+        "═")
+      ;;   - Rest of border.
+      border:fill:top/bottom
+      ;; Bottom: Type
+      (if (eq type :bottom)
+          (format  " └──┤ %s\n" name:type)
+        "")
+      ;;   - Leave to caller to fill.
+      "%s")))
 ;; (test<jerky>:debug:marker:create "test" "test<jerky>:test:debug:marker:create" :bottom "START")
 ;; (test<jerky>:debug:marker:create "test" "test<jerky>:test:debug:marker:create" :top "END")
 

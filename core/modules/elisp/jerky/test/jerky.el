@@ -61,8 +61,8 @@
                                t)))
 
     (should (equal
-             '("foo/bar/baz" :namespace qux :value 1 :docstr nil :baz "hello")
-             (int<jerky>:parse '(foo bar baz :namespace qux :value 1 :DNE nil :baz "hello")
+             '("foo/bar/baz" :namespace qux :value 1 :docstr nil :DNE nil :baz "hello")
+             (int<jerky>:parse '(foo bar baz :namespace qux :value 1 :baz "hello")
                                ;; `:namespace', `:value', and `:docstr'...
                                ;;   ...plus `:baz' and `:DNE'.
                                t :baz :DNE)))))
