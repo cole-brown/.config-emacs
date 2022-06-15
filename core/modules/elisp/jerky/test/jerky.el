@@ -55,13 +55,13 @@
     ;;===
 
     (should (equal
-             '("foo/bar/baz" (:namespace qux :value 1 :docstr nil))
+             '("foo/bar/baz" :namespace qux :value 1 :docstr nil)
              (int<jerky>:parse '(foo bar baz :namespace qux :value 1)
                                ;; t means "default of `:namespace', `:value', and `:docstr', please"
                                t)))
 
     (should (equal
-             '("foo/bar/baz" (:namespace qux :value 1 :docstr nil :baz "hello"))
+             '("foo/bar/baz" :namespace qux :value 1 :docstr nil :baz "hello")
              (int<jerky>:parse '(foo bar baz :namespace qux :value 1 :DNE nil :baz "hello")
                                ;; `:namespace', `:value', and `:docstr'...
                                ;;   ...plus `:baz' and `:DNE'.

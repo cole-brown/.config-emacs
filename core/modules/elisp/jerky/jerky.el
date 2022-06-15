@@ -154,7 +154,7 @@ defaults, which are:
 If EXTRA-KEYWORDS are supplied, will apppend them to the end of the
 usual returned plist.
 
-Returns a 2-tuple list of:
+Returns a 2-tuple cons of:
   - jerky key parsed
   - plist of keys/values parsed.
 
@@ -209,7 +209,7 @@ output will be nil."
         func/name
         func/tags
       ;; And build our tuple output.
-      (list (int<jerky>:key:normalize args) parsed))))
+      (cons (int<jerky>:key:normalize args) parsed))))
 ;; (int<jerky>:parse '(foo bar baz :namespace qux :value 1) t)
 ;; (int<jerky>:parse '(foo bar baz :namespace qux :value 1 :baz "hello") t :baz :DNE)
 ;; (int<jerky>:parse '(foo bar baz :namespace nil :value 1) t)
@@ -900,11 +900,13 @@ If not provided, they will be nil."
         :jerky
         func/name
         func/tags
-      (cons 'key       key)
-      (cons 'kwargs    kwargs)
-      (cons 'namespace namespace)
-      (cons 'value     value)
-      (cons 'docstr    docstr))
+      (cons 'keys-and-options keys-and-options)
+      (cons '--key-and-kwargs key-and-kwargs)
+      (cons '--key            key)
+      (cons '--kwargs         kwargs)
+      (cons '----namespace    namespace)
+      (cons '----value        value)
+      (cons '----docstr       docstr))
 
     (nub:debug:func/return
         :jerky
