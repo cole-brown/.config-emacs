@@ -63,7 +63,7 @@ Splits INPUT list into the args and the keyword args, where
 
 Once any of the keyword args in CLAIMS is found, that and the
 rest of INPUT are assumed to be the keyword args. Everything
-before will be the return args, and that keyword and everything
+before will be the returned args, and that keyword and everything
 after will be the returned keyword args.
 
 So this:
@@ -83,7 +83,7 @@ Example:
                                            :jeff :zort :vogon)))
     ...
 
-Return a list of lists: '(args-list kwargs-plist)"
+Return a cons of lists: '(args-list . kwargs-plist)"
   (let ((leading-args nil)
         (rest-as-keywords nil)
         (keywords nil)
@@ -102,7 +102,7 @@ Return a list of lists: '(args-list kwargs-plist)"
         (push arg keywords)))
 
     ;; Done processing list, but our lists to return are backwords right now.
-    (list (nreverse leading-args) (nreverse keywords))))
+    (cons (nreverse leading-args) (nreverse keywords))))
 ;; (elisp:parse:args+kwargs '(jeff jefferson :namespace :work) :namespace)
 ;; (elisp:parse:args+kwargs '(jeff jefferson :namespace nil :value 42) :namespace :value)
 ;; (elisp:parse:args+kwargs '((jeff (jefferson)) :namespace nil :value 42) :namespace :value)
