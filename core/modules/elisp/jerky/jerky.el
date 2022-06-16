@@ -377,13 +377,10 @@ If ACTION is `int<jerky>:action/delete', delete the namespace instead."
                 int<jerky>:action/delete)
 
         ;; Overwrite entry.
-        (setf (alist-get namespace int<jerky>:namespaces) (cdr entry))
+        (setf (alist-get namespace int<jerky>:namespaces) (cdr entry))))
 
-        ;; Return the updated entry.
-        entry))))
-;; (int<jerky>:namespace:set :jeffory)
-;; int<jerky>:namespaces
-;; (int<jerky>:namespace:set :jeff :jeffory)
+    ;; Return the updated entry.
+    entry))
 ;; int<jerky>:namespaces
 
 

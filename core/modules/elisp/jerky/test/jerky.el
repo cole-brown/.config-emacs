@@ -305,10 +305,133 @@
                   (nth 1 (int<jerky>:namespace:entry/fallback:get entry)))))))
 
 
+;;------------------------------
+;; int<jerky>:namespace:set
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:namespace:set ()
+  "Test that `int<jerky>:namespace:set' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:namespace:set"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (let* ((namespace :test)
+           (title "Test Namespace Title")
+           (docstr "Hello there.")
+           (fallbacks '(:foo :default))
+           (entry (int<jerky>:namespace:entry:set namespace title docstr fallbacks))
+           entry/updated)
+
+      ;;------------------------------
+      ;; Test create.
+      ;;------------------------------
+      (setq entry/updated (int<jerky>:namespace:set entry))
+      (should entry/updated)
+      (should (listp entry/updated))
+
+      (should (eq namespace
+                  (int<jerky>:namespace:entry/namespace:get entry/updated)))
+
+      (should (string= title
+                       (int<jerky>:namespace:entry/title:get entry/updated)))
+
+      (should (string= docstr
+                       (int<jerky>:namespace:entry/docstr:get entry/updated)))
+
+      (should (listp (int<jerky>:namespace:entry/fallback:get entry/updated)))
+      (should (= 2 (length (int<jerky>:namespace:entry/fallback:get entry/updated))))
+      (should (eq :foo
+                  (nth 0 (int<jerky>:namespace:entry/fallback:get entry/updated))))
+      (should (eq :default
+                  (nth 1 (int<jerky>:namespace:entry/fallback:get entry/updated)))))
+
+    ;;------------------------------
+    ;; Test update/overwrite.
+    ;;------------------------------
+    (let* ((namespace :test)
+           (title "New Test Namespace Title")
+           (docstr "New Docstr.")
+           (fallbacks '(:default))
+           (entry (int<jerky>:namespace:entry:set namespace title docstr fallbacks))
+           entry/updated)
+
+      (setq entry/updated (int<jerky>:namespace:set entry))
+      (should entry/updated)
+      (should (listp entry/updated))
+
+      (should (eq namespace
+                  (int<jerky>:namespace:entry/namespace:get entry/updated)))
+
+      (should (string= title
+                       (int<jerky>:namespace:entry/title:get entry/updated)))
+
+      (should (string= docstr
+                       (int<jerky>:namespace:entry/docstr:get entry/updated)))
+
+      (should (listp (int<jerky>:namespace:entry/fallback:get entry/updated)))
+      (should (= 1 (length (int<jerky>:namespace:entry/fallback:get entry/updated))))
+      (should (eq :default
+                  (nth 0 (int<jerky>:namespace:entry/fallback:get entry/updated)))))
+
+
+    ;;------------------------------
+    ;; Test delete.
+    ;;------------------------------
+    (let* ((namespace :test)
+           (title "New Test Namespace Title")
+           (docstr "New Docstr.")
+           (fallbacks '(:default))
+           (entry (int<jerky>:namespace:entry:set namespace title docstr fallbacks))
+           entry/updated
+           entry/get)
+
+      ;;---
+      ;; Check returned entry and also entry from get.
+      ;;---
+      (setq entry/updated (int<jerky>:namespace:set entry))
+      (should entry/updated)
+      (should (listp entry/updated))
+
+      (setq entry/get (int<jerky>:namespace:entry:get namespace))
+      (should entry/get)
+      (should (listp entry/get))
+
+      (should (eq namespace
+                  (int<jerky>:namespace:entry/namespace:get entry/updated)))
+      (should (eq (int<jerky>:namespace:entry/namespace:get entry/updated)
+                  (int<jerky>:namespace:entry/namespace:get entry/get)))
+
+      (should (string= title
+                       (int<jerky>:namespace:entry/title:get entry/updated)))
+      (should (string= (int<jerky>:namespace:entry/title:get entry/updated)
+                       (int<jerky>:namespace:entry/title:get entry/get)))
+
+      (should (string= docstr
+                       (int<jerky>:namespace:entry/docstr:get entry/updated)))
+      (should (string= (int<jerky>:namespace:entry/docstr:get entry/updated)
+                       (int<jerky>:namespace:entry/docstr:get entry/get)))
+
+      (should (listp (int<jerky>:namespace:entry/fallback:get entry/updated)))
+      (should (listp (int<jerky>:namespace:entry/fallback:get entry/get)))
+      (should (= 1 (length (int<jerky>:namespace:entry/fallback:get entry/updated))))
+      (should (= 1 (length (int<jerky>:namespace:entry/fallback:get entry/get))))
+      (should (eq :default
+                  (nth 0 (int<jerky>:namespace:entry/fallback:get entry/updated))))
+      (should (eq :default
+                  (nth 0 (int<jerky>:namespace:entry/fallback:get entry/get)))))))
+
+
 
 
 ;; TODO: test remaining functions:
-;; int<jerky>:namespace:set
 ;; jerky:namespace:create
 ;; jerky:namespace:has
 ;; int<jerky>:namespace/ordered
