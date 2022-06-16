@@ -209,7 +209,7 @@ output will be nil."
         func/name
         func/tags
       ;; And build our tuple output.
-      (cons (int<jerky>:key:normalize args) parsed))))
+      (list (int<jerky>:key:normalize args) parsed))))
 ;; (int<jerky>:parse '(foo bar baz :namespace qux :value 1) t)
 ;; (int<jerky>:parse '(foo bar baz :namespace qux :value 1 :baz "hello") t :baz :DNE)
 ;; (int<jerky>:parse '(foo bar baz :namespace nil :value 1) t)
