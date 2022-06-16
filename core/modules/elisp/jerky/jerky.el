@@ -349,7 +349,11 @@ Return the created namespace entry."
     ;; Create Namespace.
     ;;------------------------------
     ;; Ok, good to go. Just make a list in this particular order.
-    (list namespace title docstr verified-fallbacks)))
+    (list namespace
+          title
+          docstr
+          ;; And put these back into the correct order.
+          (nreverse verified-fallbacks))))
 
 
 (defun int<jerky>:namespace:set (entry &optional action)

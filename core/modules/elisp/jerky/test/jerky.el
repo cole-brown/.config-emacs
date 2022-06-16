@@ -259,8 +259,55 @@
                   (nth 0 (int<jerky>:namespace:entry/fallback:get entry)))))))
 
 
-;; TODO: test remaining functions:
+;;------------------------------
 ;; int<jerky>:namespace:entry:set
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:namespace:entry:set ()
+  "Test that `int<jerky>:namespace:entry:set' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:namespace:entry:set"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (let ((namespace :test)
+          (title "Test Namespace Title")
+          (docstr "Hello there.")
+          (fallbacks '(:foo :default))
+          entry)
+
+      (setq entry (int<jerky>:namespace:entry:set namespace title docstr fallbacks))
+
+      (should entry)
+      (should (listp entry))
+
+      (should (eq namespace
+                  (int<jerky>:namespace:entry/namespace:get entry)))
+
+      (should (string= title
+                       (int<jerky>:namespace:entry/title:get entry)))
+
+      (should (string= docstr
+                       (int<jerky>:namespace:entry/docstr:get entry)))
+
+      (should (listp (int<jerky>:namespace:entry/fallback:get entry)))
+      (should (= 2 (length (int<jerky>:namespace:entry/fallback:get entry))))
+      (should (eq :foo
+                  (nth 0 (int<jerky>:namespace:entry/fallback:get entry))))
+      (should (eq :default
+                  (nth 1 (int<jerky>:namespace:entry/fallback:get entry)))))))
+
+
+
+
+;; TODO: test remaining functions:
 ;; int<jerky>:namespace:set
 ;; jerky:namespace:create
 ;; jerky:namespace:has
