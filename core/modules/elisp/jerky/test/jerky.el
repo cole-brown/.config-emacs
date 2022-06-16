@@ -68,9 +68,32 @@
                                t :baz :DNE)))))
 
 
-;; TODO: test remaining functions:
-;; int<jerky>:namespaces:create
+;;------------------------------
 ;; int<jerky>:namespace:valid?
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:namespace:valid? ()
+  "Test that `int<jerky>:namespace:valid?' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:namespace:valid?"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (should (int<jerky>:namespace:valid? :jeff))
+    (should-not (int<jerky>:namespace:valid? 'jeff t))
+    (should-error (int<jerky>:namespace:valid? 'jeff))))
+
+
+
+
+;; TODO: test remaining functions:
 ;; int<jerky>:namespace:entry/namespace:get
 ;; int<jerky>:namespace:entry/title:get
 ;; int<jerky>:namespace:entry/docstr:get

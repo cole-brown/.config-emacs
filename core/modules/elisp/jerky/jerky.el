@@ -260,9 +260,11 @@ Returns t/nil if QUIET is non-nil, else it signals error on failure."
       t
     (if quiet
         nil
-      (error "%s: namespace must be a keyword. %S"
-             "int<jerky>:namespace:valid?"
-             namespace))))
+      (nub:error
+          :jerky
+          "int<jerky>:namespace:valid?"
+        "namespace must be a keyword; got: %S"
+        namespace))))
 ;; (int<jerky>:namespace:valid? :jeff)
 ;; (int<jerky>:namespace:valid? 'jeff t)
 ;; (int<jerky>:namespace:valid? 'jeff)
