@@ -130,13 +130,136 @@
                   (nth 0 (nth 3 entry)))))))
 
 
+;;------------------------------
+;; int<jerky>:namespace:entry/namespace:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:namespace:entry/namespace:get ()
+  "Test that `int<jerky>:namespace:entry/namespace:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:namespace:entry/namespace:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (let ((entry (int<jerky>:namespace:entry:get :default)))
+      (should entry)
+      (should (listp entry))
+
+      (should (keywordp (nth 0 entry)))
+
+      (should (eq :default
+                  (nth 0 entry)))
+
+      (should (eq :default
+                  (int<jerky>:namespace:entry/namespace:get entry))))))
+
+
+;;------------------------------
+;; int<jerky>:namespace:entry/title:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:namespace:entry/title:get ()
+  "Test that `int<jerky>:namespace:entry/title:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:namespace:entry/title:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (let ((entry (int<jerky>:namespace:entry:get :default)))
+      (should entry)
+      (should (listp entry))
+
+      (should (stringp (nth 1 entry)))
+
+      (should (string= "Default/Fallback Namespace"
+                       (nth 1 entry)))
+
+      (should (string= "Default/Fallback Namespace"
+                       (int<jerky>:namespace:entry/title:get entry))))))
+
+
+;;------------------------------
+;; int<jerky>:namespace:entry/docstr:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:namespace:entry/docstr:get ()
+  "Test that `int<jerky>:namespace:entry/docstr:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:namespace:entry/docstr:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (let ((entry (int<jerky>:namespace:entry:get :default)))
+      (should entry)
+      (should (listp entry))
+
+      (should (stringp (nth 2 entry)))
+
+      (should (string= "Default namespace for jerky. Other namespaces default to this for fallbacks."
+                       (nth 2 entry)))
+
+      (should (string= "Default namespace for jerky. Other namespaces default to this for fallbacks."
+                       (int<jerky>:namespace:entry/docstr:get entry))))))
+
+
+;;------------------------------
+;; int<jerky>:namespace:entry/fallback:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:namespace:entry/fallback:get ()
+  "Test that `int<jerky>:namespace:entry/fallback:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:namespace:entry/fallback:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (let ((entry (int<jerky>:namespace:entry:get :default)))
+      (should entry)
+      (should (listp entry))
+
+      (should (listp (nth 3 entry)))
+      (should (listp (int<jerky>:namespace:entry/fallback:get entry)))
+
+      (should (eq 1
+                  (length (nth 3 entry))))
+      (should (eq 1
+                  (length (int<jerky>:namespace:entry/fallback:get entry))))
+
+      (should (eq :no-fallback
+                  (nth 0 (nth 3 entry))))
+      (should (eq :no-fallback
+                  (nth 0 (int<jerky>:namespace:entry/fallback:get entry)))))))
 
 
 ;; TODO: test remaining functions:
-;; int<jerky>:namespace:entry/namespace:get
-;; int<jerky>:namespace:entry/title:get
-;; int<jerky>:namespace:entry/docstr:get
-;; int<jerky>:namespace:entry/fallback:get
 ;; int<jerky>:namespace:entry:set
 ;; int<jerky>:namespace:set
 ;; jerky:namespace:create
