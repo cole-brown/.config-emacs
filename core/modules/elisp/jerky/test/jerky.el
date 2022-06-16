@@ -91,6 +91,45 @@
     (should-error (int<jerky>:namespace:valid? 'jeff))))
 
 
+;;------------------------------
+;; int<jerky>:namespace:entry:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:namespace:entry:get ()
+  "Test that `int<jerky>:namespace:entry:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:namespace:entry:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (let ((entry (int<jerky>:namespace:entry:get :default)))
+      (should entry)
+      (should (listp entry))
+
+      (should (keywordp (nth 0 entry)))
+      (should (stringp (nth 1 entry)))
+      (should (stringp (nth 2 entry)))
+      (should (listp (nth 3 entry)))
+
+      (should (eq :default
+                  (nth 0 entry)))
+      (should (string= "Default/Fallback Namespace"
+                       (nth 1 entry)))
+      (should (string= "Default namespace for jerky. Other namespaces default to this for fallbacks."
+                       (nth 2 entry)))
+      (should (eq 1
+                  (length (nth 3 entry))))
+      (should (eq :no-fallback
+                  (nth 0 (nth 3 entry)))))))
+
+
 
 
 ;; TODO: test remaining functions:
@@ -98,7 +137,6 @@
 ;; int<jerky>:namespace:entry/title:get
 ;; int<jerky>:namespace:entry/docstr:get
 ;; int<jerky>:namespace:entry/fallback:get
-;; int<jerky>:namespace:entry:get
 ;; int<jerky>:namespace:entry:set
 ;; int<jerky>:namespace:set
 ;; jerky:namespace:create
