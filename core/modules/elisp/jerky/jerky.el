@@ -428,9 +428,9 @@ used/allowed."
 
 
 (defun jerky:namespace:has (namespace)
-  "Return t if NAMESPACE is a current Jerky namespace.
+  "Return t if NAMESPACE is an existing Jerky namespace.
 
-That is, is NAMESPACE present in `jerky:namespace/default'?"
+That is, is NAMESPACE present in `int<jerky>:namespaces'?"
   (not (null (assoc namespace int<jerky>:namespaces))))
 ;; (jerky:namespace:has :jeff)
 

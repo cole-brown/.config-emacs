@@ -629,8 +629,45 @@
                   (nth 1 (int<jerky>:namespace:entry/fallback:get entry/created)))))))
 
 
-;; TODO: test remaining functions:
+;;------------------------------
 ;; jerky:namespace:has
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::jerky:namespace:has ()
+  "Test that `jerky:namespace:has' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::jerky:namespace:has"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Create namespaces to test for.
+    ;;------------------------------
+    (should (jerky:namespace:create :test:00
+                                    :title "title 00"
+                                    :docstr "docstr 00"))
+    (should (jerky:namespace:create :test:01
+                                    :title "title 01"
+                                    :docstr "docstr 01"))
+
+    ;;------------------------------
+    ;; Test existance of namespaces.
+    ;;------------------------------
+    (should (jerky:namespace:has :test:00))
+    (should (jerky:namespace:has :test:01))
+    (should (jerky:namespace:has :default))
+
+    (should-not (jerky:namespace:has :foo))
+    (should-not (jerky:namespace:has :bar))
+    (should-not (jerky:namespace:has :test:02))))
+
 ;; int<jerky>:namespace/ordered
 ;; jerky:namespace:get
 ;; int<jerky>:key:normalize
