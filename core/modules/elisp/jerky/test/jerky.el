@@ -668,7 +668,89 @@
     (should-not (jerky:namespace:has :bar))
     (should-not (jerky:namespace:has :test:02))))
 
+
+;;------------------------------
 ;; int<jerky>:namespace/ordered
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:namespace/ordered ()
+  "Test that `int<jerky>:namespace/ordered' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:namespace/ordered"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;; Non-existant namespaces can't be fallbacks.
+    (should-error (jerky:namespace:create :test:dne
+                                    :title "title 02"
+                                    :docstr "docstr 02"
+                                    :fallbacks '(:foo :bar)))
+
+    ;;------------------------------
+    ;; Create namespaces to test for.
+    ;;------------------------------
+    ;; Just default fallback.
+    (should (jerky:namespace:create :test:00
+                                    :title "title 00"
+                                    :docstr "docstr 00"))
+
+    ;; Multiple fallbacks: :test:00 & :default
+    (should (jerky:namespace:create :test:01
+                                    :title "title 01"
+                                    :docstr "docstr 01"
+                                    :fallbacks '(:test:00)))
+
+    (should (jerky:namespace:create :test:02
+                                    :title "title 02"
+                                    :docstr "docstr 02"
+                                    :fallbacks (list jerky:namespace/no-fallback)))
+
+    ;; Cascading fallbacks.
+    (should (jerky:namespace:create :test:03/with-default
+                                    :title "title 03"
+                                    :docstr "docstr 03"
+                                    :fallbacks '(:test:02 :test:01 :default)))
+
+    (should (jerky:namespace:create :test:03/no-default
+                                    :title "title 03"
+                                    :docstr "docstr 03"
+                                    :fallbacks '(:test:02 :test:01)))
+
+    ;;------------------------------
+    ;; Test Fallback Ordering.
+    ;;------------------------------
+
+    ;; If namespace isn't found, we should get the default.
+    (should (equal '(:default)
+                   (int<jerky>:namespace/ordered :does-not-exist)))
+
+    ;; The rest should exist and so returned ordered list should start with the
+    ;; requested namespace.
+
+    ;; This is the default: a namespace and `:default' fallback.
+    (should (equal '(:test:00 :default)
+                   (int<jerky>:namespace/ordered :test:00)))
+
+    ;; These are non-defaults.
+    (should (equal '(:test:01 :test:00 :default)
+                   (int<jerky>:namespace/ordered :test:01)))
+    (should (equal '(:test:02)
+                   (int<jerky>:namespace/ordered :test:02)))
+    (should (equal '(:test:03/with-default :test:02 :test:01 :test:00 :default)
+                   (int<jerky>:namespace/ordered :test:03/with-default)))
+    (should (equal '(:test:03/no-default :test:02 :test:01 :test:00)
+                   (int<jerky>:namespace/ordered :test:03/no-default)))))
+
+
+
+;; TODO: test remaining functions:
 ;; jerky:namespace:get
 ;; int<jerky>:key:normalize
 ;; jerky:key:string

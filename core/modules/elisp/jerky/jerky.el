@@ -446,8 +446,12 @@ Return an ordered list of namespaces. If NAMESPACE isn't found, return
   ;; Sanity Checks
   ;;------------------------------
   (let ((entry (assoc namespace int<jerky>:namespaces))
-        (namespaces nil)
-        (stop? nil))
+        namespaces
+        ;; `stop?' is:
+        ;;   1) _STOP_ namespace search, even if more namespaces in NAMESPACE's fallbacks.
+        ;;   2) Don't cascade into searching fallbacks for fallbacks.
+        stop?
+        append-default?)
 
     ;; No entry at all? Default to default.
     (when (null entry)
@@ -485,27 +489,38 @@ Return an ordered list of namespaces. If NAMESPACE isn't found, return
 
     ;; Second things second: actual namespace's fallbacks.
     (dolist (ns (int<jerky>:namespace:entry/fallback:get entry))
-      ;; If we already got a no-fallback, or this one is, set `stop?' flag
-      ;; and ignore the rest.
-      (if (or stop?
-              (eq ns jerky:namespace/no-fallback))
-          (setq stop? t)
-        (push ns namespaces)))
+      (cond (stop?) ;; Just keep ignoring...
+
+            ;; If we get a no-fallback, set `stop?' flag and ignore the rest.
+            ((eq ns jerky:namespace/no-fallback)
+             (setq stop? t))
+
+            ;; If we find default, hang on to it and stick it to the very end -
+            ;; all the non-defaults should be checked first.
+            ((eq ns jerky:namespace/default)
+             (setq append-default? t))
+
+            (t
+             (push ns namespaces))))
 
     ;; Do we have a stop condition already?
     (unless stop?
       ;; Start cascading fallbacks.
 
       ;; Last things last: get the fallbacks' fallbacks.
-      (dolist (ns (cdr namespaces)) ; Skip primary namespace.
+      (dolist (ns namespaces)
         ;; When we have a fallback entry with fallbacks...
-        (when-let* ((fb-entry (assoc ns int<jerky>:namespaces))
+        (when-let* ((not-primary-ns (not (eq ns namespace))) ; Looking at fallbacks; already did primary.
+                    (fb-entry (assoc ns int<jerky>:namespaces))
                     (fb-fb (int<jerky>:namespace:entry/fallback:get fb-entry)))
           ;; ...push each of those onto the list if not there already.
           (dolist (fb-ns fb-fb)
             (unless (or (memq fb-ns namespaces)
                         (eq fb-ns jerky:namespace/no-fallback))
               (push fb-ns namespaces))))))
+
+    (when append-default?
+      (push jerky:namespace/default namespaces))
 
     ;; Return list of namespaces to check.
     (nreverse namespaces)))
