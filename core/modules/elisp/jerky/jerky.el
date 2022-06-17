@@ -106,13 +106,13 @@ E.g.: (jerky:get 'my/key :path \"to/dir\")
 
 
 (defcustom jerky:namespace/default :default
-  "(Keyword) name of the default namespace."
+  "Keyword / name of the default namespace."
   :group 'jerky:group
   :type  '(string))
 
 
 (defconst jerky:namespace/no-fallback :no-fallback
-  "(Keyword) name of the default namespace.")
+  "Keyword / name for setting namespaces to not use any (further) fallbacks.")
 
 
 (defconst int<jerky>:action/delete :int<jerky>:action/delete
@@ -308,6 +308,9 @@ TITLE should be a string.
 DOCSTR should be a string.
 
 FALLBACKS should be a list of fallback namespace keywords.
+  - nil will become `jerky:namespace/default'
+  - If no fallbacks are desired, pass in a list with only:
+    `jerky:namespace/no-fallback'
 
 Return the created namespace entry."
   ;;------------------------------
@@ -326,24 +329,29 @@ Return the created namespace entry."
   ;;------------------------------
   ;; Validation.
   ;;------------------------------
-  (let ((verified-fallbacks nil))
+  (let (fallbacks/verified)
+
     ;; Each non-nil "FallBack NameSpace"...
     (dolist (fb-ns (seq-filter (lambda (x) (not (null x))) fallbacks))
       (cond ((eq fb-ns jerky:namespace/no-fallback)
-             (push fb-ns verified-fallbacks))
+             (push fb-ns fallbacks/verified))
 
             ((not (keywordp fb-ns))
              (error (concat "int<jerky>:namespace:entry:set: "
                             "FALLBACK must be a keyword: %s")
                     fb-ns))
 
-            ((not (int<jerky>:namespace/ordered fb-ns 'quiet))
+            ((not (jerky:namespace:has fb-ns))
              (error (concat "int<jerky>:namespace:entry:set: "
                             "FALLBACK must be an existing namespace: %s")
                     fb-ns))
 
             (t
-             (push fb-ns verified-fallbacks))))
+             (push fb-ns fallbacks/verified))))
+
+    ;; No fallbacks -> default fallback.
+    (unless fallbacks/verified
+      (setq fallbacks/verified (list jerky:namespace/default)))
 
     ;;------------------------------
     ;; Create Namespace.
@@ -353,7 +361,7 @@ Return the created namespace entry."
           title
           docstr
           ;; And put these back into the correct order.
-          (nreverse verified-fallbacks))))
+          (nreverse fallbacks/verified))))
 
 
 (defun int<jerky>:namespace:set (entry &optional action)
@@ -368,13 +376,16 @@ If ACTION is `int<jerky>:action/delete', delete the namespace instead."
 
       ;; Have the entry! Delete or update it.
       (if (eq action int<jerky>:action/delete)
-          ;; Delete entry.
-          (setf (alist-get namespace int<jerky>:namespaces
-                           ;; DEFAULT set to same as new value for
-                           ;; removing from alist. REMOVE set to non-nil.
-                           int<jerky>:action/delete int<jerky>:action/delete)
-                ;; New value must be eql to DEFAULT provided to alist-get.
-                int<jerky>:action/delete)
+          (progn
+            ;; Delete entry.
+            (setf (alist-get namespace int<jerky>:namespaces
+                             ;; DEFAULT set to same as new value for
+                             ;; removing from alist. REMOVE set to non-nil.
+                             int<jerky>:action/delete int<jerky>:action/delete)
+                  ;; New value must be eql to DEFAULT provided to alist-get.
+                  int<jerky>:action/delete)
+            ;; Update what we're returning:
+            (setq entry nil))
 
         ;; Overwrite entry.
         (setf (alist-get namespace int<jerky>:namespaces) (cdr entry))))
