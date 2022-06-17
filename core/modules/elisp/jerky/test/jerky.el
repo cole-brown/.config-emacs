@@ -429,10 +429,119 @@
                   (nth 0 (int<jerky>:namespace:entry/fallback:get entry/get)))))))
 
 
+;;------------------------------
+;; jerky:namespace:create
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::jerky:namespace:create ()
+  "Test that `jerky:namespace:create' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::jerky:namespace:create"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Create w/o fallbacks.
+    ;;------------------------------
+    (let* ((namespace :test:00)
+           (title "Zeroith Namespace Title")
+           (docstr "Hello there, Double Ought.")
+           (fallbacks '(:default)) ;; What we want as fallbacks from not supplying any fallbacks.
+           entry/created)
+
+      ;; Don't even supply `:fallbacks' - should get `:default'
+      (setq entry/created (jerky:namespace:create namespace
+                                                  :title title
+                                                  :docstr docstr))
+      (should entry/created)
+      (should (listp entry/created))
+
+      (should (eq namespace
+                  (int<jerky>:namespace:entry/namespace:get entry/created)))
+
+      (should (string= title
+                       (int<jerky>:namespace:entry/title:get entry/created)))
+
+      (should (string= docstr
+                       (int<jerky>:namespace:entry/docstr:get entry/created)))
+
+      (should (listp (int<jerky>:namespace:entry/fallback:get entry/created)))
+      (should (= 1 (length (int<jerky>:namespace:entry/fallback:get entry/created))))
+      (should (eq :default
+                  (nth 0 (int<jerky>:namespace:entry/fallback:get entry/created)))))
+
+    ;;------------------------------
+    ;; Create w/ nil fallbacks.
+    ;;------------------------------
+    (let* ((namespace :test:01)
+           (title "First Namespace Title")
+           (docstr "Hello there, Number One.")
+           (fallbacks nil)
+           entry/created)
+
+      (setq entry/created (jerky:namespace:create namespace
+                                                  :title title
+                                                  :docstr docstr
+                                                  :fallbacks fallbacks))
+      (should entry/created)
+      (should (listp entry/created))
+
+      (should (eq namespace
+                  (int<jerky>:namespace:entry/namespace:get entry/created)))
+
+      (should (string= title
+                       (int<jerky>:namespace:entry/title:get entry/created)))
+
+      (should (string= docstr
+                       (int<jerky>:namespace:entry/docstr:get entry/created)))
+
+      (should (listp (int<jerky>:namespace:entry/fallback:get entry/created)))
+      (should (= 1 (length (int<jerky>:namespace:entry/fallback:get entry/created))))
+      (should (eq :default
+                  (nth 0 (int<jerky>:namespace:entry/fallback:get entry/created)))))
+
+
+    ;;------------------------------
+    ;; Create w/ fallbacks.
+    ;;------------------------------
+    (let* ((namespace :test:01)
+           (title "First Namespace Title")
+           (docstr "Hello there, Number One.")
+           (fallbacks '(nil :foo nil :bar nil)) ;; nils should get filtered out.
+           entry/created)
+
+      (setq entry/created (jerky:namespace:create namespace
+                                                  :title title
+                                                  :docstr docstr
+                                                  :fallbacks fallbacks))
+      (should entry/created)
+      (should (listp entry/created))
+
+      (should (eq namespace
+                  (int<jerky>:namespace:entry/namespace:get entry/created)))
+
+      (should (string= title
+                       (int<jerky>:namespace:entry/title:get entry/created)))
+
+      (should (string= docstr
+                       (int<jerky>:namespace:entry/docstr:get entry/created)))
+
+      (should (listp (int<jerky>:namespace:entry/fallback:get entry/created)))
+      (should (= 2 (length (int<jerky>:namespace:entry/fallback:get entry/created))))
+      (should (eq :foo
+                  (nth 0 (int<jerky>:namespace:entry/fallback:get entry/created))))
+      (should (eq :bar
+                  (nth 1 (int<jerky>:namespace:entry/fallback:get entry/created)))))))
 
 
 ;; TODO: test remaining functions:
-;; jerky:namespace:create
 ;; jerky:namespace:has
 ;; int<jerky>:namespace/ordered
 ;; jerky:namespace:get
