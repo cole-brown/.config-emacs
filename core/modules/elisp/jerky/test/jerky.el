@@ -767,7 +767,12 @@
     ;; Run the test.
     ;;===
 
+    ;; nil remains nil...
     (should-not (int<jerky>:key:normalize nil))
+
+    ;; ...but a list with nil in it becomes empty string.
+    (should (string= ""
+                     (int<jerky>:key:normalize '(nil))))
 
     (should (string= "a/b"
                      (int<jerky>:key:normalize "a/b")))
@@ -780,11 +785,41 @@
                      (int<jerky>:key:normalize '(:base "a/b" "c"))))))
 
 
+;;------------------------------
+;; jerky:key:string
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::jerky:key:string ()
+  "Test that `jerky:key:string' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::jerky:key:string"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (should (string= ""
+                     (jerky:key:string nil)))
+
+    (should (string= "a/b"
+                     (jerky:key:string "a/b")))
+    (should (string= (jerky:key:string "a/b")
+                     (jerky:key:string '("a/b"))))
+
+    (should (string= "a/b/c"
+                     (jerky:key:string '("a/b" "c"))))
+    (should (string= "base/a/b/c"
+                     (jerky:key:string '(:base "a/b" "c"))))))
+
 
 
 
 ;; TODO: test remaining functions:
-;; jerky:key:string
 ;; int<jerky>:repo:get
 ;; int<jerky>:repo/key:get
 ;; int<jerky>:repo/record:get

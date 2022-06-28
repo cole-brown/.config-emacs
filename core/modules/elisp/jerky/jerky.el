@@ -628,6 +628,7 @@ If QUIET is non-nil, return nil instead of signaling error.
 ;; (int<jerky>:key:normalize '("a/b" "c"))
 ;; (int<jerky>:key:normalize '(:base "a/b" "c"))
 ;; (int<jerky>:key:normalize nil)
+;; (int<jerky>:key:normalize '(nil))
 
 
 (defun jerky:key:string (&rest keys)
@@ -637,6 +638,7 @@ If QUIET is non-nil, return nil instead of signaling error.
 ;; (jerky:key:string 'a :b)
 ;; (jerky:key:string "a/b" "c")
 ;; (jerky:key:string :base "a/b" "c")
+;; (jerky:key:string nil)
 
 
 ;;------------------------------------------------------------------------------
