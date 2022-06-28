@@ -749,10 +749,41 @@
                    (int<jerky>:namespace/ordered :test:03/no-default)))))
 
 
+;;------------------------------
+;; int<jerky>:key:normalize
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:key:normalize ()
+  "Test that `int<jerky>:key:normalize' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:key:normalize"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (should-not (int<jerky>:key:normalize nil))
+
+    (should (string= "a/b"
+                     (int<jerky>:key:normalize "a/b")))
+    (should (string= (int<jerky>:key:normalize "a/b")
+                     (int<jerky>:key:normalize '("a/b"))))
+
+    (should (string= "a/b/c"
+                     (int<jerky>:key:normalize '("a/b" "c"))))
+    (should (string= "base/a/b/c"
+                     (int<jerky>:key:normalize '(:base "a/b" "c"))))))
+
+
+
+
 
 ;; TODO: test remaining functions:
-;; jerky:namespace:get
-;; int<jerky>:key:normalize
 ;; jerky:key:string
 ;; int<jerky>:repo:get
 ;; int<jerky>:repo/key:get
@@ -762,6 +793,7 @@
 ;; int<jerky>:record/value:get
 ;; int<jerky>:record/docstr:get
 ;; jerky:get
+;; jerky:namespace:get
 ;; int<jerky>:repo/record/namespace:set
 ;; int<jerky>:repo/key:set
 ;; int<jerky>:repo/record:set

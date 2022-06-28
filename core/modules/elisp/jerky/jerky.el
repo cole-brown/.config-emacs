@@ -624,8 +624,9 @@ If QUIET is non-nil, return nil instead of signaling error.
       ;; Return the full key string.
       key)))
 ;; (int<jerky>:key:normalize "a/b")
-;; (int<jerky>:key:normalize "a/b" "c")
-;; (int<jerky>:key:normalize :base "a/b" "c")
+;; (int<jerky>:key:normalize '("a/b"))
+;; (int<jerky>:key:normalize '("a/b" "c"))
+;; (int<jerky>:key:normalize '(:base "a/b" "c"))
 ;; (int<jerky>:key:normalize nil)
 
 
