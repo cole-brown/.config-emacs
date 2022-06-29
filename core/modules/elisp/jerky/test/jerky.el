@@ -887,10 +887,57 @@
 
 
 ;;------------------------------
+;; int<jerky>:repo/key:set
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:repo/key:set ()
+  "Test that `int<jerky>:repo/key:set' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:repo/key:set"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;; Can't guarentee that the input plist was updated or not, so don't test for that.
+
+    ;;------------------------------
+    ;; Create plist from nil input.
+    ;;------------------------------
+    (let ((key :test)
+          (plist/initial nil)
+          plist/updated)
+
+      (setq plist/updated
+            (int<jerky>:repo/key:set key plist/initial))
+
+      (should plist/updated)
+      (should (equal (list :key key)
+                  plist/updated)))
+
+    ;;------------------------------
+    ;; Set existing plist.
+    ;;------------------------------
+    (let ((key :test/updated)
+          (plist/initial '(:key :test/initial))
+          plist/updated)
+
+      (setq plist/updated
+            (int<jerky>:repo/key:set key plist/initial))
+
+      (should plist/updated)
+      (should (equal (list :key key)
+                     plist/updated)))))
+
+
+;;------------------------------
 ;; TODO: Test these functions:
 ;;------------------------------
-;;
-;; int<jerky>:repo/key:set
 ;; int<jerky>:repo/record:set
 ;; int<jerky>:repo:set
 ;; int<jerky>:repo/update
