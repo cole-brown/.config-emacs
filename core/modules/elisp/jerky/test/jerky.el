@@ -817,9 +817,89 @@
                      (jerky:key:string '(:base "a/b" "c"))))))
 
 
+;;------------------------------
+;; int<jerky>:repo/record/namespace:set
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:repo/record/namespace:set ()
+  "Test that `int<jerky>:repo/record/namespace:set' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:repo/record/namespace:set"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Create from scratch.
+    ;;------------------------------
+    (let ((record/initial nil)
+          record/updated)
+      (setq record/updated
+            (int<jerky>:repo/record/namespace:set :create
+                                                  "only value"
+                                                  "only docstring"
+                                                  record/initial))
+
+      (should record/updated)
+      (should (equal '((:create "only value" "only docstring"))
+                     record/updated)))
+
+    ;;------------------------------
+    ;; Add new namespace to existing.
+    ;;------------------------------
+    (let ((record/initial '((:default "default value" "default docstring")))
+          record/updated)
+
+      (setq record/updated
+            (int<jerky>:repo/record/namespace:set :test
+                                                  "another namespace value"
+                                                  "another namespace docstring"
+                                                  record/initial))
+
+      (should record/updated)
+      (should (equal '((:test "another namespace value" "another namespace docstring")
+                       (:default "default value" "default docstring"))
+                     record/updated))
+
+      ;;------------------------------
+      ;; Delete existing namespace.
+      ;;------------------------------
+      (setq record/initial record/updated)
+
+      (should (equal '((:test "another namespace value" "another namespace docstring")
+                       (:default "default value" "default docstring"))
+                     record/initial))
+
+      (setq record/updated
+            (int<jerky>:repo/record/namespace:set :test
+                                                  int<jerky>:action/delete
+                                                  "another namespace docstring"
+                                                  record/initial))
+
+      (should (equal '((:default "default value" "default docstring"))
+                     record/updated)))))
 
 
-;; TODO: test remaining functions:
+;;------------------------------
+;; TODO: Test these functions:
+;;------------------------------
+;;
+;; int<jerky>:repo/key:set
+;; int<jerky>:repo/record:set
+;; int<jerky>:repo:set
+;; int<jerky>:repo/update
+;; jerky:set
+
+
+;;------------------------------
+;; TODO: Test these functions:
+;;------------------------------
 ;; int<jerky>:repo:get
 ;; int<jerky>:repo/key:get
 ;; int<jerky>:repo/record:get
@@ -827,14 +907,114 @@
 ;; int<jerky>:record/namespace:get
 ;; int<jerky>:record/value:get
 ;; int<jerky>:record/docstr:get
+
+
+;; TODO: Do the above functions first?
+
+
+;;------------------------------
 ;; jerky:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::jerky:get ()
+  "Test that `jerky:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::jerky:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Set up a namespace.
+    ;;------------------------------
+
+    (let* ((namespace :testspace))
+      (jerky:namespace:create namespace
+                              :title "Test Namespace Title"
+                              :docstr "Test namespace docstring.")
+
+      ;;------------------------------
+      ;; Test getting (no namespace).
+      ;;------------------------------
+
+      (let ((value "Hello there.")
+            (docstr "Test documentation."))
+        ;; Set something to get...
+        (should (jerky:set :test 'jerky:get "00"
+                           :value     value
+                           :docstr    docstr))
+
+        (should (string= value
+                         (jerky:get :test 'jerky:get "00")))
+        (should (string= value
+                         (jerky:get :test 'jerky:get "00"
+                                    :field :value)))
+
+        (should (string= namespace
+                         (jerky:get :test 'jerky:get "00"
+                                    :field :namespace)))
+
+        (should (string= docstr
+                         (jerky:get :test 'jerky:get "00"
+                                    :field :docstr))))
+      )))
+
+      ;; ;;------------------------------
+      ;; ;; Test getting (namespaced).
+      ;; ;;------------------------------
+
+      ;; (let ((value "Hello there.")
+      ;;       (namespace :testspace)
+      ;;       (docstr "Test documentation."))
+      ;;   ;; Set something to get...
+      ;;   (should (jerky:set :test 'jerky:get
+      ;;                      :value     value
+      ;;                      :namespace namespace
+      ;;                      :docstr    docstr))
+
+      ;;   (should (string= value
+      ;;                    (jerky:get :test 'jerky:get)))
+      ;;   (should (string= value
+      ;;                    (jerky:get :test 'jerky:get
+      ;;                               :field :value)))
+
+      ;;   (should (string= namespace
+      ;;                    (jerky:get :test 'jerky:get
+      ;;                               :field :namespace)))
+
+      ;;   (should (string= docstr
+      ;;                    (jerky:get :test 'jerky:get
+      ;;                               :field :docstr))))
+
+      ;; ;;------------------------------
+      ;; ;; Test getting from Jerky.
+      ;; ;;------------------------------
+
+      ;; (should (string= ""
+      ;;                  (jerky:get nil)))
+
+      ;; (should (string= "a/b"
+      ;;                  (jerky:get "a/b")))
+      ;; (should (string= (jerky:get "a/b")
+      ;;                  (jerky:get '("a/b"))))
+
+      ;; (should (string= "a/b/c"
+      ;;                  (jerky:get '("a/b" "c"))))
+      ;; (should (string= "base/a/b/c"
+      ;;                  (jerky:get '(:base "a/b" "c"))))
+      ;; )))
+
+
+
+
+;; TODO: test remaining functions:
 ;; jerky:namespace:get
-;; int<jerky>:repo/record/namespace:set
-;; int<jerky>:repo/key:set
-;; int<jerky>:repo/record:set
-;; int<jerky>:repo:set
-;; int<jerky>:repo/update
-;; jerky:set
 ;; int<jerky>:search/filter
 ;; jerky:has
 

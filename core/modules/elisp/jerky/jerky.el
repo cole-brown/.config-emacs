@@ -62,6 +62,7 @@ For `int<jerky>:repo/test/string=' (`define-hash-table-test')."
                    :weakness nil))
 
 
+;; TODO: Consider/evaluate `record' for storing jerky values.
 (defvar int<jerky>:repo (int<jerky>:repo:create)
   "A key-path/value store, basically.
 
@@ -803,7 +804,7 @@ If VALUE is `int<jerky>:action/delete', remove NAMESPACE's record instead.
 Return new, updated copy of record list that the old RECORD should be
 replaced with."
   (if (null record)
-      ;; No existing record. Create a new one.
+      ;; No existing record. Create & return a new one.
       (list (list namespace value docstr))
 
     ;; Have the record! Delete or update it.
@@ -818,12 +819,12 @@ replaced with."
 
       ;; Overwrite record.
       (setf (alist-get namespace record)
-            (list value docstr))
+            (list value docstr)))
 
-      ;; Return the updated record.
-      record)))
+    ;; Return the updated record.
+    record))
 ;; (setq int<jerky>:alist/test '((:default "default value" "default ds")))
-;; (int<jerky>:repo/record.namespace:set :home "test" "test ds" 'int<jerky>:alist/test)
+;; (int<jerky>:repo/record/namespace:set :home "test" "test ds" 'int<jerky>:alist/test)
 ;; int<jerky>:alist/test
 
 
