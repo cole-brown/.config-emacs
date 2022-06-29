@@ -468,7 +468,7 @@
       ;; Check returned entry and also entry from get.
       ;;---
       ;; DELETE!!!
-      (setq entry/updated (int<jerky>:namespace:set entry int<jerky>:action/delete))
+      (setq entry/updated (int<jerky>:namespace:set entry jerky:action/delete))
       (should-not entry/updated)
 
       (setq entry/get (int<jerky>:namespace:entry:get namespace))
@@ -878,7 +878,7 @@
 
       (setq record/updated
             (int<jerky>:repo/record/namespace:set :test
-                                                  int<jerky>:action/delete
+                                                  jerky:action/delete
                                                   "another namespace docstring"
                                                   record/initial))
 
@@ -981,7 +981,24 @@
 
       (should plist/updated)
       (should (equal (list :record record)
-                     plist/updated)))))
+                     plist/updated)))
+
+    ;;------------------------------
+    ;; Delete.
+    ;;------------------------------
+    (let ((record jerky:action/delete)
+          (plist/initial '(:record :test/initial))
+          ;; Delete should return value of `jerky:action/delete' so that
+          ;; `int<jerky>:repo/update' functions correctly.
+          (output/expected jerky:action/delete)
+          plist/updated)
+
+      (setq plist/updated
+            (int<jerky>:repo/record:set record plist/initial))
+
+      (should plist/updated)
+      (should (eq output/expected
+                  plist/updated)))))
 
 
 ;;------------------------------
@@ -1045,19 +1062,173 @@
       ;; Delete a record.
       ;;------------------------------
       ;; Delete should return nil.
-      (should-not (int<jerky>:repo:set key int<jerky>:action/delete))
+      (should-not (int<jerky>:repo:set key jerky:action/delete))
 
       ;; Is it deleted now?
       (setq plist/repo (gethash key int<jerky>:repo))
       (should-not plist/repo))))
 
 
-
-;;------------------------------
-;; TODO: Test these functions:
 ;;------------------------------
 ;; int<jerky>:repo/update
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:repo/update ()
+  "Test that `int<jerky>:repo/update' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:repo/update"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Should have an empty Jerky Repo to start...
+    ;;------------------------------
+    (should int<jerky>:repo)
+    (should (hash-table-p int<jerky>:repo))
+    (should (hash-table-empty-p int<jerky>:repo))
+
+    ;;------------------------------
+    ;; Create the record.
+    ;;------------------------------
+    (let* ((key "test/repo/update")
+           (namespace :test:repo/update)
+           (value 9001)
+           (docstr "Hello there.")
+           (record/expected (list :key key
+                                  :record (list (list namespace value docstr))))
+           plist/repo/create)
+
+      (setq plist/repo/create (int<jerky>:repo/update key namespace value docstr))
+
+      (should plist/repo/create)
+      (should (listp plist/repo/create))
+      (should (plist-member plist/repo/create :key))
+      (should (plist-member plist/repo/create :record))
+      (should (equal (plist-get record/expected   :key)
+                     (plist-get plist/repo/create :key)))
+      (should (equal (plist-get record/expected   :record)
+                     (plist-get plist/repo/create :record)))
+
+      ;;------------------------------
+      ;; Update/overwrite the record.
+      ;;------------------------------
+      (let* ((value/update :overwritten)
+             (record/expected (list :key key
+                                    :record (list (list namespace value/update docstr))))
+             plist/repo/update)
+
+        ;; Change the value.
+        (setq plist/repo/update (int<jerky>:repo/update key namespace value/update docstr))
+
+        (should plist/repo/update)
+        (should (listp plist/repo/update))
+        (should (plist-member plist/repo/update :key))
+        (should (plist-member plist/repo/update :record))
+        (should (equal (plist-get record/expected   :key)
+                       (plist-get plist/repo/update :key)))
+        (should (equal (plist-get record/expected   :record)
+                       (plist-get plist/repo/update :record)))
+
+        ;;------------------------------
+        ;; Delete the record.
+        ;;------------------------------
+        (let* (plist/repo/delete)
+          (setq plist/repo/delete (int<jerky>:repo/update key namespace jerky:action/delete docstr))
+          (should-not plist/repo/delete))))))
+
+
+;;------------------------------
 ;; jerky:set
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::jerky:set ()
+  "Test that `jerky:set' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::jerky:set"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Should have an empty Jerky Repo to start...
+    ;;------------------------------
+    (should int<jerky>:repo)
+    (should (hash-table-p int<jerky>:repo))
+    (should (hash-table-empty-p int<jerky>:repo))
+
+    ;;------------------------------
+    ;; Create the record.
+    ;;------------------------------
+    (let* ((key/expected "test/jerky/set")
+           (namespace    :test:repo/update)
+           (value        9001)
+           (docstr       "Hello there.")
+           (record/expected (list :key key/expected
+                                  :record (list (list namespace value docstr))))
+           plist/repo/create)
+
+      (setq plist/repo/create (jerky:set 'test 'jerky 'set
+                                         :value     value
+                                         :namespace namespace
+                                         :docstr    docstr))
+
+      (should plist/repo/create)
+      (should (listp plist/repo/create))
+      (should (plist-member plist/repo/create     :key))
+      (should (plist-member plist/repo/create     :record))
+      (should (equal (plist-get record/expected   :key)
+                     (plist-get plist/repo/create :key)))
+      (should (equal (plist-get record/expected   :record)
+                     (plist-get plist/repo/create :record)))
+
+      ;;------------------------------
+      ;; Update/overwrite the record.
+      ;;------------------------------
+      (let* ((value/update :overwritten)
+             (record/expected (list :key key/expected
+                                    :record (list (list namespace value/update docstr))))
+             plist/repo/update)
+
+        ;; Change the value.
+        (setq plist/repo/update (jerky:set 'test 'jerky 'set
+                                           :value     value/update
+                                           :namespace namespace
+                                           :docstr    docstr))
+
+        (should plist/repo/update)
+        (should (listp plist/repo/update))
+        (should (plist-member plist/repo/update     :key))
+        (should (plist-member plist/repo/update     :record))
+        (should (equal (plist-get record/expected   :key)
+                       (plist-get plist/repo/update :key)))
+        (should (equal (plist-get record/expected   :record)
+                       (plist-get plist/repo/update :record))))
+
+      ;;------------------------------
+      ;; Delete the record.
+      ;;------------------------------
+      (let* (plist/repo/delete)
+        (setq plist/repo/delete (jerky:set 'test 'jerky 'set
+                                           :value     jerky:action/delete
+                                           :namespace namespace
+                                           :docstr    docstr))
+
+        (should-not plist/repo/delete)))))
+
+
 
 
 ;;------------------------------

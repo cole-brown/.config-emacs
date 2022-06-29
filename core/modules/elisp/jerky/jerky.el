@@ -116,7 +116,7 @@ E.g.: (jerky:get 'my/key :path \"to/dir\")
   "Keyword / name for setting namespaces to not use any (further) fallbacks.")
 
 
-(defconst int<jerky>:action/delete :int<jerky>:action/delete
+(defconst jerky:action/delete :jerky:action/delete
   "Value used when a delete is desired.
 
 Use some keyword that will never be used by a jerky user.")
@@ -210,7 +210,7 @@ output will be nil."
         func/name
         func/tags
       ;; And build our tuple output.
-      (list (int<jerky>:key:normalize args) parsed))))
+      (cons (int<jerky>:key:normalize args) parsed))))
 ;; (int<jerky>:parse '(foo bar baz :namespace qux :value 1) t)
 ;; (int<jerky>:parse '(foo bar baz :namespace qux :value 1 :baz "hello") t :baz :DNE)
 ;; (int<jerky>:parse '(foo bar baz :namespace nil :value 1) t)
@@ -368,7 +368,7 @@ Return the created namespace entry."
 (defun int<jerky>:namespace:set (entry &optional action)
   "Create or overwrite namespace ENTRY in `int<jerky>:namespaces'.
 
-If ACTION is `int<jerky>:action/delete', delete the namespace instead."
+If ACTION is `jerky:action/delete', delete the namespace instead."
   (let* ((namespace (int<jerky>:namespace:entry/namespace:get entry))
          (existing (int<jerky>:namespace:entry:get namespace)))
     (if (null existing)
@@ -376,15 +376,15 @@ If ACTION is `int<jerky>:action/delete', delete the namespace instead."
         (push entry int<jerky>:namespaces)
 
       ;; Have the entry! Delete or update it.
-      (if (eq action int<jerky>:action/delete)
+      (if (eq action jerky:action/delete)
           (progn
             ;; Delete entry.
             (setf (alist-get namespace int<jerky>:namespaces
                              ;; DEFAULT set to same as new value for
                              ;; removing from alist. REMOVE set to non-nil.
-                             int<jerky>:action/delete int<jerky>:action/delete)
+                             jerky:action/delete jerky:action/delete)
                   ;; New value must be eql to DEFAULT provided to alist-get.
-                  int<jerky>:action/delete)
+                  jerky:action/delete)
             ;; Update what we're returning:
             (setq entry nil))
 
@@ -799,7 +799,7 @@ If nothing found at key, return will be nil."
 (defun int<jerky>:repo/record/namespace:set (namespace value docstr record)
   "Create/overwrite NAMESPACE's alist assoc with new VALUE & DOCSTR.
 
-If VALUE is `int<jerky>:action/delete', remove NAMESPACE's record instead.
+If VALUE is `jerky:action/delete', remove NAMESPACE's record instead.
 
 Return new, updated copy of record list that the old RECORD should be
 replaced with."
@@ -808,14 +808,14 @@ replaced with."
       (list (list namespace value docstr))
 
     ;; Have the record! Delete or update it.
-    (if (eq value int<jerky>:action/delete)
+    (if (eq value jerky:action/delete)
         ;; Delete record.
         (setf (alist-get namespace record
                          ;; DEFAULT set to same as new value for
                          ;; removing from alist. REMOVE set to non-nil.
-                         int<jerky>:action/delete int<jerky>:action/delete)
+                         jerky:action/delete jerky:action/delete)
               ;; New value must be eql to DEFAULT provided to alist-get.
-              int<jerky>:action/delete)
+              jerky:action/delete)
 
       ;; Overwrite record.
       (setf (alist-get namespace record)
@@ -843,17 +843,26 @@ updated."
 
 Return the updated plist that the old plist should be replaced with; you may or
 may not get a copy and the original may or may not have been destructievly
-updated."
-  (plist-put plist :record record))
+updated.
+
+Return `jerky:action/delete' if record is nil or
+`jerky:action/delete'. This is so that `int<jerky>:repo:set' can use a
+direct call to this."
+  (if (or (null record)
+          (eq record jerky:action/delete))
+      ;; 'Delete' the record.
+      ;; Forward the delete action along...
+      jerky:action/delete
+    (plist-put plist :record record)))
 
 
 (defun int<jerky>:repo:set (key plist)
   "Create/overwrite the KEY in `int<jerky>:repo', setting it to PLIST.
 
-If PLIST is `int<jerky>:action/delete', remove KEY from `int<jerky>:repo'
+If PLIST is `jerky:action/delete', remove KEY from `int<jerky>:repo'
 instead."
   ;; Delete?
-  (cond ((eq plist int<jerky>:action/delete)
+  (cond ((eq plist jerky:action/delete)
          (remhash key int<jerky>:repo))
 
         ;; Has the correct members for adding?
@@ -864,7 +873,7 @@ instead."
         ;; Error out, I guess.
         (t
          (error (concat "int<jerky>:repo:set: plist must be "
-                        "`int<jerky>:action/delete' or an actual plist "
+                        "`jerky:action/delete' or an actual plist "
                         "with `:key' and `:record' members. Got: %s")
                 plist))))
 
@@ -873,16 +882,15 @@ instead."
   "Create, delete, or update/overwrite a NAMESPACE'd VALUE with DOCSTR.
 File it under KEY in `int<jerky>:repo'.
 
-To delete the NAMESPACE's value, pass `int<jerky>:action/delete' as the value."
+To delete the NAMESPACE's value, pass `jerky:action/delete' as the value."
   ;; Get existing plist value in our repo under key. Could be nil if it
   ;; doesn't exist; that's fine.
   (let* ((plist (int<jerky>:repo:get key))
          (record (int<jerky>:repo/record:get plist)))
 
-    ;; plist/record will be nil if they don't exist.
+    ;; The plist and/or record will be nil if they don't exist.
     ;; The code path is the same for a brand new thing and for updating
     ;; an existing thing.
-
     (int<jerky>:repo:set
      key
      ;; Make the record w/ plist from making the key.
