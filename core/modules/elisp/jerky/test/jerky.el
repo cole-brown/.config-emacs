@@ -985,9 +985,77 @@
 
 
 ;;------------------------------
+;; int<jerky>:repo:set
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:repo:set ()
+  "Test that `int<jerky>:repo:set' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:repo:set"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Should have an empty Jerky Repo to start...
+    ;;------------------------------
+    (should int<jerky>:repo)
+    (should (hash-table-p int<jerky>:repo))
+    (should (hash-table-empty-p int<jerky>:repo))
+
+    ;;------------------------------
+    ;; Should not set invalid records.
+    ;;------------------------------
+    (should-error (int<jerky>:repo:set :test/initial
+                                       nil))
+    (should-error (int<jerky>:repo:set :test/initial
+                                       '(:key :test/initial)))
+    (should-error (int<jerky>:repo:set :test/initial
+                                       '(:record :test/initial)))
+
+    ;;------------------------------
+    ;; Set a record.
+    ;;------------------------------
+    (let* ((key "test/00")
+           (record '((:ns/00   :value/00      "namespace 00 docstring")
+                     (:default :value/default "default docstring")))
+           (plist/input (list :key key :record record))
+           plist/repo)
+
+      (should (int<jerky>:repo:set key plist/input))
+
+      ;; Do we have the thing in `int<jerky>:repo' now?
+      (setq plist/repo (gethash key int<jerky>:repo))
+      (should plist/repo)
+      (should (listp plist/repo))
+      (should (plist-member plist/repo :key))
+      (should (plist-member plist/repo :record))
+      (should (equal key
+                     (plist-get plist/repo :key)))
+      (should (equal record
+                     (plist-get plist/repo :record)))
+
+      ;;------------------------------
+      ;; Delete a record.
+      ;;------------------------------
+      ;; Delete should return nil.
+      (should-not (int<jerky>:repo:set key int<jerky>:action/delete))
+
+      ;; Is it deleted now?
+      (setq plist/repo (gethash key int<jerky>:repo))
+      (should-not plist/repo))))
+
+
+
+;;------------------------------
 ;; TODO: Test these functions:
 ;;------------------------------
-;; int<jerky>:repo:set
 ;; int<jerky>:repo/update
 ;; jerky:set
 
