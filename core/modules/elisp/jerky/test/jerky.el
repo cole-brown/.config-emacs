@@ -1535,13 +1535,6 @@
                        (int<jerky>:record/docstr:get record))))))
 
 
-
-
-;; TODO: This function!
-;; TODO: This function!
-;; TODO: This function!
-
-
 ;;------------------------------
 ;; jerky:get
 ;;------------------------------
@@ -1561,92 +1554,82 @@
     ;;===
 
     ;;------------------------------
-    ;; Set up a namespace.
+    ;; Set up test values.
     ;;------------------------------
 
-    (let* ((namespace :testspace))
+    (let* ((value/default :value:default)
+           (docstr/default "Docstring default.")
+           (namespace :testspace)
+           (value/namespace :value:namespace)
+           (docstr/namespace "Docstring namespace."))
+
       (jerky:namespace:create namespace
                               :title "Test Namespace Title"
-                              :docstr "Test namespace docstring.")
+                              :docstr "This is the test namespace docstring.")
+
+      ;;---
+      ;; Set values into same jerky keys.
+      ;;---
+      ;; Without namespace.
+      (should (jerky:set :test 'jerky:get "00"
+                         :value     value/default
+                         :docstr    docstr/default))
+
+      ;; With namespace.
+      (should (jerky:set :test 'jerky:get "00"
+                         :namespace namespace
+                         :value     value/namespace
+                         :docstr    docstr/namespace))
 
       ;;------------------------------
       ;; Test getting (no namespace).
       ;;------------------------------
 
-      (let ((value "Hello there.")
-            (docstr "Test documentation."))
-        ;; Set something to get...
-        (should (jerky:set :test 'jerky:get "00"
-                           :value     value
-                           :docstr    docstr))
+      (should (string= value/default
+                       (jerky:get :test 'jerky:get "00")))
+      (should (string= value/default
+                       (jerky:get :test 'jerky:get "00"
+                                  :field :value)))
 
-        (should (string= value
-                         (jerky:get :test 'jerky:get "00")))
-        (should (string= value
-                         (jerky:get :test 'jerky:get "00"
-                                    :field :value)))
+      (should (string= jerky:namespace/default
+                       (jerky:get :test 'jerky:get "00"
+                                  :field :namespace)))
 
-        (should (string= namespace
-                         (jerky:get :test 'jerky:get "00"
-                                    :field :namespace)))
-
-        (should (string= docstr
-                         (jerky:get :test 'jerky:get "00"
-                                    :field :docstr))))
-      )))
-
-      ;; ;;------------------------------
-      ;; ;; Test getting (namespaced).
-      ;; ;;------------------------------
-
-      ;; (let ((value "Hello there.")
-      ;;       (namespace :testspace)
-      ;;       (docstr "Test documentation."))
-      ;;   ;; Set something to get...
-      ;;   (should (jerky:set :test 'jerky:get
-      ;;                      :value     value
-      ;;                      :namespace namespace
-      ;;                      :docstr    docstr))
-
-      ;;   (should (string= value
-      ;;                    (jerky:get :test 'jerky:get)))
-      ;;   (should (string= value
-      ;;                    (jerky:get :test 'jerky:get
-      ;;                               :field :value)))
-
-      ;;   (should (string= namespace
-      ;;                    (jerky:get :test 'jerky:get
-      ;;                               :field :namespace)))
-
-      ;;   (should (string= docstr
-      ;;                    (jerky:get :test 'jerky:get
-      ;;                               :field :docstr))))
-
-      ;; ;;------------------------------
-      ;; ;; Test getting from Jerky.
-      ;; ;;------------------------------
-
-      ;; (should (string= ""
-      ;;                  (jerky:get nil)))
-
-      ;; (should (string= "a/b"
-      ;;                  (jerky:get "a/b")))
-      ;; (should (string= (jerky:get "a/b")
-      ;;                  (jerky:get '("a/b"))))
-
-      ;; (should (string= "a/b/c"
-      ;;                  (jerky:get '("a/b" "c"))))
-      ;; (should (string= "base/a/b/c"
-      ;;                  (jerky:get '(:base "a/b" "c"))))
-      ;; )))
+      (should (string= docstr/default
+                       (jerky:get :test 'jerky:get "00"
+                                  :field :docstr)))
 
 
+      ;;------------------------------
+      ;; Test getting (namespaced).
+      ;;------------------------------
+
+      (should (string= value/namespace
+                       (jerky:get :test 'jerky:get "00"
+                                  :namespace namespace)))
+      (should (string= value/namespace
+                       (jerky:get :test 'jerky:get "00"
+                                  :namespace namespace
+                                  :field :value)))
+
+      (should (string= namespace
+                       (jerky:get :test 'jerky:get "00"
+                                  :namespace namespace
+                                  :field :namespace)))
+
+      (should (string= docstr/namespace
+                       (jerky:get :test 'jerky:get "00"
+                                  :namespace namespace
+                                  :field :docstr))))))
 
 
-;; TODO: test remaining functions:
-;; jerky:namespace:get
-;; int<jerky>:search/filter
-;; jerky:has
+;;------------------------------------------------------------------------------
+;; Untested Functions
+;;------------------------------------------------------------------------------
+;; There could be more, but these don't have tests:
+;;  - jerky:namespace:get
+;;  - int<jerky>:search/filter
+;;  - jerky:has
 
 
 ;;------------------------------------------------------------------------------
