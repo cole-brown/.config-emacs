@@ -1173,7 +1173,7 @@
     ;; Create the record.
     ;;------------------------------
     (let* ((key/expected "test/jerky/set")
-           (namespace    :test:repo/update)
+           (namespace    :test:jerky:set)
            (value        9001)
            (docstr       "Hello there.")
            (record/expected (list :key key/expected
@@ -1229,12 +1229,71 @@
         (should-not plist/repo/delete)))))
 
 
+;;------------------------------
+;; int<jerky>:repo:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:repo:get ()
+  "Test that `int<jerky>:repo:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:repo:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Should have an empty Jerky Repo to start...
+    ;;------------------------------
+    (should int<jerky>:repo)
+    (should (hash-table-p int<jerky>:repo))
+    (should (hash-table-empty-p int<jerky>:repo))
+
+    ;;------------------------------
+    ;; Create the repo entry to get.
+    ;;------------------------------
+    (let* ((key/expected "test/repo/get")
+           (namespace    :test:repo/get)
+           (value        9001)
+           (docstr       "Hello there.")
+           (record/expected (list :key key/expected
+                                  :record (list (list namespace value docstr))))
+           plist/repo/create
+           plist/repo/get)
+
+      (setq plist/repo/create (jerky:set 'test 'repo 'get
+                                         :value     value
+                                         :namespace namespace
+                                         :docstr    docstr))
+      (should plist/repo/create)
+
+      ;;------------------------------
+      ;; Now we can test getting it.
+      ;;------------------------------
+
+      (setq plist/repo/get (int<jerky>:repo:get key/expected))
+      (should plist/repo/get)
+      (should (listp plist/repo/get))
+      (should (plist-member plist/repo/get        :key))
+      (should (plist-member plist/repo/get        :record))
+      (should (equal (plist-get record/expected   :key)
+                     (plist-get plist/repo/create :key)))
+      (should (equal (plist-get record/expected   :record)
+                     (plist-get plist/repo/create :record)))
+
+      (should (equal plist/repo/create
+                     plist/repo/get)))))
+
 
 
 ;;------------------------------
 ;; TODO: Test these functions:
 ;;------------------------------
-;; int<jerky>:repo:get
 ;; int<jerky>:repo/key:get
 ;; int<jerky>:repo/record:get
 ;; int<jerky>:repo/record/namespace:get
