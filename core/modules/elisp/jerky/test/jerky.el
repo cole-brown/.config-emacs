@@ -1290,12 +1290,95 @@
                      plist/repo/get)))))
 
 
+;;------------------------------
+;; int<jerky>:repo/key:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:repo/key:get ()
+  "Test that `int<jerky>:repo/key:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:repo/key:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Create one repo entry for testing.
+    ;;------------------------------
+    (let* ((key "test/repo/get")
+           (namespace    :test:repo/get)
+           (value        9001)
+           (docstr       "Hello there.")
+           (entry (list :key key
+                        :record (list (list namespace value docstr)))))
+
+      (should (listp entry))
+      (should (plist-member entry :key))
+      (should (plist-member entry :record))
+
+      ;;------------------------------
+      ;; Test it.
+      ;;------------------------------
+
+      (should (string= key
+                       (int<jerky>:repo/key:get entry))))))
+
+
+;;------------------------------
+;; int<jerky>:repo/record:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:repo/record:get ()
+  "Test that `int<jerky>:repo/record:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:repo/record:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Create one repo entry for testing.
+    ;;------------------------------
+    (let* ((key "test/repo/get")
+           (namespace    :test:repo/get)
+           (value        9001)
+           (docstr       "Hello there.")
+           (entry (list :key key
+                        :record (list (list namespace value docstr))))
+           record)
+
+      (should (listp entry))
+      (should (plist-member entry :key))
+      (should (plist-member entry :record))
+
+      ;;------------------------------
+      ;; Test it.
+      ;;------------------------------
+
+      (setq record (int<jerky>:repo/record:get entry))
+
+      (should (listp record))
+      (should (seq-every-p #'listp record))
+      (should (equal (plist-get entry :record)
+                     record)))))
+
+
 
 ;;------------------------------
 ;; TODO: Test these functions:
 ;;------------------------------
-;; int<jerky>:repo/key:get
-;; int<jerky>:repo/record:get
 ;; int<jerky>:repo/record/namespace:get
 ;; int<jerky>:record/namespace:get
 ;; int<jerky>:record/value:get
