@@ -1454,16 +1454,92 @@
       (should-not namespace-assoc))))
 
 
-
-;;------------------------------
-;; TODO: Test these functions:
 ;;------------------------------
 ;; int<jerky>:record/namespace:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:record/namespace:get ()
+  "Test that `int<jerky>:record/namespace:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:record/namespace:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (let* ((namespace    :test:namespace)
+           (value        9001)
+           (docstr       "Hello there, 00.")
+           (record (list namespace value docstr)))
+
+      (should (eq namespace
+                  (int<jerky>:record/namespace:get record))))))
+
+
+;;------------------------------
 ;; int<jerky>:record/value:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:record/value:get ()
+  "Test that `int<jerky>:record/value:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:record/value:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (let* ((namespace    :test:namespace)
+           (value        9001)
+           (docstr       "Hello there, 00.")
+           (record (list namespace value docstr)))
+
+      (should (= value
+                 (int<jerky>:record/value:get record))))))
+
+
+;;------------------------------
 ;; int<jerky>:record/docstr:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:record/docstr:get ()
+  "Test that `int<jerky>:record/docstr:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:record/docstr:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    (let* ((namespace    :test:namespace)
+           (value        9001)
+           (docstr       "Hello there, 00.")
+           (record (list namespace value docstr)))
+
+      (should (string= docstr
+                       (int<jerky>:record/docstr:get record))))))
 
 
-;; TODO: Do the above functions first?
+
+
+;; TODO: This function!
+;; TODO: This function!
+;; TODO: This function!
 
 
 ;;------------------------------
