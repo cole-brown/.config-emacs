@@ -1311,8 +1311,8 @@
     ;;------------------------------
     ;; Create one repo entry for testing.
     ;;------------------------------
-    (let* ((key "test/repo/get")
-           (namespace    :test:repo/get)
+    (let* ((key "test/repo/key/get")
+           (namespace    :test:repo/key/get)
            (value        9001)
            (docstr       "Hello there.")
            (entry (list :key key
@@ -1351,8 +1351,8 @@
     ;;------------------------------
     ;; Create one repo entry for testing.
     ;;------------------------------
-    (let* ((key "test/repo/get")
-           (namespace    :test:repo/get)
+    (let* ((key "test/repo/record/get")
+           (namespace    :test:repo/record/get)
            (value        9001)
            (docstr       "Hello there.")
            (entry (list :key key
@@ -1375,11 +1375,89 @@
                      record)))))
 
 
+;;------------------------------
+;; int<jerky>:repo/record/namespace:get
+;;------------------------------
+
+(ert-deftest test<jerky/jerky>::int<jerky>:repo/record/namespace:get ()
+  "Test that `int<jerky>:repo/record/namespace:get' behaves appropriately."
+  (test<jerky>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<jerky/jerky>::int<jerky>:repo/record/namespace:get"
+      nil
+      nil
+
+    ;;===
+    ;; Run the test.
+    ;;===
+
+    ;;------------------------------
+    ;; Create one repo entry for testing.
+    ;;------------------------------
+    (let* ((key "test/repo/record/namespace/get")
+           (namespace/00    :test:namespace/00)
+           (value/00        9001)
+           (docstr/00       "Hello there, 00.")
+           (namespace/01    :test:namespace/01)
+           (value/01        "over nine thousand")
+           (docstr/01       "Hi.")
+           (value/default    'default)
+           (docstr/default   "Default.")
+           (record (list (list namespace/00 value/00 docstr/00)
+                         (list namespace/01 value/01 docstr/01)
+                         (list jerky:namespace/default value/default docstr/default)))
+           namespace-assoc)
+
+      (should (listp record))
+      (should (alist-get namespace/00 record))
+
+      ;;------------------------------
+      ;; Test single namespace.
+      ;;------------------------------
+
+      (setq namespace-assoc (int<jerky>:repo/record/namespace:get namespace/00 record))
+      (should (equal (list namespace/00 value/00 docstr/00)
+                     namespace-assoc))
+
+      (setq namespace-assoc (int<jerky>:repo/record/namespace:get namespace/01 record))
+      (should (equal (list namespace/01 value/01 docstr/01)
+                     namespace-assoc))
+
+      ;;------------------------------
+      ;; Test list of namespaces.
+      ;;------------------------------
+      ;; Give it a list of namespaces, and it should return first match found.
+
+      ;; 00 first
+      (setq namespace-assoc (int<jerky>:repo/record/namespace:get (list namespace/00 namespace/01 :does-not-exist)
+                                                                  record))
+      (should (equal (list namespace/00 value/00 docstr/00)
+                     namespace-assoc))
+
+      ;; 01 first
+      (setq namespace-assoc (int<jerky>:repo/record/namespace:get (list namespace/01 namespace/00 :does-not-exist)
+                                                                  record))
+      (should (equal (list namespace/01 value/01 docstr/01)
+                     namespace-assoc))
+
+      ;; Something it won't find first, then 01, so... expect 01.
+      (setq namespace-assoc (int<jerky>:repo/record/namespace:get (list :does-not-exist namespace/01 namespace/00)
+                                                                  record))
+      (should (equal (list namespace/01 value/01 docstr/01)
+                     namespace-assoc))
+
+      ;; Unknown -> nil.
+      (setq namespace-assoc (int<jerky>:repo/record/namespace:get :does-not-exist
+                                                                  record))
+      (should-not namespace-assoc))))
+
+
 
 ;;------------------------------
 ;; TODO: Test these functions:
 ;;------------------------------
-;; int<jerky>:repo/record/namespace:get
 ;; int<jerky>:record/namespace:get
 ;; int<jerky>:record/value:get
 ;; int<jerky>:record/docstr:get
