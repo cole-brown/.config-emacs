@@ -1,16 +1,18 @@
-;;; init.el --- Init for taskspace doom module. -*- lexical-binding: t; -*-
+;;; taskspace/init.el --- Per-task notes & files. -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2020-2021  Cole Brown
-;; Author: Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created: 2019-04-24
-;; Modified: 2021-02-14
-;; Version: 2.1
-;; Keywords:
-;; Homepage: https://github.com/cole-brown/.config-doom
-;; Package-Requires: ((emacs "27.1"))
+;; Created:    2019-04-24
+;; Modified:   2022-07-01
+;; Version: 2.2
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
+;;
+;; Per-task notes & files.
 ;;
 ;; Initialize the taskspace module.
 ;;
@@ -18,21 +20,29 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Set up imp.
+;; Set imp Root.
 ;;------------------------------------------------------------------------------
+
 (imp:path:root :taskspace
-               (imp:path:join doom-private-dir
-                              "modules"
-                              "taskspace"
-                              "taskspace")
+               (imp:path:current:dir)
                "init.el")
 
+
 ;;------------------------------------------------------------------------------
-;; Load it!
+;; Load Files
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:taskspace taskspace)
-          :filename "taskspace")
+(imp:timing
+    '(:taskspace)
+    (imp:file:current)
+    path/parent
+
+  (imp:load :feature  '(:taskspace taskspace)
+            :filename "taskspace")
+
+  ;; End load timing.
+  )
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.
