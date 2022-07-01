@@ -20,6 +20,14 @@
 ;; (system:multiplexer:get)
 ;; (jerky:get 'system 'hash)
 
+(nub:debug
+ :innit
+ (imp:path:current:file/relative :root)
+ '(:init :system :multiplexer :secret)
+ "This system's hash is: %S (== %S)"
+ (system:multiplexer:hash/this)
+ (system:secret:hash))
+
 
 ;;------------------------------------------------------------------------------
 ;; All Systems: Define Systems
@@ -63,7 +71,7 @@
 
 ;;---
 ;; work/2021/lap::e29fbd-0d21c7
-;;   via Ubuntu 20.04
+;;  Host OS: Ubuntu 20.04
 ;;---
 (system:multiplexer:define :hash "e29fbd-0d21c7"
                            :domain "work"
@@ -74,7 +82,8 @@
 
 ;;---
 ;; work/2021/vm::d3dbd4-fa7934
-;;   via Ubuntu 20.04
+;;   Guest VM: Windows 10
+;;     via Ubuntu 20.04
 ;;---
 (system:multiplexer:define :hash "d3dbd4-fa7934"
                            :domain "work"
@@ -89,13 +98,17 @@
 ;;------------------------------
 
 ;; Open Emacs. Check "mis:init:messages" or "*Messages*" buffer. You should see something like:
-;;   > [WARNING]: `system:secret:init`
-;;   >     [SKIP]: Cannot load secret 'init'; invalid system secrets.
-;;   >     Validation Result:
-;;   >      ...
-;;   >      ...
-;;   >      :hash "012345-abcdef"
-;;   >      ...
+;;   > Warning (emacs): [WARNING ]: system:secret:init: [SKIP]: Cannot load secret ’init’; invalid system secrets.
+;;   >                                 Validation Result:
+;;   >           :success nil
+;;   >            :reason "Secrets root directory for this system (work/2021/lap::e29fbd-0d21c7) is invalid: nil"
+;;   >              :hash "e29fbd-0d21c7"
+;;   >                :id "work/2021/lap::e29fbd-0d21c7"
+;;   >     :path/dir/root nil
+;;   >     :path/dir/load nil
+;;   >   :path/dir/system nil
+;;   >    :path/file/load "init"
+;;   >    :path/file/name "init.el"
 ;;
 ;; Add the new system using strings:
 ;;   - `:domain' - "home", "work", other domain

@@ -75,8 +75,7 @@ Outputs warning to 'nub' warning buffer if secret fail validation."
           caller
         '(:line:each
           "%s: Cannot load secret '%s'; invalid system secrets."
-          "Validation Result:"
-          "%s")
+          "Validation Result:\n%s")
         "[SKIP]"
         file
         (int<system/secret>:plist:pretty-string plist))
