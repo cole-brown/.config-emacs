@@ -231,14 +231,14 @@ bug investigation, log munging, or whatever."
 (defcustom taskspace:groups
   '((:default "Taskspace" taskspace:group:default))
   "Definitions for multiple task spaces. Each will have its own settings.
-Each entry in the alist is a list of: (keyword/symbol string settings-variable)
+Each entry in the alist is a list of: (keyword string settings-variable)
 
-'keyword/symbol' is used internally to identify the taskspace groups.
+'keyword' is used internally to identify the taskspace groups.
 
 'string' is a name used for display purposes.
 
 'settings-variable' should be the big settings alist (see
-`taskspace:group:default' for the default's settings."
+`taskspace:group:default' for the default's settings)."
   :group 'taskspace
   :type '(alist :key-type symbol
                 :value-type string))
@@ -248,9 +248,6 @@ Each entry in the alist is a list of: (keyword/symbol string settings-variable)
 ;; Per-Taskspace Settings
 ;;------------------------------------------------------------------------------
 
-;; Need to convert all my old defcustoms into a structure like this per
-;; taskspace. Need to also allow for not having these (have a default they can
-;; also change maybe?).
 (defcustom taskspace:group:default
   '((:type/notes :self-contained
     (concat
@@ -379,7 +376,7 @@ If FIELD is `:docstr', gets the setting's docstr.
 If FIELD is `:key', gets the setting's key, which is KEY. Almost
 useless, but does validate entry's exists."
   (let ((entry nil)
-        (settings (int<taskspace>:config:group->settings group)))
+        (settings (int<taskspace>:config:group:get/settings group)))
     ;; First, try to get from group's settings (if we found group's settings).
     (when settings
       (setq entry (int<taskspace>:config:get key settings)))
@@ -390,7 +387,7 @@ useless, but does validate entry's exists."
       (setq entry
             (int<taskspace>:config:get
              key
-             (int<taskspace>:config:group->settings :default))))
+             (int<taskspace>:config:group:get/settings :default))))
 
     ;; Now we can finally either reduce down to the value or error out.
     (if (null entry)
@@ -400,16 +397,16 @@ useless, but does validate entry's exists."
          key group)
 
       ;; Got group; return value of requested field.
-      ;; Entry should be: (symbol value docstr)
+      ;; Entry should be: (key value docstr)
       ;; Now figure out which is requested, what it actually is, and return it.
       (cond ((eq field :key)
-             (int<taskspace>:config:entry->key entry))
+             (int<taskspace>:config:entry:get/key entry))
 
             ((eq field :docstr)
-             (int<taskspace>:config:entry->docstr entry))
+             (int<taskspace>:config:entry:get/docstr entry))
 
             (t
-             (int<taskspace>:config:entry->setting entry))))))
+             (int<taskspace>:config:entry:get/setting entry))))))
 ;; (int<taskspace>:config :home :format/datetime)
 ;; (int<taskspace>:config :home :format/datetime :setting)
 ;; (int<taskspace>:config :home :format/datetime :docstr)
@@ -421,26 +418,19 @@ useless, but does validate entry's exists."
 ;; (int<taskspace>:config :home :file/new/copy)
 
 
-(defun int<taskspace>:config:entry->docstr (entry)
+(defun int<taskspace>:config:entry:get/key (entry)
   "Helper for int<taskspace>:config.
 
-Given an ENTRY from a group's settings alist, returns its docstr or nil."
-  (nth 2 entry))
-
-
-(defun int<taskspace>:config:entry->key (entry)
-  "Helper for int<taskspace>:config.
-
-Given an ENTRY from a group's settings alist, returns its key/symbol or nil."
+Given an ENTRY from a group's settings alist, returns its key or nil."
   (nth 0 entry))
 
 
-(defun int<taskspace>:config:entry->setting (entry)
+(defun int<taskspace>:config:entry:get/setting (entry)
   "Helper for int<taskspace>:config.
 
 Given an ENTRY from a group's settings alist, turn it into an actual setting.
 
-ENTRY is the alist tuple of (taskspace's-symbol thing-to-figure-out docstr).
+ENTRY is the alist tuple of (taskspace-keyword thing-to-figure-out docstr).
 
 Thing-to-figure-out could be: a symbol that needs evaluated, a string, a
 function that needs called, etc."
@@ -485,34 +475,38 @@ function that needs called, etc."
      ;; Else just return it.
      (t
       setting))))
-;; (int<taskspace>:config:entry->setting '(jeff (+ 4 1) "list function"))
-;; (int<taskspace>:config:entry->setting '(jeff (4 1)   "just a list"))
-;; (int<taskspace>:config:entry->setting '(jeff #'ignore "a function"))
-;; (int<taskspace>:config:entry->setting '(jeff jeff "symbol, no value"))
-;; (let ((a 42)) (int<taskspace>:config:entry->setting '(jeff a "symbol w/ value")))
+;; (int<taskspace>:config:entry:get/setting '(jeff (+ 4 1) "list function"))
+;; (int<taskspace>:config:entry:get/setting '(jeff (4 1)   "just a list"))
+;; (int<taskspace>:config:entry:get/setting '(jeff #'ignore "a function"))
+;; (int<taskspace>:config:entry:get/setting '(jeff jeff "symbol, no value"))
+;; (let ((a 42)) (int<taskspace>:config:entry:get/setting '(jeff a "symbol w/ value")))
 
 
-(defun int<taskspace>:config:group->settings (group)
+(defun int<taskspace>:config:entry:get/docstr (entry)
   "Helper for int<taskspace>:config.
 
-Gets settings from `taskspace:groups' using GROUP as alist key.
-Returns just the settings - doesn't return the assoc value.
+Given an ENTRY from a group's settings alist, returns its docstr or nil."
+  (nth 2 entry))
+
+
+(defun int<taskspace>:config:group:get/settings (group)
+  "Helper for int<taskspace>:config.
+
+Get settings from `taskspace:groups' using GROUP as alist key.
+Return just the settings - not the full assoc value.
 Can return nil."
-  ;; Group entry is: (keyword/symbol display-name settings)
+  ;; Group entry is: (keyword display-name settings)
   ;; Return only settings, or just nil if assoc/nth don't find anything.
   (let ((settings (int<taskspace>:group:settings group)))
     (cond ((listp settings)
-           ;; (message "list. returning.")
            settings)
 
           ((symbolp settings)
-           ;; (message "symbol. evaluating.")
            (eval settings))
 
           (t
-           ;; (message "nil. returning.")
            nil))))
-;; (int<taskspace>:config:group->settings :default)
+;; (int<taskspace>:config:group:get/settings :default)
 
 
 (defun int<taskspace>:config:get (key settings)
@@ -537,25 +531,25 @@ Returns assoc value if found (key's full entry in SETTINGS alist)."
 GROUP-ASSOC shoud be an entry from `taskspace:groups'.
 
 Returns a cons of:
-  - A string containing both the display name and the symbol name.
-  - The symbol."
+  - A string containing both the display name and the keyword.
+  - The keyword."
   (cons
    ;; Display string first, since that's what `completing-read' shows to user.
-   (concat (format "%-10s" (int<taskspace>:group:symbol group-assoc))
+   (concat (format "%-10s" (int<taskspace>:group:keyword group-assoc))
            " - "
            (int<taskspace>:group:name/display group-assoc))
-   ;; Group symbol second so we can get back to it from user's choice of display
-   ;; strings.
-   (int<taskspace>:group:symbol group-assoc)))
+   ;; Group keyword second so we can get back to it from user's choice of
+   ;; display strings.
+   (int<taskspace>:group:keyword group-assoc)))
 ;; (int<taskspace>:prompt:group:name '(:default "Jeff!" taskspace:group:default))
 
 
 (defun int<taskspace>:prompt:group:get (choices)
   "Interactive prompt for user to input/choose group name.
-Provides both the symbol name and the display string for user to
-complete against. Returns symbol name chosen.
+Provides both the keyword name and the display string for user to
+complete against. Returns keyword name chosen.
 
-CHOICES should be filtered down symbol names from `taskspace:groups'."
+CHOICES should be filtered down keyword names from `taskspace:groups'."
   (let ((display-choices (-map #'int<taskspace>:prompt:group:name choices)))
     (alist-get
      (completing-read "Taskspace Group: "
@@ -585,7 +579,7 @@ AUTO can be a few things:
 
 If QUIET is non-nil, return nil on error instead of raising error signal.
 
-Return group symbol (aka 0th element of entry in `taskspace:groups')."
+Return group keyword (aka 0th element of entry in `taskspace:groups')."
   ;; `or' will give us either:
   ;;   1) the auto group,
   ;;   2) or the prompted group.
@@ -607,7 +601,7 @@ Return group symbol (aka 0th element of entry in `taskspace:groups')."
    ;; 2) No luck on the auto-group... Check the groups and prompt as needed.
    (let ((groups-sans-default
           ;; Filter down to just non-defaults...
-          (-filter (lambda (group) (not (eq (int<taskspace>:group:symbol group) :default)))
+          (-filter (lambda (group) (not (eq (int<taskspace>:group:keyword group) :default)))
                    taskspace:groups)))
      ;; Just one group? Return it.
      (cond ((= (length groups-sans-default) 1)
@@ -727,7 +721,7 @@ This sets the automatic group for that dir (and sub-dirs) to GROUP."
 
 ;; TODO: use this to validate group in code places.
 (defun int<taskspace>:group:valid? (group)
-  "Return non-nil if GROUP is a valid group symbol/name."
+  "Return non-nil if GROUP is a valid group keyword/name."
   (keywordp group))
 
 
@@ -763,7 +757,7 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
     ;; Do we have enough to get started?
     (when path
         ;; Search through our groups for something to match to that.
-        ;; Start by getting our group symbols...
+        ;; Start by getting our group keywords...
         (setq current-root
               (car
                (->> (-map #'car taskspace:groups)
@@ -812,7 +806,7 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
               #'null
               (-map (lambda (entry)
                       ;; If we match one of this group's roots, return the
-                      ;; group symbol.
+                      ;; group keyword.
                       (if (or
                            (string= (directory-file-name
                                      (f-canonical
@@ -853,34 +847,44 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
 (defun int<taskspace>:group (group)
   "Return the `assoc' from `taskspace:groups' for GROUP.
 
+If GROUP is a keyword, get the assoc and then return it.
 If GROUP is a list, assume it is already the assoc list and return it.
-If GROUP is a symbol, get the assoc and then return it."
-  (if (symbolp group)
-      (assoc group taskspace:groups)
-    ;; It's not a symbol... assume it's a list, which we assume is the
-    ;; `taskspace:groups' alist, and return it.
-    group))
+Else signal an error."
+  ;; Keyword? Get the assoc for that group.
+  (cond ((keywordp group)
+         (assoc group taskspace:groups))
+
+        ;; List? Assume it's already the group assoc from `taskspace:groups',
+        ;; and return it.
+        ((listp group)
+         group)
+
+        (t
+         (error "%s: Cannot understand type '%S'; need a keyword or list! Group: %S"
+                "int<taskspace>:group"
+                (type-of group)
+                group))))
 ;; (int<taskspace>:group :default)
 ;; (int<taskspace>:group '(:default "Defaults" taskspace:group:default))
 
 
-(defun int<taskspace>:group:symbol (group)
-  "Given GROUP symbol/list, return group's symbol.
+(defun int<taskspace>:group:keyword (group)
+  "Given GROUP keyword/list, return group's keyword.
 
 GROUP should be return value from `int<taskspace>:group' (assoc from
 `taskspace:groups')."
   (nth 0 (int<taskspace>:group group)))
-;; (int<taskspace>:group:symbol '(:default "Taskspace of Default" this-dne))
+;; (int<taskspace>:group:keyword '(:default "Taskspace of Default" this-dne))
 
 
 (defun int<taskspace>:group:name/display (group)
-  "Given GROUP symbol/list, return group's display name.
+  "Given GROUP keyword/list, return GROUP's display name.
 
-GROUP should be return value from `int<taskspace>:group' (assoc from
-`taskspace:groups')."
+GROUP should be either a keyword or the return value from `int<taskspace>:group'
+\(assoc from `taskspace:groups')."
   (let ((group-list (int<taskspace>:group group)))
-    (if (null (nth 1 group-list))
-        (symbol-name (int<taskspace>:group:symbol group-list))
+    (if (null (nth 1 group-list)) ;; Does the group even have a display name?
+        (symbol-name (int<taskspace>:group:keyword group-list))
       (nth 1 group-list))))
 ;; (int<taskspace>:group:name/display '(:default "Taskspace of Default" this-dne))
 ;; (int<taskspace>:group:name/display '(:default nil this-dne))
