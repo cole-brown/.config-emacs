@@ -10,6 +10,14 @@
 ;;   - file-name-as-directory == path->dir ?
 ;;     - and some inverse: path->file ?
 
+;; TODO: truenames?
+;;   - E.g. Funcs to follow symlinks.
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Truenames.html
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/File-Name-Expansion.html
+;; And I guess TODO symlinks in general?
+
+;; TODO: `ignore-case' non-nil on windows et al?
+
 
 ;;------------------------------------------------------------------------------
 ;; Constants
@@ -48,21 +56,21 @@ NOTE: These should be compiled regex strings.")
 ;;------------------------------------------------------------------------------
 
 (defun int<path>:type:valid? (caller type &optional nil-invalid?)
-  "Errors if TYPE is invalid. Returns TYPE if valid (can be `nil').
+  "Error if TYPE is invalid. Return TYPE if valid (can be nil).
 
 CALLER should be the name of the calling function, for use in the error messages."
   ;;---
-  ;; Error/OK: `nil' may or may not be valid...
+  ;; Error/OK: nil may or may not be valid...
   ;;---
   (cond ((null type)
-         ;; Should `nil' be allowed as a type?
+         ;; Should nil be allowed as a type?
          (if nil-invalid?
              (error "%s: Invalid TYPE `%S'. TYPE must be one of: %S"
                 caller
                 type
                 path:types)
 
-           ;; `nil' is allowed.
+           ;; nil is allowed.
            type))
 
          ;;---
@@ -91,24 +99,25 @@ CALLER should be the name of the calling function, for use in the error messages
 
 
 (defun path:directory? (path)
-  "Returns non-nil if PATH is a directory name path."
+  "Return non-nil if PATH is a directory name path."
   (directory-name-p path))
 
 
 (defun path:file? (path)
-  "Returns non-nil if PATH is a file name path."
+  "Return non-nil if PATH is a file name path."
   (not (path:directory? path)))
 
 
 (defun path:absolute? (path)
-  "Returns non-nil if PATH is an absolute path."
+  "Return non-nil if PATH is an absolute path."
   (file-name-absolute-p path))
 
 
 (defun path:exists? (path &optional type)
-  "Returns non-nil if PATH exists.
+  "Return non-nil if PATH exists.
 
-If TYPE is provided, PATH must exist and match."
+TYPE can be: :dir, :file, :symlink, or nil.
+If TYPE is provided, PATH must exist \and\ be the correct type."
   ;;------------------------------
   ;; Error Cases
   ;;------------------------------
@@ -147,19 +156,80 @@ If TYPE is provided, PATH must exist and match."
 ;; (path:exists? (path:current:dir))
 
 
+(defun path:readable? (path)
+  "Return non-nil if PATH exists and is readable."
+  (file-readable-p path))
+
+
+(defun path:descendant? (descendant parent)
+  "Return non-nil if DESCENDANT path is a descendant of PARENT path.
+
+DESCENDANT and PARENT cannot be the same path.
+
+Will convert the paths to absolute/canonical values before comparing."
+  ;; Convert both to dir or file paths so that a dir and a file path work correctly.
+  ;; e.g.:
+  ;;   (path:descendant? "/foo/" "/foo")
+  ;;     -> nil
+  (let ((descendant/abs (path:canonicalize:dir descendant))
+        (parent/abs (path:canonicalize:dir parent)))
+    (unless (string= descendant/abs parent/abs)
+      (string-prefix-p parent/abs
+                       descendant/abs))))
+
+
+(defun path:child? (child parent)
+  "Return non-nil if CHILD path is a direct child of PARENT path.
+
+CHILD and PARENT cannot be the same path.
+
+Will convert the paths to absolute/canonical values before comparing."
+  ;; Convert both to file paths so that a dir and a file path work correctly.
+  ;; (File paths because that's what `path:parent' returns).
+  ;; e.g.:
+  ;;   (path:child? "/foo/" "/foo")
+  ;;     -> nil
+  (let ((child/abs (path:canonicalize:file child))
+        (parent/abs (path:canonicalize:file parent)))
+    (message (mapconcat #'identity
+                        '("child:          %s"
+                          "parent:         %s"
+                          "child's parent: %s")
+                        "\n")
+             child/abs
+             parent/abs
+             (path:parent child/abs))
+    (unless (string= child/abs parent/abs)
+      (string= (path:parent child/abs)
+               parent/abs))))
+;; (path:child? "/" "/")
+;; (path:child? "/foo" "/")
+;; (path:child? "/foo/bar" "/foo")
+
+
+(defun path:equal? (a b)
+  "Return non-nil if paths A and B are the same.
+
+Will convert the paths to absolute/canonical values before comparing."
+  ;; Convert both to dir or file paths so that comparing a dir and a file path work correctly.
+  (string= (path:canonicalize:file a)
+           (path:canonicalize:file b)))
+
+
+
 ;;------------------------------------------------------------------------------
 ;; Traversal
 ;;------------------------------------------------------------------------------
 
 (defun path:parent (path)
-  "Returns the parent directory of PATH."
+  "Return the parent directory of PATH."
   (directory-file-name (file-name-directory path)))
 ;; (path:parent "relative/path/to/foo.test")
 
 
 ;; TODO: Move to regex.el?
 (defun path:ignore? (path regexes)
-  "Returns non-nil if PATH matches any of the REGEXES."
+  "Return non-nil if PATH matches any of the REGEXES."
   (let ((func/name "path:ignore?")
         (regex:list regexes) ;; Shallow copy so we can pop without possibly changing caller's list.
         ignore?)
@@ -192,17 +262,17 @@ If TYPE is provided, PATH must exist and match."
 
 
 (defun path:children:types (path:dir &optional absolute-paths? &rest types)
-  "Returns immediate children of PATH:DIR directory.
+  "Return immediate children of PATH:DIR directory.
 
-Returns an alist of children by type:
+Return an alist of children by type:
   '((:file . (\"child.ext\" ...))
     ...)
 
 TYPES should be nil or a list of keywords from `path:types'.
-If TYPES is non-nil, returns only children of those types.
+If TYPES is non-nil, return only children of those types.
 
-If ABSOLUTE-PATHS? is non-nil, returns absolute paths to the children.
-Else returns names of children."
+If ABSOLUTE-PATHS? is non-nil, return absolute paths to the children.
+Else return names of children."
   (let ((types (if types
                    ;; Remove nils & flatten '(nil) to just nil.
                    (seq-filter (lambda (t) (not (null t)))
@@ -214,7 +284,7 @@ Else returns names of children."
     ;;------------------------------
     ;; Errors on invaild type.
     (dolist (type types)
-      (int<path>:type:valid? "path:exists?" type))
+      (int<path>:type:valid? "path:children:types" type))
 
     (let ((func/name "path:children:types"))
       (unless (stringp path:dir)
@@ -253,10 +323,10 @@ Else returns names of children."
                   ;;---
                   ;; Save / Ignore by Type
                   ;;---
-                  ((eq (file-attribute-type child:attrs) t) ;; `t' is the attr type for directories.
+                  ((eq (file-attribute-type child:attrs) t) ;; t is the attr type for directories.
                    (setq type (if save:dirs :dir :ignore)))
 
-                  ((eq (file-attribute-type child:attrs) nil) ;; `nil' is the attr type for files.
+                  ((eq (file-attribute-type child:attrs) nil) ;; nil is the attr type for files.
                    (setq type (if save:files :file :ignore)))
 
                   ((stringp (file-attribute-type child:attrs)) ;; The attr type for symlinks is a string of the path they point to.(
@@ -295,12 +365,12 @@ Else returns names of children."
 
 ;; TODO: Follow symlinks or no?
 (defun path:children (path:dir &optional absolute-paths? type)
-  "Returns immediate children of PATH:DIR directory.
+  "Return immediate children of PATH:DIR directory.
 
-If TYPE is supplied, returns only children of that type.
+If TYPE is supplied, return only children of that type.
 
-If ABSOLUTE-PATHS? is non-nil, returns a list of absolute paths to the children.
-Else returns a list of names of children."
+If ABSOLUTE-PATHS? is non-nil, return a list of absolute paths to the children.
+Else return a list of names of children."
   ;; Get by TYPE, then flatten to a single list of all children.
   (let ((by-types (path:children:types path:dir absolute-paths? type))
         children)
@@ -508,7 +578,7 @@ names can be used as well as strings."
 ;;------------------------------
 
 (defun path:segments (&rest path)
-  "Splits all PATH strings by directory separators, returns a plist.
+  "Split all PATH strings by directory separators, return a plist.
 
 Returned PLIST will have these keys (if their values are non-nil).
   :drive   - Drive letter / name
@@ -637,7 +707,7 @@ Example:
 (defun path:canonicalize:file (path &rest segment)
   "Canonicalize/normalize a file PATH and path SEGMENTS.
 
-Returns an absolute path.
+Return an absolute path.
 
 Does not fix or validate PATH or SEGMENT components; they are expected to be valid."
   (expand-file-name (apply #'path:join
@@ -655,7 +725,7 @@ Does not fix or validate PATH or SEGMENT components; they are expected to be val
 (defun path:canonicalize:dir (path &rest segment)
   "Canonicalize/normalize a directory PATH and path SEGMENTS.
 
-Returns an absolute path.
+Return an absolute path.
 
 Does not fix or validate PATH or SEGMENT components; they are expected to be valid."
   ;; Fully qualify base as start of return value.
@@ -673,7 +743,7 @@ Does not fix or validate PATH or SEGMENT components; they are expected to be val
 Attempts to preserve file/directory-ness off PATH - that is, tries to
 preserve the final slash if it exists.
 
-Returns an absolute path.
+Return an absolute path.
 
 Does not fix or validate PATH or SEGMENT components; they are expected to be valid."
   (let ((path/joined (apply #'path:join path segment)))
@@ -768,7 +838,7 @@ Raises an error signal if it cannot find a file path."
 
 
 (defun path:current:dir ()
-  "Returns the directory of the emacs lisp file this function is called from.
+  "Return the directory of the emacs lisp file this function is called from.
 
 Uses `path:current:file' and just chops off the filename."
   (when-let (path (path:current:file))
@@ -870,7 +940,7 @@ For `:windows' -> `:wsl':
 (defun int<path>:type (path)
   "Try to guess a PATH type.
 
-Returns:
+Return:
    :wsl     - Linux path to a windows drive?
    :windows - Windows path?
    :linix   - Linux path?"
