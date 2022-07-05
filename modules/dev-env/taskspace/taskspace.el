@@ -1,4 +1,4 @@
-;; taskspace/taskspace.el --- Extremely Simple Taskspace/Workspace Management  -*- lexical-binding: t; -*-
+;;; taskspace/taskspace.el --- Extremely Simple Taskspace/Workspace Management  -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -274,21 +274,18 @@ Each entry in the alist is a list of: (keyword string settings-variable)
      "Function to call to open shell buffer. `shell' and `eshell' work. "
      "Opens the current taskspace's top dir in an emacs shell buffer."))
 
-   (:dir/tasks (file-name-as-directory
-                (expand-file-name "taskspace" user-emacs-directory))
+   (:dir/tasks (path:absolute:dir "taskspace" user-emacs-directory)
     (concat
      "User's root taskspace folder for small work tasks. "
      "All taskspaces for this group will be created here."))
 
-   (:dir/notes (file-name-as-directory
-                (expand-file-name "taskspace" user-emacs-directory))
+   (:dir/notes (path:absolute:dir "taskspace" user-emacs-directory)
     (concat
      "User's folder for all notes that are in `:noteless' taskspaces. "
      "Unused in `:self-contained' taskspaces."))
 
-   (:file/new/copy (file-name-as-directory
-                    (expand-file-name "taskspace-new"
-                                      (int<taskspace>:config :default :dir/tasks)))
+   (:file/new/copy (path:absolute:dir "taskspace-new"
+                                      (int<taskspace>:config :default :dir/tasks))
     "User's folder for files to copy into new taskspaces.")
 
    (:file/new/generate (((int<taskspace>:config :default :file/notes) "") ;; empty file
@@ -313,7 +310,7 @@ Each entry in the alist is a list of: (keyword string settings-variable)
     ;; probably since regexes are just strings?
     ("." ".."
      "00_archive"
-     (file-name-nondirectory (int<taskspace>:config :default :file/new/copy)))
+     (path:absolute:file (int<taskspace>:config :default :file/new/copy)))
     (concat
      "Always ignore these when getting/determining a taskspace directory. "
      "Can be strings or functions."))
@@ -657,7 +654,7 @@ GROUP should be return value from `int<taskspace>:group' (assoc from
 
 DISPLAY can be:
 - nil: Pass taskspaces as-is to completion. AKA display as-is.
-- nondirectory: Strip each element to `file-name-nondirectory'
+- nondirectory: Strip each element to `file:name'
 
 Choice is matched back to taskspaces via dumb string matching. First match in
 TASKSPACES that substring matches user's choice from `completing-read' is
@@ -673,7 +670,7 @@ Return nil or a string in TASKSPACES."
 
      ;; nondirectory -> strip each to remove all parent dirs
      ((equal display 'nondirectory)
-      (setq display-names (mapcar #'file-name-nondirectory taskspaces)))
+      (setq display-names (mapcar #'file:name taskspaces)))
 
      ;; unexpected -> error?
      (t (error "Unknown display option `%s'" display)))
@@ -757,9 +754,9 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
     ;; Do we have enough to get started?
     (when path
         ;; Search through our groups for something to match to that.
-        ;; Start by getting our group keywords...
         (setq current-root
               (car
+               ;; Start by getting our group keywords...
                (->> (-map #'car taskspace:groups)
                     ;; and turning into task and notes dirs...
                     (-map (lambda (g) (list
@@ -772,9 +769,8 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
                             ;; If a child or the same dir as root, keep root.
                             ;; Otherwise return nil for a "nope, not this one".
                             (if (or
-                                 (f-descendant-of? path root)
-                                 (string= (directory-file-name (f-canonical path))
-                                          (directory-file-name (f-canonical root))))
+                                 (path:descendant? path root)
+                                 (path:equal? path root))
                                 root
                               nil)))
                     ;; Reduce down to non-nil answer.
@@ -791,33 +787,25 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
                          path)))
 
       ;; Normalize the path.
-      (setq current-root (directory-file-name (f-canonical current-root)))
-
-      ;; ;; Strip to just dir name.
-      ;; (setq current-root (f-filename current-root))
-      ;; (message "current-root: %S" current-root))))
+      (setq current-root (path:absolute:dir current-root))
 
       ;; Now, finally... We're not done.
       ;; Got to translate some taskspace or notes root dir into its group.
       (setq current-group
-            (car ;; not sure what to do if there's more than one choice left...
-             ;; reduce down to whatever is non-nil.
+            (car ;; Not sure what to do if there's more than one choice left...
+             ;; Reduce down to whatever is non-nil.
              (-remove
               #'null
               (-map (lambda (entry)
                       ;; If we match one of this group's roots, return the
                       ;; group keyword.
                       (if (or
-                           (string= (directory-file-name
-                                     (f-canonical
-                                      (int<taskspace>:config (nth 0 entry)
-                                                         :dir/tasks)))
-                                    current-root)
-                           (string= (directory-file-name
-                                     (f-canonical
-                                      (int<taskspace>:config (nth 0 entry)
-                                                         :dir/notes)))
-                                    current-root))
+                           (path:equal? (int<taskspace>:config (nth 0 entry)
+                                                               :dir/tasks)
+                                        current-root)
+                           (path:equal? (int<taskspace>:config (nth 0 entry)
+                                                               :dir/notes)
+                                        current-root))
                           (nth 0 entry)
                         nil))
                     taskspace:groups))))
@@ -921,12 +909,12 @@ If NO-MESSAGE, skips output message."
   (setq notespath (int<taskspace>:path:notes group taskpath :self-contained))
 
   ;; Does it exist?
-  (unless (f-file? notespath)
+  (unless (path:exists? notespath :file)
     ;; Nope; try remote/:noteless.
     (setq notespath (int<taskspace>:path:notes group taskpath :noteless)))
 
   ;; There is no third try.
-  (if (not (f-file? notespath))
+  (if (not (path:exists? notespath :file))
       (if no-error
           nil
         (error "No notes file found! Look for it: %s, %s"
@@ -949,25 +937,10 @@ If NO-MESSAGE, skips output message."
          default-directory)
 
         ((buffer-file-name)
-         (f-dirname (buffer-file-name)))
+         (path:parent (buffer-file-name)))
 
         (t
          nil)))
-
-
-;; TODO: switch over to `:path' functions
-(defun int<taskspace>:path:child-of? (child parent)
-  "Return non-nil if CHILD is actually a direct child directory of PARENT.
-CHILD and PARENT are only compared as strings/theoretical paths.
-CHILD and PARENT are assumed to be both canonical and directory path names.
-
-f.el's `f-child-of?' and `f-parent-of' require the files to exist for a yes
-answer, which makes testing things a tiny bit annoying, so... f-those-function.
-I'm making my own `f-child-of?'...
-With it's own stupid assumptions.
-And Futurama quotes!
-In fact, forget the quotes!"
-  (string= parent (f-parent child)))
 
 
 (defun int<taskspace>:path:notes (group taskpath &optional type/notes)
@@ -998,7 +971,7 @@ build the notes file path based on that."
             ;; Remote File Name is:
             (concat
              ;; Task Name
-             (file-name-nondirectory taskpath)
+             (file:name taskpath)
              ;; Plus a dot...
              "."
              ;; Plus filename, sans 'sort to top' stuff...
@@ -1013,7 +986,7 @@ build the notes file path based on that."
             ;; Remote File Name is:
             (concat
              ;; Task Name
-             (file-name-nondirectory taskpath)
+             (file:name taskpath)
              ;; Plus a dot...
              "."
              ;; Plus filename, sans 'sort to top' stuff...
@@ -1045,7 +1018,7 @@ file will be elsewhere."
       ;; Remote file name could be different - may want task name in it.
       (expand-file-name (concat ;; remote file name:
                          ;; Task Name
-                         (file-name-nondirectory taskpath)
+                         (file:name taskpath)
                          ;; Plus a dot...
                          "."
                          ;; Plus filename, sans 'sort to top' stuff...
@@ -1062,7 +1035,8 @@ file will be elsewhere."
 (defun int<taskspace>:file:generate (group taskpath file-alist)
   "Generate each file in FILE-ALIST into the new taskpath.
 
-GROUP should be return value from `int<taskspace>:group' (assoc from `taskspace:groups').
+GROUP should be return value from `int<taskspace>:group' (assoc from
+`taskspace:groups').
 
 Expect FILE-ALIST entries to be:
   (filename . string-or-func)
@@ -1077,15 +1051,15 @@ Errors alist is all files not generated, where each assoc in errors alist is:
   ;; let it just do nothing when empty list
   (let (errors-alist ;; empty return value alist
         ;; Get taskname from path to supply to any file content gen funcs.
-        (taskname (file-name-nondirectory taskpath)))
+        (taskname (file:name taskpath)))
     (dolist (entry file-alist errors-alist)
-      (let* ((file (file-name-nondirectory (eval (cl-first entry))))
+      (let* ((file (file:name (eval (cl-first entry))))
              (filepath (int<taskspace>:path:generate group taskpath file))
              (str-or-func (cl-second entry)))
 
         (cond
          ;; ERROR: already exists...
-         ((f-file? filepath)
+         ((path:exists? filepath)
           (push `(,filepath . "file already exist") errors-alist))
 
 ;;         ;; ERROR: generator not bound
@@ -1110,7 +1084,7 @@ Errors alist is all files not generated, where each assoc in errors alist is:
 
         ;; ;; If made a remote notes file, make a .taskspace config now.
         ;; (when (and (string= file (int<taskspace>:config group :file/notes))
-        ;;            (not (f-parent-of? taskpath filepath)))
+        ;;            (not (path:child? filepath taskpath)))
         ;;   (taskspace/with/config taskpath
         ;;     (setq taskspace/config
         ;;           (taskspace/config/set :notes filepath taskspace/config))
@@ -1134,20 +1108,20 @@ Return nil or an errors alist.
     (dolist (path filepaths errors-alist)
       (cond
        ;; ERROR: can't find or...
-       ((not (file-exists-p path))
+       ((not (path:exists? path))
         (push `(,path . "file does not exist") errors-alist))
        ;; ERROR: can't read file or...
-       ((not (file-readable-p path))
+       ((not (path:readable? path))
         (push `(,path . "file is not readable") errors-alist))
        ;; ERROR: not a file (dir or symlink or something)
-       ((not (file-regular-p path))
+       ((not (path:exists? path :file))
         (push `(,path . "path is not a file") errors-alist))
 
        ;; HAPPY: copy it
        (t
         (copy-file path ;; from "the full path of where it is" to...
                    ;; taskpath + "the filename part of where it is"
-                   (expand-file-name (file-name-nondirectory path) taskpath)))
+                   (expand-file-name (file:name path) taskpath)))
 
        ;; dolist returns the errors
        ))))
@@ -1168,11 +1142,11 @@ DATE-ARG must be nil, 'today (for today), or an number for a relative day.
 Directory name is formatted with DESCRIPTION, date, and (monotonically
 increasing) serial number."
   ;; Make sure basic folders exist.
-  (unless (f-directory? (int<taskspace>:config group :dir/tasks))
+  (unless (path:exists? (int<taskspace>:config group :dir/tasks) :dir)
     (message "Taskspace: Making root directory... %s"
              (int<taskspace>:config group :dir/tasks))
     (make-directory (int<taskspace>:config group :dir/tasks)))
-  (unless (f-directory? (int<taskspace>:config group :dir/notes))
+  (unless (path:exists? (int<taskspace>:config group :dir/notes) :dir)
     (message "Taskspace: Making remote notes directory... %s"
              (int<taskspace>:config group :dir/notes))
     (make-directory (int<taskspace>:config group :dir/notes)))
@@ -1203,7 +1177,7 @@ increasing) serial number."
                                                 x
                                                 'description))
                           date-dirs))
-               (not (file-exists-p dir-full-path)))
+               (not (path:exists? dir-full-path)))
         ;; Make it.
         (progn
 
@@ -1214,7 +1188,7 @@ increasing) serial number."
           ;; How about we report something actually useful maybe?
           ;; Full path of created dir on... success?
           ;; Nil on folder non-existance.
-          (if (file-exists-p dir-full-path)
+          (if (path:exists? dir-full-path)
               dir-full-path
             nil))
 
@@ -1236,7 +1210,7 @@ Return nil/non-nil."
   (unless (or (null name) (null dir) (null part))
     ;; strip dir down to file name and
     ;; strip file name down to part (if non-nil part)
-    (let* ((dir-name (file-name-nondirectory dir))
+    (let* ((dir-name (file:name dir))
            (dir-part (int<taskspace>:naming:split group dir-name part)))
       (if (null dir-part)
           nil ;; don't accept nulls
@@ -1259,12 +1233,11 @@ Get children directories of taskspace/dir, ignoring:
     (dolist (file
              (directory-files (int<taskspace>:config group :dir/tasks) 'full)
              task-dirs)
-      (when (and (file-directory-p file) ;; ignore files and...
+      (when (and (path:exists? file :dir) ;; Only want dirs and...
                  (not (member ;; ignore things in ignore list
-                       (file-name-nondirectory file)
+                       (file:name file)
                        (int<taskspace>:config group :dir/tasks/ignore))))
-        (push file task-dirs)
-        ))
+        (push file task-dirs)))
     ;; dolist returns our constructed list since we put it as `result'
     ;; so we're done
   ))
@@ -1304,8 +1277,8 @@ GROUP should be return value from `int<taskspace>:group' (assoc from
    (-max
        (or
         (->>
-         ;; First, need to change from paths to dir names.
-         (-map #'f-filename dir-list)
+         ;; First, need to change from paths to just the name of the dirs.
+         (-map #'file:name dir-list)
          ;; Now pare down to just numbers.
          (-map (lambda (dir) (int<taskspace>:naming:split group dir 'number)))
          ;; Filter out any nils; don't matter to us.
@@ -1381,7 +1354,7 @@ Return nil/non-nil."
   ;; Sanity check 2: Not a path sep in there?
   ;; Valid check:    Verify name obeys my regexp.
   (let ((matched-invalid (string-match file-name-invalid-regexp name))
-        (dir-sep-check (file-name-nondirectory name))
+        (dir-sep-check (file:name name))
         (valid-name (string-match (int<taskspace>:config group :naming/description/rx/valid) name)))
 
     ;; Check for bad input, fail if so... Bad if:
@@ -1565,7 +1538,7 @@ Prompt to choose from multiple."
 
   ;; Get task's full path, reduce to just task directory...
   (let* ((fullpath (call-interactively #'taskspace:dwim:dir))
-         (taskname (file-name-nondirectory fullpath)))
+         (taskname (file:name fullpath)))
 
     ;; copy to kill-ring
     (kill-new taskname)
@@ -1612,8 +1585,8 @@ Else:
       (let ((task-dir (int<taskspace>:org:keyword:get
                        (int<taskspace>:config group :dir/tasks/org/keyword))))
         (when (and (not (null task-dir))
-                   (f-directory? task-dir))
-          (setq task-dir-shortcut (f-full task-dir))
+                   (path:exists? task-dir :dir))
+          (setq task-dir-shortcut (path:canonicalize:dir task-dir))
           (setq task-msg-shortcut
                 (format "Got Taskspace from org-mode keyword (#+%s). %s"
                         (int<taskspace>:config group :dir/tasks/org/keyword)
@@ -1711,7 +1684,7 @@ Else:
           (error "Error creating taskspace directory for: %s" description)
 
         ;; Copy files into new taskspace.
-        (when (f-dir? (int<taskspace>:config group :file/new/copy))
+        (when (path:exists? (int<taskspace>:config group :file/new/copy) :dir)
           (apply #'int<taskspace>:file:copy
                  ;; arg 1: our new taskpath
                  taskpath
@@ -1744,7 +1717,7 @@ Else:
         ;; Copy taskpath to kill-ring.
         (kill-new taskpath)
         ;; Say something.
-        (message "Created taskspace: %s" (file-name-nondirectory taskpath))
+        (message "Created taskspace: %s" (file:name taskpath))
         ;; (message "Created taskspace: %s" taskpath)
 
         ;; Open the notes file.
@@ -1779,11 +1752,15 @@ If in a file or sub-dir of the task dir, go to the task's dir."
         (setq taskpath
               ;; If we are in a dir/file under a task, get the topmost dir that
               ;; isn't the root.
-              (cond ((f-descendant-of? path root)
+              (cond ((path:descendant? path root)
                      ;; Go up from current until we get to direct child.
-                     (f-traverse-upwards (lambda (dir)
-                                           (int<taskspace>:path:child-of? dir root))
-                                         path))
+                     (let ((path/curr path)
+                           child/found?)
+                       (while (and path/curr
+                                   (not child/found?))
+                         (setq path/curr (path:parent path/curr)
+                               child/found? (path:child? path/curr root)))
+                       path/curr))
 
                     ;; If we are in a remote notes file, dunno.
                     ;;   *shrug* Fallthrough to 't.
@@ -1792,7 +1769,7 @@ If in a file or sub-dir of the task dir, go to the task's dir."
                     (t
                      nil)))))
 
-    (if (not (f-dir? taskpath))
+    (if (not (path:exists? taskpath :dir))
         ;; Not a dir - error out.
         (error "'%s' taskspace directory doesn't exist?: '%s'"
                group taskpath)
@@ -1801,7 +1778,7 @@ If in a file or sub-dir of the task dir, go to the task's dir."
       (find-file taskpath)
       (message "Opening '%s' taskspace directory: %s"
                group
-               (f-filename taskpath))
+               (file:name taskpath))
       ;; Return the task's path?
       taskpath)))
 ;; (taskspace:dired:task)
@@ -1813,7 +1790,7 @@ If in a file or sub-dir of the task dir, go to the task's dir."
   "Open the root directory of GROUP's taskspaces in an Emacs (Dired?) buffer."
   (interactive (list (int<taskspace>:prompt:group 'auto t)))
 
-  (if (not (file-directory-p (int<taskspace>:config group :dir/tasks)))
+  (if (not (file:exists? (int<taskspace>:config group :dir/tasks) :dir))
       ;; not a dir - error out
       (error "Can't find taskspace root directory: '%s'" (int<taskspace>:config group :dir/tasks))
 
@@ -1821,7 +1798,7 @@ If in a file or sub-dir of the task dir, go to the task's dir."
     (find-file (int<taskspace>:config group :dir/tasks))
     ;; say something
     (message "Opening taskspace parent: %s"
-             (file-name-nondirectory (int<taskspace>:config group :dir/tasks)))
+             (file:name (int<taskspace>:config group :dir/tasks)))
     ;; return the top dir?
     (int<taskspace>:config group :dir/tasks)))
 ;; (taskspace:dired:root :home)
@@ -1846,14 +1823,14 @@ Shell opened can be set by modifying:
       ;; prompt user for the taskspace with an attempt at DWIM
       (let ((task (call-interactively #'taskspace:dwim:dir)))
         ;; expecting a path from task-dir/dwim
-        (if (not (file-directory-p task))
+        (if (not (path:exists? task :dir))
             ;; not a dir - error out
             (error "Can't find taskspace (not a directory?): '%s'" task)
 
           ;; open with shell-fn
           (funcall shell-fn)
           ;; say something
-          (message "Opening taskspace shell: %s" (file-name-nondirectory task))
+          (message "Opening taskspace shell: %s" (file:name task))
           ;; return the chosen task's dir?
           task)))))
 ;; (taskspace:shell :work)
