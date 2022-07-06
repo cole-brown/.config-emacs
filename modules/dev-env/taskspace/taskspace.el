@@ -1143,60 +1143,78 @@ DATE-ARG must be nil, 'today (for today), or an number for a relative day.
 
 Directory name is formatted with DESCRIPTION, date, and (monotonically
 increasing) serial number."
-  ;; Make sure basic folders exist.
-  (unless (path:exists? (int<taskspace>:config group :dir/tasks) :dir)
-    (message "Taskspace: Making root directory... %s"
-             (int<taskspace>:config group :dir/tasks))
-    (make-directory (int<taskspace>:config group :dir/tasks)))
-  (unless (path:exists? (int<taskspace>:config group :dir/notes) :dir)
-    (message "Taskspace: Making remote notes directory... %s"
-             (int<taskspace>:config group :dir/notes))
-    (make-directory (int<taskspace>:config group :dir/notes)))
+  (let ((func/name "int<taskspace>:dir:create")
+        (func/tags '(:create)))
 
-  ;; Get today's date.
-  (let* ((date (int<taskspace>:naming:get:date group date-arg))
-         ;; Get today's dirs.
-         (date-dirs (int<taskspace>:dir:list:date group date))
-         ;;   - figure out index of this one
-         (number (int<taskspace>:naming:get:number group date-dirs))
+    ;; Make sure basic folders exist.
+    (unless (path:exists? (int<taskspace>:config group :dir/tasks) :dir)
+      (message "Taskspace: Making root directory... %s"
+               (int<taskspace>:config group :dir/tasks))
+      (make-directory (int<taskspace>:config group :dir/tasks)))
+    (unless (path:exists? (int<taskspace>:config group :dir/notes) :dir)
+      (message "Taskspace: Making remote notes directory... %s"
+               (int<taskspace>:config group :dir/notes))
+      (make-directory (int<taskspace>:config group :dir/notes)))
 
-         ;; Build dir string from all that.
-         (dir-name (int<taskspace>:naming:make group date number description))
-         (dir-full-path (path:absolute:dir (int<taskspace>:config group :dir/tasks)
-                                           dir-name)))
+    ;; Get today's date.
+    (let* ((date (int<taskspace>:naming:get:date group date-arg))
+           ;; Get today's dirs.
+           (date-dirs (int<taskspace>:dir:list:date group date))
+           ;;   - figure out index of this one
+           (number (int<taskspace>:naming:get:number group date-dirs))
 
-    ;; TODO: taskspace debugging func.
-    (message "create-dir: %s %s %s %s" date date-dirs number dir-name)
-    (message "create dir: %s" dir-full-path)
+           ;; Build dir string from all that.
+           (dir-name (int<taskspace>:naming:make group date number description))
+           (dir-full-path (path:absolute:dir (int<taskspace>:config group :dir/tasks)
+                                             dir-name)))
 
-    ;; Only create if:
-    ;;   - valid description input and
-    ;;   - no dupes or accidental double creates
-    ;;   - it doesn't exist (this is probably redundant if verify-description
-    ;;     works right)
-    (if (and (int<taskspace>:naming:verify group description)
-               (not (cl-some (lambda (x) (int<taskspace>:dir= group
-                                                description
-                                                x
-                                                'description))
-                          date-dirs))
-               (not (path:exists? dir-full-path)))
-        ;; Make it.
-        (progn
+      ;; TODO: taskspace debugging func.
+      (nub:debug:func/start
+          :taskspace
+          func/name
+          func/tags
+        (cons 'group           group)
+        (cons 'description     description)
+        (cons 'date-arg        date-arg)
+        (cons '--date          date)
+        (cons '--date-dirs     date-dirs)
+        (cons '--number        number)
+        (cons '--dir-name      dir-name)
+        (cons '--dir-full-path dir-full-path))
 
-          ;; make-directory helpfully has no data on what it returns or why or when
-          ;; or anything. But it returns nil on success so... super useful guys.
-          (make-directory dir-full-path)
+      (nub:debug:func/return
+          :taskspace
+          func/name
+          func/tags
 
-          ;; How about we report something actually useful maybe?
-          ;; Full path of created dir on... success?
-          ;; Nil on folder non-existance.
-          (if (path:exists? dir-full-path)
-              dir-full-path
-            nil))
+        ;; Only create if:
+        ;;   - valid description input and
+        ;;   - no dupes or accidental double creates
+        ;;   - it doesn't exist (this is probably redundant if verify-description
+        ;;     works right)
+        (if (and (int<taskspace>:naming:verify group description)
+                 (not (cl-some (lambda (x) (int<taskspace>:dir= group
+                                                                description
+                                                                x
+                                                                'description))
+                               date-dirs))
+                 (not (path:exists? dir-full-path)))
+            ;; Make it.
+            (progn
 
-      ;; Failed check; return nil.
-      nil)))
+              ;; make-directory helpfully has no data on what it returns or why or when
+              ;; or anything. But it returns nil on success so... super useful guys.
+              (make-directory dir-full-path)
+
+              ;; How about we report something actually useful maybe?
+              ;; Full path of created dir on... success?
+              ;; Nil on folder non-existance.
+              (if (path:exists? dir-full-path)
+                  dir-full-path
+                nil))
+
+          ;; Failed check; return nil.
+          nil)))))
 ;; (int<taskspace>:dir:create :work "testcreate" nil)
 
 
@@ -1399,27 +1417,48 @@ NUMBER should be the day's monotonically increasing serial number.
 DESCRIPTION should be a string."
   ;; How long is the parts-alist we're looking for?
   ;;   - Stringify each (don't want nulls here...)
-  (let* ((name-parts (seq-map (lambda (x) (format "%s" x))
+  (let* ((func/name "int<taskspace>:dir:create")
+         (func/tags '(:create))
+         (name-parts (seq-map (lambda (x) (format "%s" x))
                               ;; But take out nulls?
                               (seq-remove #'null
                                           ;; turn inputs into list
                                           (list date number description))))
          (name-len (length name-parts))
          split-alist)
+    (nub:debug:func/start
+        :taskspace
+        func/name
+        func/tags
+      (cons 'group        group)
+      (cons 'date         date)
+      (cons 'number       number)
+      (cons 'description  description)
+      (cons '--name-parts name-parts)
+      (cons '--name-len   name-len))
 
     ;; find the right alist for building the dir string
     (dolist (alist (int<taskspace>:config group :naming/parts-alists) split-alist)
       (when (= name-len (length alist))
         (setq split-alist alist)))
 
-    ;; (message "make-name: %s->%s %s %s null?%s"
-    ;;          name-parts (seq-remove #'null name-parts)
-    ;;          name-len
-    ;;          split-alist (null split-alist))
+    (nub:debug
+        :taskspace
+        func/name
+        func/tags
+      '(:line:each
+        "split-alist: %S"
+        "  --> null? %S")
+      split-alist
+      (null split-alist))
 
-    (unless (null split-alist)
-      (mapconcat #'identity (seq-remove #'null name-parts)
-                 (int<taskspace>:config group :naming/separator)))))
+    (nub:debug:func/return
+        :taskspace
+        func/name
+        func/tags
+      (unless (null split-alist)
+        (mapconcat #'identity (seq-remove #'null name-parts)
+                   (int<taskspace>:config group :naming/separator))))))
 ;; (int<taskspace>:naming:make :default "2000" "1" "hi")
 ;; (int<taskspace>:naming:make :default "2000" nil "hi")
 ;; (int<taskspace>:naming:make :default "hi" nil nil)
@@ -1520,10 +1559,12 @@ Optionally output MSG via `message' with MSG-ARGS."
   ;; copy to kill-ring
   (kill-new string)
   ;; say what we did
-  (message msg msg-args)
+  (when msg
+    (message msg msg-args))
   ;; return it
   string)
 ;; (int<taskspace>:kill-and-return "hello")
+;; (int<taskspace>:kill-and-return "hello" "hey, %s" "there")
 
 
 ;;----------------------------------Taskspace-----------------------------------
