@@ -42,6 +42,9 @@
   ;; Initialize nub before going any further for debug/error/etc output.
   (int<taskspace>:nub:init)
 
+  (imp:load :feature  '(:taskspace group)
+            :filename "group")
+
   (imp:load :feature  '(:taskspace taskspace)
             :filename "taskspace")
 
