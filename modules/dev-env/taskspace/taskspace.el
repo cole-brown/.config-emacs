@@ -3,8 +3,8 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2019-04-24
-;; Modified:   2022-07-01
-;; Version: 2.2
+;; Modified:   2022-07-06
+;; Version:    2.3
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

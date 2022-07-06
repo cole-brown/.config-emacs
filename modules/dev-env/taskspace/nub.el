@@ -1,5 +1,19 @@
-;;; system/secret/debug.el --- Debugging/error help. -*- lexical-binding: t; -*-
-
+;;; nub.el --- Debug/Error/Etc Output via `:nub` -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2022-07-06
+;; Modified:   2022-07-06
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Debug/Error/Etc Output via `:nub'
+;;
+;;; Code:
 
 (imp:require :nub)
 
@@ -8,20 +22,20 @@
 ;; Initialization
 ;;------------------------------------------------------------------------------
 
-(defun int<system/secret>:nub:init ()
-  "Initialize nub user & settings for secret."
+(defun int<taskspace>:nub:init ()
+  "Initialize nub user & settings for Taskspace."
   ;; Defaults for all the settings.
-  (nub:vars:init :system/secret))
+  (nub:vars:init :taskspace))
 
 
 ;;------------------------------------------------------------------------------
 ;; Debugging Toggle
 ;;------------------------------------------------------------------------------
 
-(defun system:secret:debug:toggle ()
-  "Toggle debugging for dlv."
+(defun taskspace:debug:toggle ()
+  "Toggle debugging for Taskspace."
   (interactive)
-  (nub:debug:toggle :system/secret))
+  (nub:debug:toggle :taskspace))
 
 
 ;;------------------------------------------------------------------------------
@@ -37,4 +51,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :system 'secret 'debug)
+(imp:provide :taskspace 'nub)

@@ -35,7 +35,12 @@
 (imp:timing
     '(:taskspace)
     (imp:file:current)
-    path/parent
+    (imp:path:current:dir)
+
+  (imp:load :feature  '(:taskspace nub)
+            :filename "nub")
+  ;; Initialize nub before going any further for debug/error/etc output.
+  (int<taskspace>:nub:init)
 
   (imp:load :feature  '(:taskspace taskspace)
             :filename "taskspace")
