@@ -223,6 +223,9 @@
   (imp:load :feature  '(:taskspace group)
             :filename "group")
 
+  (imp:load :feature  '(:taskspace naming)
+            :filename "naming")
+
   (imp:load :feature  '(:taskspace path)
             :filename "path")
 
