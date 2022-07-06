@@ -389,9 +389,11 @@ useless, but does validate entry's exists."
     ;; Now we can finally either reduce down to the value or error out.
     (if (null entry)
         ;; Not found anywhere; error out.
-        (error
-         "Taskspace: Could not find setting '%S' in group '%S' or default"
-         key group)
+        (nub:error
+            :taskspace
+            "int<taskspace>:config"
+          "Taskspace: Could not find setting '%S' in group '%S' or default"
+          key group)
 
       ;; Got group; return value of requested field.
       ;; Entry should be: (key value docstr)
@@ -593,8 +595,11 @@ Return group keyword (aka 0th element of entry in `taskspace:groups')."
          ((not (null auto))
           (if quiet
               nil
-            (error "%s: Unknown AUTO option `%S'"
-                   "taskspace: int<taskspace>:prompt:group" auto))))
+            (nub:error
+                :taskspace
+                "int<taskspace>:prompt:group"
+              "Unknown AUTO option `%S'"
+              auto))))
    ;; 2) No luck on the auto-group... Check the groups and prompt as needed.
    (let ((groups-sans-default
           ;; Filter down to just non-defaults...
@@ -673,7 +678,12 @@ Return nil or a string in TASKSPACES."
       (setq display-names (mapcar #'file:name taskspaces)))
 
      ;; unexpected -> error?
-     (t (error "Unknown display option `%s'" display)))
+     (t
+      (nub:error
+          :taskspace
+          "int<taskspace>:prompt:task/existing"
+        "Unknown display option `%s'"
+        display)))
 
     ;; Give user their choices...
     ;;
@@ -709,11 +719,11 @@ This sets the automatic group for that dir (and sub-dirs) to GROUP."
                (list 'int<taskspace>:dlv:group
                      group
                      :safe))
-
-    (error (concat "%s: Requires `dlv' feature/package/module;"
-                   "didn't find them. %s %s")
-           "taskspace:group:dlv"
-           group directory)))
+    (nub:error
+        :taskspace
+        "taskspace:group:dlv"
+      "Requires `dlv' feature/package/module; didn't find them. Group: %s, Directory: %s"
+      group directory)))
 
 
 ;; TODO: use this to validate group in code places.
@@ -782,9 +792,11 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
         ;; Complain if interactive; return nil if not.
         (if quiet
             nil
-          (error (format (concat "Could not find a taskspace root for "
-                                 "currently visited buffer dir: %s")
-                         path)))
+          (nub:error
+              :taskspace
+              "int<taskspace>:group:current"
+            "Could not find a taskspace root for currently visited buffer dir: %s"
+            path))
 
       ;; Normalize the path.
       (setq current-root (path:absolute:dir current-root))
@@ -848,10 +860,12 @@ Else signal an error."
          group)
 
         (t
-         (error "%s: Cannot understand type '%S'; need a keyword or list! Group: %S"
-                "int<taskspace>:group"
-                (type-of group)
-                group))))
+         (nub:error
+             :taskspace
+             "int<taskspace>:group"
+           "Cannot understand type '%S'; need a keyword or list! Group: %S"
+           (type-of group)
+           group))))
 ;; (int<taskspace>:group :default)
 ;; (int<taskspace>:group '(:default "Defaults" taskspace:group:default))
 
@@ -917,9 +931,12 @@ If NO-MESSAGE, skips output message."
   (if (not (path:exists? notespath :file))
       (if no-error
           nil
-        (error "No notes file found! Look for it: %s, %s"
-               (int<taskspace>:path:notes group taskpath :self-contained)
-               (int<taskspace>:path:notes group taskpath :noteless)))
+        (nub:error
+            :taskspace
+            "int<taskspace>:notes:open"
+          "No notes file found! Look for it: %s, %s"
+          (int<taskspace>:path:notes group taskpath :self-contained)
+          (int<taskspace>:path:notes group taskpath :noteless)))
 
     ;; Exists; message and visit it.
     (unless no-message
@@ -1602,7 +1619,12 @@ Else:
 
         (cond
          ;; error out if we have no idea what date to dwim with...
-         ((null date) (error "Date string is nil: %s" date))
+         ((null date)
+          (nub:error
+              :taskspace
+              "taskspace:dwim:dir"
+            "Date string is nil: %s"
+            date))
 
          ;; if none, create one.
          ((null taskspaces)
@@ -1659,7 +1681,11 @@ Else:
       ;;   nil)
       ;; Trying out just erroring out instead.
       ;; We are up to the interactive level now.
-      (error "Invalid description: %s" description)
+      (nub:error
+          :taskspace
+          "taskspace:create"
+        "Invalid description: %s"
+        description)
 
     ;; Create the dir/project for today.
     (let ((taskpath (int<taskspace>:dir:create group description 'today)))
@@ -1667,7 +1693,11 @@ Else:
           ;; Couldn't create it for some reason...
           ;; TODO: Better reasons if known. "already exists" would be nice for
           ;; that case.
-          (error "Error creating taskspace directory for: %s" description)
+          (nub:error
+              :taskspace
+              "taskspace:create"
+            "Error creating taskspace directory for: %s"
+            description)
 
         ;; Copy files into new taskspace.
         (when (path:exists? (int<taskspace>:config group :file/new/copy) :dir)
@@ -1692,7 +1722,11 @@ Else:
                              taskpath
                              (int<taskspace>:config group :file/new/generate))))
             (when gen-errors
-              (error "Taskspace file generation errors: %s" gen-errors))))
+              (nub:error
+                  :taskspace
+                  "taskspace:create"
+                "Taskspace file generation errors: %s"
+                gen-errors))))
 
         ;; Either of those can put a projectile file into the taskspace.
         ;; Just name it: .projectile
@@ -1758,8 +1792,11 @@ If in a file or sub-dir of the task dir, go to the task's dir."
 
     (if (not (path:exists? taskpath :dir))
         ;; Not a dir - error out.
-        (error "'%s' taskspace directory doesn't exist?: '%s'"
-               group taskpath)
+        (nub:error
+            :taskspace
+            "taskspace:dired:task"
+          "'%s' taskspace directory doesn't exist?: '%s'"
+          group taskpath)
 
       ;; Ok - message and open (probably in dired but let emacs decide).
       (find-file taskpath)
@@ -1779,7 +1816,11 @@ If in a file or sub-dir of the task dir, go to the task's dir."
 
   (if (not (file:exists? (int<taskspace>:config group :dir/tasks) :dir))
       ;; not a dir - error out
-      (error "Can't find taskspace root directory: '%s'" (int<taskspace>:config group :dir/tasks))
+      (nub:error
+          :taskspace
+          "taskspace:dired:root"
+        "Can't find taskspace root directory: '%s'"
+        (int<taskspace>:config group :dir/tasks))
 
     ;; ok - message and open (probably in dired but let emacs decide)
     (find-file (int<taskspace>:config group :dir/tasks))
@@ -1804,15 +1845,22 @@ Shell opened can be set by modifying:
 
   (let ((shell-fn (int<taskspace>:config group :function/shell)))
     (if (not (functionp shell-fn))
-        (error "`shell-fn' is not bound to a fuction. %s"
-               shell-fn)
+        (nub:error
+            :taskspace
+            "taskspace:shell"
+          "`:function/shell' in taskspace settings for group `%S' is not bound to a fuction: %s"
+          shell-fn)
 
       ;; prompt user for the taskspace with an attempt at DWIM
       (let ((task (call-interactively #'taskspace:dwim:dir)))
         ;; expecting a path from task-dir/dwim
         (if (not (path:exists? task :dir))
             ;; not a dir - error out
-            (error "Can't find taskspace (not a directory?): '%s'" task)
+            (nub:error
+                :taskspace
+                "taskspace:shell"
+              "Can't find taskspace (not a directory?): '%s'"
+              task)
 
           ;; open with shell-fn
           (funcall shell-fn)
@@ -1870,7 +1918,12 @@ DWIM-ish actions:
 
     (cond
      ;; error out if we have no idea what date to dwim with...
-     ((null date) (error "Date string is nil: %s" date))
+     ((null date)
+      (nub:error
+          :taskspace
+          "taskspace:notes"
+         "Date string is nil: %s"
+         date))
 
      ;; If just one, open its notes file.
      ((= length-ts 1)
@@ -1890,7 +1943,11 @@ DWIM-ish actions:
      (t nil))
 
     (if (null taskpath)
-        (error "No taskspace notes found for date: %s" date)
+        (nub:error
+            :taskspace
+            "taskspace:notes"
+          "No taskspace notes found for date: %s"
+          date)
 
         ;; Exists; message and visit it.
         (int<taskspace>:notes:open group taskpath))))
@@ -1927,9 +1984,10 @@ TODO:      - (\"n t\" . \"taskspace\")
 TODO:   3) a list of 1 or 2 for setting into a sub-map:
 TODO:      - (\"t\" (\"n\" (\"t\" . \"taskspace\")))"
   (if (null (symbolp 'doom!)) ;; Doom's loading function should mean this is doom?
-      (error (concat "%s: We are not in a Doom Emacs environment..? "
-                     "Cannot set Doom Emacs keybinds.")
-             "taskspace/doom/keys")
+      (nub:error
+          :taskspace
+          "taskspace:keybind:doom"
+        "We are not in a Doom Emacs environment..? Cannot set Doom Emacs keybinds.")
 
     ;; Map under the Doom leader, probably.
     (map! :leader
