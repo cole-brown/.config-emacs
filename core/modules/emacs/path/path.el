@@ -51,6 +51,13 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Kinds-of-Files.html")
 NOTE: These should be compiled regex strings.")
 
 
+(defconst path:rx:dirs:not-parent-or-current-dot
+  directory-files-no-dot-files-regexp
+  "Regexp matching any (non-empty) file name except \".\" and \"..\".
+
+Useful for `path:children' and `path:children:types'.")
+
+
 ;;------------------------------------------------------------------------------
 ;; Predicates
 ;;------------------------------------------------------------------------------
@@ -261,18 +268,20 @@ Will convert the paths to absolute/canonical values before comparing."
 ;; (path:ignore? "..." path:rx:names:ignore)
 
 
-(defun path:children:types (path:dir &optional absolute-paths? &rest types)
+(defun path:children:types (path:dir &optional absolute-paths? regex &rest types)
   "Return immediate children of PATH:DIR directory.
 
 Return an alist of children by type:
   '((:file . (\"child.ext\" ...))
     ...)
 
-TYPES should be nil or a list of keywords from `path:types'.
-If TYPES is non-nil, return only children of those types.
-
 If ABSOLUTE-PATHS? is non-nil, return absolute paths to the children.
-Else return names of children."
+Else return names of children.
+
+If REGEX is non-nil, return only children whose filename matches the REGEX.
+
+TYPES should be nil or a list of keywords from `path:types'.
+If TYPES is non-nil, return only children of those types."
   (let ((types (if types
                    ;; Remove nils & flatten '(nil) to just nil.
                    (seq-filter (lambda (t) (not (null t)))
@@ -307,7 +316,7 @@ Else return names of children."
         ;;------------------------------
         ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Contents-of-Directories.html
         ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/File-Attributes.html#Definition-of-file_002dattributes
-        (dolist (child (directory-files-and-attributes path:root))
+        (dolist (child (directory-files-and-attributes path:root nil regex))
           (let* ((child:name  (car child))
                  (child:path  (path:join path:root child:name))
                  (child:attrs (cdr child))
@@ -364,15 +373,17 @@ Else return names of children."
 
 
 ;; TODO: Follow symlinks or no?
-(defun path:children (path:dir &optional absolute-paths? type)
+(defun path:children (path:dir &optional absolute-paths? type regex)
   "Return immediate children of PATH:DIR directory.
+
+If ABSOLUTE-PATHS? is non-nil, return a list of absolute paths to the children.
+Else return a list of names of children.
 
 If TYPE is supplied, return only children of that type.
 
-If ABSOLUTE-PATHS? is non-nil, return a list of absolute paths to the children.
-Else return a list of names of children."
+If REGEX is non-nil, return only children whose filename matches the REGEX."
   ;; Get by TYPE, then flatten to a single list of all children.
-  (let ((by-types (path:children:types path:dir absolute-paths? type))
+  (let ((by-types (path:children:types path:dir absolute-paths? regex type))
         children)
     (dolist (type:assoc by-types)
       (setq children (if children
