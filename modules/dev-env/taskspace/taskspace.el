@@ -200,8 +200,6 @@
 
 (require 'cl-lib) ;; for `some'
 (require 'seq) ;; for `seq-contains'
-;; TODO: switch over to `:path' functions
-(require 'f) ;; for nicer file api
 (require 'dash)
 (require 'org-element)
 
