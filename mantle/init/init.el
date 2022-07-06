@@ -19,6 +19,15 @@
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
+;; Prereq Modules
+;;------------------------------
+
+(imp:load :feature  '(:taskspace)
+          :path     (imp:path:join innit:path:module "dev-env" "taskspace")
+          :filename "init") ; Needed by ':mantle/theme/init'.
+
+
+;;------------------------------
 ;; Systems
 ;;------------------------------
 
