@@ -963,37 +963,22 @@ build the notes file path based on that."
     (cond ((eq type/notes :self-contained)
            ;; :self-contained notes filepath is just filename tacked
            ;; on to taskpath.
-           (expand-file-name filename taskpath))
+           (path:absolute:file taskpath filename))
 
           ((eq type/notes :noteless)
-
-           (expand-file-name
-            ;; Remote File Name is:
-            (concat
-             ;; Task Name
-             (file:name taskpath)
-             ;; Plus a dot...
-             "."
-             ;; Plus filename, sans 'sort to top' stuff...
-             (string-trim filename "_" "_"))
-            ;; ...And the remote notes dir from the group's config to get
-            ;; notespath.
-            (int<taskspace>:config group :dir/notes))
-
            ;; Remote file name is different - you want the task name in it so
            ;; the remote notes folder makes any sense on its own.
-           (expand-file-name
-            ;; Remote File Name is:
+           (path:absolute:file
+            ;; The remote notes dir from the group's config to get notespath:
+            (int<taskspace>:config group :dir/notes)
+            ;; And Remote File Name is:
             (concat
              ;; Task Name
              (file:name taskpath)
              ;; Plus a dot...
              "."
              ;; Plus filename, sans 'sort to top' stuff...
-             (string-trim filename "_" "_"))
-            ;; ...And the remote notes dir from the group's config to get
-            ;; notespath.
-            (int<taskspace>:config group :dir/notes))))))
+             (string-trim filename "_" "_")))))))
 ;; (int<taskspace>:path:notes :home "c:/2020-08-24_11_jeff/" :self-contained)
 ;; (int<taskspace>:path:notes :home "c:/2020-08-24_11_jeff/" :noteless)
 ;; (int<taskspace>:path:notes :home "c:/2020-08-24_11_jeff/" :jeff)
@@ -1007,23 +992,23 @@ This can be outside of the taskspace for e.g. :noteless taskspaces - the note
 file will be elsewhere."
   (if (not (string= filename (int<taskspace>:config group :file/notes)))
       ;; Non-note files just go in taskspace...
-      (expand-file-name filename taskpath)
+      (path:absolute:file taskpath filename)
 
     ;; Notes files may or may not go in taskspace. Find out.
     (if (eq (int<taskspace>:config group :type/notes)
             :self-contained)
         ;; Local file name is just provided name.
-        (expand-file-name filename taskpath)
+        (path:absolute:file taskpath filename)
 
       ;; Remote file name could be different - may want task name in it.
-      (expand-file-name (concat ;; remote file name:
-                         ;; Task Name
-                         (file:name taskpath)
-                         ;; Plus a dot...
-                         "."
-                         ;; Plus filename, sans 'sort to top' stuff...
-                         (string-trim filename "_" "_"))
-                        (int<taskspace>:config group :dir/notes)))))
+      (path:absolute:file (int<taskspace>:config group :dir/notes)
+                          (concat ;; remote file name:
+                           ;; Task Name
+                           (file:name taskpath)
+                           ;; Plus a dot...
+                           "."
+                           ;; Plus filename, sans 'sort to top' stuff...
+                           (string-trim filename "_" "_"))))))
 ;; (int<taskspace>:path:generate :default "c:/2020-20-20_20_jeff" "_notes.org")
 ;; (int<taskspace>:path:generate :default "c:/2020-20-20_20_jeff" "jeff.data")
 
@@ -1121,7 +1106,7 @@ Return nil or an errors alist.
        (t
         (copy-file path ;; from "the full path of where it is" to...
                    ;; taskpath + "the filename part of where it is"
-                   (expand-file-name (file:name path) taskpath)))
+                   (path:absolute:file taskpath (file:name path))))
 
        ;; dolist returns the errors
        ))))
@@ -1160,7 +1145,8 @@ increasing) serial number."
 
          ;; Build dir string from all that.
          (dir-name (int<taskspace>:naming:make group date number description))
-         (dir-full-path (expand-file-name dir-name (int<taskspace>:config group :dir/tasks))))
+         (dir-full-path (path:absolute:dir (int<taskspace>:config group :dir/tasks)
+                                           dir-name)))
 
     ;; TODO: taskspace debugging func.
     (message "create-dir: %s %s %s %s" date date-dirs number dir-name)
