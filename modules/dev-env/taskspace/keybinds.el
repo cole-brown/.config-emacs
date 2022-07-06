@@ -20,6 +20,16 @@
 ;;--                   Simple Taskspace / Task Management                     --
 ;;------------------------------------------------------------------------------
 
+(require 'cl-lib) ;; for `some'
+(require 'seq) ;; for `seq-contains'
+(require 'dash)
+(require 'org-element)
+
+(imp:require :dlv)
+
+(imp:require :nub)
+(imp:require :taskspace 'taskspace)
+
 
 ;;------------------------------------------------------------------------------
 ;; DOOM!

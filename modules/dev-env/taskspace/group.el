@@ -23,6 +23,7 @@
 (require 'dash)
 (require 'org-element)
 
+(imp:require :nub)
 (imp:require :dlv)
 
 
