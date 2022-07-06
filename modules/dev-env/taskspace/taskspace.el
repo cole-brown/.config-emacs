@@ -250,81 +250,81 @@ Each entry in the alist is a list of: (keyword string settings-variable)
 
 (defcustom taskspace:group:default
   '((:type/notes :self-contained
-    (concat
-     "What kind of taskspace to create by default.\n"
-     "\n"
-     "It can 'deal' with these kind of taskspaces:\n"
-     "  - `:self-contained' - Self-Contained (taskspace contains everything)\n"
-     "    - Taskspace dir contains:\n"
-     "      - notes,\n"
-     "      - data,\n"
-     "      - etc.\n"
-     "   - No other directories or files.\n"
-     "  - `:noteless' - Split (taskspace notes are separate from rest)\n"
-     "    - Taskspace dir contains:\n"
-     "      - data,\n"
-     "      - etc.\n"
-     "   - Notes file exists separately.\n"))
+     (concat
+      "What kind of taskspace to create by default.\n"
+      "\n"
+      "It can 'deal' with these kind of taskspaces:\n"
+      "  - `:self-contained' - Self-Contained (taskspace contains everything)\n"
+      "    - Taskspace dir contains:\n"
+      "      - notes,\n"
+      "      - data,\n"
+      "      - etc.\n"
+      "   - No other directories or files.\n"
+      "  - `:noteless' - Split (taskspace notes are separate from rest)\n"
+      "    - Taskspace dir contains:\n"
+      "      - data,\n"
+      "      - etc.\n"
+      "   - Notes file exists separately.\n"))
 
-   (:format/datetime "%Y-%m-%d"
-    "Date format for parsing/naming taskspace directory names.")
+    (:format/datetime "%Y-%m-%d"
+     "Date format for parsing/naming taskspace directory names.")
 
-   (:function/shell  #'shell
-    (concat
-     "Function to call to open shell buffer. `shell' and `eshell' work. "
-     "Opens the current taskspace's top dir in an emacs shell buffer."))
+    (:function/shell  #'shell
+     (concat
+      "Function to call to open shell buffer. `shell' and `eshell' work. "
+      "Opens the current taskspace's top dir in an emacs shell buffer."))
 
-   (:dir/tasks (path:absolute:dir "taskspace" user-emacs-directory)
-    (concat
-     "User's root taskspace folder for small work tasks. "
-     "All taskspaces for this group will be created here."))
+    (:dir/tasks (path:absolute:dir "taskspace" user-emacs-directory)
+     (concat
+      "User's root taskspace folder for small work tasks. "
+      "All taskspaces for this group will be created here."))
 
-   (:dir/notes (path:absolute:dir "taskspace" user-emacs-directory)
-    (concat
-     "User's folder for all notes that are in `:noteless' taskspaces. "
-     "Unused in `:self-contained' taskspaces."))
+    (:dir/notes (path:absolute:dir "taskspace" user-emacs-directory)
+     (concat
+      "User's folder for all notes that are in `:noteless' taskspaces. "
+      "Unused in `:self-contained' taskspaces."))
 
-   (:file/new/copy (path:absolute:dir "taskspace-new"
-                                      (int<taskspace>:config :default :dir/tasks))
-    "User's folder for files to copy into new taskspaces.")
+    (:file/new/copy (path:absolute:dir "taskspace-new"
+                                       (int<taskspace>:config :default :dir/tasks))
+     "User's folder for files to copy into new taskspaces.")
 
-   (:file/new/generate (((int<taskspace>:config :default :file/notes) "") ;; empty file
-                        (".projectile" "")) ;; also empty
-    (concat
-     "Files to generate for new taskspaces. Expects an alist like:\n"
-     "(('file1.name' 'contents') ('file2.name' #'your-gen-function))\n"
-     "\n"
-     "Note: `group', `taskname' and `taskpath' are supplied as the args to \n"
-     "the generator functions. Taskpath is the fully expanded file path.\n"
-     "Should return a string of the file's contents.\n"
-     "e.g.: (defun my/taskspace/gen-org-notes (taskname taskpath)\n"
-     "        (format ...))\n"))
+    (:file/new/generate (((int<taskspace>:config :default :file/notes) "") ;; empty file
+                         (".projectile" "")) ;; also empty
+     (concat
+      "Files to generate for new taskspaces. Expects an alist like:\n"
+      "(('file1.name' 'contents') ('file2.name' #'your-gen-function))\n"
+      "\n"
+      "Note: `group', `taskname' and `taskpath' are supplied as the args to \n"
+      "the generator functions. Taskpath is the fully expanded file path.\n"
+      "Should return a string of the file's contents.\n"
+      "e.g.: (defun my/taskspace/gen-org-notes (taskname taskpath)\n"
+      "        (format ...))\n"))
 
-   (:file/notes "_notes.org" "File for storing/recording notes about a task.")
+    (:file/notes "_notes.org" "File for storing/recording notes about a task.")
 
-   ;; TODO: REGEX
-   ;; TODO: regex all these or somethinng?
-   ;; TODO: REGEX
-   (:dir/tasks/ignore
-    ;; TODO: how do I even do string and/or regexes? Different alist entries
-    ;; probably since regexes are just strings?
-    ("." ".."
-     "00_archive"
-     (path:absolute:file (int<taskspace>:config :default :file/new/copy)))
-    (concat
-     "Always ignore these when getting/determining a taskspace directory. "
-     "Can be strings or functions."))
+    ;; TODO: REGEX
+    ;; TODO: regex all these or somethinng?
+    ;; TODO: REGEX
+    (:dir/tasks/ignore
+     ;; TODO: how do I even do string and/or regexes? Different alist entries
+     ;; probably since regexes are just strings?
+     ("." ".."
+      "00_archive"
+      (path:absolute:file (int<taskspace>:config :default :file/new/copy)))
+     (concat
+      "Always ignore these when getting/determining a taskspace directory. "
+      "Can be strings or functions."))
 
-   (:naming/separator "_"
-    "Split directory name on this to extract date, number, and description.")
+    (:naming/separator "_"
+     "Split directory name on this to extract date, number, and description.")
 
-   ;; TODO: Turn these into regexes w/ capture groups, I think?..
-   ;; Have make-name and split-name use the regexes to make/split.
-   ;; http://ergoemacs.org/emacs/elisp_string_functions.html
-   ;; TODO: use this nice regex builder (elisp sexprs)?:
-   ;;   https://www.reddit.com/r/emacs/comments/cf8r83/easier_editing_of_elisp_regexps/eu84ob1/
-   (:naming/parts-alists
-    (
+    ;; TODO: Turn these into regexes w/ capture groups, I think?..
+    ;; Have make-name and split-name use the regexes to make/split.
+    ;; http://ergoemacs.org/emacs/elisp_string_functions.html
+    ;; TODO: use this nice regex builder (elisp sexprs)?:
+    ;;   https://www.reddit.com/r/emacs/comments/cf8r83/easier_editing_of_elisp_regexps/eu84ob1/
+    (:naming/parts-alists
+     (
       ;; Three part. Code does this all the time?
       ((date . 0)
        (number . 1)
@@ -333,23 +333,23 @@ Each entry in the alist is a list of: (keyword string settings-variable)
       ((date . 0)
        (description . 2))
       )
-    (concat
-     "Order of items in task's descriptive directory name. List of alists. "
-     "First one of the correct length is used currently."))
+     (concat
+      "Order of items in task's descriptive directory name. List of alists. "
+      "First one of the correct length is used currently."))
 
-   ;; §-TODO-§ [2020-08-18]: Turn this into an `(rx ...)'.
-   (:naming/description/rx/valid "^[[:alnum:]_\\-]\\{3,\\}$"
-    "Letters, numbers, underscore, and hypen are valid.")
+    ;; §-TODO-§ [2020-08-18]: Turn this into an `(rx ...)'.
+    (:naming/description/rx/valid "^[[:alnum:]_\\-]\\{3,\\}$"
+     "Letters, numbers, underscore, and hypen are valid.")
 
-   (:dir/tasks/org/keyword "TASKSPACE"
-    (concat
-     "Name of the Property/Keyword that might hold a pointer to the "
-     "taskspace directory in a taskspace's org notes file.\n"
-     "\n"
-     "e.g.: if this line is in the '_notes.org':"
-     "#+TASKSPACE: ~/path/to/taskspace/2020-03-17_0_example"
-     "...then `int<taskspace>:org:keyword:get' can be used to get it for"
-     "`taskspace:dwim:dir'.")))
+    (:dir/tasks/org/keyword "TASKSPACE"
+     (concat
+      "Name of the Property/Keyword that might hold a pointer to the "
+      "taskspace directory in a taskspace's org notes file.\n"
+      "\n"
+      "e.g.: if this line is in the '_notes.org':"
+      "#+TASKSPACE: ~/path/to/taskspace/2020-03-17_0_example"
+      "...then `int<taskspace>:org:keyword:get' can be used to get it for"
+      "`taskspace:dwim:dir'.")))
 
   "Alist of custom settings (name/value/docstr) for default taskspace."
   :group 'taskspace
@@ -763,29 +763,29 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
 
     ;; Do we have enough to get started?
     (when path
-        ;; Search through our groups for something to match to that.
-        (setq current-root
-              (car
-               ;; Start by getting our group keywords...
-               (->> (-map #'car taskspace:groups)
-                    ;; and turning into task and notes dirs...
-                    (-map (lambda (g) (list
-                                       (int<taskspace>:config g :dir/tasks)
-                                       (int<taskspace>:config g :dir/notes))))
-                    ;; Have list of tuple lists now; want flat list.
-                    (-flatten)
-                    ;; Figure out which one is our current root.
-                    (-map (lambda (root)
-                            ;; If a child or the same dir as root, keep root.
-                            ;; Otherwise return nil for a "nope, not this one".
-                            (if (or
-                                 (path:descendant? path root)
-                                 (path:equal? path root))
-                                root
-                              nil)))
-                    ;; Reduce down to non-nil answer.
-                    ;; Assumes there is only one non-nil answer.
-                    (-remove #'null)))))
+      ;; Search through our groups for something to match to that.
+      (setq current-root
+            (car
+             ;; Start by getting our group keywords...
+             (->> (-map #'car taskspace:groups)
+                  ;; and turning into task and notes dirs...
+                  (-map (lambda (g) (list
+                                     (int<taskspace>:config g :dir/tasks)
+                                     (int<taskspace>:config g :dir/notes))))
+                  ;; Have list of tuple lists now; want flat list.
+                  (-flatten)
+                  ;; Figure out which one is our current root.
+                  (-map (lambda (root)
+                          ;; If a child or the same dir as root, keep root.
+                          ;; Otherwise return nil for a "nope, not this one".
+                          (if (or
+                               (path:descendant? path root)
+                               (path:equal? path root))
+                              root
+                            nil)))
+                  ;; Reduce down to non-nil answer.
+                  ;; Assumes there is only one non-nil answer.
+                  (-remove #'null)))))
 
     ;; How'd we do?
     (if (not (stringp current-root))
@@ -823,7 +823,7 @@ QUIET also suppresses the \"Current Taskspace Group: ...\" message."
                     taskspace:groups))))
       ;; Inform it and return it.
       (unless quiet
-          (message "Current Taskspace Group: %s" current-group))
+        (message "Current Taskspace Group: %s" current-group))
       current-group)))
 ;; (int<taskspace>:group:current)
 
@@ -1064,9 +1064,9 @@ Errors alist is all files not generated, where each assoc in errors alist is:
          ((path:exists? filepath)
           (push `(,filepath . "file already exist") errors-alist))
 
-;;         ;; ERROR: generator not bound
-;;         ((not (boundp str-or-func))
-;;          (push `(,filepath . "string/function not bound") errors-alist))
+         ;; ;; ERROR: generator not bound
+         ;; ((not (boundp str-or-func))
+         ;;  (push `(,filepath . "string/function not bound") errors-alist))
 
          ;; ERROR: unknown generator
          ((and (not (stringp str-or-func))
@@ -1261,7 +1261,7 @@ Get children directories of taskspace/dir, ignoring:
         (push file task-dirs)))
     ;; dolist returns our constructed list since we put it as `result'
     ;; so we're done
-  ))
+    ))
 ;; (message "%s" (int<taskspace>:dir:list:all :home))
 
 
@@ -1296,19 +1296,19 @@ GROUP should be return value from `int<taskspace>:group' (assoc from
   (1+
    ;; The max of map/reduce shenanigans (or just -1 if given no dirs).
    (-max
-       (or
-        (->>
-         ;; First, need to change from paths to just the name of the dirs.
-         (-map #'file:name dir-list)
-         ;; Now pare down to just numbers.
-         (-map (lambda (dir) (int<taskspace>:naming:split group dir 'number)))
-         ;; Filter out any nils; don't matter to us.
-         (-remove #'null)
-         ;; string -> int
-         (-map #' string-to-number))
+    (or
+     (->>
+      ;; First, need to change from paths to just the name of the dirs.
+      (-map #'file:name dir-list)
+      ;; Now pare down to just numbers.
+      (-map (lambda (dir) (int<taskspace>:naming:split group dir 'number)))
+      ;; Filter out any nils; don't matter to us.
+      (-remove #'null)
+      ;; string -> int
+      (-map #' string-to-number))
 
-        ;; fallback list: negative 1 so we return zero.
-        '(-1)))))
+     ;; fallback list: negative 1 so we return zero.
+     '(-1)))))
 ;; (int<taskspace>:naming:get:number :work (int<taskspace>:dir:list:date :work "2020-08-26"))
 ;; (int<taskspace>:naming:get:number :work (int<taskspace>:dir:list:date :work "2020-08-26"))
 ;; (int<taskspace>:naming:get:number :default '("zort/troz/2000_0_baz"))
@@ -1480,7 +1480,7 @@ Return the requested PART. PART can be one of: 'date 'number 'description"
     ;; unless or if/error?
     (let* ((split-name (split-string name
                                      (int<taskspace>:config group
-                                                        :naming/separator)))
+                                                            :naming/separator)))
            (len-split (length split-name))
            split-alist)
 
@@ -1672,8 +1672,8 @@ Else:
           ;; call-interactively will give user prompt for description,
           ;; etc. as if they called themselves.
           (funcall #'taskspace:create
-                                 group
-                                 (int<taskspace>:prompt:name group)))
+                   group
+                   (int<taskspace>:prompt:name group)))
 
          ;; If just one, return it.
          ;; How to create second in that case? Use a non-dwim create func?
@@ -1682,8 +1682,8 @@ Else:
 
           ;; copy & return
           (int<taskspace>:kill-and-return (cl-first taskspaces)
-                                     "Existing taskspace: %s"
-                                     (cl-first taskspaces)))
+                                          "Existing taskspace: %s"
+                                          (cl-first taskspaces)))
 
          ;; For now, only give existing choices. User can use a non-dwim create
          ;; func if they want new.
@@ -1691,11 +1691,11 @@ Else:
 
           ;; list available choices to user, get the taskspace they chose
           (let ((choice (int<taskspace>:prompt:task/existing group
-                                                taskspaces
-                                                'nondirectory)))
+                                                             taskspaces
+                                                             'nondirectory)))
             (int<taskspace>:kill-and-return choice
-                                       "Chose taskspace: %s"
-                                       choice)))
+                                            "Chose taskspace: %s"
+                                            choice)))
 
          ;; Don't need a default case... Fall through with nil.
          ;;(t nil)
@@ -1963,8 +1963,8 @@ DWIM-ish actions:
       (nub:error
           :taskspace
           "taskspace:notes"
-         "Date string is nil: %s"
-         date))
+        "Date string is nil: %s"
+        date))
 
      ;; If just one, open its notes file.
      ((= length-ts 1)
@@ -1990,8 +1990,8 @@ DWIM-ish actions:
           "No taskspace notes found for date: %s"
           date)
 
-        ;; Exists; message and visit it.
-        (int<taskspace>:notes:open group taskpath))))
+      ;; Exists; message and visit it.
+      (int<taskspace>:notes:open group taskpath))))
 ;; M-x taskspace:notes
 ;; (taskspace:notes)
 ;; (taskspace:notes -1 (int<taskspace>:prompt:group 'auto t))
