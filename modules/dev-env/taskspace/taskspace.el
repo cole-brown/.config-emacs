@@ -1217,7 +1217,7 @@ Get children directories of taskspace/dir, ignoring:
   (let (task-dirs) ;; empty list for return value
     ;; loop on each file in the directory
     (dolist (file
-             (directory-files (int<taskspace>:config group :dir/tasks) 'full)
+             (path:children (int<taskspace>:config group :dir/tasks) :absolute-paths)
              task-dirs)
       (when (and (path:exists? file :dir) ;; Only want dirs and...
                  (not (member ;; ignore things in ignore list
@@ -1680,9 +1680,10 @@ Else:
                  ;;     - no '.', '..'
                  ;;     - yes actual dotfiles somehow?
                  ;;     - This is what I want, so... ok.
-                 (directory-files (int<taskspace>:config group :file/new/copy)
-                                  'full
-                                  directory-files-no-dot-files-regexp)))
+                 (path:children (int<taskspace>:config group :file/new/copy)
+                                :absolute-paths
+                                nil
+                                path:rx:dirs:not-parent-or-current-dot)))
 
         ;; Generate files into new taskspace.
         (when (int<taskspace>:config group :file/new/generate)
