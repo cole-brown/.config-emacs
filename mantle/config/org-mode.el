@@ -389,14 +389,16 @@ Then runs COMMAND interactively with ARGS."
   ;; shenanigans have to constantly mess with this, I think?
   (unless (dlv:var:safe/predicate? 'org-journal-dir)
     ;; It's marked as risky - force it to safe?
-    (dlv:var:safe.predicate 'org-journal-dir #'file-directory-p :quiet))
+    (dlv:var:safe/predicate 'org-journal-dir #'file-directory-p :quiet))
 
 
   ;;--------------------
   ;; configuration
   ;;--------------------
 
-  ;; Keybinds are in: TODO: WHERE ARE KEYBINDS IN sn-004??? Previously: config/keybinds/org-mode.el
+  ;; Keybinds are in:
+  ;;   - TODO: WHERE ARE KEYBINDS IN sn-004???
+  ;;   - Previously: config/keybinds/org-mode.el
   )
 
 

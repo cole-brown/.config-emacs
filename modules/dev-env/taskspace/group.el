@@ -542,7 +542,7 @@ GROUP should be return value from `int<taskspace>:group' (assoc from
 It should only be set via `taskspace:group:dlv'")
 
 ;; Mark our DLV variable as safe for DLV use.
-(dlv:var:safe.predicate 'int<taskspace>:dlv:group #'int<taskspace>:group:valid?)
+(dlv:var:safe/predicate 'int<taskspace>:dlv:group #'int<taskspace>:group:valid?)
 
 
 ;;------------------------------------------------------------------------------
