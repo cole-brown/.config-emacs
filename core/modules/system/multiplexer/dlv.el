@@ -43,7 +43,7 @@ NOTE: This must be run:
   1) By user, and/or
   2) after user's config
 so that user has a chance to add functions to the hook variable."
-  (run-hook-with-args system:multiplexer:dlv/functions
+  (run-hook-with-args 'system:multiplexer:dlv/functions
                       dir-path
                       domain-keyword))
 
