@@ -57,10 +57,15 @@ so that user has a chance to add functions to the hook variable."
 
 This should be a list of list of args to `system:multiplexer:dlv:domain'.
 
-Each list of args should be:
+Each list of args should be a 2-tuple list of:
+  1. Absolute path string
+  2. Domain keyword
+Example:
   '(\"/path/to/directory/\" :domain-namespace-keyword)"
   :group 'system:multiplexer:group
-  :type  '(repeat (cons string (restricted-sexp :match-alternatives (keywordp)))))
+  ;; List of list tuples so we can use `apply' on the list tuples.
+  :type  '(repeat (list string
+                        (restricted-sexp :match-alternatives (keywordp)))))
 
 
 (defun system:multiplexer:dlv:add (dir-path domain-keyword)
@@ -73,7 +78,7 @@ Examples: `:work', `:home', `:etc'
 
 Appends to the `system:multiplexer:dlv/args' variable, which is used by the
 `system:multiplexer:dlv:domain/all' function between user's init and config."
-  (push (cons (path:abs:dir dir-path)
+  (push (list (path:abs:dir dir-path)
               domain-keyword)
         system:multiplexer:dlv/args))
 
@@ -88,7 +93,7 @@ NOTE: This should be run between user's init and config so that user has a
 chance to add functions to the hook variable & args to the arg variable in their
 init, and then do things after it's all run later in their config."
   (dolist (args system:multiplexer:dlv/args)
-    (apply system:multiplexer:dlv:domain args)))
+    (apply #'system:multiplexer:dlv:domain args)))
 
 
 ;;------------------------------------------------------------------------------
