@@ -80,6 +80,15 @@ Example:
   └─aa.bb seconds    : level 0")
 
 
+(defvar int<imp>:timing:feature:current nil
+  "Currently timed imp feature.
+
+Used to prevent duplicate start/end timing messages.
+
+List of imp keyword/symbol names.
+Example: '(:imp example feature)")
+
+
 (defvar imp:timing:sum 0.0
   "Sum of all timings at indent 0 level.")
 
@@ -201,6 +210,27 @@ Args to this format string are:
   :group 'imp:group
   :type '(string)
   :risky t)
+
+
+;;------------------------------------------------------------------------------
+;; Deduplication
+;;------------------------------------------------------------------------------
+
+(defun int<imp>:timing:feature:duplicate? (feature)
+  "Is FEATURE the same as currently timed feature?
+
+FEATURE should be a list of keyword/symbol names.
+
+Return non-nil if FEATURE is non-nil and matches feature currently being timed
+\(`int<imp>:timing:feature:current')."
+  (message "int<imp>:timing:feature:duplicate?: %S %S --> %S"
+           int<imp>:timing:feature:current
+           feature
+           (and (not (null feature))
+                (equal feature int<imp>:timing:feature:current)))
+  ;; Don't think we want nil to be a match? We /shouldn't/ get a nil anyways...
+  (and (not (null feature))
+       (equal feature int<imp>:timing:feature:current)))
 
 
 ;;------------------------------------------------------------------------------
@@ -448,26 +478,35 @@ Output message depends on `imp:timing:format:time'.
 Return result of evaluating BODY."
   (declare (indent 3))
 
-  `(if (imp:timing:enabled?)
-       ;; Timings enabled: Run body in between timing start/end messages.
-       (let ((macro<imp>:feature  ,feature)
-             (macro<imp>:filename ,filename)
-             (macro<imp>:path     ,path)
-             (macro<imp>:time     (current-time)))
-         (prog2
-             ;; Start with load message.
-             (int<imp>:timing:start macro<imp>:feature
-                                    macro<imp>:filename
-                                    macro<imp>:path)
-             ;; Increase indent level for body.
-             (let ((int<imp>:timing:indent (1+ int<imp>:timing:indent)))
-               ;; Run the body...
-               ,@body)
-           ;; Finish with the timing message.
-           (int<imp>:timing:end macro<imp>:time)))
+  `(let ((macro<imp>:feature (int<imp>:feature:normalize ,feature)))
+     (if (and (imp:timing:enabled?)
+              ;; Don't do (another) timing block/level for a duplicated call.
+              (not (int<imp>:timing:feature:duplicate? macro<imp>:feature)))
 
-     ;; Timings disabled: Just run body.
-     ,@body))
+         ;; Timings enabled: Run body in between timing start/end messages.
+         (let ((macro<imp>:filename ,filename)
+               (macro<imp>:path     ,path)
+               (macro<imp>:time     (current-time)))
+           ;; Update current feature being timed.
+           (setq int<imp>:timing:feature:current macro<imp>:feature)
+           ;; Output load message.
+           (int<imp>:timing:start macro<imp>:feature
+                                  macro<imp>:filename
+                                  macro<imp>:path)
+           (prog1
+               ;; Increase indent level for body.
+               (let ((int<imp>:timing:indent (1+ int<imp>:timing:indent)))
+                 ;; Run the body...
+                 ,@body)
+
+             ;; Clear this feature from current.
+             (setq int<imp>:timing:feature:current nil)
+
+             ;; Finish with the timing message.
+             (int<imp>:timing:end macro<imp>:time)))
+
+       ;; Timing disabled: Just run body.
+       ,@body)))
 
 
 ;;------------------------------------------------------------------------------
