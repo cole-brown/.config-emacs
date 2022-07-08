@@ -17,9 +17,9 @@
 (defun int<imp>:list:flatten:recurse (recurse &rest input)
   "Flatten INPUT list to a single list.
 
-If RECURSE is an integer greater than zero, flattens by that many levels.
-If RECURSE `:recursive', flattens recursively until flat.
-Else, flattens by one level."
+If RECURSE is an integer greater than zero, flatten by that many levels.
+If RECURSE `:recursive', flatten recursively until flat.
+Else, flatten by one level."
   (let ((recurse (if (integerp recurse)
                      ;; We always flatten by one; find out how many extra levels
                      ;; of flattening they want.
@@ -51,7 +51,7 @@ Else, flattens by one level."
 (defun int<imp>:list:flatten (&rest input)
   "Flatten INPUT list to a single list.
 
-Flattens by a max of 10 levels."
+Flatten by a max of 10 levels."
   ;; &rest wrapped our INPUT in a list, and `int<imp>:list:flatten:recurse' will
   ;; do the same, so +2 to our max of 10.
   (int<imp>:list:flatten:recurse 12 input))
@@ -64,13 +64,15 @@ Flattens by a max of 10 levels."
 ;;------------------------------------------------------------------------------
 
 (defun int<imp>:alist:valid/key (caller key &optional error?)
-  "Returns non-nil if KEY is valid.
+  "Return non-nil if KEY is valid.
 
-If ERROR? is non-nil, raises an error for invalid keys. Else returns t/nil."
+CALLER should be the calling function's name string.
+
+If ERROR? is non-nil, raise an error for invalid keys. Else return nil/non-nil."
   (if (stringp key)
       (if error?
           (int<imp>:error (int<imp>:output:callers "int<imp>:alist:valid/key" caller)
-                          "Imp alist cannot have a string key! Key: %S"
+                          "imp alist cannot have a string key! Key: %S"
                           key)
         nil)
     key))
@@ -80,14 +82,20 @@ If ERROR? is non-nil, raises an error for invalid keys. Else returns t/nil."
 
 
 (defun int<imp>:alist:get/value (key alist &optional equal-fn)
-  "Get value of KEY's entry in ALIST."
+  "Get value of KEY's entry in ALIST.
+
+EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
+two alist keys."
   (int<imp>:alist:valid/key "int<imp>:alist:get/value" key :error)
   (alist-get key alist nil nil equal-fn))
 ;; (int<imp>:alist:get/value :foo test-foo #'equal)
 
 
 (defun int<imp>:alist:get/pair (key alist &optional equal-fn)
-  "Get KEY's entire entry (`car' is KEY, `cdr' is value) from ALIST."
+  "Get KEY's entire entry (`car' is KEY, `cdr' is value) from ALIST.
+
+EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
+two alist keys."
   (int<imp>:alist:valid/key "int<imp>:alist:get/pair" key :error)
   (assoc key alist equal-fn))
 
@@ -98,7 +106,10 @@ If ERROR? is non-nil, raises an error for invalid keys. Else returns t/nil."
 If VALUE is nil, it will be set as KEY's value. Use
 `int<imp>:alist:delete' if you want to remove it.
 
-Returns a new alist, which isn't ALIST."
+EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
+two alist keys.
+
+Return an updated alist, which may or may not be ALIST."
   (int<imp>:alist:valid/key "int<imp>:alist:update/helper" key :error)
 
   (if (null alist)
@@ -118,12 +129,13 @@ Returns a new alist, which isn't ALIST."
 (defmacro int<imp>:alist:update (key value alist &optional equal-fn)
   "Set/overwrite an entry in the ALIST.
 
-SYMBOL/ALIST should be a (quoted) symbol so that this can update it directly.
-
 If VALUE is nil, it will be set as KEY's value. Use
 `int<imp>:alist:delete' if you want to remove it.
 
-Returns ALIST."
+EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
+two alist keys.
+
+Return updated ALIST."
   `(let ((macro<imp>:alist ,alist))
      (cond
       ((listp macro<imp>:alist)
@@ -144,9 +156,12 @@ Returns ALIST."
 
 
 (defun int<imp>:alist:delete/helper (key alist &optional equal-fn)
-  "Removes KEY from ALIST.
+  "Remove KEY from ALIST.
 
-Returns alist without the key."
+EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
+two alist keys.
+
+Return updated ALIST sans KEY."
   (int<imp>:alist:valid/key "int<imp>:alist:delete/helper" key :error)
 
   ;; If it's null, no need to do anything.
@@ -158,7 +173,10 @@ Returns alist without the key."
 
 
 (defmacro int<imp>:alist:delete (key alist &optional equal-fn)
-  "Removes KEY from ALIST.
+  "Remove KEY from ALIST.
+
+EQUAL-FN should be `eq', `eql', `equal', etc - a function that tests equality of
+two alist keys.
 
 Returns ALIST."
   `(let ((macro<imp>:alist ,alist))
