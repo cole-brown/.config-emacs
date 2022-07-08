@@ -38,7 +38,9 @@
 
 
 (defun imp:timing:enabled? ()
-  "Returns non-nil if `imp:timing:enabled?' is non-nil or imp's `+timing'
+  "Return non-nil if timing is enabled.
+
+Specifically, if `imp:timing:enabled?' is non-nil or imp's `+timing'
 feature flag is set."
   (or imp:timing:enabled?
       imp:timing:feature?))
@@ -57,10 +59,11 @@ feature flag is set."
     :branch "├─"
     :trunk  "│ ")
   "Strings for creating loading trees like:
-  loading xxx...
-  ├─loading yyy...
-  │ └─cc.dd seconds
-  └─aa.bb seconds")
+
+loading xxx...
+├─loading yyy...
+│ └─cc.dd seconds
+└─aa.bb seconds")
 
 
 (defconst int<imp>:timing:precision:time 4
@@ -87,8 +90,10 @@ Example:
 
 (defcustom imp:timing:buffer:name
   "ⓘ-imp:timing-ⓘ"
-  "Buffer name to print to. If you want it to go to *Messages* with the usual
-minibuffer interaction, set to: `:messages'"
+  "Buffer name to print to.
+
+If you want it to go to *Messages* with the usual minibuffer interaction, set
+to: `:messages'."
   :group 'autogit:group
   :type '(choice (string :tag "Name of Buffer")
                  (const :tag "Use `message' to send to *Messages* buffer with the usual minibuffer interactions."
@@ -96,7 +101,9 @@ minibuffer interaction, set to: `:messages'"
 
 
 (defcustom imp:timing:buffer:show t
-  "If non-nil, show `imp:timing:buffer:name' every time it gets a new message.")
+  "If non-nil, show `imp:timing:buffer:name' every time it gets a new message."
+  :group 'autogit:group
+  :type  '(boolean))
 
 
 (defcustom imp:timing:format:load "loading %1$S..."
@@ -167,7 +174,9 @@ Args to this format string are:
           ;; Close Box.
           ;;---
           "└───────┴──────────────────┘")
-  "String format for total elapsed time according to `imp:timing:sum'.")
+  "String format for total elapsed time according to `imp:timing:sum'."
+  :group 'imp:group
+  :type '(string))
 
 
 (defcustom imp:timing:format:time
@@ -229,7 +238,7 @@ indention levels."
 
 
 (defun int<imp>:timing:tree:string (type)
-  "Get tree type string for current type."
+  "Get tree type string for current TYPE."
   (mapconcat
    #'identity
    (let (prefix)
@@ -251,7 +260,7 @@ indention levels."
 ;;------------------------------------------------------------------------------
 
 (defun int<imp>:timing:buffer:messages? ()
-  "Returns `t' if `imp:timing:buffer:name' is the \"*Messages*\" buffer.
+  "Return t if `imp:timing:buffer:name' is the \"*Messages*\" buffer.
 
 NOTE: This covers a value `:messages' as well as the string name."
   ;; Check for `:messages' keyword as well as a name match to the buffer.
@@ -267,7 +276,7 @@ NOTE: This covers a value `:messages' as well as the string name."
 
 
 (defun imp:timing:buffer:name ()
-  "Returns the string name of `imp:timing:buffer:name' custom variable.
+  "Return the string name of `imp:timing:buffer:name' custom variable.
 
 NOTE: This converts a value `:messages' to \"*Messages*\"."
   (if (int<imp>:timing:buffer:messages?)
@@ -327,7 +336,7 @@ does nothing instead."
 ;;------------------------------------------------------------------------------
 
 (defun int<imp>:timing:buffer:insert (string)
-  "Inserts finalized message STRING into output buffer."
+  "Insert finalized message STRING into output buffer."
   ;; Don't do anything unless enabled.
   (when-let ((enabled? (imp:timing:enabled?))
              (name (imp:timing:buffer:name)))
@@ -368,7 +377,7 @@ does nothing instead."
 
 
 (defun int<imp>:timing:message (type formatting &rest args)
-  "Prepends indentation and prints timing message for FORMATTING string and ARGS.
+  "Prepend indentation and print timing message for FORMATTING string and ARGS.
 
 TYPE should be either `:root' or `:leaf'. Uses TYPE to get the indent string."
   (int<imp>:timing:buffer:insert
@@ -402,7 +411,7 @@ Message depends on `imp:timing:format:time'."
 
 
 (defun imp:timing:already-provided (feature filename path)
-  "Prints out a message about skipping this FEATURE / FILENAME / PATH.
+  "Print a message about skipping this FEATURE / FILENAME / PATH.
 
 Message depends on `imp:timing:format:skip'."
   (when (imp:timing:enabled?)
@@ -414,7 +423,7 @@ Message depends on `imp:timing:format:skip'."
 
 
 (defun imp:timing:optional-dne (feature filename path)
-  "Prints out a message about optional FEATURE / FILENAME / PATH that doesn't exist.
+  "Print a message about optional FEATURE / FILENAME / PATH that doesn't exist.
 
 Message depends on `imp:timing:format:optional'."
   (when (imp:timing:enabled?)
@@ -426,11 +435,17 @@ Message depends on `imp:timing:format:optional'."
 
 
 (defmacro imp:timing (feature filename path &rest body)
-  "Measure & prints the time it takes to evaluate BODY.
+  "Measure & print the time it takes to evaluate BODY.
 
-Message depends on `imp:timing:format:time'.
+FEATURE should be a list of keyword & symbol names.
 
-Returns result of evaluating BODY."
+FILENAME should be the file's basename.
+
+PATH should be the path to FILENAME's parent directory.
+
+Output message depends on `imp:timing:format:time'.
+
+Return result of evaluating BODY."
   (declare (indent 3))
 
   `(if (imp:timing:enabled?)
@@ -511,3 +526,8 @@ Expects `use-package' to be loaded already."
        (use-package ,name
          ,@args))))
 ;; (imp:use-package test-foo)
+
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
