@@ -223,11 +223,6 @@ FEATURE should be a list of keyword/symbol names.
 
 Return non-nil if FEATURE is non-nil and matches feature currently being timed
 \(`int<imp>:timing:feature:current')."
-  (message "int<imp>:timing:feature:duplicate?: %S %S --> %S"
-           int<imp>:timing:feature:current
-           feature
-           (and (not (null feature))
-                (equal feature int<imp>:timing:feature:current)))
   ;; Don't think we want nil to be a match? We /shouldn't/ get a nil anyways...
   (and (not (null feature))
        (equal feature int<imp>:timing:feature:current)))
