@@ -468,19 +468,42 @@ PREFIX is an optional string to be printed first on its own line."
 ;;------------------------------------------------------------------------------
 
 (defun nub:debug:status (user)
-  "Get message with status of debugging toggle, active debug tags for USER."
+  "Get message with status of debugging toggle, active debug tags for USER.
+
+USER should be:
+  - the result from `int<nub>:prompt:user'
+  - a nub user keyword
+  - the `:all' keyword
+  - nil
+nil and `:all' will return the statuses for all nub users."
   (interactive (int<nub>:prompt:user "nub:debug:status"
                                      "Debug Status for User"
                                      :list))
-  ;; Valid user?
-  (if user
-      ;; This also returns active tags, t, or nil.
-      (int<nub>:debug:status/message (format "Nub Debug Status: %S" user)
-                                     user)
+  (let (users/status)
+    ;; A specific user or all of them?
+    (cond ((and user
+                (not (eq user :all)))
+           ;; Just the one user.
+           (push user users/status))
 
-    (message "nub:debug:status: Unknown user: %S" user)
-    ;; Let's just say 'not debugging' for unknown user.
-    nil))
+          ;; All users?
+          ((or (eq user :all)
+               (null user))
+           (setq users/status int<nub>:var:users))
+
+          ;; Error/unknown user?
+          (t
+           (message "nub:debug:status: Unknown user: %S" user)))
+
+    ;; Output statuses for users.
+    (if users/status
+        (dolist (user/status users/status)
+          ;; This also returns active tags, t, or nil.
+          (int<nub>:debug:status/message (format "Nub Debug Status: %S" user/status)
+                                         user/status))
+
+      ;; Let's just say 'not debugging' for unknown user(s).
+      nil)))
 
 
 ;;------------------------------------------------------------------------------
