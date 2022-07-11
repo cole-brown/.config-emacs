@@ -205,10 +205,11 @@ Sets both current and backup values (backups generally only used for tests)."
 ;;------------------------------
 
 (defvar int<nub>:var:enabled?:backup
-  (list (cons int<nub>:var:user:fallback '((:error   . t)
-                                           (:warning . t)
-                                           (:info    . t)
-                                           (:debug   . t))))
+  (list (cons int<nub>:var:user:fallback (list (cons :error   t)
+                                               (cons :warning t)
+                                               (cons :info    t)
+                                               ;; Init debug to env/Emacs vars.
+                                               (cons :debug   (int<nub>:debug:init)))))
   "Alist of USER keyword to verbosity of various log levels for the user.
 
 Valid values:

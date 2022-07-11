@@ -158,6 +158,138 @@ ARGS will be passed to `format' with the finalized message string."
 
 
 ;;------------------------------------------------------------------------------
+;; Debugging
+;;------------------------------------------------------------------------------
+
+(defun int<nub>:debug:init ()
+  "Initialize `nub' debugging based on Emacs' variables.
+
+Check these and return t/nil based on their values:
+  - Emacs variables:
+    - `init-file-debug'
+    - `debug-on-error'
+  - Environment variables:
+    - `DEBUG'
+
+Return a boolean value (t/nil)"
+  ;; Set our debug variable (`int<nub>:debug?') and Emacs' variables based on inputs.
+  (cond
+   ;;---
+   ;; Environment Variable: DEBUG
+   ;;---
+   ((and (getenv-internal "DEBUG")
+         (not init-file-debug)
+         (not debug-on-error))
+    (message (mapconcat #'identity
+                        '("int<nub>:debug:init: env var DEBUG:"
+                          "  Environment vars:"
+                          "    DEBUG:           %S   <--"
+                          "  Emacs vars:"
+                          "    init-file-debug: %S"
+                          "    debug-on-error:  %S"
+                          "  <-----result-----: %S")
+                        "\n")
+             (getenv-internal "DEBUG")
+             init-file-debug
+             debug-on-error
+             (and (getenv-internal "DEBUG")
+                  (not init-file-debug)
+                  (not debug-on-error)))
+
+    ;; `innit:debug:init' does the cascading currently...
+    ;; ;; Also cascade debug setting into Emacs?
+    ;; (setq init-file-debug   t
+    ;;       debug-on-error    t
+    ;;       jka-compr-verbose t)
+
+    ;; Return t or nil.
+    t)
+
+   ;;---
+   ;; CLI Flag: "--debug-init"
+   ;;---
+   (init-file-debug
+    (message (mapconcat #'identity
+                        '("int<nub>:debug:init: Emacs var `init-file-debug':"
+                          "  Environment vars:"
+                          "    DEBUG:           %S"
+                          "  Emacs vars:"
+                          "    init-file-debug: %S   <--"
+                          "    debug-on-error:  %S"
+                          "  <-----result-----: %S")
+                        "\n")
+             (getenv-internal "DEBUG")
+             init-file-debug
+             debug-on-error
+             init-file-debug)
+
+    ;; `innit:debug:init' does the cascading currently...
+    ;; ;; Also cascade into Emacs?
+    ;; (setq debug-on-error t
+    ;;       jka-compr-verbose t)
+
+    ;; Return t or nil.
+    t)
+
+   ;;---
+   ;; Interactive Flag?
+   ;;---
+   ;; How did you get this set and not `init-file-debug'? Debugging some small
+   ;; piece of init, maybe?
+   (debug-on-error
+    (message (mapconcat #'identity
+                        '("int<nub>:debug:init: Emacs var `debug-on-error':"
+                          "  Environment vars:"
+                          "    DEBUG:           %S"
+                          "  Emacs vars:"
+                          "    init-file-debug: %S"
+                          "    debug-on-error:  %S   <--"
+                          "  <-----result-----: %S")
+                        "\n")
+             (getenv-internal "DEBUG")
+             init-file-debug
+             debug-on-error
+             debug-on-error)
+
+    ;; `innit:debug:init' does the cascading currently...
+    ;; ;; Also cascade into Emacs?
+    ;; (setq jka-compr-verbose t)
+    ;; ;; Don't set `init-file-debug'?
+    ;; ;; (setq init-file-debug t)
+
+    ;; Return t or nil.
+    t)
+
+   ;;---
+   ;; _-NOT-_ Debugging
+   ;;---
+   (t
+    ;; Be quite about not debugging?
+    ;; (message (mapconcat #'identity
+    ;;                     '("int<nub>:debug:init: Not Debugging?"
+    ;;                       "  Environment vars:"
+    ;;                       "    DEBUG:           %S"
+    ;;                       "  Emacs vars:"
+    ;;                       "    init-file-debug: %S"
+    ;;                       "    debug-on-error:  %S"
+    ;;                       "  <-----result-----: %S")
+    ;;                     "\n")
+    ;;          (getenv-internal "DEBUG")
+    ;;          init-file-debug
+    ;;          debug-on-error
+    ;;          nil)
+
+    ;; `innit:debug:init' does the cascading currently...
+    ;; ;; Set everything to "no"?
+    ;; (setq init-file-debug   nil
+    ;;       debug-on-error    nil
+    ;;       jka-compr-verbose nil)
+
+    ;; Return t or nil.
+    nil)))
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :nub 'internal)

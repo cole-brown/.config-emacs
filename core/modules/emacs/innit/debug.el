@@ -77,11 +77,14 @@ NOTE: If it needs to get any more fancy, consider a minor mode like
 (defun innit:debug:init ()
   "Initialize `innit' debugging based on Emacs' variables.
 
-Checks:
-  - `init-file-debug'
-  - `debug-on-error'
+Check these and set `innit:debug?' based on their values:
+  - Emacs variables:
+    - `init-file-debug'
+    - `debug-on-error'
+  - Environment variables:
+    - `DEBUG'
 
-Returns `innit:debug?'"
+Return `innit:debug?'"
   (let ((func/name "innit:debug:init")
         (func/tags '(:innit :debug :init)))
     ;; Set our debug variable (`innit:debug?') and Emacs' variables based on inputs.
