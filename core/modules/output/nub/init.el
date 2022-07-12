@@ -53,6 +53,8 @@
             :filename "debug")
   (imp:load :feature  '(:nub debug format)
             :filename "debug-format")
+  (imp:load :feature  '(:nub info)
+            :filename "info")
   (imp:load :feature  '(:nub warning)
             :filename "warning")
   (imp:load :feature  '(:nub error)
