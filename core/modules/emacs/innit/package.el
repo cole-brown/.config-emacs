@@ -189,10 +189,9 @@ this needs to be called during \"init.el\"."
     ;; Update packages list if we are on a new install.
     (unless (or (package-installed-p 'use-package)
                 package-archive-contents)
-      (nub:debug
+      (nub:info
           :innit
           func/name
-          func/tags
         "Update packages list...")
       (package-refresh-contents))
 
