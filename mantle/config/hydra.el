@@ -1,4 +1,27 @@
-;;; config/hydra.el -*- lexical-binding: t; -*-
+;;; mantle/config/hydra.el - hydras, pretty and otherwise -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2022-07-13
+;; Modified:   2022-07-13
+;; URL:        https://github.com/cole-brown/.config-emacs
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; `hydra':
+;;   https://github.com/abo-abo/hydra
+;;
+;; `pretty-hydra' & `major-mode-hydra':
+;;   https://github.com/jerrypnz/major-mode-hydra.el
+;;
+;; `hydra-posframe':
+;;   https://github.com/Ladicle/hydra-posframe
+;;
+;;; Code:
 
 
 ;; ┌──────────────────────────────────═══───────────────────────────────────┐ ;;
@@ -7,8 +30,12 @@
 ;; │                                 ═════                                  │ ;;
 ;; └──────────────────────────────────═══───────────────────────────────────┘ ;;
 
-(require 's)
-(require 'all-the-icons)
+
+;;------------------------------------------------------------------------------
+;; Hydra
+;;------------------------------------------------------------------------------
+
+(use-package hydra)
 
 
 ;;------------------------------------------------------------------------------
@@ -28,6 +55,7 @@
 ;;   TODO: Some of my Font Awesome icons are wrong, so I might have to do this...
 ;; https://github.com/domtronn/all-the-icons.el#troubleshooting
 
+;; TODO: Move to "mantle/config/all-the-icon.el" or whatever.
 ;;------------------------------
 ;; The Missing Functions:
 ;;------------------------------
@@ -37,7 +65,9 @@
 ;;   https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
 
 
+(require 'all-the-icons)
 
+(imp:require :str)
 
 ;; TODO: Move to mis.
 (defun with-faicon (icon str &rest plist)
@@ -148,9 +178,10 @@ If NO-SPACE is nil, adds a space between MODE's icon and STR.
 
 (use-package! major-mode-hydra
   ;; If you want a keybind:
-  ;; NOTE: "M-SPC" is an alt. keybind for Doom leader.
   ;; :bind
   ;; ("M-SPC" . major-mode-hydra)
+  ;; NOTE: If desired, maybe do with `:general' keyword instead so it works
+  ;; better with `general' & `evil'?
   )
 
 
@@ -171,7 +202,7 @@ If NO-SPACE is nil, adds a space between MODE's icon and STR.
 
 ;;
 ;;
-;; No package setup, currently.
+;; No package setup, currently. `major-mode-hydra' pulls it in.
 ;;
 ;;
 
@@ -180,33 +211,24 @@ If NO-SPACE is nil, adds a space between MODE's icon and STR.
 ;; Hydra Posframe
 ;;------------------------------------------------------------------------------
 
-(use-package hydra-posframe
-  ;;--------------------
-  :hook
-  ;;--------------------
-  (after-init . hydra-posframe-enable)
-
-  ;;--------------------
-  :custom
-  ;;--------------------
-  ;; Defaults to centered, which is a bit far from any feedback printed into the minibuffer...
-  ;; [2022-03-16] Let's see how centered goes. It's on average closer to where I'm looking.
-  (hydra-posframe-poshandler 'posframe-poshandler-frame-center)
-  ;; TODO: If center is no good, try one of these:
-  ;; (hydra-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
-  ;; (hydra-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner)
-  )
-
-
-;;------------------------------------------------------------------------------
-;; Original Hydra
-;;------------------------------------------------------------------------------
-
+;; [2022-07-13] This can cover up what I'm trying to do in the buffer, which is
+;; very annoying and not easy to fix on the spot? Skip using it while I think
+;; about it.
+;; (use-package hydra-posframe
+;;   ;;--------------------
+;;   :hook
+;;   ;;--------------------
+;;   (after-init . hydra-posframe-enable)
 ;;
-;;
-;; No package setup, currently.
-;;
-;;
+;;   ;;--------------------
+;;   :custom
+;;   ;;--------------------
+;;   ;; Defaults to centered, which is a bit far from any feedback printed into the minibuffer...
+;;   (hydra-posframe-poshandler 'posframe-poshandler-frame-center)
+;;   ;; TODO: If center is no good, try one of these:
+;;   ;; (hydra-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
+;;   ;; (hydra-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner)
+;;   )
 
 
 ;;------------------------------------------------------------------------------
