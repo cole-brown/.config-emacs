@@ -46,6 +46,23 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Init: Input
+;;------------------------------------------------------------------------------
+
+;; TODO: is this module used or is it all in "mantle/init/evil.el" instead?
+;; Get the `:input' root set up.
+(imp:load :feature  '(:input)
+          :path     (imp:path:join innit:path:module "input")
+          :filename "init")
+
+;; TODO: is this module used or is it all in "mantle/init/evil.el" instead?
+;; Initialize `evil' et al.
+(imp:load :feature  '(:input keyboard evil init)
+          :path     (imp:path:join innit:path:module "input" "keyboard" "evil")
+          :filename "init")
+
+
+;;------------------------------------------------------------------------------
 ;; Init: Modules
 ;;------------------------------------------------------------------------------
 
