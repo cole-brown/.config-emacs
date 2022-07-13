@@ -167,7 +167,7 @@ Returns non-nil if FEATURE has FLAG flag, nil if not."
 ;; Set Flag Flags
 ;;------------------------------------------------------------------------------
 
-(defmacro imp:flags (feature &rest flag)
+(defmacro imp:flag (feature &rest flag)
   "Set FLAG flag(s) for FEATURE.
 
 FEATURE should be a keyword.
@@ -176,7 +176,7 @@ FLAG should be one or more symbol names that start with a \"+\" or \"-\"
 sign.
 
 Example:
-  (imp:flags :numbers +random -negative)
+  (imp:flag :numbers +random -negative)
     -> This sets flag flags for the `:numbers' feature/package/whatever to:
        - Include optional `random' numbers flag.
        - Exclude optional `negative' numbers flag."
@@ -184,11 +184,11 @@ Example:
   ;; Error checks...
   ;;------------------------------
   (unless (keywordp feature)
-    (error "imp:flags: FEATURE must be a keyword, got: %S"
+    (error "imp:flag: FEATURE must be a keyword, got: %S"
            feature))
 
   (unless flag
-    (error "imp:flags: `%S' must have one or more flags to add/remove, got: %S"
+    (error "imp:flag: `%S' must have one or more flags to add/remove, got: %S"
            feature
            flag))
 
@@ -205,7 +205,7 @@ Example:
        (if (int<imp>:flag:exists? macro<imp>:feature
                                   macro<imp>:flag)
            ;; Flag is invalid; error out now.
-           (error "imp:flags: `%S' is already flagged for flag matching `%S'. Existing flags: %S"
+           (error "imp:flag: `%S' is already flagged for flag matching `%S'. Existing flags: %S"
                   macro<imp>:feature
                   macro<imp>:flag
                   (int<imp>:alist:get/value macro<imp>:feature int<imp>:feature:flags))
@@ -227,11 +227,11 @@ Example:
      macro<imp>:flags:update))
 ;; int<imp>:feature:flags
 ;; ;; OK:
-;; (imp:flags :foo +bar)
+;; (imp:flag :foo +bar)
 ;; ;; Fail - already has +bar can't add -bar:
-;; (imp:flags :foo -bar)
+;; (imp:flag :foo -bar)
 ;; ;; OK: multiple flags
-;; (imp:flags :foo -baz +qux +quux)
+;; (imp:flag :foo -baz +qux +quux)
 
 
 ;;------------------------------------------------------------------------------
