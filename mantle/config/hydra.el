@@ -181,7 +181,9 @@ If NO-SPACE is nil, adds a space between MODE's icon and STR.
   ;; :bind
   ;; ("M-SPC" . major-mode-hydra)
   ;; NOTE: If desired, maybe do with `:general' keyword instead so it works
-  ;; better with `general' & `evil'?
+  ;; better with `general' & `evil'? Except that might introduce a circular
+  ;; dependency if `general' is still wanting `pretty-hydra' for the 'SPC'
+  ;; leader key function.
   )
 
 

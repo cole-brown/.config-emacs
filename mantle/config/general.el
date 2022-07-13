@@ -29,7 +29,9 @@
 
 (imp:use-package general
   :demand t ;; Always load.
-  :after  (:any hydra pretty-hydra major-mode-hydra)
+  ;; Depending on the 'SPC' leader function defined:
+  ;; :after  (hydra)
+  :after  (pretty-hydra)
 
   ;;--------------------
   :init
@@ -52,6 +54,7 @@
   :config
   ;;--------------------
 
+  ;; TODO: This here or in some keybinds file?
   ;; https://github.com/emacs-evil/evil-collection#making-spc-work-similarly-to-spacemacs
   ;; NOTE: `evil-collection' binds over 'SPC' in many packages. To use 'SPC' as
   ;; a leader key with `general', second define your leader entry function:
@@ -59,7 +62,7 @@
    :states '(normal visual motion)
    :keymaps 'override
    ;; TODO: An actual 'SPC' leader hydra or function.
-   "SPC" 'hydra-space/body))
+   "SPC" #'ignore))
 
 
 ;;------------------------------------------------------------------------------
