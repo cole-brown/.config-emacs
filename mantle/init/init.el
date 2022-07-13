@@ -46,21 +46,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Init: Input
-;;------------------------------------------------------------------------------
-
-;; Get the `:input' root set up.
-(imp:load :feature  '(:input)
-          :path     (imp:path:join innit:path:module "input")
-          :filename "init")
-
-;; Initialize `evil' et al.
-(imp:load :feature  '(:input keyboard evil init)
-          :path     (imp:path:join innit:path:module "input" "keyboard" "evil")
-          :filename "init")
-
-
-;;------------------------------------------------------------------------------
 ;; Init: Modules
 ;;------------------------------------------------------------------------------
 

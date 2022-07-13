@@ -9,24 +9,38 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Configure User Stuff
+;;  Configure User Stuff in This Order
 ;;
 ;;; Code:
 
 
 ;;------------------------------------------------------------------------------
-;; Run User's Config Files in This Order
+;; Config: Input
 ;;------------------------------------------------------------------------------
 
-(let ((path/dir (imp:path:current:dir)))
+;; Set up `evil' et al. Do this here in init instead of config as we'll want to
+;; tweak a lot along the way.
+(imp:load :feature  '(:mantle config user evil)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "evil")
 
-  (imp:load :feature  '(:mantle config user secret)
-            :path     path/dir
-            :filename "secret")
 
-  (imp:load :feature  '(:mantle config user org-mode)
-            :path     path/dir
-            :filename "org-mode"))
+;;------------------------------------------------------------------------------
+;; Config: Secrets (Consts, Vars, Etc.)
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config user secret)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "secret")
+
+
+;;------------------------------------------------------------------------------
+;; Config: Modes
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config user org-mode)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "org-mode")
 
 
 ;;------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-;;; init/secrets.el -*- lexical-binding: t; -*-
+;;; init/secret.el -*- lexical-binding: t; -*-
 
 
 (imp:require :system 'secret)
