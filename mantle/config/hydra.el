@@ -35,7 +35,7 @@
 ;; Hydra
 ;;------------------------------------------------------------------------------
 
-(use-package hydra)
+(imp:use-package hydra)
 
 
 ;;------------------------------------------------------------------------------
@@ -176,7 +176,7 @@ If NO-SPACE is nil, adds a space between MODE's icon and STR.
 ;;------------------------------------------------------------------------------
 ;; https://github.com/jerrypnz/major-mode-hydra.el#major-mode-hydra
 
-(use-package! major-mode-hydra
+(imp:use-package major-mode-hydra
   ;; If you want a keybind:
   ;; :bind
   ;; ("M-SPC" . major-mode-hydra)
@@ -216,7 +216,7 @@ If NO-SPACE is nil, adds a space between MODE's icon and STR.
 ;; [2022-07-13] This can cover up what I'm trying to do in the buffer, which is
 ;; very annoying and not easy to fix on the spot? Skip using it while I think
 ;; about it.
-;; (use-package hydra-posframe
+;; (imp:use-package hydra-posframe
 ;;   ;;--------------------
 ;;   :hook
 ;;   ;;--------------------
@@ -236,4 +236,4 @@ If NO-SPACE is nil, adds a space between MODE's icon and STR.
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :dot-emacs 'config 'hydra)
+(imp:provide :mantle 'config 'user 'hydra)
