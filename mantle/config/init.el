@@ -15,6 +15,19 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Packages
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config user all-the-icons)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "all-the-icons")
+
+(imp:load :feature  '(:mantle config user hydra)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "hydra")
+
+
+;;------------------------------------------------------------------------------
 ;; Config: Input
 ;;------------------------------------------------------------------------------
 
