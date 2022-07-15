@@ -152,14 +152,14 @@
         ("q" . spydez/window/kill-or-quit))
 
 
-  ;;--------------------
-  :custom
-  ;;--------------------
+  ;; ;;--------------------
+  ;; :custom
+  ;; ;;--------------------
 
-  ;; Default is 5. Can change if desired, but I tried 2 and went back to 5.
-  ;; [2019-10-28]: 2->5
-  ;; (helpful-max-buffers 5
-  ;;   "If this or more, kill oldest when opening another.")
+  ;; ;; Default is 5. Can change if desired, but I tried 2 and went back to 5.
+  ;; ;; [2019-10-28]: 2->5
+  ;; ;; (helpful-max-buffers 5
+  ;; ;;   "If this or more, kill oldest when opening another.")
 
 
   ;;--------------------
