@@ -78,7 +78,9 @@ Example:
 
 
 (defconst int<imp>:features:locate:equal #'equal
-  "Supply as EQUAL-FN param to all 'imp/alist.el' functions used
+  "Equality func to use for alists.
+
+Supply as EQUAL-FN param to all 'imp/alist.el' functions used
 by `imp:features:locate'.")
 
 
@@ -87,7 +89,7 @@ by `imp:features:locate'.")
 ;;------------------------------------------------------------------------------
 
 (defun int<imp>:feature:exists? (features)
-  "Checks for list of FEATURES in the `imp:features' tree."
+  "Check for list of FEATURES in the `imp:features' tree."
   ;; When not `imp:features', always return `nil'.
   (when imp:features
     (not (null (int<imp>:tree:contains? (int<imp>:list:flatten features)
@@ -95,6 +97,18 @@ by `imp:features:locate'.")
 ;; (int<imp>:feature:exists? '(:imp))
 ;; (int<imp>:feature:exists? '(:imp provide))
 ;; (int<imp>:feature:exists? '(:imp (provide)))
+
+
+(defun imp:feature? (&rest feature)
+  "Check if FEATURE is provided by 'imp' or Emacs."
+  (or (imp:provided? feature)
+      (featurep (int<imp>:feature:normalize:imp->emacs feature))))
+;; (imp:feature? 'which-key)
+;; (imp:feature? :which-key)
+;; (imp:feature? :imp)
+
+
+(defalias 'imp:featurep 'imp:feature?)
 
 
 ;;------------------------------------------------------------------------------
@@ -109,13 +123,15 @@ by `imp:features:locate'.")
 Using lists instead of cons for alist entries because `cons' doesn't like
 strings.
 
-Used symbol-by-symbol in `int<imp>:feature:normalize:imp->emacs' when translating an imp symbol
-chain into one symbol for Emacs.")
+Used symbol-by-symbol in `int<imp>:feature:normalize:imp->emacs' when
+translating an imp symbol chain into one symbol for Emacs.")
 
 
 (defconst int<imp>:feature:replace:separator
   ":"
-  "String to use in between symbols when translating an imp symbol chain to
+  "Used for 'imp' -> Emacs feature normalization.
+
+String to use in between symbols when translating an imp symbol chain to
 an Emacs symbol.")
 
 
@@ -219,11 +235,12 @@ FEATURE should be:
   2) or a list of keywords/symbols.
 
 FEATURE will be normalized, then converted into a single symbol
-(not a keyword)."
+\(not a keyword)."
   (intern
    (mapconcat #'identity
               (nreverse (int<imp>:feature:normalize:string feature))
               int<imp>:feature:replace:separator)))
+;; (int<imp>:feature:normalize:imp->emacs :imp 'test 'symbols)
 ;; (int<imp>:feature:normalize:imp->emacs '(:imp test symbols))
 ;; (int<imp>:feature:normalize:imp->emacs '(:imp test) 'symbols)
 ;; (int<imp>:feature:normalize:imp->emacs '(:imp provide))
@@ -327,12 +344,12 @@ list of keywords/symbols."
 (defun imp:feature:assert (feature:base &rest feature)
   "A \"soft require\"; error if the feature is not already loaded.
 
-Normalizes FEATURE:BASE and FEATURE into an imp feature
-(via `imp:feature:normalize'), then checks if it's loaded or not.
+Normalize FEATURE:BASE and FEATURE into an imp feature
+\(via `imp:feature:normalize'), then checks if it's loaded or not.
 
-Returns normalized feature symobl if loaded.
-Raises an error signal if not found.
-Only checks `imp:features' variable; does not check Emacs' `features' list."
+Return normalized feature symobl if loaded.
+Raise an error signal if not found.
+Only check `imp:features' variable; does not check Emacs' `features' list."
   (if (int<imp>:feature:exists? (cons feature:base feature))
       t
     (int<imp>:error "imp:feature:assert"
@@ -345,7 +362,7 @@ Only checks `imp:features' variable; does not check Emacs' `features' list."
 ;;------------------------------------------------------------------------------
 
 (defun int<imp>:feature:locations (feature:base)
-  "Returns FEATURE:BASE's entry in `imp:features:locate' or nil."
+  "Return FEATURE:BASE's entry in `imp:features:locate' or nil."
   (int<imp>:alist:get/value feature:base
                             imp:features:locate))
 
@@ -353,10 +370,10 @@ Only checks `imp:features' variable; does not check Emacs' `features' list."
 (defun int<imp>:feature:paths (feature:base &rest feature)
   "Find (relative) path(s) to files for FEATURE:BASE + FEATURE.
 
-This only provides the paths for the feature itself, each of which may
+This will only provide the paths for the feature itself, each of which may
 `imp:require' more features.
 
-Returns list of: '(path:root . (paths:relative))
+Return list of: '(path:root . (paths:relative))
 
 Errors if:
   - No root path for FEATURE:BASE.
@@ -445,7 +462,8 @@ Features in the FEATURE:ALIST should:
      e.g. '(:imp path) instead of (imp:feature :imp path)
   2) Be either:
      a) The base feature keyword (e.g. `:imp').
-     b) A list of the base feature keyword plus other symbols (e.g. `(:imp path)').
+     b) A list of the base feature keyword plus other symbols
+        (e.g. `(:imp path)').
 
 Paths in the FEATURE:ALIST should be relative to your `imp:path:root'.
 

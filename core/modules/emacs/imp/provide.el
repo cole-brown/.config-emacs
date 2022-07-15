@@ -44,8 +44,6 @@ If FILE-NAME is a string, returns true if loading that exact
 ;;   (let (imp:features)
 ;;     (imp:provided? :foo))
 
-(defalias 'imp:feature? 'imp:provided?)
-(defalias 'imp:featurep 'imp:provided?)
 (defalias 'imp:providedp 'imp:provided?)
 
 
