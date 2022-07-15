@@ -4,6 +4,8 @@
 ;;------------------------------------------------------------------------------
 ;; Kill Functions
 ;;------------------------------------------------------------------------------
+;; See `:window:manage' for similar functions.
+;;   git-root://core/modules/emacs/window/manage.el
 
 ;; Like `kill-buffer-ask' but no confirmation for unmodified buffers.
 (defun buffer:kill:ask (buffer-or-name &optional delete-process)

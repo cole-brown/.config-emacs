@@ -44,6 +44,10 @@
               :path     (imp:path:join path-core-modules "emacs" "buffer")
               :filename "init")
 
+    (imp:load :feature  '(:window)
+              :path     (imp:path:join path-core-modules "emacs" "window")
+              :filename "init")
+
     (imp:load :feature  '(:alist)
               :path     (imp:path:join path-core-modules "emacs" "alist")
               :filename "init")
