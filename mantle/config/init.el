@@ -18,6 +18,11 @@
 ;; Packages
 ;;------------------------------------------------------------------------------
 
+;; Which-Key & Helpful
+(imp:load :feature  '(:mantle config user help)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "help")
+
 (imp:load :feature  '(:mantle config user all-the-icons)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "all-the-icons")
