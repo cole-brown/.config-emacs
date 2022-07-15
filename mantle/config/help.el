@@ -17,6 +17,9 @@
 ;;; Code:
 
 
+(imp:require :window)
+
+
 ;;------------------------------------------------------------------------------
 ;; General Settings
 ;;------------------------------------------------------------------------------
@@ -149,7 +152,7 @@
         ;; TRIAL: [2019-10-28]
         ;; kill-or-quit instead of original quit-or-kill?
         ;;  - "quit" as in bury...
-        ("q" . spydez/window/kill-or-quit))
+        ("q" . window:kill-or-quit))
 
 
   ;; ;;--------------------
