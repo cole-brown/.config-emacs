@@ -27,14 +27,14 @@
           :path     (imp:path:current:dir/relative :mantle)
           :filename "all-the-icons")
 
-(imp:load :feature  '(:mantle config user hydra)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "hydra")
-
 
 ;;------------------------------------------------------------------------------
 ;; Config: Input
 ;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config user hydra)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "hydra")
 
 (imp:load :feature  '(:mantle config user general)
           :path     (imp:path:current:dir/relative :mantle)
@@ -46,13 +46,21 @@
           :path     (imp:path:current:dir/relative :mantle)
           :filename "undo-tree")
 
-
 ;; Set up `evil' et al. Do early in config in case we want to tweak a lot along
 ;; the way.
 (imp:load :feature  '(:mantle config user evil)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "evil")
 
+
+;;------------------------------
+;; Keyboard Layout
+;;------------------------------
+;; I use Dvorak, plus I like to tweak things, so... change the basic Vim
+;; keybinds and such:
+(imp:load :feature  '(:mantle config user keyboard)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "keyboard")
 
 ;;------------------------------------------------------------------------------
 ;; Config: Secrets (Consts, Vars, Etc.)
