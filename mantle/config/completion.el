@@ -418,6 +418,29 @@ targets."
 
 
 ;;------------------------------------------------------------------------------
+;; Mini-Frame
+;;------------------------------------------------------------------------------
+;; https://github.com/muffinmad/emacs-mini-frame
+;;
+;; TODO: Do I want the minibuffer at the top of the current frame during
+;; `read-from-minibuffer'?
+;;
+;; TODO: In order to find out, try this:
+;; (imp:use-package mini-frame
+;;   ;; Not all that much config help on the GitHub...
+;;   ;; May have to go Googling to see how people use this.
+;;
+;;   ;;--------------------
+;;   :config
+;;   ;;--------------------
+;;   (mini-frame-mode +1))
+;;
+;; TODO: If I like this, move it elsewhere. It was suggested by a "SMOCE"
+;; completion framework package, but it's a minibuffer package, not a completion
+;; package.
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :mantle 'config 'user 'completion)
