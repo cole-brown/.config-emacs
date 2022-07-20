@@ -62,6 +62,19 @@
           :path     (imp:path:current:dir/relative :mantle)
           :filename "keyboard")
 
+
+;;------------------------------------------------------------------------------
+;; Config: Completion Frameworks
+;;------------------------------------------------------------------------------
+;; There's the standards like `ivy', `helm', `ido', etc...
+;;
+;; Or there's the new kids like the "SMOCE stack".
+
+(imp:load :feature  '(:mantle config user completion)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "completion")
+
+
 ;;------------------------------------------------------------------------------
 ;; Config: Secrets (Consts, Vars, Etc.)
 ;;------------------------------------------------------------------------------
