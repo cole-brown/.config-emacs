@@ -49,11 +49,12 @@
 ;;------------------------------------------------------------------------------
 ;; Selectrum: Better Completion UI
 ;;------------------------------------------------------------------------------
-;; Not a whole lot of configuration
+;; https://github.com/raxod502/selectrum
 
 ;;------------------------------
 ;; Selectrum
 ;;------------------------------
+;; Not a whole lot of configuration...
 
 (imp:use-package selectrum
   ;;--------------------
@@ -100,6 +101,31 @@
 ;;   (customize-set-variable 'selectrum-prescient-enable-filtering nil)
 ;;   (selectrum-prescient-mode +1)
 ;;   (prescient-persist-mode +1))
+
+
+;;------------------------------------------------------------------------------
+;; Marginalia: Notes & Info in the Minibuffer Margin
+;;------------------------------------------------------------------------------
+;; https://github.com/minad/marginalia
+
+(imp:use-package marginalia
+  ;; The :init configuration is always executed (Not lazy!)
+  ;;--------------------
+  :init
+  ;;--------------------
+
+  ;; Must be in the :init section of use-package such that the mode gets
+  ;; enabled right away. Note that this forces loading the package.
+  (marginalia-mode)
+
+  ;;--------------------
+  :bind
+  ;;--------------------
+  ;; TODO: What keybind to give this? What does it do?
+  ;; Either bind `marginalia-cycle` globally or only in the minibuffer
+  (("M-A" . marginalia-cycle)
+   :map minibuffer-local-map
+   ("M-A" . marginalia-cycle)))
 
 
 ;;------------------------------------------------------------------------------
