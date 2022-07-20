@@ -1,10 +1,9 @@
 ;;; mantle/config/keyboard.el --- Change basic keybinds. -*- lexical-binding: t; -*-
-;;; general.el --- General Keybinds -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-07-19
-;; Modified:   2022-07-19
+;; Modified:   2022-07-20
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -97,7 +96,7 @@
   ;; │ Keymap:                        │
   ;; │   - `evil-org-mode-map'        │
   ;; └────────────────────────────────┘
-  (imp:eval:after '(:and org evil-org)
+  (imp:eval:after (:and org evil-org)
     (general-define-key :states 'normal
                         :keymaps '(evil-org-mode-map)
                         ;; Unbind from `evil-open-below'.
@@ -238,7 +237,7 @@
   ;; │ Mode: Org-Mode                 │
   ;; └────────────────────────────────┘
 
-  (imp:eval:after '(:and org evil-org)
+  (imp:eval:after (:and org evil-org)
     (general-define-key
      :states 'normal
      :keymaps '(evil-org-mode-map)
@@ -256,4 +255,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'general)
+(imp:provide :mantle 'config 'user 'keyboard)
