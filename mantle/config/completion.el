@@ -70,11 +70,9 @@
 ;; Selectrum + Orderless
 ;;------------------------------
 ;; https://github.com/radian-software/selectrum#alternative-2-orderless
+;; https://github.com/oantolin/orderless#selectrum
 
 (imp:eval:after (:and selectrum orderless)
-
-  ;; Tell Emacs/`selectrum' to use `orderless' for completion.
-  (customize-set-variable 'completion-styles '(orderless))
 
   ;; Persist history over Emacs restarts
   (savehist-mode)
@@ -82,6 +80,7 @@
   ;; Optional performance optimization
   ;; by highlighting only the visible candidates.
   (customize-set-variable 'orderless-skip-highlighting (lambda () selectrum-is-active))
+  (customize-set-variable 'selectrum-refine-candidates-function    #'orderless-filter)
   (customize-set-variable 'selectrum-highlight-candidates-function #'orderless-highlight-matches))
 
 
@@ -126,6 +125,35 @@
   (("M-A" . marginalia-cycle)
    :map minibuffer-local-map
    ("M-A" . marginalia-cycle)))
+
+
+;;------------------------------------------------------------------------------
+;; Orderless: Orderless, Space-Separated Completion Style
+;;------------------------------------------------------------------------------
+;; https://github.com/oantolin/orderless
+
+(imp:use-package orderless
+
+  ;;--------------------
+  :custom
+  ;;--------------------
+  ;; Selectrum suggests only `orderless' when using Selectrum & Orderless together.
+  ;; Orderless suggests `orderless' and `basic'.
+  ;; Orderless explains, so go with Orderless' settings?
+  ;;
+  ;;   > The `basic' completion style is specified as fallback in addition to
+  ;;   > `orderless' in order to ensure that completion commands which rely on
+  ;;   > dynamic completion tables, e.g., `completion-table-dynamic' or
+  ;;   > `completion-table-in-turn', work correctly. Furthermore the `basic'
+  ;;   > completion style needs to be tried /first/ (not as a fallback) for
+  ;;   > TRAMP hostname completion to work. In order to achieve that, we add an
+  ;;   > entry for the `file' completion category in the
+  ;;   > `completion-category-overrides' variable. In addition, the
+  ;;   > `partial-completion' style allows you to use wildcards for file
+  ;;   > completion and partial paths, e.g., '/u/s/l' for '/usr/share/local'.
+  ;;     - https://github.com/oantolin/orderless#overview
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
 
 
 ;;------------------------------------------------------------------------------
