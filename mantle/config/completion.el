@@ -311,6 +311,113 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Embark: Emacs Mini-Buffer Action Rooted in Keymaps
+;;------------------------------------------------------------------------------
+;; https://github.com/oantolin/embark
+;;
+;; > You can think of `embark-act' as a keyboard-based version of a right-click
+;; > contextual menu. The `embark-act' command (which you should bind to a
+;; > convenient key), acts as a prefix for a keymap offering you relevant actions
+;; > to use on a target determined by the context:
+;; >  - In the minibuffer, the target is the current top completion candidate.
+;; >  - In the *Completions* buffer the target is the completion at point.
+;; >  - In a regular buffer, the target is the region if active, or else the file,
+;; >    symbol, URL, s-expression or defun at point.
+
+(imp:use-package embark
+
+  ;;--------------------
+  :init
+  ;;--------------------
+
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+
+  ;;--------------------
+  :bind
+  ;;--------------------
+  ;; TODO: EVIL bindings?
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+
+  ;;--------------------
+  :config
+  ;;--------------------
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+
+;;------------------------------
+;; Embark + Consult
+;;------------------------------
+;; https://github.com/oantolin/embark#quick-start
+;; https://github.com/minad/consult#embark-integration
+
+(imp:use-package embark-consult
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+
+  ;;--------------------
+  :hook
+  ;;--------------------
+  (embark-collect-mode . consult-preview-at-point-mode))
+
+
+;;------------------------------
+;; Embark + Which-Key
+;;------------------------------
+;; https://github.com/oantolin/embark/wiki/Additional-Configuration#use-which-key-like-a-key-menu-prompt
+
+(imp:eval:after (:and embark which-key)
+
+  (defun embark-which-key-indicator ()
+    "An embark indicator that displays keymaps using which-key.
+The which-key help message will show the type and value of the
+current target followed by an ellipsis if there are further
+targets."
+    (lambda (&optional keymap targets prefix)
+      (if (null keymap)
+          (which-key--hide-popup-ignore-command)
+        (which-key--show-keymap
+         (if (eq (plist-get (car targets) :type) 'embark-become)
+             "Become"
+           (format "Act on %s '%s'%s"
+                   (plist-get (car targets) :type)
+                   (embark--truncate-target (plist-get (car targets) :target))
+                   (if (cdr targets) "…" "")))
+         (if prefix
+             (pcase (lookup-key keymap prefix 'accept-default)
+               ((and (pred keymapp) km) km)
+               (_ (key-binding prefix 'accept-default)))
+           keymap)
+         nil nil t (lambda (binding)
+                     (not (string-suffix-p "-argument" (cdr binding))))))))
+
+  (setq embark-indicators
+        '(embark-which-key-indicator
+          embark-highlight-indicator
+          embark-isearch-highlight-indicator))
+
+  (defun embark-hide-which-key-indicator (fn &rest args)
+    "Hide the which-key indicator immediately when using the completing-read prompter."
+    (which-key--hide-popup-ignore-command)
+    (let ((embark-indicators
+           (remq #'embark-which-key-indicator embark-indicators)))
+      (apply fn args)))
+
+  (advice-add #'embark-completing-read-prompter
+              :around #'embark-hide-which-key-indicator))
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :mantle 'config 'user 'completion)
