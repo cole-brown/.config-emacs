@@ -29,13 +29,15 @@
 
 (imp:eval:after (:and evil evil-collection general)
 
-  ;;----------------------------------------------------------------------------
-  ;; Undefine Keys
-  ;;----------------------------------------------------------------------------
 
-  ;;------------------------------
-  ;; Keymap: nil/global
-  ;;------------------------------
+  ;; ╔═════════════════════════════════════════════════════════════════════════╗
+  ;; ║ Undefine Keys                                                           ║
+  ;; ╚═════════════════════════════════════════════════════════════════════════╝
+
+  ;; ┌────────────────────────────────┐
+  ;; │ Keymap:                        │
+  ;; │   - nil/global                 │
+  ;; └────────────────────────────────┘
   ;; Undefine some keys so we can redefine them later.
   ;;
   ;; TODO: Doom wasn't happy just overwriting, which is why we undefine then
@@ -74,9 +76,11 @@
    ;; Unbind from `evil-insert-line'.
    "I" #'nil)
 
-  ;;------------------------------
-  ;; Keymap: evil-snipe-mode-map / evil-snipe-local-mode-map
-  ;;------------------------------
+  ;; ┌────────────────────────────────┐
+  ;; │ Keymap:                        │
+  ;; │  - `evil-snipe-mode-map'       │
+  ;; │  - `evil-snipe-local-mode-map' │
+  ;; └────────────────────────────────┘
 
   (imp:eval:after evil-snipe
     ;; Doom or General or someone will complain if bound keys are not
@@ -89,9 +93,10 @@
                         "s" #'nil
                         "t" #'nil))
 
-  ;;------------------------------
-  ;; Keymap: evil-org-mode-map
-  ;;------------------------------
+  ;; ┌────────────────────────────────┐
+  ;; │ Keymap:                        │
+  ;; │   - `evil-org-mode-map'        │
+  ;; └────────────────────────────────┘
   (imp:eval:after '(:and org evil-org)
     (general-define-key :states 'normal
                         :keymaps '(evil-org-mode-map)
@@ -99,13 +104,86 @@
                         "o" #'nil))
 
 
-  ;;----------------------------------------------------------------------------
-  ;; Define Keys
-  ;;----------------------------------------------------------------------------
+  ;; ╔═════════════════════════════════════════════════════════════════════════╗
+  ;; ║ Define Keys                                                             ║
+  ;; ╚═════════════════════════════════════════════════════════════════════════╝
 
-  ;;------------------------------
-  ;; Evil States
-  ;;------------------------------
+  ;; ┌────────────────────────────────┐
+  ;; │ Movement                       │
+  ;; └────────────────────────────────┘
+  ;; ESDF position keys (shifted-WASD left-hand, index on home key)
+  ;;   - Except Dvorak, so .oeu/>OEU keys.
+  ;; A & G (Dvorak A & I) are "extra left" and "extra right", basically.
+  ;;   - example:
+  ;;     - "shift left" (O) is `evil-backward-word-end' which goes back to the
+  ;;       end of the previous word.
+  ;;     - "shift extra left" (A) is `evil-backward-word-begin' which goes back
+  ;;       further, to the beginning of the previous word.
+
+  (general-define-key
+   :states '(motion visual normal)
+   ;; ──┬────────────────
+   ;;   │ ↑ ↓ ← →
+   ;; ──┴────────────────
+   "." #'evil-previous-line
+   "e" #'evil-next-line
+   "o" #'evil-backward-char
+   "u" #'evil-forward-char)
+
+  (general-define-key
+   :states 'motion
+
+   ;; ──┬────────────────
+   ;;   │ Word
+   ;; ──┴────────────────
+   ;; ESDF-based. To go 'farther away', move finger away (e.g. word-next-begin is "U", word-next-end is "I".)
+   ;; "Small" words: Shift
+   ;; "Big"   words: Meta
+   ;; TODO: swap modifier if using "Big" more than "Small".
+   ;; TODO: TODO: Use derive? But nothing to derive "A"/"I" from.
+   "A"     #'evil-backward-word-begin
+   "O"     #'evil-backward-word-end
+   "U"     #'evil-forward-word-begin
+   "I"     #'evil-forward-word-end
+   "M-a"   #'evil-backward-WORD-begin
+   "M-o"   #'evil-backward-WORD-end
+   "M-u"   #'evil-forward-WORD-begin
+   "M-i"   #'evil-forward-WORD-end
+
+   ;; ──┬────────────────
+   ;;   │ Sentences
+   ;; ──┴────────────────
+   "("     #'evil-backward-sentence-begin
+   ")"     #'evil-forward-sentence-begin
+
+   ;; ──┬────────────────
+   ;;   │ Paragraphs
+   ;; ──┴────────────────
+   ;; TODO: Leave as-is or move near movement keys?
+   "{"     #'evil-backward-paragraph
+   "}"     #'evil-forward-paragraph
+
+   ;; ──┬────────────────
+   ;;   │ Scroll
+   ;; ──┴────────────────
+   ;; TODO: Recentering & other scrolling.
+   "C-."   #'evil-scroll-up
+   "C-e"   #'evil-scroll-down
+   "M-C-." #'evil-scroll-page-up
+   "M-C-e" #'evil-scroll-page-down
+
+   ;; ──┬────────────────
+   ;;   │ Lines
+   ;; ──┴────────────────
+   "C-o"   #'evil-beginning-of-line
+   "C-u"   #'evil-end-of-line)
+
+  ;; ┌────────────────────────────────┐
+  ;; │ Evil States                    │
+  ;; └────────────────────────────────┘
+  ;; IJKL position keys (shifted-WASD right-hand, index on home key)
+  ;;   - Except Dvorak, so CHTN keys.
+  ;; H & ; (Dvorak D & S) are "extra left" and "extra right", basically.
 
   ;; TODO: define a prefix differently?
   ;; 'general' has `general-create-definer' for "frequently used prefix keys" (e.g. SPC leader key).
@@ -130,6 +208,7 @@
   (general-define-key
    :states 'motion
    :prefix "s"
+   ;; TODO: Leave original Qwerty 'v' as Dvorak 'v' or change?
    "v" #'evil-visual-char
    "V" #'evil-visual-line)
 
@@ -138,9 +217,9 @@
    "" (list :ignore t
             :which-key "Evil States"))
 
-  ;;------------------------------
-  ;; Undo Tree
-  ;;------------------------------
+  ;; ┌────────────────────────────────┐
+  ;; │ Undo Tree                      │
+  ;; └────────────────────────────────┘
 
   (imp:eval:after undo-tree
     (general-define-key
@@ -155,46 +234,15 @@
      ;; `undo-tree-visualizer-mode-map'
      ))
 
-  ;;------------------------------
-  ;; Movement
-  ;;------------------------------
-
-  (general-define-key
-   :states '(motion visual normal)
-   "." #'evil-previous-line
-   "e" #'evil-next-line
-   "o" #'evil-backward-char
-   "u" #'evil-forward-char)
-
-  (general-define-key
-   :states 'motion
-   "A" #'evil-backward-word-begin
-   "O" #'evil-backward-word-end
-   "U" #'evil-forward-word-begin
-   "I" #'evil-forward-word-end
-   "M-a" #'evil-backward-WORD-begin
-   "M-o" #'evil-backward-WORD-end
-   "M-u" #'evil-forward-WORD-begin
-   "M-i" #'evil-forward-WORD-end
-   "(" #'evil-backward-sentence-begin
-   ")" #'evil-forward-sentence-begin
-   "{" #'evil-backward-paragraph
-   "}" #'evil-forward-paragraph
-   "C-." #'evil-scroll-up
-   "C-e" #'evil-scroll-down
-   "M-C-." #'evil-scroll-page-up
-   "M-C-e" #'evil-scroll-page-down
-   "C-o" #'evil-beginning-of-line
-   "C-u" #'evil-end-of-line)
-
-  ;;------------------------------
-  ;; Org-Mode
-  ;;------------------------------
+  ;; ┌────────────────────────────────┐
+  ;; │ Mode: Org-Mode                 │
+  ;; └────────────────────────────────┘
 
   (imp:eval:after '(:and org evil-org)
     (general-define-key
      :states 'normal
      :keymaps '(evil-org-mode-map)
+     ;; Special Org Version of `evil-open-below'.
      :prefix "s"
      "t" #'evil-org-open-below)
 
