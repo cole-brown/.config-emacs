@@ -45,7 +45,7 @@
 ;;; Code:
 
 
-;; TODO: Make a `:keybind' module?
+(imp:require :keybind 'general 'constants)
 
 
 ;;------------------------------------------------------------------------------

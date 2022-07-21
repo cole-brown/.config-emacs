@@ -26,6 +26,19 @@
     (imp:file:current)
     (imp:path:current:dir)
 
+
+  ;;----------------------------------------------------------------------------
+  ;; Pre-General
+  ;;----------------------------------------------------------------------------
+
+  (imp:load :feature  '(:keybind general constants)
+            :path     (imp:path:current:dir/relative :keybind)
+            :filename "constants.el")
+
+
+  ;;------------------------------------------------------------------------------
+  ;; Post-General
+  ;;------------------------------------------------------------------------------
   ;; Delay everything in here until after general.
   (imp:eval:after general
 
@@ -38,13 +51,15 @@
               :filename "leaders.el")
 
 
+    ;;------------------------------
     ;; INSERT HERE
+    ;;------------------------------
 
 
     ;;--------------------------------------------------------------------------
     ;; Done / Loaded / Ready / Etc.
     ;;--------------------------------------------------------------------------
-    ;; Now provide a symbol that others can await for their keybinds.
+    ;; Provide a symbol that others can await for setting up their keybinds.
     (imp:provide:with-emacs :keybind general ready)
     ))
 
