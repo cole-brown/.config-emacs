@@ -58,7 +58,7 @@ Each FEATURE should be one of:
 If you want to provide the feature to emacs as well, you can either:
   1. Use `imp:provide:with-emacs' instead of this to have it automatically
      happen.
-     - imp will translate the FEATURE symbol chain via `int<imp>:feature:normalize:imp->emacs'.
+     - imp will translate the FEATURE symbol chain via `imp:feature:normalize:imp->emacs'.
   2. Do it yourself by also calling Emacs' `provide' with a symbol of your
      choosing."
   (let ((feature/imp (int<imp>:feature:normalize feature)))
@@ -84,12 +84,12 @@ Each FEATURE should be one of:
   - A symbol.
   - A string to be passed through `imp:feature:normalize'.
 
-imp will translate the FEATURE symbol chain via `int<imp>:feature:normalize:imp->emacs' and use
+imp will translate the FEATURE symbol chain via `imp:feature:normalize:imp->emacs' and use
 the result for the call to Emacs' `provide'.
 
 Returns the Emacs feature symbol created/used."
   (imp:provide feature)
-  (let ((feature/emacs (int<imp>:feature:normalize:imp->emacs feature)))
+  (let ((feature/emacs (imp:feature:normalize:imp->emacs feature)))
     (int<imp>:debug "imp:provide:with-emacs" "Providing to emacs as '%S'..."
                     feature/emacs)
     (provide feature/emacs)

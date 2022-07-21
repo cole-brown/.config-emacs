@@ -116,17 +116,17 @@ For Example:
 Does nothing if:
   1) `imp' already has the feature, or
   2) Emacs already has a feature named:
-     `(int<imp>:feature:normalize:imp->emacs FEATURE:BASE FEATURE)'
+     `(imp:feature:normalize:imp->emacs FEATURE:BASE FEATURE)'
 
 Returns non-nil if loaded."
   (let* ((func/name "int<imp>:load:feature")
          (feature:normal (int<imp>:feature:normalize feature))
          (feature:base (car feature:normal))
          (feature:rest (cdr feature:normal))
-         (feature:emacs (int<imp>:feature:normalize:imp->emacs feature:normal))
-         (feature:emacs/base (int<imp>:feature:normalize:imp->emacs feature:base))
+         (feature:emacs (imp:feature:normalize:imp->emacs feature:normal))
+         (feature:emacs/base (imp:feature:normalize:imp->emacs feature:base))
          (feature:emacs/rest (if feature:rest
-                                 (int<imp>:feature:normalize:imp->emacs feature:rest)
+                                 (imp:feature:normalize:imp->emacs feature:rest)
                                nil)))
     (int<imp>:debug func/name
                     '("Inputs:\n"

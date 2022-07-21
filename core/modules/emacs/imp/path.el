@@ -127,7 +127,7 @@
      nil))
   "Alist of regexs to replace and their replacement strings.
 
-Used symbol-by-symbol in `int<imp>:feature:normalize:imp->emacs' when
+Used symbol-by-symbol in `imp:feature:normalize:imp->emacs' when
 translating an imp symbol chain into one symbol for Emacs.
 
 Alist format in `defcustom' language:

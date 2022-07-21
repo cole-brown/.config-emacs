@@ -74,14 +74,14 @@ This is a wrapper around `eval-after-load' that:
                ;; macro expansion from pulling (or failing to pull) in autoloaded
                ;; macros/features.
                `(eval-after-load ',(if (keywordp feature)
-                                       (int<imp>:feature:normalize:imp->emacs feature)
+                                       (imp:feature:normalize:imp->emacs feature)
                                      feature)
                   ',(macroexp-progn body))))
 
         ((and (listp feature)
               (not (memq (car feature) '(:and :all :or :any))))
          ;; Convert imp feature list to Emacs feature symbol & recurse to hit the above case.
-         `(imp:eval:after ,(apply #'int<imp>:feature:normalize:imp->emacs feature) ,@body))
+         `(imp:eval:after ,(apply #'imp:feature:normalize:imp->emacs feature) ,@body))
 
         ;;------------------------------
         ;; Multiple Features

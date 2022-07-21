@@ -102,7 +102,7 @@ by `imp:features:locate'.")
 (defun imp:feature? (&rest feature)
   "Check if FEATURE is provided by 'imp' or Emacs."
   (or (imp:provided? feature)
-      (featurep (int<imp>:feature:normalize:imp->emacs feature))))
+      (featurep (imp:feature:normalize:imp->emacs feature))))
 ;; (imp:feature? 'which-key)
 ;; (imp:feature? :which-key)
 ;; (imp:feature? :imp)
@@ -123,7 +123,7 @@ by `imp:features:locate'.")
 Using lists instead of cons for alist entries because `cons' doesn't like
 strings.
 
-Used symbol-by-symbol in `int<imp>:feature:normalize:imp->emacs' when
+Used symbol-by-symbol in `imp:feature:normalize:imp->emacs' when
 translating an imp symbol chain into one symbol for Emacs.")
 
 
@@ -227,7 +227,7 @@ First symbol in output list will be a keyword; rest will be symbols.
 ;;   (int<imp>:feature:normalize (list feature)))
 
 
-(defun int<imp>:feature:normalize:imp->emacs (&rest feature)
+(defun imp:feature:normalize:imp->emacs (&rest feature)
   "Translate the feature to a single symbol appropriate for Emacs' `provide'.
 
 FEATURE should be:
@@ -240,13 +240,13 @@ FEATURE will be normalized, then converted into a single symbol
    (mapconcat #'identity
               (nreverse (int<imp>:feature:normalize:string feature))
               int<imp>:feature:replace:separator)))
-;; (int<imp>:feature:normalize:imp->emacs :imp 'test 'symbols)
-;; (int<imp>:feature:normalize:imp->emacs '(:imp test symbols))
-;; (int<imp>:feature:normalize:imp->emacs '(:imp test) 'symbols)
-;; (int<imp>:feature:normalize:imp->emacs '(:imp provide))
-;; (int<imp>:feature:normalize:imp->emacs :imp 'provide)
-;; (int<imp>:feature:normalize:imp->emacs :imp)
-;; (int<imp>:feature:normalize:imp->emacs '(((:imp))) '((provide)))
+;; (imp:feature:normalize:imp->emacs :imp 'test 'symbols)
+;; (imp:feature:normalize:imp->emacs '(:imp test symbols))
+;; (imp:feature:normalize:imp->emacs '(:imp test) 'symbols)
+;; (imp:feature:normalize:imp->emacs '(:imp provide))
+;; (imp:feature:normalize:imp->emacs :imp 'provide)
+;; (imp:feature:normalize:imp->emacs :imp)
+;; (imp:feature:normalize:imp->emacs '(((:imp))) '((provide)))
 
 
 (defun imp:feature:normalize (&rest input)
@@ -290,7 +290,7 @@ E.g.
 (defun int<imp>:feature:normalize:display (&rest feature)
   "Normalizes FEATURE down into a single keyword with separators.
 
-Similar output to `int<imp>:feature:normalize:imp->emacs'."
+Similar output to `imp:feature:normalize:imp->emacs'."
   ;; Prepend ":" and turn into a keyword.
   (intern (concat ":"
                   ;; Compress feature list down into a single string w/ separators.

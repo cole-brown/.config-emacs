@@ -157,7 +157,7 @@ the same index in SEQUENCE:EXPECTED."
               (test<imp>:should:marker:small (format "Write file var: '%s'..."
                                                      path:full))
               (insert (format "(setq test<imp/feature/at>::%s t)\n"
-                              (int<imp>:feature:normalize:imp->emacs features))))
+                              (imp:feature:normalize:imp->emacs features))))
 
             ;; Put our feature definition in the last file in the list?
             (when (string= path:full path:final)
@@ -580,16 +580,16 @@ to a list of string."
 
 
 ;;------------------------------
-;; int<imp>:feature:normalize:imp->emacs
+;; imp:feature:normalize:imp->emacs
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::int<imp>:feature:normalize:imp->emacs ()
-  "Test that `int<imp>:feature:normalize:imp->emacs' behaves appropriately."
+(ert-deftest test<imp/feature>::imp:feature:normalize:imp->emacs ()
+  "Test that `imp:feature:normalize:imp->emacs' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::int<imp>:feature:normalize:imp->emacs"
+      "test<imp/feature>::imp:feature:normalize:imp->emacs"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
@@ -597,22 +597,22 @@ to a list of string."
     ;; Run the test.
     ;;===
     (should (equal 'imp:test:symbols
-                   (int<imp>:feature:normalize:imp->emacs '(:imp test symbols))))
+                   (imp:feature:normalize:imp->emacs '(:imp test symbols))))
 
     (should (equal 'imp:test:symbols
-                   (int<imp>:feature:normalize:imp->emacs '(:imp test) 'symbols)))
+                   (imp:feature:normalize:imp->emacs '(:imp test) 'symbols)))
 
     (should (equal 'imp:provide
-                   (int<imp>:feature:normalize:imp->emacs '(:imp provide))))
+                   (imp:feature:normalize:imp->emacs '(:imp provide))))
 
-    (should (equal (int<imp>:feature:normalize:imp->emacs '(:imp provide))
-                   (int<imp>:feature:normalize:imp->emacs :imp 'provide)))
+    (should (equal (imp:feature:normalize:imp->emacs '(:imp provide))
+                   (imp:feature:normalize:imp->emacs :imp 'provide)))
 
-    (should (equal (int<imp>:feature:normalize:imp->emacs '(:imp provide))
-                   (int<imp>:feature:normalize:imp->emacs '(((:imp))) '((provide)))))
+    (should (equal (imp:feature:normalize:imp->emacs '(:imp provide))
+                   (imp:feature:normalize:imp->emacs '(((:imp))) '((provide)))))
 
     (should (equal 'imp:strings
-                   (int<imp>:feature:normalize:imp->emacs '("imp" "strings"))))))
+                   (imp:feature:normalize:imp->emacs '("imp" "strings"))))))
 
 
 ;;------------------------------
