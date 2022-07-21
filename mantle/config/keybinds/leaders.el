@@ -12,9 +12,40 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Who has two thumbs? This key.
+;; Leader keys and their definer functions created here.
+;;
+;; To prevent your global leader keybindings from ever being overridden (e.g. an
+;; evil package may bind "SPC"), use ~:keymaps 'override~:
+;;   (my-leader-def
+;;     :states 'normal
+;;     :keymaps 'override
+;;     "a" 'org-agenda)
+;;
+;; or the compact version:
+;;   (my-leader-def 'normal 'override
+;;     "a" 'org-agenda)
+;;
+;; For local leaders, use ~:keymaps 'local~
+;;
+;; NOTE: By default, evil keybindings made with ~:keymaps 'override~ will override
+;; even those made with ~:keymaps 'local~.
+;;
+;; https://github.com/noctuid/general.el#override-keymaps-and-buffer-local-keybindings
+;;
+;; For example, to ruin your `evil-next-line' keybind (assuming you use evil):
+;;   (general-create-definer jay-def
+;;     :prefix "j"
+;;     :keymaps 'override)
+;;   (general-def
+;;    :states '(normal visual motion)
+;;    "j" (lambda () (interactive) (message "hi")))
+;;
+;; Now "j j" prints "hi" to the *Messages* buffer (& minibuffer).
 ;;
 ;;; Code:
+
+
+;; TODO: Make a `:keybind' module?
 
 
 ;;------------------------------------------------------------------------------
@@ -22,14 +53,19 @@
 ;;------------------------------------------------------------------------------
 ;; https://github.com/noctuid/general.el#evil-examples
 
-(defconst mantle:user:keybinds:leader/global:key "SPC"
+(defconst keybind:leader/global:key "SPC"
   "`kbd' type string to use as the primary keybinds leader key.
 
-Add keybinds to the leader using function `mantle:user:keybinds:leader/global'.")
+Add keybinds to the leader using function `keybind:leader/global'.")
 
 
-(general-create-definer mantle:user:keybinds:leader/global
-  :prefix mantle:user:keybinds:leader/global:key)
+;; This creates the macro `keybind:leader/global:def', which just calls
+;; `general-def' with the arguments supplied here, which can be overridden by
+;; callers.
+(general-create-definer keybind:leader/global:def
+  :prefix keybind:leader/global:key
+  :states '(normal visual motion)
+  :keymaps 'override)
 
 
 ;;------------------------------------------------------------------------------
@@ -37,14 +73,16 @@ Add keybinds to the leader using function `mantle:user:keybinds:leader/global'."
 ;;------------------------------------------------------------------------------
 ;; https://github.com/noctuid/general.el#evil-examples
 
-(defconst mantle:user:keybinds:leader/local:key "SPC m"
+(defconst keybind:leader/local:key "SPC m"
   "`kbd' type string to use as the primary keybinds leader key.
 
-Add keybinds to the leader using function `mantle:user:keybinds:leader/local'.")
+Add keybinds to the leader using function `keybind:leader/local'.")
 
 
-(general-create-definer mantle:user:keybinds:leader/local
-  :prefix mantle:user:keybinds:leader/local:key)
+(general-create-definer keybind:leader/local:def
+  :prefix keybind:leader/local:key
+  :states '(normal visual motion)
+  :keymaps 'override)
 
 
 ;;------------------------------------------------------------------------------
