@@ -1,7 +1,10 @@
 ;;; config/init.el --- Configure User Stuff -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2022-04-26
+;; Modified:   2022-04-26
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -61,6 +64,16 @@
 (imp:load :feature  '(:mantle config user keyboard)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "keyboard")
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:load :feature  '(:mantle config user keybinds)
+          :path     (imp:path:join (imp:path:current:dir/relative :mantle)
+                                   "keybinds")
+          :filename "init")
 
 
 ;;------------------------------------------------------------------------------
