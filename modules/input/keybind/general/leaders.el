@@ -1,4 +1,4 @@
-;;; mantle/config/keybinds/leaders.el --- Who has two thumbs? This key. -*- lexical-binding: t; -*-
+;;; modules/keybind/general/leaders.el --- Who has two thumbs? This key. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -79,6 +79,9 @@ Add keybinds to the leader using function `keybind:leader/global'.")
 Add keybinds to the leader using function `keybind:leader/local'.")
 
 
+;; This creates the macro `keybind:leader/global:def', which just calls
+;; `general-def' with the arguments supplied here, which can be overridden by
+;; callers.
 (general-create-definer keybind:leader/local:def
   :prefix keybind:leader/local:key
   :states '(normal visual motion)
@@ -88,4 +91,4 @@ Add keybinds to the leader using function `keybind:leader/local'.")
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'keybinds 'leaders)
+(imp:provide :keybind 'general 'leaders)

@@ -21,16 +21,10 @@
 ;; Keybinds Dependencies
 ;;------------------------------------------------------------------------------
 ;; Just assume all keybinds in here need `general'. Most of them will.
-(imp:eval:after general
+(imp:eval:after (:keybind general ready)
 
-
-  ;;----------------------------------------------------------------------------
-  ;; Keybind Leaders & Definer Functions
-  ;;----------------------------------------------------------------------------
-
-  (imp:load :feature  '(:mantle config user keybinds leaders)
-            :path     (imp:path:current:dir/relative :mantle)
-            :filename "leaders.el"))
+  ;; TODO: ...something, surely.
+  )
 
 
 ;;------------------------------------------------------------------------------

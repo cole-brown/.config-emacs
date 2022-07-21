@@ -55,10 +55,24 @@
           :path     (imp:path:join innit:path:module "input")
           :filename "init")
 
+
+;;------------------------------
+;; Keyboard Layouts
+;;------------------------------
+
 ;; TODO: is this module used or is it all in "mantle/init/evil.el" instead?
 ;; Initialize `evil' et al.
 (imp:load :feature  '(:input keyboard evil init)
           :path     (imp:path:join innit:path:module "input" "keyboard" "evil")
+          :filename "init")
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:load :feature  '(:keybind)
+          :path     (imp:path:join innit:path:module "input" "keybind")
           :filename "init")
 
 
