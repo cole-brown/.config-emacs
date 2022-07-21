@@ -50,19 +50,16 @@
                                   replace))
 
 
-  ;;--------------------
-  :config
-  ;;--------------------
-
-  ;; TODO: This here or in some keybinds file?
-  ;; https://github.com/emacs-evil/evil-collection#making-spc-work-similarly-to-spacemacs
-  ;; NOTE: `evil-collection' binds over 'SPC' in many packages. To use 'SPC' as
-  ;; a leader key with `general', second define your leader entry function:
-  (general-define-key
-   :states '(normal visual motion)
-   :keymaps 'override
-   ;; TODO: An actual 'SPC' leader hydra or function.
-   "SPC" #'ignore))
+  ;; ;;--------------------
+  ;; :config
+  ;; ;;--------------------
+  ;;
+  ;; The big/general leader keys & definers defined in:
+  ;;   "mantle/config/keybinds/leaders.el"
+  ;;
+  ;; Keybinds configured in "mantle/config/keybinds/" files, or nearer to
+  ;; (ideally in) their `use-package'.
+  )
 
 
 ;;------------------------------------------------------------------------------
