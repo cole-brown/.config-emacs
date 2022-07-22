@@ -53,19 +53,19 @@
 ;;------------------------------------------------------------------------------
 ;; https://github.com/noctuid/general.el#evil-examples
 
-(defconst keybind:leader/global:key "SPC"
-  "`kbd' type string to use as the primary keybinds leader key.
-
-Add keybinds to the leader using function `keybind:leader/global'.")
-
-
 ;; This creates the macro `keybind:leader/global:def', which just calls
 ;; `general-def' with the arguments supplied here, which can be overridden by
 ;; callers.
 (general-create-definer keybind:leader/global:def
-  :prefix keybind:leader/global:key
-  :states '(normal visual motion)
-  :keymaps 'override)
+  :prefix  keybind:leader/global:prefix
+  :states  keybind:leader/global:states
+  :keymaps keybind:leader/global:keymaps)
+
+
+;; Give it its title.
+(keybind:leader/global:def
+  ;; Unbind the prefix and give it a title for which-key.
+  "" '(nil :which-key "The Doyen of Keybind Leaders"))
 
 
 ;;------------------------------------------------------------------------------
@@ -83,9 +83,15 @@ Add keybinds to the leader using function `keybind:leader/local'.")
 ;; `general-def' with the arguments supplied here, which can be overridden by
 ;; callers.
 (general-create-definer keybind:leader/local:def
-  :prefix keybind:leader/local:key
-  :states '(normal visual motion)
-  :keymaps 'override)
+  :prefix  keybind:leader/local:prefix
+  :states  keybind:leader/local:states
+  :keymaps keybind:leader/local:keymaps)
+
+
+;; Give it its title.
+(keybind:leader/local:def
+  ;; Unbind the prefix and give it a title for which-key.
+  "" '(nil :which-key "Local Mode Leader"))
 
 
 ;;------------------------------------------------------------------------------
