@@ -76,7 +76,16 @@
   ;;   (which-key-setup-side-window-right-bottom)
   ;; [2022-07-15] Try out right for a while... It's nice that it's one column of
   ;; keys -> binds instead of 1-5 or whatever for the bottom.
-  (which-key-setup-side-window-right)
+  ;; (which-key-setup-side-window-right)
+  ;; [2022-07-22] Getting this error with `which-key-setup-side-window-right' if Emacs is small:
+  ;;   > which-key can’t show keys: There is not enough space based on your
+  ;;   > settings and frame size.
+  ;; Try `which-key-setup-side-window-right-bottom' and see if that makes it happier?
+  (which-key-setup-side-window-right-bottom)
+  ;; If I don't like that, try tweaking these variables:
+  ;;   `which-key-side-window-max-height'
+  ;;   `which-key-side-window-max-width'
+  ;; https://github.com/justbur/emacs-which-key#special-features-and-configuration-options
 
   (when (imp:feature? 'evil)
     ;; https://github.com/justbur/emacs-which-key#evil-operators
