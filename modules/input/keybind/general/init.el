@@ -40,31 +40,31 @@
   ;; Post-General
   ;;------------------------------------------------------------------------------
   ;; Delay everything in here until after general.
-  (imp:eval:after general
+  (let ((path/here (imp:path:current:dir/relative :keybind)))
+    (imp:eval:after general
 
-    ;;--------------------------------------------------------------------------
-    ;; Leaders
-    ;;--------------------------------------------------------------------------
+      ;;--------------------------------------------------------------------------
+      ;; Leaders
+      ;;--------------------------------------------------------------------------
 
-    (imp:load :feature  '(:keybind general leaders)
-              :path     (imp:path:current:dir/relative :keybind)
-              :filename "leaders.el")
-
-
-    ;;------------------------------
-    ;; INSERT HERE
-    ;;------------------------------
+      (imp:load :feature  '(:keybind general leaders)
+                :path     path/here
+                :filename "leaders.el")
 
 
-    ;;--------------------------------------------------------------------------
-    ;; Done / Loaded / Ready / Etc.
-    ;;--------------------------------------------------------------------------
-    ;; Provide a symbol that others can await for setting up their keybinds.
-    (imp:provide:with-emacs :keybind general ready)
-    ))
+      ;;------------------------------
+      ;; INSERT HERE
+      ;;------------------------------
+
+
+      ;;--------------------------------------------------------------------------
+      ;; Done / Loaded / Ready / Etc.
+      ;;--------------------------------------------------------------------------
+      ;; Provide a symbol that others can await for setting up their keybinds.
+      (imp:provide:with-emacs :keybind 'general 'ready))))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :keybind general)
+(imp:provide :keybind 'general)

@@ -29,9 +29,6 @@
 
 (imp:use-package general
   :demand t ;; Always load.
-  ;; Depending on the 'SPC' leader function defined:
-  ;; :after  (hydra)
-  :after  (pretty-hydra)
 
   ;;--------------------
   :init
