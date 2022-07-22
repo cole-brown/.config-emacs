@@ -40,15 +40,41 @@
   ;;--------------------
   :general
   ;;--------------------
-  ;; Get into the global leader.
-  (:prefix keybind:leader/global:key
-   :states '(normal visual motion)
+  ;; Put Magit Leader under the Global Leader
+  ;;---
+  (:prefix  (keybind:leader :global "g") ;; TODO: prefix name?
+   :states  keybind:leader/global:states
+   :keymaps keybind:leader/global:keymaps
+   ;; Title
+   "" '(nil :which-key "Magit / Version Control")
 
-   ;; Make a magit leader.
-   (:prefix "g" ;; TODO: prefix name?
-    ;; TODO: More keybinds!
-    "g" 'magit-status
-    )))
+   ;;---
+   ;; Magit Keybinds
+   ;;---
+   "g" 'magit-status
+
+   ;; TODO: More keybinds!
+   ;; TODO: And use `:repeat' / `:jump'?
+   ;;   https://github.com/noctuid/general.el#evil-command-properties
+   ;;   https://github.com/noctuid/evil-guide#command-properties
+   ;;
+   ;; (general-define-key
+   ;;  :keymaps 'normal
+   ;;  :prefix "SPC"
+   ;;  "gj" '(git-gutter:next-hunk :properties (:repeat t :jump t))
+   ;;  "gk" '(git-gutter:previous-hunk :repeat t :jump t))
+   ;;
+   ;; ;; they also work globally
+   ;; (general-define-key
+   ;;  :keymaps 'normal
+   ;;  :prefix "SPC"
+   ;;  :properties '(:repeat t :jump t)
+   ;;  ;; or
+   ;;  :repeat t
+   ;;  :jump t
+   ;;  "gj" 'git-gutter:next-hunk
+   ;;  "gk" 'git-gutter:previous-hunk)
+   ))
 
 
 ;;------------------------------------------------------------------------------
