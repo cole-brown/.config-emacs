@@ -77,6 +77,18 @@
    ))
 
 
+;;------------------------------
+;; Magit Forge (GitHub, et al)
+;;------------------------------
+;; "Work with Git forges, such as Github and Gitlab, from the comfort of Magit
+;; and the rest of Emacs."
+;; https://github.com/magit/forge
+;; https://magit.vc/manual/forge/Loading-Forge.html#Loading-Forge
+
+(imp:use-package forge
+  :after magit)
+
+
 ;;------------------------------------------------------------------------------
 ;; Git File Modes
 ;;------------------------------------------------------------------------------
