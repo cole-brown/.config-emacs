@@ -90,6 +90,20 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Git Gutter
+;;------------------------------------------------------------------------------
+;; https://github.com/emacsorphanage/git-gutter-fringe
+
+(imp:use-package git-gutter-fringe
+  ;; NOTE: `git-gutter-fringe' does not work in the terminal. Use `git-gutter' if
+  ;; needed there.
+  :when (display-graphic-p)
+
+  :config
+  (global-git-gutter-mode))
+
+
+;;------------------------------------------------------------------------------
 ;; Git File Modes
 ;;------------------------------------------------------------------------------
 
