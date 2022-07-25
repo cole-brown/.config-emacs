@@ -1,4 +1,23 @@
 ;;; tools/autogit/api.el -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2022-02-14
+;; Modified:   2022-07-25
+;; URL:        https://github.com/cole-brown/.config-emacs
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Commands for:
+;;   - Getting general status for certain other git repos.
+;;     + E.g. get status for your notes repo(s) and your code repo(s) in one go.
+;;
+;;; Code:
+
 
 (imp:require :path)
 
@@ -8,7 +27,7 @@
 ;;------------------------------------------------------------------------------
 
 (defun autogit:repo? (path)
-  "Returns non-nil if PATH is a git repository."
+  "Return non-nil if PATH is a git repository."
   (and (path:exists? path :dir)
        (path:exists? (path:join path ".git"))))
 
