@@ -78,6 +78,24 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Git File Modes
+;;------------------------------------------------------------------------------
+
+;; .gitignore, .gitattributes, and .gitconfig
+(imp:use-package git-modes
+  :defer t
+
+  ;;--------------------
+  :config
+  ;;--------------------
+
+  ;; Docker's ignore file is basically the same format as .gitignore, so use the
+  ;; `gitignore-mode' for it.
+  (add-to-list 'auto-mode-alist
+             (cons "/.dockerignore\\'" 'gitignore-mode)))
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :mantle 'config 'user 'version-control)
