@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2020-10-28
-;; Modified:   2020-10-28
+;; Modified:   2022-07-25
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Version:    1.0.0
 ;; Keywords:   vc tools
