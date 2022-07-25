@@ -89,6 +89,60 @@
   :after magit)
 
 
+;;------------------------------
+;; Magit Todos
+;;------------------------------
+;; https://github.com/alphapapa/magit-todos
+
+;;---
+;; External Tool Prereqs:
+;;---
+;; > One of the following external scanners is required:
+;; >   - 'ripgrep'
+;; >   - 'git grep' (built with PCRE support)
+;; >   - 'GNU grep' (built with PCRE support)
+;; >
+;; > Most Linux systems should have the latter two by default, but some
+;; > non-standard systems may not. For example, on MacOS you may use Homebrew to
+;; > install ripgrep, or git with PCRE support, like: brew reinstall --with-pcre2
+;; > git.
+;;
+;; I have installed 'ripgrep', so we're triple good on Linux.
+;;---
+
+;; Lodge a complaint if 'ripgrep' isn't installed on the system. But don't skip
+;; the `use-package', since it can use 'git grep' or 'GNU grep'.
+(unless (executable-find "rg")
+  (nub:warning
+      :innit
+      (imp:path:join (imp:path:current:dir/relative :mantle)
+                     (imp:path:current:file))
+    '("Could not find 'ripgrep' (`rg') executable. Is it installed? "
+      "`magit-todos' wants it.")))
+
+
+(imp:use-package magit-todos
+  :after magit
+
+  ;;--------------------
+  :general
+  ;;--------------------
+  (:prefix  (keybind:leader :global "g") ;; TODO: prefix name?
+   :states  keybind:leader/global:states
+   :keymaps keybind:leader/global:keymaps
+
+   ;;---
+   ;; Magit-Todos Keybinds
+   ;;---
+   "t" '(magit-todos-list :which-key "Magit TODOs list buffer"))
+
+
+  ;;--------------------
+  :config
+  ;;--------------------
+  (magit-todos-mode +1))
+
+
 ;;------------------------------------------------------------------------------
 ;; Git Gutter
 ;;------------------------------------------------------------------------------
@@ -99,8 +153,10 @@
   ;; needed there.
   :when (display-graphic-p)
 
+  ;;--------------------
   :config
-  (global-git-gutter-mode))
+  ;;--------------------
+  (global-git-gutter-mode +1))
 
 
 ;;------------------------------------------------------------------------------
