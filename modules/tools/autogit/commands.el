@@ -1,19 +1,14 @@
-;;; tools/autogit/commands.el -*- lexical-binding: t; -*-
+;;; tools/autogit/commands.el --- Autogit Commands -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2021 Cole Brown
-;; TODO: MIT or GPL dual license?
-;; TODO: full header?
-;;
-;; Author: Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created: 2020-08-28
-;; Modified: 2021-06-30 10:10:10
-;; Version: 0.0.1
-;; Keywords: vc tools
-;; Homepage: https://github.com/cole-brown/.config-secret
-;; Package-Requires: ((emacs "27.1") (magit "3.3.0"))
+;; Created:    2020-08-28
+;; Modified:   2022-07-25
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
-;; This file is not part of GNU Emacs.
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
@@ -27,17 +22,13 @@
 
 
 (require 'subr-x)
+;; TODO: Get deferred working for all commands.
+;;   - Currently one of them, at least, isn't async...
 (require 'deferred)
 
 ;; How to get this lazy loaded?
 ;;   - Take the require out of the funcs when figured out.
 ;; (require 'magit)
-
-
-;;------------------------------------------------------------------------------
-;; Usage
-;;------------------------------------------------------------------------------
-
 
 
 ;;------------------------------------------------------------------------------
@@ -80,10 +71,14 @@ If NAME is `:messages', kills the \"*Messages*\" buffer."
 ;;------------------------------------------------------------------------------
 
 (defun autogit:push (&optional dry-run)
-  "For each item in `autogit:repos:path/commit', use
-Magit to: add files, commit, and push.
+  "Commit and push changes.
 
-If DRY-RUN is non-nil, does not execute git commands."
+For each item in `autogit:repos:path/commit', use Magit to:
+  1. add files
+  2. commit
+  3. and then push
+
+If DRY-RUN is non-nil, does not execute the (Ma)git commands."
   (interactive "P")
 
   ;; Either have to require magit here, or set magit to ":demand t" in
@@ -318,9 +313,10 @@ If DRY-RUN is non-nil, does not execute git commands."
 ;; Status
 ;;------------------------------------------------------------------------------
 
-
 (defun autogit:status ()
-  "For each item in `autogit:repos:path/watch', use Magit to look for
+  "Display repo statuses.
+
+For each item in `autogit:repos:path/watch', use (Ma)git to look for
 uncommitted(/unpushed?) changes."
   (interactive)
 
@@ -390,8 +386,7 @@ uncommitted(/unpushed?) changes."
                                    " - "
                                    (list :prop :face:success :text "Done."))
           ;; Finally, switch to the buffer if settings dictate.
-          (autogit//buffer:switch buffer)
-          )))))
+          (autogit//buffer:switch buffer))))))
 ;; (autogit:status)
 
 

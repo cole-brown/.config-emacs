@@ -8,7 +8,7 @@
 ;; Version:    1.0.0
 ;; Keywords:   vc tools
 ;; Homepage:   https://github.com/cole-brown/.config-secret
-;; Package-Requires: ((emacs "27.1") (magit "3.3.0"))
+;; Package-Requires: ((emacs "27.1") (magit "3.3.0") (deferred "0.5.1"))
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
