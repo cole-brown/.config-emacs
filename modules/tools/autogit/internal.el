@@ -33,7 +33,7 @@
 ;; Paths & Files
 ;;------------------------------------------------------------------------------
 
-(defun autogit//path:join (root &rest path)
+(defun int<autogit>:path:join (root &rest path)
   "Return absolute (file) path to ROOT + PATH.
 
 Given a git ROOT, and a PATH of e.g. ('path/to' 'dir' 'with-file' 'file.txt'),
@@ -42,10 +42,10 @@ will return full /file/ path in platform-agnostic manner."
       (apply #'path:absolute:file root path)
     (concat (file-name-as-directory (expand-file-name "" root))
             (directory-file-name (mapconcat #'file-name-as-directory path "")))))
-;; (autogit//path:join (car autogit:repos:path/commit) "foo")
+;; (int<autogit>:path:join (car autogit:repos:path/commit) "foo")
 
 
-(defun autogit//path:changes/rel->abs (path-abs alist/changes)
+(defun int<autogit>:path:changes/rel->abs (path-abs alist/changes)
   "Convert relative paths to absolute.
 
 Converts all of ALIST/CHANGES' relative paths to absolute paths given
@@ -57,17 +57,17 @@ a PATH-ABS inside of the git repository."
     (dolist (entry alist/changes results)
       ;; Convert to absolute paths.
       (push (cons (car entry)
-                  (mapcar (lambda (x) (autogit//path:join git-root x))
+                  (mapcar (lambda (x) (int<autogit>:path:join git-root x))
                           (cdr entry)))
             results))))
-;; (autogit//path:changes/rel->abs default-directory (autogit//changes:in-repo default-directory))
+;; (int<autogit>:path:changes/rel->abs default-directory (int<autogit>:changes:in-repo default-directory))
 
 
 ;;------------------------------------------------------------------------------
 ;; Repo: Changes
 ;;------------------------------------------------------------------------------
 
-(defun autogit//changes:in-repo (subdir-abs)
+(defun int<autogit>:changes:in-repo (subdir-abs)
   "Find changed files in a repository.
 
 Determine if magit knows of any changes (staged, unstaged, untracked, unmerged)
@@ -89,10 +89,10 @@ Return an alist of changes:
           (cons :unstaged  (magit-unstaged-files))
           (cons :untracked (magit-untracked-files))
           (cons :unmerged  (magit-unmerged-files)))))
-;; (autogit//changes:in-repo default-directory)
+;; (int<autogit>:changes:in-repo default-directory)
 
 
-(defun autogit//changes:in-subdir (subdir-abs)
+(defun int<autogit>:changes:in-subdir (subdir-abs)
   "Find changed files under a repository's sub-directory.
 
 Determine if magit knows of any changes (staged, unstaged, untracked, unmerged)
@@ -106,15 +106,15 @@ Return an alist of changes:
     (:unstaged  . <list of filenames or nil)
     (:untracked . <list of filenames or nil)
     (:unmerged  . <list of filenames or nil))"
-  (let ((alist/changes (autogit//path:changes/rel->abs subdir-abs
-                                                       (autogit//changes:in-repo subdir-abs)))
+  (let ((alist/changes (int<autogit>:path:changes/rel->abs subdir-abs
+                                                           (int<autogit>:changes:in-repo subdir-abs)))
         results)
     ;; Need to filter each category of changes down to just the subdir requested.
     (dolist (entry alist/changes results)
       (push (cons (car entry)
                   (seq-filter (lambda (x) (string-prefix-p subdir-abs x)) (cdr entry)))
             results))))
-;; (autogit//changes:in-subdir default-directory)
+;; (int<autogit>:changes:in-subdir default-directory)
 
 
 ;; TODO: Ahead/behind upstream.
@@ -124,11 +124,11 @@ Return an alist of changes:
 ;; (cons "↓" commits-behind)
 
 
-(defun autogit//changes:summary (alist/changes)
+(defun int<autogit>:changes:summary (alist/changes)
   "Convert ALIST/CHANGES into a summary string.
 
-ALIST/CHANGES should be output of `autogit//changes:in-subdir' or
-`autogit//changes:in-repo':
+ALIST/CHANGES should be output of `int<autogit>:changes:in-subdir' or
+`int<autogit>:changes:in-repo':
   '((:staged    . <list of filenames or nil)
     (:unstaged  . <list of filenames or nil)
     (:untracked . <list of filenames or nil)
@@ -149,10 +149,10 @@ Will convert using `autogit:changes:symbols' custom var."
    " ")
   ;; TODO: also want ahead/behind upstream info?
   )
-;; (autogit//changes:summary (autogit//changes:in-subdir default-directory))
+;; (int<autogit>:changes:summary (int<autogit>:changes:in-subdir default-directory))
 
 
-;; TODO: autogit//changes:summary/multiple-repos-fmt
+;; TODO: int<autogit>:changes:summary/multiple-repos-fmt
 ;;   - Take in alist of repo-path to alist/changes.
 ;;   - Check entire alist for how to format:
 ;;     - numbers
@@ -165,15 +165,15 @@ Will convert using `autogit:changes:symbols' custom var."
 ;;       ...)
 
 
-(defun autogit//changes:commit-filter (alist/changes)
+(defun int<autogit>:changes:commit-filter (alist/changes)
   "Return either list of files to commit or a keyword.
 
 Returns a keyword if you shouldn't commit changes.
   - :unmerged - unmerged changes exist - do not commit.
   - :no-op    - No staged/unstaged/untracked to commit.
 
-ALIST/CHANGES should be output of `autogit//changes:in-subdir' or
-`autogit//changes:in-repo':
+ALIST/CHANGES should be output of `int<autogit>:changes:in-subdir' or
+`int<autogit>:changes:in-repo':
   '((:staged    . <list of filenames or nil)
     (:unstaged  . <list of filenames or nil)
     (:untracked . <list of filenames or nil)
@@ -206,13 +206,13 @@ single list."
 ;; Magit
 ;;------------------------------------------------------------------------------
 
-(defmacro autogit//magit/with-errors (&rest body)
+(defmacro int<autogit>:magit/with-errors (&rest body)
   "Set magit error flag and run BODY."
   `(let ((magit-process-raise-error t))
      ,@body))
 
 
-(defun autogit//magit:fetch (dry-run buffer indent)
+(defun int<autogit>:magit:fetch (dry-run buffer indent)
   "Fetch from remotes (w/ prune) and then pull current branch.
 
 DRY-RUN should be nil/non-nil.
@@ -220,51 +220,51 @@ DRY-RUN should be nil/non-nil.
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `autogit//macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
 
 INDENT must be a wholenum - 0 is 'not indented'."
-  (autogit//magit/with-errors
+  (int<autogit>:magit/with-errors
    ;;------------------------------
    ;; Fetch from remotes.
    ;;------------------------------
-   (autogit//output:message/indented buffer
-                                     (autogit//output:indent indent 1)
-                                     ;; Dry-Run prefix?
-                                     (list :prop :face:failure
-                                           :text (concat (if dry-run
-                                                             autogit:text:dry-run
-                                                           "GIT")
-                                                         ":")))
-   (autogit//output:message/indented buffer
-                                     (autogit//output:indent indent 2)
+   (int<autogit>:output:message/indented buffer
+                                         (int<autogit>:output:indent indent 1)
+                                         ;; Dry-Run prefix?
+                                         (list :prop :face:failure
+                                               :text (concat (if dry-run
+                                                                 autogit:text:dry-run
+                                                               "GIT")
+                                                             ":")))
+   (int<autogit>:output:message/indented buffer
+                                         (int<autogit>:output:indent indent 2)
 
-                                     ;; Command or message.
-                                     (list :prop :face:git
-                                           :text "`magit-fetch-all-prune'"))
+                                         ;; Command or message.
+                                         (list :prop :face:git
+                                               :text "`magit-fetch-all-prune'"))
    (magit-fetch-all-prune)
 
    ;;------------------------------
    ;; Pull current branch.
    ;;------------------------------
-   (autogit//output:message/indented buffer
-                                     (autogit//output:indent indent 1)
-                                     ;; Dry-Run prefix?
-                                     (list :prop :face:failure
-                                           :text (concat (if dry-run
-                                                             autogit:text:dry-run
-                                                           "GIT")
-                                                         ":")))
-   (autogit//output:message/indented buffer
-                                     (autogit//output:indent indent 2)
+   (int<autogit>:output:message/indented buffer
+                                         (int<autogit>:output:indent indent 1)
+                                         ;; Dry-Run prefix?
+                                         (list :prop :face:failure
+                                               :text (concat (if dry-run
+                                                                 autogit:text:dry-run
+                                                               "GIT")
+                                                             ":")))
+   (int<autogit>:output:message/indented buffer
+                                         (int<autogit>:output:indent indent 2)
 
-                                     ;; Command or message.
-                                     (list :prop :face:git
-                                           :text "`magit-pull-from-upstream'"))
+                                         ;; Command or message.
+                                         (list :prop :face:git
+                                               :text "`magit-pull-from-upstream'"))
    (magit-pull-from-upstream nil)))
 
 
 ;; TODO: use in status
-(defun autogit//magit:head-name (subdir-abs)
+(defun int<autogit>:magit:head-name (subdir-abs)
   "Return a string about what the repo's HEAD is.
 
 SUBDIR-ABS should be an absolute path string.
@@ -278,16 +278,16 @@ Returned string will be either:
          (headish (magit-headish))
          (branch (magit-name-branch headish)))
     (or branch headish)))
-;; (autogit//magit:head-name default-directory)
+;; (int<autogit>:magit:head-name default-directory)
 
 
-(defun autogit//magit:git (dry-run buffer indent message &rest args)
+(defun int<autogit>:magit:git (dry-run buffer indent message &rest args)
   "Call `magit-call-git' with ARGS (unless DRY-RUN is nil).
 
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `autogit//macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
 
 INDENT can be a string or a wholenum (0 is 'not indented').
 
@@ -298,31 +298,31 @@ If MESSAGE is `:args-as-msg', message string will be INDENT (as
 above) plus 'git' plus the ARGS provided.
 
 Example:
-  (autogit//magit:git 2 :args-as-msg  \"add\" \"-A\" \".\")
+  (int<autogit>:magit:git 2 :args-as-msg  \"add\" \"-A\" \".\")
      -message-> \"  git add -A .\"
-  (autogit//magit:git \"calling git: \"
+  (int<autogit>:magit:git \"calling git: \"
                       \"adding all changes...\"
                       \"add\" \"-A\" \".\")
      -message-> \"calling git: adding all changes...\""
-  (autogit//magit/with-errors
+  (int<autogit>:magit/with-errors
    ;; Output messages first.
-   (autogit//output:message/indented buffer
-                                     (autogit//output:indent indent 1)
+   (int<autogit>:output:message/indented buffer
+                                         (int<autogit>:output:indent indent 1)
 
-                                     ;; Dry-Run prefix?
-                                     (list :prop :face:failure
-                                           :text (concat (if dry-run
-                                                             autogit:text:dry-run
-                                                           "GIT")
-                                                         ":")))
-   (autogit//output:message/indented buffer
-                                     (autogit//output:indent indent 2)
+                                         ;; Dry-Run prefix?
+                                         (list :prop :face:failure
+                                               :text (concat (if dry-run
+                                                                 autogit:text:dry-run
+                                                               "GIT")
+                                                             ":")))
+   (int<autogit>:output:message/indented buffer
+                                         (int<autogit>:output:indent indent 2)
 
-                                     ;; Command or message.
-                                     (list :prop :face:git
-                                           :text (if (eq message :args-as-msg)
-                                                     (concat "git " (string-join args " "))
-                                                   message)))
+                                         ;; Command or message.
+                                         (list :prop :face:git
+                                               :text (if (eq message :args-as-msg)
+                                                         (concat "git " (string-join args " "))
+                                                       message)))
 
    ;; Do not actually run the command in dry-run mode.
    (unless dry-run
@@ -338,7 +338,7 @@ Example:
 ;; don't. Maybe pull that out into a validation func so everyone can use it.
 
 
-(defun autogit//macro:with-buffer//tail (buffer)
+(defun int<autogit>:macro:with-buffer//tail (buffer)
   "Make sure all windows viewing the BUFFER are viewing the tail of it.
 
 BUFFER should be a string or buffer object."
@@ -348,7 +348,7 @@ BUFFER should be a string or buffer object."
       (setq windows (cdr windows)))))
 
 
-(defun autogit//macro:with-buffer//call (buffer body)
+(defun int<autogit>:macro:with-buffer//call (buffer body)
   "Run BODY forms then ensure the tail of the buffer is viewed.
 
 BUFFER should be a keyword, string or buffer object.
@@ -363,14 +363,14 @@ BUFFER."
       ;; Just using `message' for the *Messages* buffer.
       `(progn
          ,@body
-         (autogit//macro:with-buffer//tail ,buffer))
+         (int<autogit>:macro:with-buffer//tail ,buffer))
     ;; Create/get buffer to use while executing body.
     `(with-current-buffer (get-buffer-create ,buffer)
        ,@body
-       (autogit//macro:with-buffer//tail ,buffer))))
+       (int<autogit>:macro:with-buffer//tail ,buffer))))
 
 
-(defmacro autogit//macro:with-buffer (buffer &rest body)
+(defmacro int<autogit>:macro:with-buffer (buffer &rest body)
   "Run BODY then tail BUFFER.
 
 BUFFER should be a keyword, string or buffer object.
@@ -378,17 +378,17 @@ BUFFER should be a keyword, string or buffer object.
   - If it is a string, insert into that named buffer.
   - Else insert into the buffer object."
   (declare (indent 1))
-  (autogit//macro:with-buffer//call buffer
-                                    body))
+  (int<autogit>:macro:with-buffer//call buffer
+                                        body))
 ;; (pp-macroexpand-expression
-;;  (autogit//macro:with-buffer autogit:buffer:name/push
+;;  (int<autogit>:macro:with-buffer autogit:buffer:name/push
 ;;                              (message "hello there")))
 ;; (pp-macroexpand-expression
-;;  (autogit//macro:with-buffer :messages
+;;  (int<autogit>:macro:with-buffer :messages
 ;;                              (message "hello there")))
 
 
-(defun autogit//buffer:switch (buffer)
+(defun int<autogit>:buffer:switch (buffer)
   "Give focus to the BUFFER or not, depending on settings.
 
 BUFFER should be a keyword, string or buffer object.
@@ -400,10 +400,10 @@ BUFFER should be a keyword, string or buffer object.
                             (eq buffer :messages))
                        "*Messages*"
                      buffer))))
-;; (autogit//buffer:switch autogit:buffer:buffer/status)
+;; (int<autogit>:buffer:switch autogit:buffer:buffer/status)
 
 
-(defun autogit//buffer:display (buffer)
+(defun int<autogit>:buffer:display (buffer)
   "Display BUFFER or not, depending on settings.
 
 BUFFER should be a keyword, string or buffer object.
@@ -415,14 +415,14 @@ BUFFER should be a keyword, string or buffer object.
                              (eq buffer :messages))
                         "*Messages*"
                       buffer))))
-;; (autogit//buffer:display autogit:buffer:buffer/status)
+;; (int<autogit>:buffer:display autogit:buffer:buffer/status)
 
 
 ;;------------------------------------------------------------------------------
 ;; Messages
 ;;------------------------------------------------------------------------------
 
-(defun autogit//output:indent (indent level)
+(defun int<autogit>:output:indent (indent level)
   "Get indent string for indent LEVEL from INDENT.
 
 LEVEL must be a wholenum - 0 is 'not indented'.
@@ -432,14 +432,14 @@ INDENT can be:
   - string:   returns the string repeated LEVEL times.
   - list:     returns the string at element (LEVEL - 1) or \"\" if LEVEL is 0."
   (cond ((not (wholenump level))
-         (error "autogit//output:indent: LEVEL must be a wholenum, got: %S"
+         (error "int<autogit>:output:indent: LEVEL must be a wholenum, got: %S"
                 level))
 
         ((listp indent)
          (if (= level 0)
              ""
            ;; Pretend level 1 indent so no enlarging of the list's indent.
-           (autogit//output:indent (seq-elt indent (1- level)) 1)))
+           (int<autogit>:output:indent (seq-elt indent (1- level)) 1)))
 
         ((wholenump indent)
          (make-string (* indent level) ?\s))
@@ -451,17 +451,17 @@ INDENT can be:
            (apply 'concat indents)))
 
         (t
-         (error "autogit//output:indent: Unknown INDENT type: %S %S"
+         (error "int<autogit>:output:indent: Unknown INDENT type: %S %S"
                 (type-of indent) indent))))
-;; (autogit//output:indent 4 1)
-;; (autogit//output:indent 4 2)
-;; (autogit//output:indent "  " 1)
-;; (autogit//output:indent "  " 2)
-;; (autogit//output:indent '("hello" "there") 1)
-;; (autogit//output:indent '("hello" "there") 2)
+;; (int<autogit>:output:indent 4 1)
+;; (int<autogit>:output:indent 4 2)
+;; (int<autogit>:output:indent "  " 1)
+;; (int<autogit>:output:indent "  " 2)
+;; (int<autogit>:output:indent '("hello" "there") 1)
+;; (int<autogit>:output:indent '("hello" "there") 2)
 
 
-(defun autogit//output:propertize (&rest args)
+(defun int<autogit>:output:propertize (&rest args)
   "Parse ARGS to created a propertized string.
 
 ARGS is a plist. Keys/Values are:
@@ -472,7 +472,7 @@ ARGS is a plist. Keys/Values are:
     + Value must be either a single string,
       or a list of (format-string arg0 ...) pass through `format'.
 
-PROPS should be either a keyword from `autogit//properties' or actual string
+PROPS should be either a keyword from `int<autogit>:properties' or actual string
 properties."
   (let (properties
         text)
@@ -491,7 +491,7 @@ properties."
               ;; Only had a string, set it as text and we're done "building".
               (setq text fmt/str)
             ;; No args and no text; error.
-            (error (concat "autogit//output:propertize: "
+            (error (concat "int<autogit>:output:propertize: "
                            "Must have text to propertize. Found nothing "
                            "for key `:text' in args: %S")
                    args))
@@ -499,7 +499,7 @@ properties."
         ;; Have args.
         (if (not fmt/str)
             ;; Args but no string... Don't know what to do with this.
-            (error (concat "autogit//output:propertize: "
+            (error (concat "int<autogit>:output:propertize: "
                            "Must have a string to propertize as "
                            "`:text' key's value, or as first element in "
                            "`:text' key's value's list. Got `:text' value: %S")
@@ -534,7 +534,7 @@ properties."
 
             (t
              ;; Unknown so... error.
-             (error (concat "autogit//output:propertize: "
+             (error (concat "int<autogit>:output:propertize: "
                             "Found `:prop' keyword, but don't know how to "
                             "process its value. Expected keyword or list; "
                             "got: %S (type: %S)")
@@ -546,12 +546,12 @@ properties."
         text
       ;; Properties are backwards, so fix that.
       (apply #'propertize text (nreverse properties)))))
-;; (autogit//output:propertize :text "hello there" :prop :autogit)
-;; (autogit//output:message :messages (autogit//output:propertize "hello there" :autogit))
+;; (int<autogit>:output:propertize :text "hello there" :prop :autogit)
+;; (int<autogit>:output:message :messages (int<autogit>:output:propertize "hello there" :autogit))
 ;; (propertize "hello there" 'face 'package-name)
 
 
-(defun autogit//output:finalize (args)
+(defun int<autogit>:output:finalize (args)
   "Create a (propertized) string ready to be output to a buffer.
 
 ARGS should be a list and each item should be one of:
@@ -560,7 +560,7 @@ ARGS should be a list and each item should be one of:
     + With requried key `:text', value of a string or list of
       format-string and format-args.
     + With optional key `:prop' or `:property', value of a keyword from
-      `autogit//output:propertize'.
+      `int<autogit>:output:propertize'.
   - A list of: a format-string and format-args.
 
 No padding between args is created."
@@ -576,7 +576,7 @@ No padding between args is created."
             ;; Plist
             ((and (listp arg)
                   (keywordp (nth 0 arg)))
-             (push (apply #'autogit//output:propertize arg) text/list))
+             (push (apply #'int<autogit>:output:propertize arg) text/list))
 
             ;; Regular list
             ((listp arg)
@@ -584,7 +584,7 @@ No padding between args is created."
 
             ;; Unknown - Error
             (t
-             (error "`autogit//output:finalize': Cannot process input: %S"
+             (error "`int<autogit>:output:finalize': Cannot process input: %S"
                     arg))))
 
     (when text/list
@@ -592,15 +592,15 @@ No padding between args is created."
       (apply #'concat (nreverse text/list)))))
 
 
-(defun autogit//output:insert (buffer message)
+(defun int<autogit>:output:insert (buffer message)
   "Insert finalized MESSAGE into BUFFER.
 
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `autogit//macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
 
-MESSAGE should be output from `autogit//output:finalize'."
+MESSAGE should be output from `int<autogit>:output:finalize'."
   (cond ((and (keywordp buffer)
               (eq buffer :messages))
          ;; Using *Messages* buffer, so just use the `message' function to put the
@@ -609,29 +609,29 @@ MESSAGE should be output from `autogit//output:finalize'."
 
         ;; Some other keyword: error.
         ((keywordp buffer)
-         (error "`autogit//output:insert': unknown buffer keyword: %S" buffer))
+         (error "`int<autogit>:output:insert': unknown buffer keyword: %S" buffer))
 
         ;; Buffer obj or str:
         ((or (stringp buffer)
              (bufferp buffer))
-         (autogit//macro:with-buffer buffer
-           ;; We are now in BUFFER, so just insert the formatted string on a new line at the end.
-           (goto-char (point-max))
-           (insert (concat "\n" message))))
+         (int<autogit>:macro:with-buffer buffer
+                                         ;; We are now in BUFFER, so just insert the formatted string on a new line at the end.
+                                         (goto-char (point-max))
+                                         (insert (concat "\n" message))))
 
         ;; Fallthrough error.
         (t
-         (error "`autogit//output:insert': unhandled buffer type %S %S"
+         (error "`int<autogit>:output:insert': unhandled buffer type %S %S"
                 (type-of buffer) buffer))))
 
 
-(defun autogit//output:message (buffer &rest args)
+(defun int<autogit>:output:message (buffer &rest args)
   "Create a (propertized) string and outputs it to BUFFER.
 
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `autogit//macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
 
 ARGS should each be one of:
   - A string.
@@ -639,32 +639,32 @@ ARGS should each be one of:
     + With requried key `:text', value of a string or list of
       format-string and format-args.
     + With optional key `:prop' or `:property', value of a keyword from
-      `autogit//output:propertize'.
+      `int<autogit>:output:propertize'.
   - A list of: a format-string and format-args.
 
 No padding between args is created.
 
 NOTE: If BUFFER is not `:message', it will print to the current buffer,
-so it must be used inside the `autogit//macro:with-buffer' macro body!"
-  (autogit//output:insert buffer (autogit//output:finalize args)))
+so it must be used inside the `int<autogit>:macro:with-buffer' macro body!"
+  (int<autogit>:output:insert buffer (int<autogit>:output:finalize args)))
 ;; (let ((buffer autogit:buffer:name/status))
-;;     (autogit//output:message buffer
+;;     (int<autogit>:output:message buffer
 ;;                         (list :prop :face:self :text autogit:text:name)
 ;;                         ": "
 ;;                         "Status of "
 ;;                         (list :prop :face:highlight
 ;;                               :text (list "%d" (length autogit:repos:path/watch)))
 ;;                         " watch locations...")
-;;     (autogit//buffer:display buffer)))
+;;     (int<autogit>:buffer:display buffer)))
 
 
-(defun autogit//output:message/indented (buffer indent &rest args)
+(defun int<autogit>:output:message/indented (buffer indent &rest args)
   "Create an indented, propertized message and outputs it to BUFFER.
 
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `autogit//macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
 
 INDENT should be a wholenum or a string.
   - wholenum: indent by that number of spaces
@@ -678,14 +678,14 @@ ARGS should each be one of:
     + With requried key `:text', value of a string or list of
       format-string and format-args.
     + With optional key `:prop' or `:property', value of a keyword from
-      `autogit//output:propertize'.
+      `int<autogit>:output:propertize'.
   - A list of: a format-string and format-args.
 
 No padding between args is created.
 
 NOTE: If BUFFER is not `:message', it will print to the current buffer,
-so it must be used inside the `autogit//macro:with-buffer' macro body!"
-  (let ((msg (autogit//output:finalize args))
+so it must be used inside the `int<autogit>:macro:with-buffer' macro body!"
+  (let ((msg (int<autogit>:output:finalize args))
         (indent-str (cond ((wholenump indent)
                            (make-string indent ?\s))
                           ((stringp indent)
@@ -700,71 +700,71 @@ so it must be used inside the `autogit//macro:with-buffer' macro body!"
           (push (concat indent-str line) indented))
         (setq msg (mapconcat 'identity indented "\n"))))
 
-    (autogit//output:insert buffer msg)))
+    (int<autogit>:output:insert buffer msg)))
 
 
 ;; TODO: namespace for 'message', 'section', 'buffer' type things.
 ;;   - 'output'?
 ;;   - 'display'?
-(defun autogit//output:newline (buffer)
+(defun int<autogit>:output:newline (buffer)
   "Insert a newline into autogit output BUFFER."
-  (autogit//output:message buffer ""))
+  (int<autogit>:output:message buffer ""))
 
 
-(defun autogit//output:section-break/display (buffer)
+(defun int<autogit>:output:section-break/display (buffer)
   "Insert a section break into BUFFER.
 
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `autogit//macro:with-buffer'."
+  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'."
   ;; TODO: Make these from defcustoms. num newlines, padding cons, padding char, width-or-use-fill-column.
   (let* ((newlines (make-string 2 ?\n))
          (padding '("┌" . "┐")))
-    (autogit//output:message buffer
-                             (list :prop :face:section
-                                   :text (concat newlines
-                                                 (car padding)
-                                                 (make-string (- fill-column
-                                                                 (length (car padding))
-                                                                 (length (cdr padding)))
-                                                              (string-to-char "─"))
-                                                 (cdr padding))))))
+    (int<autogit>:output:message buffer
+                                 (list :prop :face:section
+                                       :text (concat newlines
+                                                     (car padding)
+                                                     (make-string (- fill-column
+                                                                     (length (car padding))
+                                                                     (length (cdr padding)))
+                                                                  (string-to-char "─"))
+                                                     (cdr padding))))))
 
 
-(defun autogit//output:section-break/auto (buffer)
+(defun int<autogit>:output:section-break/auto (buffer)
   "Inserts a section break into BUFFER if needed.
 
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `autogit//macro:with-buffer'."
+  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'."
   (when (> (point) 1)
-    (autogit//output:section-break/display buffer)))
+    (int<autogit>:output:section-break/display buffer)))
 
 
 ;;------------------------------------------------------------------------------
 ;; Output/Repo: Status
 ;;------------------------------------------------------------------------------
 
-(defun autogit//output:status (buffer alist/changes)
+(defun int<autogit>:output:status (buffer alist/changes)
   "Output a status message to BUFFER about a git repo sub-dir's ALIST/CHANGES."
   ;; Error checking.
-  (unless (memq autogit:changes:display autogit//changes:display/valid)
+  (unless (memq autogit:changes:display int<autogit>:changes:display/valid)
     (error "`autogit:changes:display' (%S) is not a valid setting. Set it to one of: %S"
            autogit:changes:display
-           autogit//changes:display/valid))
+           int<autogit>:changes:display/valid))
 
   ;; Title or whatever is not our responsibility.
 
   (let (indent)
     ;; Should we display summary?
     (when (memq autogit:changes:display '(:summary :full))
-      (autogit//output:message buffer
-                               (list :prop :face:title
-                                     :text "  Status: ")
-                               (list :prop :face:highlight
-                                     :text (autogit//changes:summary alist/changes)))
+      (int<autogit>:output:message buffer
+                                   (list :prop :face:title
+                                         :text "  Status: ")
+                                   (list :prop :face:highlight
+                                         :text (int<autogit>:changes:summary alist/changes)))
       (setq indent t))
 
     ;; List, if desired.
@@ -777,20 +777,20 @@ BUFFER should be a keyword, string or buffer object.
         ;; TODO: Keyword (:staged, :unstaged, etc) to display string?
         (if (null (cdr entry))
             ;; No changes for this dir.
-            (autogit//output:message buffer
-                                     (list "%s" indent)
-                                     (list :prop :face:title :text (list "%s" (car entry)))
-                                     ": "
-                                     (list :prop :face:highlight :text "None."))
+            (int<autogit>:output:message buffer
+                                         (list "%s" indent)
+                                         (list :prop :face:title :text (list "%s" (car entry)))
+                                         ": "
+                                         (list :prop :face:highlight :text "None."))
           ;; Show type (staged, unstaged...) and list of change.
-          (autogit//output:message buffer
-                                   (list "%s" indent)
-                                   (list :prop :face:title :text (list "%s" (car entry)))
-                                   ":")
+          (int<autogit>:output:message buffer
+                                       (list "%s" indent)
+                                       (list :prop :face:title :text (list "%s" (car entry)))
+                                       ":")
           (dolist (path (cdr entry))
-            (autogit//output:message buffer
-                                     (list "%s  - " indent)
-                                     (list :prop :face:path :text path))))))))
+            (int<autogit>:output:message buffer
+                                         (list "%s  - " indent)
+                                         (list :prop :face:path :text path))))))))
 
 
 ;;------------------------------------------------------------------------------

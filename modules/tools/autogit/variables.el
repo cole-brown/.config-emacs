@@ -195,7 +195,7 @@ Set to nil if not desired in output.")
 ;; Constants & Variables
 ;;------------------------------------------------------------------------------
 
-(defconst autogit//changes:display/valid '(:summary :paths :full)
+(defconst int<autogit>:changes:display/valid '(:summary :paths :full)
   "Allowed values of `autogit:changes:display'.")
 
 
