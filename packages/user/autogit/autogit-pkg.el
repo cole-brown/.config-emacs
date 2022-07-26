@@ -4,11 +4,6 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2020-10-28
 ;; Modified:   2022-07-25
-;; URL:        https://github.com/cole-brown/.config-emacs
-;; Version:    1.0.0
-;; Keywords:   vc tools
-;; Homepage:   https://github.com/cole-brown/.config-secret
-;; Package-Requires: ((emacs "27.1") (magit "3.3.0") (deferred "0.5.1"))
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -25,47 +20,16 @@
 ;;; Code:
 
 
-;;------------------------------------------------------------------------------
-;; Set imp Root.
-;;------------------------------------------------------------------------------
-
-(imp:path:root :autogit
-               (imp:path:current:dir)
-               "init.el")
-
-
-;;------------------------------------------------------------------------------
-;; Load Files
-;;------------------------------------------------------------------------------
-
-(imp:timing
-    '(:autogit)
-    (imp:file:current)
-    (imp:path:current:dir)
-
-  (imp:load :feature  '(:autogit variables)
-            :filename "variables")
-
-  (imp:load :feature  '(:autogit path)
-            :filename "path")
-
-  (imp:load :feature  '(:autogit buffer)
-            :filename "buffer")
-
-  (imp:load :feature  '(:autogit magit)
-            :filename "magit")
-
-  (imp:load :feature  '(:autogit output)
-            :filename "output")
-
-  (imp:load :feature  '(:autogit api)
-            :filename "api")
-
-  (imp:load :feature  '(:autogit commands)
-            :filename "commands"))
-
-
-;;------------------------------------------------------------------------------
-;; The End.
-;;------------------------------------------------------------------------------
-(imp:provide:with-emacs :autogit)
+;; Obsolete in Emacs 28.1, but no documentation to say what to switch to.
+;; Maybe when Emacs 29 comes along and they delete `define-package' there'll be
+;; a replacement? Already `define-package' is just:
+;;   (error "Don't call me")
+;; ...Which isn't very helpful.
+(define-package "autogit" "1.0.0"
+  "View status on multiple repositories & commit to multiple repositories."
+  '((emacs    "28.1")
+    (magit    "3.3.0")
+    (deferred "0.5.1"))
+  ;; TODO: Change when autogit gets its own repository
+  :homepage "https://github.com/cole-brown/.config-emacs"
+  :keywords '("git" "tools" "vc"))
