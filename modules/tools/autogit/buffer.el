@@ -1,4 +1,4 @@
-;;; tools/autogit/buffer.el -*- lexical-binding: t; -*-
+;;; tools/autogit/buffer.el --- Buffer helper functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
