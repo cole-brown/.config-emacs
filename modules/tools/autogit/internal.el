@@ -45,7 +45,7 @@ will return full /file/ path in platform-agnostic manner."
 ;; (int<autogit>:path:join (car autogit:repos:path/commit) "foo")
 
 
-(defun int<autogit>:path:changes/rel->abs (path-abs alist/changes)
+(defun int<autogit>:path:changes:rel->abs (path-abs alist/changes)
   "Convert relative paths to absolute.
 
 Converts all of ALIST/CHANGES' relative paths to absolute paths given
@@ -60,7 +60,7 @@ a PATH-ABS inside of the git repository."
                   (mapcar (lambda (x) (int<autogit>:path:join git-root x))
                           (cdr entry)))
             results))))
-;; (int<autogit>:path:changes/rel->abs default-directory (int<autogit>:changes:in-repo default-directory))
+;; (int<autogit>:path:changes:rel->abs default-directory (int<autogit>:changes:in-repo default-directory))
 
 
 ;;------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ Return an alist of changes:
     (:unstaged  . <list of filenames or nil)
     (:untracked . <list of filenames or nil)
     (:unmerged  . <list of filenames or nil))"
-  (let ((alist/changes (int<autogit>:path:changes/rel->abs subdir-abs
+  (let ((alist/changes (int<autogit>:path:changes:rel->abs subdir-abs
                                                            (int<autogit>:changes:in-repo subdir-abs)))
         results)
     ;; Need to filter each category of changes down to just the subdir requested.
@@ -206,7 +206,7 @@ single list."
 ;; Magit
 ;;------------------------------------------------------------------------------
 
-(defmacro int<autogit>:magit/with-errors (&rest body)
+(defmacro int<autogit>:magit:with-errors (&rest body)
   "Set magit error flag and run BODY."
   `(let ((magit-process-raise-error t))
      ,@body))
@@ -223,7 +223,7 @@ BUFFER should be a keyword, string or buffer object.
   - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
 
 INDENT must be a wholenum - 0 is 'not indented'."
-  (int<autogit>:magit/with-errors
+  (int<autogit>:magit:with-errors
    ;;------------------------------
    ;; Fetch from remotes.
    ;;------------------------------
@@ -304,7 +304,7 @@ Example:
                       \"adding all changes...\"
                       \"add\" \"-A\" \".\")
      -message-> \"calling git: adding all changes...\""
-  (int<autogit>:magit/with-errors
+  (int<autogit>:magit:with-errors
    ;; Output messages first.
    (int<autogit>:output:message/indented buffer
                                          (int<autogit>:output:indent indent 1)
@@ -338,7 +338,7 @@ Example:
 ;; don't. Maybe pull that out into a validation func so everyone can use it.
 
 
-(defun int<autogit>:macro:with-buffer//tail (buffer)
+(defun int<autogit>:macro:with-buffer/tail (buffer)
   "Make sure all windows viewing the BUFFER are viewing the tail of it.
 
 BUFFER should be a string or buffer object."
@@ -348,7 +348,7 @@ BUFFER should be a string or buffer object."
       (setq windows (cdr windows)))))
 
 
-(defun int<autogit>:macro:with-buffer//call (buffer body)
+(defun int<autogit>:macro:with-buffer/call (buffer body)
   "Run BODY forms then ensure the tail of the buffer is viewed.
 
 BUFFER should be a keyword, string or buffer object.
@@ -363,11 +363,11 @@ BUFFER."
       ;; Just using `message' for the *Messages* buffer.
       `(progn
          ,@body
-         (int<autogit>:macro:with-buffer//tail ,buffer))
+         (int<autogit>:macro:with-buffer/tail ,buffer))
     ;; Create/get buffer to use while executing body.
     `(with-current-buffer (get-buffer-create ,buffer)
        ,@body
-       (int<autogit>:macro:with-buffer//tail ,buffer))))
+       (int<autogit>:macro:with-buffer/tail ,buffer))))
 
 
 (defmacro int<autogit>:macro:with-buffer (buffer &rest body)
@@ -378,7 +378,7 @@ BUFFER should be a keyword, string or buffer object.
   - If it is a string, insert into that named buffer.
   - Else insert into the buffer object."
   (declare (indent 1))
-  (int<autogit>:macro:with-buffer//call buffer
+  (int<autogit>:macro:with-buffer/call buffer
                                         body))
 ;; (pp-macroexpand-expression
 ;;  (int<autogit>:macro:with-buffer autogit:buffer:name/push
@@ -732,8 +732,8 @@ BUFFER should be a keyword, string or buffer object.
                                                      (cdr padding))))))
 
 
-(defun int<autogit>:output:section-break/auto (buffer)
-  "Inserts a section break into BUFFER if needed.
+(defun int<autogit>:output:section-break (buffer)
+  "Insert a section break into BUFFER if needed.
 
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using

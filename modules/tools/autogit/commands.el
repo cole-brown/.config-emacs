@@ -97,7 +97,7 @@ If DRY-RUN is non-nil, does not execute the (Ma)git commands."
       (deferred:$
         (deferred:next
           (lambda ()
-            (int<autogit>:output:section-break/auto buffer)))
+            (int<autogit>:output:section-break buffer)))
         (deferred:nextc it
           (lambda (_)
             (int<autogit>:output:message buffer
@@ -329,7 +329,7 @@ uncommitted(/unpushed?) changes."
       ;; puts "Status of [...]" message inside of the ASCII box.
       (deferred:next
         (lambda ()
-          (int<autogit>:output:section-break/auto buffer)))
+          (int<autogit>:output:section-break buffer)))
       (deferred:next
         (lambda ()
           (int<autogit>:output:message buffer
