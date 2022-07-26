@@ -185,7 +185,7 @@ DRY-RUN should be nil/non-nil.
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:buffer:with'.
 
 INDENT must be a wholenum - 0 is 'not indented'."
   (int<autogit>:magit:with-errors
@@ -252,7 +252,7 @@ Returned string will be either:
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:buffer:with'.
 
 INDENT can be a string or a wholenum (0 is 'not indented').
 

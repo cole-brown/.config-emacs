@@ -208,7 +208,7 @@ No padding between args is created."
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:buffer:with'.
 
 MESSAGE should be output from `int<autogit>:string:finalize'."
   (cond ((and (keywordp buffer)
@@ -224,10 +224,10 @@ MESSAGE should be output from `int<autogit>:string:finalize'."
         ;; Buffer obj or str:
         ((or (stringp buffer)
              (bufferp buffer))
-         (int<autogit>:macro:with-buffer buffer
-                                         ;; We are now in BUFFER, so just insert the formatted string on a new line at the end.
-                                         (goto-char (point-max))
-                                         (insert (concat "\n" message))))
+         (int<autogit>:buffer:with buffer
+                                   ;; We are now in BUFFER, so just insert the formatted string on a new line at the end.
+                                   (goto-char (point-max))
+                                   (insert (concat "\n" message))))
 
         ;; Fallthrough error.
         (t
@@ -241,7 +241,7 @@ MESSAGE should be output from `int<autogit>:string:finalize'."
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:buffer:with'.
 
 ARGS should each be one of:
   - A string.
@@ -255,7 +255,7 @@ ARGS should each be one of:
 No padding between args is created.
 
 NOTE: If BUFFER is not `:message', it will print to the current buffer,
-so it must be used inside the `int<autogit>:macro:with-buffer' macro body!"
+so it must be used inside the `int<autogit>:buffer:with' macro body!"
   (int<autogit>:display:insert buffer (int<autogit>:string:finalize args)))
 ;; (let ((buffer autogit:buffer:name/status))
 ;;     (int<autogit>:display:message buffer
@@ -274,7 +274,7 @@ so it must be used inside the `int<autogit>:macro:with-buffer' macro body!"
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:buffer:with'.
 
 INDENT should be a wholenum or a string.
   - wholenum: indent by that number of spaces
@@ -294,7 +294,7 @@ ARGS should each be one of:
 No padding between args is created.
 
 NOTE: If BUFFER is not `:message', it will print to the current buffer,
-so it must be used inside the `int<autogit>:macro:with-buffer' macro body!"
+so it must be used inside the `int<autogit>:buffer:with' macro body!"
   (let ((msg (int<autogit>:string:finalize args))
         (indent-str (cond ((wholenump indent)
                            (make-string indent ?\s))
@@ -324,7 +324,7 @@ so it must be used inside the `int<autogit>:macro:with-buffer' macro body!"
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
+  - Else inserts into BUFFER using `int<autogit>:buffer:with'.
 
 If FORCE is non-nil, always output a section break. Else only output one if
 insert point in BUFFER is not the very beginning of the buffer."
@@ -363,10 +363,10 @@ insert point in BUFFER is not the very beginning of the buffer."
     ;; Should we display summary?
     (when (memq autogit:changes:display '(:summary :full))
       (int<autogit>:display:message buffer
-                                   (list :prop :face:title
-                                         :text "  Status: ")
-                                   (list :prop :face:highlight
-                                         :text (int<autogit>:changes:summary alist/changes)))
+                                    (list :prop :face:title
+                                          :text "  Status: ")
+                                    (list :prop :face:highlight
+                                          :text (int<autogit>:changes:summary alist/changes)))
       (setq indent t))
 
     ;; List, if desired.
@@ -380,19 +380,19 @@ insert point in BUFFER is not the very beginning of the buffer."
         (if (null (cdr entry))
             ;; No changes for this dir.
             (int<autogit>:display:message buffer
-                                         (list "%s" indent)
-                                         (list :prop :face:title :text (list "%s" (car entry)))
-                                         ": "
-                                         (list :prop :face:highlight :text "None."))
+                                          (list "%s" indent)
+                                          (list :prop :face:title :text (list "%s" (car entry)))
+                                          ": "
+                                          (list :prop :face:highlight :text "None."))
           ;; Show type (staged, unstaged...) and list of change.
           (int<autogit>:display:message buffer
-                                       (list "%s" indent)
-                                       (list :prop :face:title :text (list "%s" (car entry)))
-                                       ":")
+                                        (list "%s" indent)
+                                        (list :prop :face:title :text (list "%s" (car entry)))
+                                        ":")
           (dolist (path (cdr entry))
             (int<autogit>:display:message buffer
-                                         (list "%s  - " indent)
-                                         (list :prop :face:path :text path))))))))
+                                          (list "%s  - " indent)
+                                          (list :prop :face:path :text path))))))))
 
 
 ;;------------------------------------------------------------------------------

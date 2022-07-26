@@ -35,7 +35,7 @@
 ;; With Buffer as Context
 ;;------------------------------------------------------------------------------
 
-(defun int<autogit>:macro:with-buffer/tail (buffer)
+(defun int<autogit>:buffer:with/tail (buffer)
   "Make sure all windows viewing the BUFFER are viewing the tail of it.
 
 BUFFER should be a string or buffer object."
@@ -45,7 +45,7 @@ BUFFER should be a string or buffer object."
       (setq windows (cdr windows)))))
 
 
-(defun int<autogit>:macro:with-buffer/call (buffer body)
+(defun int<autogit>:buffer:with/call (buffer body)
   "Run BODY forms then ensure the tail of the buffer is viewed.
 
 BUFFER should be a keyword, string or buffer object.
@@ -60,14 +60,14 @@ BUFFER."
       ;; Just using `message' for the *Messages* buffer.
       `(progn
          ,@body
-         (int<autogit>:macro:with-buffer/tail ,buffer))
+         (int<autogit>:buffer:with/tail ,buffer))
     ;; Create/get buffer to use while executing body.
     `(with-current-buffer (get-buffer-create ,buffer)
        ,@body
-       (int<autogit>:macro:with-buffer/tail ,buffer))))
+       (int<autogit>:buffer:with/tail ,buffer))))
 
 
-(defmacro int<autogit>:macro:with-buffer (buffer &rest body)
+(defmacro int<autogit>:buffer:with (buffer &rest body)
   "Run BODY then tail BUFFER.
 
 BUFFER should be a keyword, string or buffer object.
@@ -75,13 +75,12 @@ BUFFER should be a keyword, string or buffer object.
   - If it is a string, insert into that named buffer.
   - Else insert into the buffer object."
   (declare (indent 1))
-  (int<autogit>:macro:with-buffer/call buffer
-                                        body))
+  (int<autogit>:buffer:with/call buffer body))
 ;; (pp-macroexpand-expression
-;;  (int<autogit>:macro:with-buffer autogit:buffer:name/push
+;;  (int<autogit>:buffer:with autogit:buffer:name/push
 ;;                              (message "hello there")))
 ;; (pp-macroexpand-expression
-;;  (int<autogit>:macro:with-buffer :messages
+;;  (int<autogit>:buffer:with :messages
 ;;                              (message "hello there")))
 
 
