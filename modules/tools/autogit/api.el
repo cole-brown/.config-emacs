@@ -26,12 +26,14 @@
 ;; Repositories
 ;;------------------------------------------------------------------------------
 
+;;;###autoload
 (defun autogit:repo? (path)
   "Return non-nil if PATH is a git repository."
   (and (path:exists? path :dir)
        (path:exists? (path:join path ".git"))))
 
 
+;;;###autoload
 (defun autogit:repos:list (root)
   "Get all repo directories that are (direct) children of ROOT path.
 

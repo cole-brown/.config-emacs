@@ -25,10 +25,7 @@
 ;; TODO: Get deferred working for all commands.
 ;;   - Currently one of them, at least, isn't async...
 (require 'deferred)
-
-;; How to get this lazy loaded?
-;;   - Take the require out of the funcs when figured out.
-;; (require 'magit)
+(require 'magit)
 
 (imp:require :autogit 'variables)
 (imp:require :autogit 'buffer)
@@ -40,6 +37,7 @@
 ;; Buffer Functions
 ;;------------------------------------------------------------------------------
 
+;;;###autoload
 (defun autogit:buffers:bury ()
   "Hide and bury the autogit output buffers.
 
@@ -58,6 +56,7 @@ settings are `:messages'."
 ;; (autogit:buffers:bury)
 
 
+;;;###autoload
 (defun autogit:buffers:kill ()
   "Kill the autogit output buffer(s).
 
@@ -75,6 +74,7 @@ If NAME is `:messages', kills the \"*Messages*\" buffer."
 ;; Commit & Push
 ;;------------------------------------------------------------------------------
 
+;;;###autoload
 (defun autogit:push (&optional dry-run)
   "Commit and push changes.
 
@@ -318,6 +318,7 @@ If DRY-RUN is non-nil, does not execute the (Ma)git commands."
 ;; Status
 ;;------------------------------------------------------------------------------
 
+;;;###autoload
 (defun autogit:status ()
   "Display repo statuses.
 

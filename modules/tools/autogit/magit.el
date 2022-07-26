@@ -19,9 +19,7 @@
 ;;; Code:
 
 
-;; TODO: How to get this lazy loaded?
-;;   - Take the require out of the funcs when figured out.
-;; (require 'magit)
+(require 'magit)
 
 (imp:require :autogit 'variables)
 (imp:require :autogit 'path)
