@@ -46,6 +46,9 @@
   (imp:load :feature  '(:autogit variables)
             :filename "variables")
 
+  (imp:load :feature  '(:autogit buffer)
+            :filename "buffer")
+
   (imp:load :feature  '(:autogit internal)
             :filename "internal")
 

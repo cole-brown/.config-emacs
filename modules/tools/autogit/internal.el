@@ -1,4 +1,4 @@
-;;; tools/autogit/status.el -*- lexical-binding: t; -*-
+;;; tools/autogit/internal.el -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
