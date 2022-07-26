@@ -12,26 +12,23 @@
 ;;
 ;;; Commentary:
 ;;
-;; Functions for displaying output to a buffer.
+;; Functions for manipulating strings and displaying output to a buffer.
 ;;
 ;;; Code:
 
 
 (require 'subr-x)
 
-;; TODO: How to get this lazy loaded?
-;;   - Take the require out of the funcs when figured out.
-;; (require 'magit)
-
 (imp:require :autogit 'variables)
+(imp:require :autogit 'buffer)
+(imp:require :autogit 'repo)
 
 
 ;;------------------------------------------------------------------------------
 ;; Strings
 ;;------------------------------------------------------------------------------
 
-;; TODO: int<autogit>:string:indent ???
-(defun int<autogit>:output:indent (indent level)
+(defun int<autogit>:string:indent (indent level)
   "Get indent string for indent LEVEL from INDENT.
 
 LEVEL must be a wholenum - 0 is 'not indented'.
@@ -41,14 +38,14 @@ INDENT can be:
   - string:   returns the string repeated LEVEL times.
   - list:     returns the string at element (LEVEL - 1) or \"\" if LEVEL is 0."
   (cond ((not (wholenump level))
-         (error "int<autogit>:output:indent: LEVEL must be a wholenum, got: %S"
+         (error "int<autogit>:string:indent: LEVEL must be a wholenum, got: %S"
                 level))
 
         ((listp indent)
          (if (= level 0)
              ""
            ;; Pretend level 1 indent so no enlarging of the list's indent.
-           (int<autogit>:output:indent (seq-elt indent (1- level)) 1)))
+           (int<autogit>:string:indent (seq-elt indent (1- level)) 1)))
 
         ((wholenump indent)
          (make-string (* indent level) ?\s))
@@ -60,18 +57,17 @@ INDENT can be:
            (apply 'concat indents)))
 
         (t
-         (error "int<autogit>:output:indent: Unknown INDENT type: %S %S"
+         (error "int<autogit>:string:indent: Unknown INDENT type: %S %S"
                 (type-of indent) indent))))
-;; (int<autogit>:output:indent 4 1)
-;; (int<autogit>:output:indent 4 2)
-;; (int<autogit>:output:indent "  " 1)
-;; (int<autogit>:output:indent "  " 2)
-;; (int<autogit>:output:indent '("hello" "there") 1)
-;; (int<autogit>:output:indent '("hello" "there") 2)
+;; (int<autogit>:string:indent 4 1)
+;; (int<autogit>:string:indent 4 2)
+;; (int<autogit>:string:indent "  " 1)
+;; (int<autogit>:string:indent "  " 2)
+;; (int<autogit>:string:indent '("hello" "there") 1)
+;; (int<autogit>:string:indent '("hello" "there") 2)
 
 
-;; TODO: int<autogit>:string:propertize ???
-(defun int<autogit>:output:propertize (&rest args)
+(defun int<autogit>:string:propertize (&rest args)
   "Parse ARGS to created a propertized string.
 
 ARGS is a plist. Keys/Values are:
@@ -101,7 +97,7 @@ properties."
               ;; Only had a string, set it as text and we're done "building".
               (setq text fmt/str)
             ;; No args and no text; error.
-            (error (concat "int<autogit>:output:propertize: "
+            (error (concat "int<autogit>:string:propertize: "
                            "Must have text to propertize. Found nothing "
                            "for key `:text' in args: %S")
                    args))
@@ -109,7 +105,7 @@ properties."
         ;; Have args.
         (if (not fmt/str)
             ;; Args but no string... Don't know what to do with this.
-            (error (concat "int<autogit>:output:propertize: "
+            (error (concat "int<autogit>:string:propertize: "
                            "Must have a string to propertize as "
                            "`:text' key's value, or as first element in "
                            "`:text' key's value's list. Got `:text' value: %S")
@@ -144,7 +140,7 @@ properties."
 
             (t
              ;; Unknown so... error.
-             (error (concat "int<autogit>:output:propertize: "
+             (error (concat "int<autogit>:string:propertize: "
                             "Found `:prop' keyword, but don't know how to "
                             "process its value. Expected keyword or list; "
                             "got: %S (type: %S)")
@@ -156,13 +152,12 @@ properties."
         text
       ;; Properties are backwards, so fix that.
       (apply #'propertize text (nreverse properties)))))
-;; (int<autogit>:output:propertize :text "hello there" :prop :autogit)
-;; (int<autogit>:output:message :messages (int<autogit>:output:propertize "hello there" :autogit))
+;; (int<autogit>:string:propertize :text "hello there" :prop :autogit)
+;; (int<autogit>:display:message :messages (int<autogit>:string:propertize "hello there" :autogit))
 ;; (propertize "hello there" 'face 'package-name)
 
 
-;; TODO: int<autogit>:string:finalize ???
-(defun int<autogit>:output:finalize (args)
+(defun int<autogit>:string:finalize (args)
   "Create a (propertized) string ready to be output to a buffer.
 
 ARGS should be a list and each item should be one of:
@@ -171,7 +166,7 @@ ARGS should be a list and each item should be one of:
     + With requried key `:text', value of a string or list of
       format-string and format-args.
     + With optional key `:prop' or `:property', value of a keyword from
-      `int<autogit>:output:propertize'.
+      `int<autogit>:string:propertize'.
   - A list of: a format-string and format-args.
 
 No padding between args is created."
@@ -187,7 +182,7 @@ No padding between args is created."
             ;; Plist
             ((and (listp arg)
                   (keywordp (nth 0 arg)))
-             (push (apply #'int<autogit>:output:propertize arg) text/list))
+             (push (apply #'int<autogit>:string:propertize arg) text/list))
 
             ;; Regular list
             ((listp arg)
@@ -195,7 +190,7 @@ No padding between args is created."
 
             ;; Unknown - Error
             (t
-             (error "`int<autogit>:output:finalize': Cannot process input: %S"
+             (error "`int<autogit>:string:finalize': Cannot process input: %S"
                     arg))))
 
     (when text/list
@@ -203,9 +198,11 @@ No padding between args is created."
       (apply #'concat (nreverse text/list)))))
 
 
-;; TODO: int<autogit>:message:insert ???
-;; TODO: int<autogit>:display:insert ???
-(defun int<autogit>:output:insert (buffer message)
+;;------------------------------------------------------------------------------
+;; Output/Display to Buffer
+;;------------------------------------------------------------------------------
+
+(defun int<autogit>:display:insert (buffer message)
   "Insert finalized MESSAGE into BUFFER.
 
 BUFFER should be a keyword, string or buffer object.
@@ -213,7 +210,7 @@ BUFFER should be a keyword, string or buffer object.
     `message'.
   - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
 
-MESSAGE should be output from `int<autogit>:output:finalize'."
+MESSAGE should be output from `int<autogit>:string:finalize'."
   (cond ((and (keywordp buffer)
               (eq buffer :messages))
          ;; Using *Messages* buffer, so just use the `message' function to put the
@@ -222,7 +219,7 @@ MESSAGE should be output from `int<autogit>:output:finalize'."
 
         ;; Some other keyword: error.
         ((keywordp buffer)
-         (error "`int<autogit>:output:insert': unknown buffer keyword: %S" buffer))
+         (error "`int<autogit>:display:insert': unknown buffer keyword: %S" buffer))
 
         ;; Buffer obj or str:
         ((or (stringp buffer)
@@ -234,15 +231,11 @@ MESSAGE should be output from `int<autogit>:output:finalize'."
 
         ;; Fallthrough error.
         (t
-         (error "`int<autogit>:output:insert': unhandled buffer type %S %S"
+         (error "`int<autogit>:display:insert': unhandled buffer type %S %S"
                 (type-of buffer) buffer))))
 
 
-;; TODO: int<autogit>:message:message ???
-;; TODO: int<autogit>:message:output ???
-;; TODO: int<autogit>:message:display ???
-;; TODO: int<autogit>:display:message ???
-(defun int<autogit>:output:message (buffer &rest args)
+(defun int<autogit>:display:message (buffer &rest args)
   "Create a (propertized) string and outputs it to BUFFER.
 
 BUFFER should be a keyword, string or buffer object.
@@ -256,16 +249,16 @@ ARGS should each be one of:
     + With requried key `:text', value of a string or list of
       format-string and format-args.
     + With optional key `:prop' or `:property', value of a keyword from
-      `int<autogit>:output:propertize'.
+      `int<autogit>:string:propertize'.
   - A list of: a format-string and format-args.
 
 No padding between args is created.
 
 NOTE: If BUFFER is not `:message', it will print to the current buffer,
 so it must be used inside the `int<autogit>:macro:with-buffer' macro body!"
-  (int<autogit>:output:insert buffer (int<autogit>:output:finalize args)))
+  (int<autogit>:display:insert buffer (int<autogit>:string:finalize args)))
 ;; (let ((buffer autogit:buffer:name/status))
-;;     (int<autogit>:output:message buffer
+;;     (int<autogit>:display:message buffer
 ;;                         (list :prop :face:self :text autogit:text:name)
 ;;                         ": "
 ;;                         "Status of "
@@ -275,11 +268,7 @@ so it must be used inside the `int<autogit>:macro:with-buffer' macro body!"
 ;;     (int<autogit>:buffer:display buffer)))
 
 
-;; TODO: int<autogit>:message:message/indented ???
-;; TODO: int<autogit>:message:output/indented ???
-;; TODO: int<autogit>:message:display/indented ???
-;; TODO: int<autogit>:display:message/indented ???
-(defun int<autogit>:output:message/indented (buffer indent &rest args)
+(defun int<autogit>:display:message/indented (buffer indent &rest args)
   "Create an indented, propertized message and outputs it to BUFFER.
 
 BUFFER should be a keyword, string or buffer object.
@@ -299,14 +288,14 @@ ARGS should each be one of:
     + With requried key `:text', value of a string or list of
       format-string and format-args.
     + With optional key `:prop' or `:property', value of a keyword from
-      `int<autogit>:output:propertize'.
+      `int<autogit>:string:propertize'.
   - A list of: a format-string and format-args.
 
 No padding between args is created.
 
 NOTE: If BUFFER is not `:message', it will print to the current buffer,
 so it must be used inside the `int<autogit>:macro:with-buffer' macro body!"
-  (let ((msg (int<autogit>:output:finalize args))
+  (let ((msg (int<autogit>:string:finalize args))
         (indent-str (cond ((wholenump indent)
                            (make-string indent ?\s))
                           ((stringp indent)
@@ -321,56 +310,46 @@ so it must be used inside the `int<autogit>:macro:with-buffer' macro body!"
           (push (concat indent-str line) indented))
         (setq msg (mapconcat 'identity indented "\n"))))
 
-    (int<autogit>:output:insert buffer msg)))
+    (int<autogit>:display:insert buffer msg)))
 
 
-;; TODO: int<autogit>:message:newline ???
-;; TODO: int<autogit>:display:newline ???
-(defun int<autogit>:output:newline (buffer)
+(defun int<autogit>:display:newline (buffer)
   "Insert a newline into autogit output BUFFER."
-  (int<autogit>:output:message buffer ""))
+  (int<autogit>:display:message buffer ""))
 
 
-;; TODO: int<autogit>:display:section-break ???
-;; TODO: int<autogit>:display:break ???
-(defun int<autogit>:output:section-break/display (buffer)
+(defun int<autogit>:display:break (buffer &optional force)
   "Insert a section break into BUFFER.
 
 BUFFER should be a keyword, string or buffer object.
   - If it is the keyword `:messages', output to the *Messages* buffer using
     `message'.
-  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'."
-  ;; TODO: Make these from defcustoms. num newlines, padding cons, padding char, width-or-use-fill-column.
-  (let* ((newlines (make-string 2 ?\n))
-         (padding '("┌" . "┐")))
-    (int<autogit>:output:message buffer
-                                 (list :prop :face:section
-                                       :text (concat newlines
-                                                     (car padding)
-                                                     (make-string (- fill-column
-                                                                     (length (car padding))
-                                                                     (length (cdr padding)))
-                                                                  (string-to-char "─"))
-                                                     (cdr padding))))))
+  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'.
 
-
-;; TODO: combine w/ above function (add param to for auto or forced)
-(defun int<autogit>:output:section-break (buffer)
-  "Insert a section break into BUFFER if needed.
-
-BUFFER should be a keyword, string or buffer object.
-  - If it is the keyword `:messages', output to the *Messages* buffer using
-    `message'.
-  - Else inserts into BUFFER using `int<autogit>:macro:with-buffer'."
-  (when (> (point) 1)
-    (int<autogit>:output:section-break/display buffer)))
+If FORCE is non-nil, always output a section break. Else only output one if
+insert point in BUFFER is not the very beginning of the buffer."
+  ;; Add section break if forced or we think it's needed.
+  (when (or force
+            (> (point) 1))
+    ;; TODO: Make these from defcustoms?: num newlines, padding cons, padding char, width-or-use-fill-column.
+    (let* ((newlines (make-string 2 ?\n))
+           (padding '("┌" . "┐")))
+      (int<autogit>:display:message buffer
+                                    (list :prop :face:section
+                                          :text (concat newlines
+                                                        (car padding)
+                                                        (make-string (- fill-column
+                                                                        (length (car padding))
+                                                                        (length (cdr padding)))
+                                                                     (string-to-char "─"))
+                                                        (cdr padding)))))))
 
 
 ;;------------------------------------------------------------------------------
 ;; Higher-Level Output Functions:
 ;;------------------------------------------------------------------------------
 
-(defun int<autogit>:output:status (buffer alist/changes)
+(defun int<autogit>:display:status (buffer alist/changes)
   "Output a status message to BUFFER about a git repo sub-dir's ALIST/CHANGES."
   ;; Error checking.
   (unless (memq autogit:changes:display int<autogit>:changes:display/valid)
@@ -383,7 +362,7 @@ BUFFER should be a keyword, string or buffer object.
   (let (indent)
     ;; Should we display summary?
     (when (memq autogit:changes:display '(:summary :full))
-      (int<autogit>:output:message buffer
+      (int<autogit>:display:message buffer
                                    (list :prop :face:title
                                          :text "  Status: ")
                                    (list :prop :face:highlight
@@ -400,18 +379,18 @@ BUFFER should be a keyword, string or buffer object.
         ;; TODO: Keyword (:staged, :unstaged, etc) to display string?
         (if (null (cdr entry))
             ;; No changes for this dir.
-            (int<autogit>:output:message buffer
+            (int<autogit>:display:message buffer
                                          (list "%s" indent)
                                          (list :prop :face:title :text (list "%s" (car entry)))
                                          ": "
                                          (list :prop :face:highlight :text "None."))
           ;; Show type (staged, unstaged...) and list of change.
-          (int<autogit>:output:message buffer
+          (int<autogit>:display:message buffer
                                        (list "%s" indent)
                                        (list :prop :face:title :text (list "%s" (car entry)))
                                        ":")
           (dolist (path (cdr entry))
-            (int<autogit>:output:message buffer
+            (int<autogit>:display:message buffer
                                          (list "%s  - " indent)
                                          (list :prop :face:path :text path))))))))
 
@@ -419,4 +398,4 @@ BUFFER should be a keyword, string or buffer object.
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :autogit 'internal)
+(imp:provide :autogit 'output)

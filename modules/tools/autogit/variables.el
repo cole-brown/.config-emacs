@@ -108,6 +108,10 @@ Options:
                   (const :tag "Full: 'Summary' followed by 'paths'." :full)))
 
 
+(defconst int<autogit>:changes:display/valid '(:summary :paths :full)
+  "Allowed values of `autogit:changes:display'.")
+
+
 ;;------------------------------
 ;; Buffer
 ;;------------------------------
@@ -189,14 +193,6 @@ Set to nil if not desired in output.")
   "Plist of text properties for prettier output.")
 ;; (plist-get autogit:text:properties :face:self)
 ;; (makunbound 'autogit:text:properties)
-
-
-;;------------------------------------------------------------------------------
-;; Constants & Variables
-;;------------------------------------------------------------------------------
-
-(defconst int<autogit>:changes:display/valid '(:summary :paths :full)
-  "Allowed values of `autogit:changes:display'.")
 
 
 ;;------------------------------------------------------------------------------

@@ -26,6 +26,8 @@
 ;; (require 'magit)
 
 (imp:require :autogit 'variables)
+(imp:require :autogit 'output)
+
 (imp:require :path)
 
 
@@ -227,16 +229,16 @@ INDENT must be a wholenum - 0 is 'not indented'."
    ;;------------------------------
    ;; Fetch from remotes.
    ;;------------------------------
-   (int<autogit>:output:message/indented buffer
-                                         (int<autogit>:output:indent indent 1)
+   (int<autogit>:display:message/indented buffer
+                                         (int<autogit>:string:indent indent 1)
                                          ;; Dry-Run prefix?
                                          (list :prop :face:failure
                                                :text (concat (if dry-run
                                                                  autogit:text:dry-run
                                                                "GIT")
                                                              ":")))
-   (int<autogit>:output:message/indented buffer
-                                         (int<autogit>:output:indent indent 2)
+   (int<autogit>:display:message/indented buffer
+                                         (int<autogit>:string:indent indent 2)
 
                                          ;; Command or message.
                                          (list :prop :face:git
@@ -246,16 +248,16 @@ INDENT must be a wholenum - 0 is 'not indented'."
    ;;------------------------------
    ;; Pull current branch.
    ;;------------------------------
-   (int<autogit>:output:message/indented buffer
-                                         (int<autogit>:output:indent indent 1)
+   (int<autogit>:display:message/indented buffer
+                                         (int<autogit>:string:indent indent 1)
                                          ;; Dry-Run prefix?
                                          (list :prop :face:failure
                                                :text (concat (if dry-run
                                                                  autogit:text:dry-run
                                                                "GIT")
                                                              ":")))
-   (int<autogit>:output:message/indented buffer
-                                         (int<autogit>:output:indent indent 2)
+   (int<autogit>:display:message/indented buffer
+                                         (int<autogit>:string:indent indent 2)
 
                                          ;; Command or message.
                                          (list :prop :face:git
@@ -306,8 +308,8 @@ Example:
      -message-> \"calling git: adding all changes...\""
   (int<autogit>:magit:with-errors
    ;; Output messages first.
-   (int<autogit>:output:message/indented buffer
-                                         (int<autogit>:output:indent indent 1)
+   (int<autogit>:display:message/indented buffer
+                                         (int<autogit>:string:indent indent 1)
 
                                          ;; Dry-Run prefix?
                                          (list :prop :face:failure
@@ -315,8 +317,8 @@ Example:
                                                                  autogit:text:dry-run
                                                                "GIT")
                                                              ":")))
-   (int<autogit>:output:message/indented buffer
-                                         (int<autogit>:output:indent indent 2)
+   (int<autogit>:display:message/indented buffer
+                                         (int<autogit>:string:indent indent 2)
 
                                          ;; Command or message.
                                          (list :prop :face:git
