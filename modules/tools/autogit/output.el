@@ -21,7 +21,7 @@
 
 (imp:require :autogit 'variables)
 (imp:require :autogit 'buffer)
-(imp:require :autogit 'repo)
+(imp:require :autogit 'magit)
 
 
 ;;------------------------------------------------------------------------------

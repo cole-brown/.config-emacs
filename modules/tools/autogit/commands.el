@@ -33,6 +33,7 @@
 (imp:require :autogit 'variables)
 (imp:require :autogit 'buffer)
 (imp:require :autogit 'output)
+(imp:require :autogit 'magit)
 
 
 ;;------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-;;; tools/autogit/internal.el -*- lexical-binding: t; -*-
+;;; tools/autogit/magit.el -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -19,50 +19,13 @@
 ;;; Code:
 
 
-(require 'subr-x)
-
 ;; TODO: How to get this lazy loaded?
 ;;   - Take the require out of the funcs when figured out.
 ;; (require 'magit)
 
 (imp:require :autogit 'variables)
+(imp:require :autogit 'path)
 (imp:require :autogit 'output)
-
-(imp:require :path)
-
-
-;;------------------------------------------------------------------------------
-;; Paths & Files
-;;------------------------------------------------------------------------------
-
-(defun int<autogit>:path:join (root &rest path)
-  "Return absolute (file) path to ROOT + PATH.
-
-Given a git ROOT, and a PATH of e.g. ('path/to' 'dir' 'with-file' 'file.txt'),
-will return full /file/ path in platform-agnostic manner."
-  (if (imp:feature? :path)
-      (apply #'path:absolute:file root path)
-    (concat (file-name-as-directory (expand-file-name "" root))
-            (directory-file-name (mapconcat #'file-name-as-directory path "")))))
-;; (int<autogit>:path:join (car autogit:repos:path/commit) "foo")
-
-
-(defun int<autogit>:path:changes:rel->abs (path-abs alist/changes)
-  "Convert relative paths to absolute.
-
-Converts all of ALIST/CHANGES' relative paths to absolute paths given
-a PATH-ABS inside of the git repository."
-  (let* ((default-directory path-abs)
-         (git-root (magit-toplevel))
-         results)
-    ;; Have alist of staged, unstaged, etc files.
-    (dolist (entry alist/changes results)
-      ;; Convert to absolute paths.
-      (push (cons (car entry)
-                  (mapcar (lambda (x) (int<autogit>:path:join git-root x))
-                          (cdr entry)))
-            results))))
-;; (int<autogit>:path:changes:rel->abs default-directory (int<autogit>:changes:in-repo default-directory))
 
 
 ;;------------------------------------------------------------------------------
@@ -334,4 +297,4 @@ Example:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :autogit 'internal)
+(imp:provide :autogit 'magit)

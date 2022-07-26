@@ -46,11 +46,17 @@
   (imp:load :feature  '(:autogit variables)
             :filename "variables")
 
+  (imp:load :feature  '(:autogit path)
+            :filename "path")
+
   (imp:load :feature  '(:autogit buffer)
             :filename "buffer")
 
-  (imp:load :feature  '(:autogit internal)
-            :filename "internal")
+  (imp:load :feature  '(:autogit magit)
+            :filename "magit")
+
+  (imp:load :feature  '(:autogit output)
+            :filename "output")
 
   (imp:load :feature  '(:autogit api)
             :filename "api")
