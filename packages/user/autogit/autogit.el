@@ -21,6 +21,19 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Autogit Files
+;;------------------------------------------------------------------------------
+
+(require 'autogit-variables)
+(require 'autogit-path)
+(require 'autogit-buffer)
+(require 'autogit-magit)
+(require 'autogit-output)
+(require 'autogit-api)
+(require 'autogit-commands)
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (provide 'autogit)
