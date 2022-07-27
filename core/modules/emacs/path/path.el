@@ -44,8 +44,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Kinds-of-Files.html")
                    string-start
                    (repeat 1 2 ".")
                    string-end)
-                 :no-group)
-    )
+                 :no-group))
   "What to ignore when traversing paths, getting children, etc..
 
 NOTE: These should be compiled regex strings.")
@@ -720,7 +719,8 @@ Example:
 
 Return an absolute path.
 
-Does not fix or validate PATH or SEGMENT components; they are expected to be valid."
+Does not fix or validate PATH or SEGMENT components; they are expected to be
+valid."
   (expand-file-name (apply #'path:join
                            path
                            segment)))
@@ -738,7 +738,8 @@ Does not fix or validate PATH or SEGMENT components; they are expected to be val
 
 Return an absolute path.
 
-Does not fix or validate PATH or SEGMENT components; they are expected to be valid."
+Does not fix or validate PATH or SEGMENT components; they are expected to be
+valid."
   ;; Fully qualify base as start of return value.
   (file-name-as-directory (apply #'path:canonicalize:file path segment)))
 ;; (path:canonicalize:dir "~" "personal" "something" "zort")
@@ -756,7 +757,8 @@ preserve the final slash if it exists.
 
 Return an absolute path.
 
-Does not fix or validate PATH or SEGMENT components; they are expected to be valid."
+Does not fix or validate PATH or SEGMENT components; they are expected to be
+valid."
   (let ((path/joined (apply #'path:join path segment)))
     (funcall (if (path:directory? path/joined)
                  #'path:canonicalize:dir
