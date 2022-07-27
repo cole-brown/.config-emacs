@@ -1,0 +1,142 @@
+* Do (simple) things on a defined list of git repos
+
+"git repos" means "git repo root or children directories". That is, you can set
+it up to commit/status just a subdirectory of a repository.
+
+** Auto-commit (multiple) git repos
+
+"Auto-commit" might be a bit of a misnomer...
+
+It will, for each directory in ~autogit:repos:path/commit~:
+  1. Fetch all branches (& prune).
+  2. Pull current branch from upstream.
+  3. Check for changes to commit.
+  4. Add changed files.
+  5. Commit changes with pre-defined commit message.
+  6. Push.
+  7. Report along the way what's happening.
+  8. Report a summary at the end.
+
+** View status on (mutiple) git repos
+
+It will, for each directory in ~autogit:repos:path/watch~:
+  1. Get status of directory.
+  2. Display status in format chosen by ~autogit:changes:display~ defcustom.
+
+
+* Settings
+
+** Required
+
+~autogit:repos:path/commit~
+  - List of strings of directories to automatically add/commit/push in their respective git repos.
+  - Can be sub-directories of a repository.
+
+~autogit:repos:path/watch~
+  - List of strings of directories to watch for changes/status.
+  - Can be sub-directories of a repository.
+
+** Optional
+
+~autogit:datetime:format~
+  - Datetime format string for autogit messages.
+  - default: ~"%Y-%m-%d %H:%M:%S"~
+
+~autogit:changes:symbols~
+  - Symbol/icon/character to use to represent change type.
+  - default:
+    #+begin_src emacs-lisp
+    '((:staged    . "•")
+      (:unstaged  . "+")   ;; too wide in current font/theme: ✚
+      (:untracked . "¬")   ;; acceptable: ?
+      (:unmerged  . "⊥")) ;; acceptable: ×, too wide in current font/theme: ✖
+    #+end_src
+
+~autogit:changes:display~
+  - What to display for watched repo statuses.
+  - Options:
+    - :summary - One line of symbols & number of files staged/unstaged/etc. See `autogit:changes:symbols'.
+    - :paths   - List of lists. Type of change (staged/etc) -> file paths.
+    - :full    - Summary followed by paths.
+  - default: ~:full~
+
+~autogit:buffer:display?~
+  - Should autogit /display/ the push/status buffers when it starts outputting?
+  - default: ~t~
+
+~autogit:buffer:switch?~
+  - Should autogit /switch to/ the push/status buffers when it completes?
+  - default: ~t~
+
+~autogit:buffer:name/push~
+  - Buffer name to print commit/push output to.
+  - default: ~"ⓘ-autogit:push-ⓘ~
+
+~autogit:buffer:name/status~
+  - Buffer name to print status output to.
+  - default: ~"ⓘ-autogit:status-ⓘ"~
+
+~autogit:text:name~
+  - Name of this package, used in output messages.
+  - Set to nil if not desired in output.
+  - default: ~"[AUTOGIT]"~
+
+~autogit:text:dry-run~
+  - Text to prefix `git` calls with during a dry-run.
+  - Set to nil if not desired in output.
+  - default: ~"[DRY-RUN]"~
+
+~autogit:text:properties~
+  - Plist of text properties for prettier output.
+  - default: see variable help: ~C-h v autogit:text:properties~
+
+
+* Installation
+
+#+begin_src emacs-lisp
+(use-package autogit
+
+  ;;--------------------
+  :custom
+  ;;--------------------
+
+  ;; List of Repos for Commit Command:
+  (autogit:repos:path/commit (list
+                              ;; Org-Mode Files.
+                              "~/path/to/org/files/"
+
+                              ;; Any other just-auto-commit-'em repos?
+                              ;;   - Personal docs dirs.
+                              ;;   - "Backup" git repos.
+                              ;;   - etc.
+                              ))
+
+  ;; List of Repos for Status Command:
+  (autogit:repos:path/watch (-flatten
+                             (list
+                              ;;------------------------------
+                              ;; Auto-commit repos to also watch:
+                              ;;------------------------------
+                              ;; Org-Mode Files.
+                              "~/path/to/org/files/"
+
+                              ;;------------------------------
+                              ;; Only watch/status repos:
+                              ;;------------------------------
+
+                              ;;---
+                              ;; Personal
+                              ;;---
+                              ;; Emacs: .emacs.d Repo.
+                              "~/.config/emacs"
+                              ;; Emacs: .secret.d Repo.
+                              "~/.config/secret"
+
+                              "~/.config/personal/bash"
+
+                              ;;---
+                              ;; Work
+                              ;;---
+                              ;; All repos in this dir:
+                              (autogit:repos:list "~/repositories")))))
+#+end_src
