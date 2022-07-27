@@ -92,6 +92,12 @@
   :type  'string)
 
 
+(defcustom innit:path:packages:user (path:join innit:path:packages "user")
+  "Directory for user's personal/custom packages."
+  :group 'innit:group
+  :type  'string)
+
+
 ;;------------------------------------------------------------------------------
 ;; Package Early-Init
 ;;------------------------------------------------------------------------------
