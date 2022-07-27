@@ -178,6 +178,60 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Autogit
+;;------------------------------------------------------------------------------
+
+;; Autogit is configured set up in secrets repo and it looks something like
+;; this:
+;;   (imp:use-package autogit
+;;   ;; This is my own package, so...
+;;   ;;   1) Don't try to install.
+;;   :ensure nil
+;;   ;;   2) Here's where it is; add this dir to the `load-path'.
+;;   :load-path (path:join innit:path:packages:user "autogit")
+;;
+;;   ;;--------------------
+;;   :custom
+;;   ;;--------------------
+;;
+;;   ;; Repos: Autocommit:
+;;   (autogit:repos:path/commit (list
+;;                           ;; Org-Mode Files.
+;;                           "/path/to/dir/org"
+;;
+;;                           ;; Any other just-auto-commit-'em repos?
+;;                           ;;   - Personal docs dirs.
+;;                           ;;   - "Backup" git repos.
+;;                           ;;   - etc.
+;;                           ))
+;;
+;;   ;; Repos: Gather Status:
+;;   (autogit:repos:path/watch (list
+;;                           ;;------------------------------
+;;                           ;; Auto-commit repos to also watch:
+;;                           ;;------------------------------
+;;                           ;; Org-Mode Files.
+;;                           "/path/to/dir/org"
+;;
+;;                           ;;------------------------------
+;;                           ;; Only watch repos:
+;;                           ;;------------------------------
+;;
+;;                           ;;---
+;;                           ;; Personal
+;;                           ;;---
+;;                           ;; Your .emacs repo?
+;;                           (path:abs:dir "~" ".config" "emacs")
+;;                           ;; or...
+;;                           (path:abs:dir "~" ".emacs.d")
+;;
+;;                           ;;---
+;;                           ;; Work: all repos in directory
+;;                           ;;---
+;;                           (autogit:repos:list "/path/to/work/repositories/"))))
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :mantle 'config 'user 'version-control)
