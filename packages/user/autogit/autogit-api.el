@@ -26,8 +26,8 @@
 ;;;###autoload
 (defun autogit:repo? (path)
   "Return non-nil if PATH is a git repository."
-  (and (path:exists? path :dir)
-       (path:exists? (path:join path ".git"))))
+  (and (int<autogit>:path:exists? path :dir)
+       (int<autogit>:path:exists? (int<autogit>:path:join path ".git"))))
 
 
 ;;;###autoload
@@ -42,11 +42,11 @@ Returns list of absolute paths or nil."
     (error "autogit:repos:list: ROOT must be a string! Got: %S"
            root))
 
-  (let ((path:root (path:canonicalize:dir root)))
-    (unless (path:exists? path:root)
+  (let ((path:root (int<autogit>:path:canonicalize:dir root)))
+    (unless (int<autogit>:path:exists? path:root)
       (error "autogit:repos:list: ROOT does not exist! %s"
              path:root))
-    (unless (path:exists? path:root :dir)
+    (unless (int<autogit>:path:exists? path:root :dir)
       (error "autogit:repos:list: ROOT is not a directory! %s"
              path:root))
 
@@ -55,10 +55,10 @@ Returns list of absolute paths or nil."
     ;;------------------------------
     ;; Is the root itself a repo?
     (if (autogit:repo? path:root)
-        (list path:root)
+        (list int<autogit>:path:root)
       ;; Nope; check its direct children.
       (let (repos)
-        (dolist (path:dir (path:children path:root :absolute :dir))
+        (dolist (path:dir (int<autogit>:path:children path:root :absolute :dir))
           (when (autogit:repo? path:dir)
             (push path:dir repos)))
         ;; Return absolute path to any repos found.
