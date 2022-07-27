@@ -1,10 +1,9 @@
-;;; tools/autogit/variables.el --- Variables -*- lexical-binding: t; -*-
+;;; autogit-variables.el --- Variables -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-07-25
-;; Modified:   2022-07-25
-;; URL:        https://github.com/cole-brown/.config-emacs
+;; Modified:   2022-07-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -198,4 +197,5 @@ Set to nil if not desired in output.")
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide:with-emacs :autogit 'variables)
+(provide 'autogit-variables)
+;;; autogit-variables.el ends here

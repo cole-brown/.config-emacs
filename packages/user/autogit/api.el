@@ -1,10 +1,9 @@
-;;; tools/autogit/api.el -*- lexical-binding: t; -*-
+;;; autogit-api.el --- Autogit API Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-02-14
-;; Modified:   2022-07-25
-;; URL:        https://github.com/cole-brown/.config-emacs
+;; Modified:   2022-07-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,14 +11,12 @@
 ;;
 ;;; Commentary:
 ;;
-;; Commands for:
-;;   - Getting general status for certain other git repos.
-;;     + E.g. get status for your notes repo(s) and your code repo(s) in one go.
+;; Autogit API (non-interactive but interesting to end users) Functions
 ;;
 ;;; Code:
 
 
-(imp:require :path)
+(require 'autogit-path)
 
 
 ;;------------------------------------------------------------------------------
@@ -72,4 +69,5 @@ Returns list of absolute paths or nil."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :autogit 'api)
+(provide 'autogit-api)
+;;; autogit-api.el ends here

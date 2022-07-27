@@ -1,10 +1,9 @@
-;;; tools/autogit/buffer.el --- Buffer helper functions -*- lexical-binding: t; -*-
+;;; autogit-buffer.el --- Buffer helper functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2020-08-28
-;; Modified:   2022-07-26
-;; URL:        https://github.com/cole-brown/.config-emacs
+;; Modified:   2022-07-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,7 +16,7 @@
 ;;; Code:
 
 
-(imp:require :autogit 'variables)
+(require 'autogit-buffer)
 
 
 ;;------------------------------------------------------------------------------
@@ -121,4 +120,5 @@ BUFFER should be a keyword, string or buffer object.
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :autogit 'buffer)
+(provide 'autogit-buffer)
+;;; autogit-buffer.el ends here

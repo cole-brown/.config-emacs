@@ -1,10 +1,9 @@
-;;; tools/autogit/magit.el -*- lexical-binding: t; -*-
+;;; autogit-magit.el --- Autogit/Magit interactions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2020-08-28
-;; Modified:   2022-07-25
-;; URL:        https://github.com/cole-brown/.config-emacs
+;; Modified:   2022-07-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,18 +11,21 @@
 ;;
 ;;; Commentary:
 ;;
-;; Commands for:
-;;   - Getting general status for certain other git repos.
-;;     + E.g. get status for your notes repo(s) and your code repo(s) in one go.
+;; Autogit/Magit abstraction layer
+;;
+;; Sorta.
+;; Almost.
+;; Magit's in a few other places.
 ;;
 ;;; Code:
 
 
 (require 'magit)
 
-(imp:require :autogit 'variables)
-(imp:require :autogit 'path)
-(imp:require :autogit 'output)
+
+(require 'autogit-variables)
+(require 'autogit-path)
+(require 'autogit-output)
 
 
 ;;------------------------------------------------------------------------------
@@ -295,4 +297,5 @@ Example:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :autogit 'magit)
+(provide 'autogit-magit)
+;;; autogit-magit.el ends here

@@ -1,10 +1,9 @@
-;;; tools/autogit/commands.el --- Autogit Commands -*- lexical-binding: t; -*-
+;;; autogit-commands.el --- Autogit Commands -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2020-08-28
-;; Modified:   2022-07-25
-;; URL:        https://github.com/cole-brown/.config-emacs
+;; Modified:   2022-07-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -27,10 +26,10 @@
 (require 'deferred)
 (require 'magit)
 
-(imp:require :autogit 'variables)
-(imp:require :autogit 'buffer)
-(imp:require :autogit 'output)
-(imp:require :autogit 'magit)
+(require 'autogit-variables)
+(require 'autogit-buffer)
+(require 'autogit-output)
+(require 'autogit-magit)
 
 
 ;;------------------------------------------------------------------------------
@@ -399,4 +398,5 @@ uncommitted(/unpushed?) changes."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :autogit 'commands)
+(provide 'autogit-commands)
+;;; autogit-commands.el ends here

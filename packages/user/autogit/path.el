@@ -1,9 +1,9 @@
-;;; tools/autogit/path.el --- Path Functions -*- lexical-binding: t; -*-
+;;; autogit-path.el --- Path Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2020-08-28
-;; Modified:   2022-07-26
+;; Modified:   2022-07-27
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -19,8 +19,6 @@
 
 (require 'magit)
 
-(imp:require :path)
-
 
 ;;------------------------------------------------------------------------------
 ;; Paths & Files
@@ -31,10 +29,8 @@
 
 Given a git ROOT, and a PATH of e.g. ('path/to' 'dir' 'with-file' 'file.txt'),
 will return full /file/ path in platform-agnostic manner."
-  (if (imp:feature? :path)
-      (apply #'path:absolute:file root path)
-    (concat (file-name-as-directory (expand-file-name "" root))
-            (directory-file-name (mapconcat #'file-name-as-directory path "")))))
+  (concat (file-name-as-directory (expand-file-name "" root))
+          (directory-file-name (mapconcat #'file-name-as-directory path ""))))
 ;; (int<autogit>:path:join (car autogit:repos:path/commit) "foo")
 
 
@@ -59,4 +55,5 @@ a PATH-ABS inside of the git repository."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :autogit 'path)
+(provide 'autogit-path)
+;;; autogit-path.el ends here
