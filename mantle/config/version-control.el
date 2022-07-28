@@ -245,6 +245,22 @@
 ;;                                    (autogit:repos:list "~/path/to/repositories"))))
 
 
+;;------------------------------
+;; Autogit Requirement: Deferred
+;;------------------------------
+;; This is in Autogit's package requirements, so I'm not sure why it isn't loaded.
+;;   - Is it because `:ensure' is nil for autogit so no dependencies are ensured
+;;     either?
+;;   - Is it because my first package (`autogit') has something wrong with it?
+;;   - Something else?
+;;   - None of the above?
+;;   - All of the above?
+;;
+;; ...Just make sure it's installed...
+
+(imp:use-package deferred)
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
