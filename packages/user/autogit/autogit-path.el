@@ -226,7 +226,7 @@ valid."
 ;; Directory Files (Children)
 ;;------------------------------------------------------------------------------
 
-(defun path:children:types (path/dir &optional absolute-paths? regex &rest types)
+(defun int<autogit>:path:children:types (path/dir &optional absolute-paths? regex &rest types)
   "Return immediate children of PATH/DIR directory.
 
 Return an alist of children by type:
