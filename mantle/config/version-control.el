@@ -183,52 +183,66 @@
 
 ;; Autogit is configured set up in secrets repo and it looks something like
 ;; this:
-;;   (imp:use-package autogit
-;;   ;; This is my own package, so...
-;;   ;;   1) Don't try to install.
-;;   :ensure nil
-;;   ;;   2) Here's where it is; add this dir to the `load-path'.
-;;   :load-path (path:join innit:path:packages:user "autogit")
+;;    (imp:use-package autogit
+;;    ;; This is my own package, so...
+;;    ;;   1) Don't try to install.
+;;    :ensure nil
+;;    ;;   2) Here's where it is; add this dir to the `load-path'.
+;;    :load-path (path:join innit:path:packages:user "autogit")
 ;;
-;;   ;;--------------------
-;;   :custom
-;;   ;;--------------------
+;;    ;;--------------------
+;;    :custom
+;;    ;;--------------------
 ;;
-;;   ;; Repos: Autocommit:
-;;   (autogit:repos:path/commit (list
-;;                           ;; Org-Mode Files.
-;;                           "/path/to/dir/org"
+;;    ;; Repos: Autocommit:
+;;    (autogit:repos:path/commit (list
+;;                            ;; Org-Mode Files.
+;;                            "/path/to/dir/org"
 ;;
-;;                           ;; Any other just-auto-commit-'em repos?
-;;                           ;;   - Personal docs dirs.
-;;                           ;;   - "Backup" git repos.
-;;                           ;;   - etc.
-;;                           ))
+;;                            ;; Any other just-auto-commit-'em repos?
+;;                            ;;   - Personal docs dirs.
+;;                            ;;   - "Backup" git repos.
+;;                            ;;   - etc.
+;;                            ))
 ;;
-;;   ;; Repos: Gather Status:
-;;   (autogit:repos:path/watch (list
-;;                           ;;------------------------------
-;;                           ;; Auto-commit repos to also watch:
-;;                           ;;------------------------------
-;;                           ;; Org-Mode Files.
-;;                           "/path/to/dir/org"
+;;    ;; Repos: Gather Status:
+;;    (autogit:repos:path/watch (list
+;;                            ;;------------------------------
+;;                            ;; Auto-commit repos to also watch:
+;;                            ;;------------------------------
+;;                            ;; Org-Mode Files.
+;;                            "/path/to/dir/org"
 ;;
-;;                           ;;------------------------------
-;;                           ;; Only watch repos:
-;;                           ;;------------------------------
+;;                            ;;------------------------------
+;;                            ;; Only watch repos:
+;;                            ;;------------------------------
 ;;
-;;                           ;;---
-;;                           ;; Personal
-;;                           ;;---
-;;                           ;; Your .emacs repo?
-;;                           (path:abs:dir "~" ".config" "emacs")
-;;                           ;; or...
-;;                           (path:abs:dir "~" ".emacs.d")
+;;                            ;;---
+;;                            ;; Personal
+;;                            ;;---
+;;                            ;; Your .emacs repo?
+;;                            (path:abs:dir "~" ".config" "emacs")
+;;                            ;; or...
+;;                            (path:abs:dir "~" ".emacs.d")
 ;;
-;;                           ;;---
-;;                           ;; Work: all repos in directory
-;;                           ;;---
-;;                           (autogit:repos:list "/path/to/work/repositories/"))))
+;;                            ;;---
+;;                            ;; Work: all repos in directory
+;;                            ;;--
+;;                            ;; Delay until after 'autogit' is loaded so we can
+;;                            ;; use `autogit:repos:list' to load all repos in a
+;;                            ;; directory.
+;;                            )))
+;;
+;;    ;; Can't use `autogit:repos:list' to set up `autogit:repos:path/watch' until
+;;    ;; after it's loaded, so... use it after 'autogit' is loaded.
+;;    (imp:eval:after autogit
+;;    ;; Add more repos to `autogit:repos:path/watch' list.
+;;    (customize-set-variable 'autogit:repos:path/watch
+;;                            (append autogit:repos:path/watch ;; We want to add, not replace, so append to it.
+;;                                    ;;---
+;;                                    ;; Work: all repos in directory
+;;                                    ;;---
+;;                                    (autogit:repos:list "~/path/to/repositories"))))
 
 
 ;;------------------------------------------------------------------------------
