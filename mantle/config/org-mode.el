@@ -81,14 +81,14 @@
   ;;---
   (innit:hook:defun org-jump-to-now-hook
     '(:name "org/jump-to-now-target"
-      :file (path:relative (path:current:file) user-emacs-directory)
+      :file (path:relative user-emacs-directory (path:current:file))
       :docstr "Jump point to \"now\" link, if it's in the first part of the file."
       :quiet nil) ;; TODO: t)
     (buffer:cmd:search:header "[[--now"))
 
   (innit:hook:defun org-local-settings-hook
     '(:name "org/local-settings"
-      :file (path:relative (path:current:file) user-emacs-directory)
+      :file (path:relative user-emacs-directory (path:current:file))
       :docstr "Set up buffer local vars."
       :quiet nil) ;; TODO: t)
     (setq-local yas-indent-line 'auto)
@@ -100,8 +100,8 @@
   :hook
   ;;--------------------
 
-  ((org-mode . mantle:hook:org/jump-to-now-target) ;; (innit:hook:func-symbol "org/jump-to-now-target" 'org-mode-hook)
-   (org-mode . mantle:hook:org/local-settings)) ;; (innit:hook:func-symbol "org/local-settings" 'org-mode-hook)
+  ((org-mode . mantle:hook:org/jump-to-now-target) ;; (innit:hook:func-symbol "org/jump-to-now-target" nil)
+   (org-mode . mantle:hook:org/local-settings))    ;; (innit:hook:func-symbol "org/local-settings"     nil)
 
 
   ;;--------------------
