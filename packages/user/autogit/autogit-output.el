@@ -20,7 +20,6 @@
 
 (require 'autogit-variables)
 (require 'autogit-buffer)
-(require 'autogit-magit)
 
 
 ;;------------------------------------------------------------------------------

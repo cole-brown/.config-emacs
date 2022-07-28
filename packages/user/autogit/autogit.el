@@ -27,8 +27,8 @@
 (require 'autogit-variables)
 (require 'autogit-path)
 (require 'autogit-buffer)
-(require 'autogit-magit)
 (require 'autogit-output)
+(require 'autogit-magit)
 (require 'autogit-api)
 (require 'autogit-commands)
 

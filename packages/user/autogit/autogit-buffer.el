@@ -16,7 +16,7 @@
 ;;; Code:
 
 
-(require 'autogit-buffer)
+(require 'autogit-variables)
 
 
 ;;------------------------------------------------------------------------------
