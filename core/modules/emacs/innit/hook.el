@@ -160,7 +160,7 @@ OPTIONS is a plist of optional vars:
             (if (not (stringp ,macro<innit>:file))
                 ""
               (concat " from "
-                      (path:relative ,macro<innit>:file)))))
+                      (path:relative ,macro<innit>:file user-emacs-directory)))))
          ;; And run the actual hook.
          ,@body)
        ;; ...add the new hook  function to the hook variable.
@@ -220,7 +220,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
           (if (not (stringp ,macro<innit>:file))
               ""
             (concat " from "
-                    (path:relative ,macro<innit>:file)))))
+                    (path:relative ,macro<innit>:file user-emacs-directory)))))
        ;; And run the actual hook.
        ,@body)))
 ;; (setq test-hook nil)
