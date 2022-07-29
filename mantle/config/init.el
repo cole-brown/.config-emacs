@@ -18,7 +18,7 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Packages
+;; Config: Basics & Prereqs
 ;;------------------------------------------------------------------------------
 
 ;; Which-Key & Helpful
@@ -29,6 +29,15 @@
 (imp:load :feature  '(:mantle config user all-the-icons)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "all-the-icons")
+
+
+;;------------------------------------------------------------------------------
+;; Config: Emacs, Files, Etc
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config user files)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "files")
 
 
 ;;------------------------------------------------------------------------------
