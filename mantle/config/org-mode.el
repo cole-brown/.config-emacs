@@ -79,22 +79,21 @@
   ;;---
   ;; Create Org-Mode Hooks
   ;;---
-  (let ((path/rel (path:relative (path:current:file) user-emacs-directory)))
-    (innit:hook:defun
-        (list :name "org/jump-to-now-target"
-              :file (path:current:file)
-              :docstr "Jump point to \"now\" link, if it's in the first part of the file."
-              :quiet nil) ;; TODO: t)
-      (buffer:cmd:search:header "[[--now"))
+  (innit:hook:defun
+      (list :name "org/jump-to-now-target"
+            :file (path:current:file)
+            :docstr "Jump point to \"now\" link, if it's in the first part of the file."
+            :quiet nil) ;; TODO: t)
+    (buffer:cmd:search:header "[[--now"))
 
-    (innit:hook:defun
-        (list :name "org/local-settings"
-              :file (path:current:file)
-              :docstr "Set up buffer local vars."
-              :quiet nil) ;; TODO: t)
-      (setq-local yas-indent-line 'auto)
-      ;; Automatically becomes buffer local.
-      (setq tab-width (jerky:get 'docs 'tab 'short))))
+  (innit:hook:defun
+      (list :name "org/local-settings"
+            :file (path:current:file)
+            :docstr "Set up buffer local vars."
+            :quiet nil) ;; TODO: t)
+    (setq-local yas-indent-line 'auto)
+    ;; Automatically becomes buffer local.
+    (setq tab-width (jerky:get 'docs 'tab 'short)))
 
 
   ;;--------------------

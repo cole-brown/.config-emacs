@@ -23,8 +23,7 @@
 ;; Undo-Tree
 ;;------------------------------------------------------------------------------
 
-(let ((file/this (imp:file:current))
-      (tags/this '(:innit :mantle :undo :innit)))
+(let ((file/this (imp:file:current)))
   (imp:use-package undo-tree
     :demand t ;; Always load.
 
@@ -61,18 +60,27 @@
 
     ;; Prefer `zstd' for compressing history files.
     (cond ((executable-find "zstd")
+           (nub:info
+              :innit
+              file/this
+            "`undo-tree': Using compression `zstd' for undo history files.")
            (define-advice undo-tree-make-history-save-file-name (:filter-return (file) mantle:advice:compress/zstd)
              (concat file ".zst")))
           ((executable-find "gzip")
-           (define-advice undo-tree-make-history-save-file-name (:filter-return (file) mantle:advice:compress/zstd)
-             (concat file ".gz")))
-          ;; Fallback: Just don't compress.
-          (t
-           (nub:debug
+           (nub:info
               :innit
               file/this
-              tags/this
-            "`undo-tree': No compression found for undo history files.")
+            "`undo-tree': `zstd' not found; using compression `gzip' for undo history files.")
+           (define-advice undo-tree-make-history-save-file-name (:filter-return (file) mantle:advice:compress/zstd)
+             (concat file ".gz")))
+          ;; Fallback: Just don't compress. :o
+          (t
+           (nub:info
+              :innit
+              file/this
+            '("`undo-tree': No compression found for undo history files; install "
+              "`zstd' (preferred) or `gzip' to enable compression of `undo-tree' "
+              "history files."))
            nil))
 
     ;; Strip text properties from undo-tree data to stave off bloat. File size
@@ -90,10 +98,10 @@
     ;; in the echo-area.
     (advice-add #'undo-tree-save-history :around #'innit:advice:squelch)
 
-    (global-undo-tree-mode +1))
+    (global-undo-tree-mode +1)))
 
 
-  ;;------------------------------------------------------------------------------
-  ;; The End.
-  ;;------------------------------------------------------------------------------
-  (imp:provide :mantle 'config 'user 'undo-tree)
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
+(imp:provide :mantle 'config 'user 'undo-tree)
