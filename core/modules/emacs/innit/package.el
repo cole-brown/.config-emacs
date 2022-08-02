@@ -226,6 +226,19 @@ this needs to be called during \"init.el\"."
     ;; `auto-package-update' or something similar.
     (customize-set-variable 'use-package-always-ensure t)
 
+    ;; 'When using :hook omit the "-hook" suffix if you specify the hook
+    ;; explicitly, as this is appended by default.
+    ;;
+    ;; [...]
+    ;;
+    ;; If you do not like this behaviour, set use-package-hook-name-suffix to
+    ;; nil. By default the value of this variable is "-hook".'
+    ;;   - https://github.com/jwiegley/use-package#hooks
+    ;;
+    ;; Need to override this to allow naming hooks something other than
+    ;; `*-hook'.
+    (customize-set-variable 'use-package-hook-name-suffix nil)
+
     ;;---
     ;; Debugging Settings:
     ;;---
