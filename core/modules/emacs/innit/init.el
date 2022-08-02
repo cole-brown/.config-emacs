@@ -57,6 +57,8 @@
             :filename "hook")
   (imp:load :feature  '(:innit theme)
             :filename "theme")
+  (imp:load :feature  '(:innit squelch)
+            :filename "squelch")
 
   ;; End load timing.
   )
