@@ -17,6 +17,9 @@
 ;;; Code:
 
 
+(imp:require :keybind)
+
+
 ;;------------------------------------------------------------------------------
 ;; Color Codes
 ;;------------------------------------------------------------------------------
@@ -57,6 +60,32 @@
    (css-mode    . mantle:hook:rainbow-mode/enable)
    (php-mode    . mantle:hook:rainbow-mode/enable)
    (html-mode   . mantle:hook:rainbow-mode/enable)))
+
+
+;;------------------------------------------------------------------------------
+;; Emacs Lisp
+;;------------------------------------------------------------------------------
+;; TODO:
+;;   1. Pull out into "elisp.el"? Or probably better: "dev-env/elisp.el"?
+;;   2. In which case rename "dev-env.el" to "dev-env/common.el"?
+;;   3. And I guess have a "dev-env/init.el"?
+
+;; Provides a very helpful elisp macro debugging tool: `macrostep-expand'
+(imp:use-package macrostep
+
+  ;;--------------------
+  :general
+  ;;--------------------
+
+  ;; Bind to `emacs-lisp' local leader
+  (:prefix  (keybind:leader :local "")
+   :states  keybind:leader/local:states
+   :keymaps keybind:leader/local:keymaps
+
+   ;;---
+   ;; Macroexpand Commands
+   ;;---
+   "m" '(macrostep-expand :which-key "Expand Macro")))
 
 
 ;;------------------------------------------------------------------------------
