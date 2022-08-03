@@ -201,11 +201,10 @@ all themes. It will apply to all themes once they are loaded."
                               (list ,@specs)))))))
        ;; Apply the changes immediately if the user is not using `innit' theme
        ;; variables or the theme has already loaded. This allows you to evaluate
-       ;; these macros on the fly and customize your faces iteratively.
-       (when (or int<innit>:theme:loaded
-                 (null innit:theme:feature))
+       ;; these macros on the fly and customize your faces interactively.
+       (when innit:theme:feature
          (funcall #',fn))
-       ;; Add to the customize hook in any case.
+       ;; Always add to the customize hook.
        (add-hook 'innit:theme:customize:hook #',fn 100))))
 
 

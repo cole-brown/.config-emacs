@@ -21,9 +21,9 @@
 ;; Zenburn Theme Tweaks for Whitespace-Mode
 ;;------------------------------------------------------------------------------
 
-;; Run this after both `zenburn' and `whitespace-mode' have loaded.
+;; Run this after both `zenburn-theme' and `whitespace' have loaded.
 ;; Need elisp from both in order to evaluate this.
-(imp:eval:after (:and zenburn whitespace-mode)
+(imp:eval:after (:and zenburn-theme whitespace)
 
   ;; Set up keys as variables from :
   ;;   - `zenburn-default-colors-alist'
