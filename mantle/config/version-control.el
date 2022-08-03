@@ -17,6 +17,9 @@
 ;;; Code:
 
 
+(imp:require :keybind)
+
+
 ;;------------------------------------------------------------------------------
 ;; Magit & Friends
 ;;------------------------------------------------------------------------------
@@ -42,7 +45,7 @@
   ;;--------------------
   ;; Put Magit Leader under the Global Leader
   ;;---
-  (:prefix  (keybind:leader :global "g") ;; TODO: prefix name?
+  (:prefix  (keybind:leader :global "g")
    :states  keybind:leader/global:states
    :keymaps keybind:leader/global:keymaps
    ;; Title
@@ -127,7 +130,7 @@
   ;;--------------------
   :general
   ;;--------------------
-  (:prefix  (keybind:leader :global "g") ;; TODO: prefix name?
+  (:prefix  (keybind:leader :global "g")
    :states  keybind:leader/global:states
    :keymaps keybind:leader/global:keymaps
 
