@@ -134,8 +134,8 @@ OPTIONS is a plist of optional vars:
     ;; Should the hook's BODY be squelched?
     (setq body
           (if (not macro<innit>:squelch)
-              (macroexp-progn body)
-            (macroexp-progn (innit:squelch body))))
+              body
+            (innit:squelch body)))
 
     `(progn
        ;; Create function...
@@ -211,8 +211,8 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
     ;; Should the hook's BODY be squelched?
     (setq body
           (if (not macro<innit>:squelch)
-              (macroexp-progn body)
-            (macroexp-progn (innit:squelch body))))
+              body
+            (innit:squelch body)))
 
     `(defun ,macro<innit>:hook-fn ()
        ,macro<innit>:docstr

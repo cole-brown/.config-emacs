@@ -71,11 +71,14 @@ writes to `standard-output'. In interactive sessions this won't suppress writing
 to *Messages*, only inhibit output in the echo area.
 
 Originally from Doom's `quiet!' macro."
-  `(if (innit:debug? :any)
-       ;; Don't squelch if any true of: `innit:debug?', `debug-on-error', `init-file-debug'
+  ;; Can use `innit:debug?' optional param `:any' if we want to not squelch for
+  ;; any of: `innit:debug?', `debug-on-error', `init-file-debug'
+  `(if (innit:debug?)
+       ;; Debugging; don't squelch!
        (progn ,@forms)
      ,(if innit:interactive?
-          ;; Be less bossy; allow output to buffers but not the minibuffer.
+          ;; Be less bossy; allow output to *Messages* buffer but not to the
+          ;; minibuffer.
           `(let ((inhibit-message t)
                  (save-silently t))
              (prog1
