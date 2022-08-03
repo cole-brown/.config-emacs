@@ -22,6 +22,7 @@
 (imp:require :path)
 (imp:require :nub)
 (imp:require :innit 'error)
+(imp:require :innit 'squelch)
 
 
 ;;------------------------------------------------------------------------------
@@ -96,10 +97,16 @@ Hook function name returned will be an interned symbol from
 OPTIONS is a plist of optional vars:
   :name     - Hook function will be named:
                 (concat innit:hook:func/name:prefix '<hook-name>')
-              If no `:name', '<hook-name>' will be `(hook-var-name HOOK-VAR)'
-              sans \"-hook\" suffix.
+              - '<hook-name>':
+                - If `:name' is a string, that string.
+                - If `:name' is a symbol (e.g. the hook variable), convert to a
+                  string via `symbol-name'.
+                - Remove \"-hook\" suffix if present.
+                - See: `innit:hook:func/name:string'
 
-  :quiet    - Do not output the 'Running hook [...]' message.
+  :quiet    - If non-nil, do not output the 'Running hook [...]' message.
+
+  :squelch  - If non-nil, wrap BODY in `innit:squelch'.
 
   :postpend - Passed on to `add-hook'. If non-nil, hook will be postpended to
               the list of hooks. If nil, hook will be prepended.
@@ -114,6 +121,7 @@ OPTIONS is a plist of optional vars:
          (macro<innit>:options   (eval options))
          (macro<innit>:name      (plist-get macro<innit>:options :name))
          (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
+         (macro<innit>:squelch   (plist-get macro<innit>:options :squelch))
          (macro<innit>:postpend  (plist-get macro<innit>:options :postpend))
          (macro<innit>:file      (when (plist-member macro<innit>:options :file)
                                    (path:relative (plist-get macro<innit>:options :file)
@@ -122,6 +130,12 @@ OPTIONS is a plist of optional vars:
          (macro<innit>:hook-name (innit:hook:func/name:string (or macro<innit>:name
                                                                   macro<innit>:hook)))
          (macro<innit>:hook-fn   (intern macro<innit>:hook-name)))
+
+    ;; Should the hook's BODY be squelched?
+    (setq body
+          (if (not macro<innit>:squelch)
+              (macroexp-progn body)
+            (macroexp-progn (innit:squelch body))))
 
     `(progn
        ;; Create function...
@@ -163,13 +177,19 @@ OPTIONS is a plist of optional vars:
 OPTIONS is a plist of optional vars:
   :name     - Hook function will be named:
                 (concat innit:hook:func/name:prefix '<hook-name>')
-              If `:name' is a symbol, convert to a string via `symbol-name' and
-              remove optional \"-hook\" suffix.
+              - '<hook-name>':
+                - If `:name' is a string, that string.
+                - If `:name' is a symbol (e.g. the hook variable), convert to a
+                  string via `symbol-name'.
+                - Remove \"-hook\" suffix if present.
+                - See: `innit:hook:func/name:string'
 
-  :quiet    - Do not output the 'Running hook [...]' message.
+  :quiet    - If non-nil, do not output the 'Running hook [...]' message.
 
-  :file     - Filename where your macro is called from... in case you happen
-              to lose your hook and need to find it.
+  :squelch  - If non-nil, wrap BODY in `innit:squelch'.
+
+  :file     - File path string for where your macro is called from... in case
+              you happen to lose your hook and need to find it.
 
   :docstr   - A string to use as the defined function's docstring.
 
@@ -180,12 +200,19 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
   (let* ((macro<innit>:options   (eval options))
          (macro<innit>:name      (plist-get macro<innit>:options :name))
          (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
+         (macro<innit>:squelch   (plist-get macro<innit>:options :squelch))
          (macro<innit>:file      (when (plist-member macro<innit>:options :file)
                                    (path:relative (plist-get macro<innit>:options :file)
                                                   user-emacs-directory)))
          (macro<innit>:docstr    (plist-get macro<innit>:options :docstr))
          (macro<innit>:hook-name (innit:hook:func/name:string macro<innit>:name))
          (macro<innit>:hook-fn   (intern macro<innit>:hook-name)))
+
+    ;; Should the hook's BODY be squelched?
+    (setq body
+          (if (not macro<innit>:squelch)
+              (macroexp-progn body)
+            (macroexp-progn (innit:squelch body))))
 
     `(defun ,macro<innit>:hook-fn ()
        ,macro<innit>:docstr
