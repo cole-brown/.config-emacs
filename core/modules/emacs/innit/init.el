@@ -53,12 +53,12 @@
             :filename "optimize")
   (imp:load :feature  '(:innit package)
             :filename "package")
+  (imp:load :feature  '(:innit squelch)
+            :filename "squelch")
   (imp:load :feature  '(:innit hook)
             :filename "hook")
   (imp:load :feature  '(:innit theme)
             :filename "theme")
-  (imp:load :feature  '(:innit squelch)
-            :filename "squelch")
 
   ;; End load timing.
   )

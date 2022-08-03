@@ -116,6 +116,7 @@ nil means use nub's defaults."
                  innit:nub:levels:prefixes ; output message prefixes
                  innit:nub:levels:enabled  ; default enabled/disabled per output levels
                  innit:nub:sinks)) ; output sinks by level
+;; (innit:nub:init)
 
 
 ;;------------------------------------------------------------------------------
