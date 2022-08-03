@@ -22,6 +22,21 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Squelch
+;;------------------------------------------------------------------------------
+;; Silence some functions that are overly chatty.
+
+;; `sh-set-shell' function:
+;;   > Setting up indent for shell type bash
+;;   > Indentation variables are now local.
+;;   > Indentation setup for shell type bash
+;; So you end up with "Indentation setup for shell type bash" in the minibuffer
+;; at odd times, sometimes. Like opening an org file that I guess has a shell
+;; source block maybe?
+(advice-add #'sh-set-shell :around #'innit:advice:squelch)
+
+
+;;------------------------------------------------------------------------------
 ;; Initialize!
 ;;------------------------------------------------------------------------------
 ;; TODO: This doesn't go here. This goes in mantle
