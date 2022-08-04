@@ -189,8 +189,13 @@ THEME can be a single symbol or list thereof. If nil, apply these settings to
 Initially from Doom's `custom-theme-set-faces!'."
   (declare (indent 1))
   ;; Make a function name for the hook based on THEME.
-  (let ((macro<innit/theme>:func (gensym (concat "innit:theme:face:hook:"
-                                                 (str:normalize:name (elisp:unquote theme))
+  (let* ((theme/unquote (elisp:unquote theme))
+         (macro<innit/theme>:func (gensym (concat "innit:theme:face:hook:"
+                                                 (if (listp theme/unquote)
+                                                     (mapconcat #'str:normalize:name
+                                                                theme/unquote
+                                                                "/")
+                                                   (str:normalize:name theme/unquote))
                                                  ":"
                                                  ;; `gensym' will suffix the name with `gensym-counter' for a unique name.
                                                  ))))
