@@ -25,7 +25,8 @@
 (require 'color) ; `color-clamp'
 
 (imp:require :innit 'vars)
-(imp:require :str '+random)
+(imp:require :str)
+(imp:require :elisp)
 
 
 ;;------------------------------------------------------------------------------
@@ -98,7 +99,7 @@ Run when loaded with `load-theme' or reloaded with `innit:theme:reload'.")
 ;;----------------------------
 
 (defvar innit:theme:loaded nil
-  "Theme that user has loaded, or `nil' for \"not loaded (yet)\".")
+  "Theme that user has loaded, or nil for \"not loaded (yet)\".")
 
 
 (defun innit:theme:load (theme)
@@ -180,45 +181,47 @@ Initially from Doom's `doom--custom-theme-set-face'."
 
 
 (defmacro innit:theme:face:set (theme &rest specs)
-  "Apply a list of face SPECS as user customizations for THEME.
+  "Apply a list of face SPECS as user customizations for THEME(s).
 
 THEME can be a single symbol or list thereof. If nil, apply these settings to
-all themes. It will apply to all themes once they are loaded.
+`user' theme (all themes). It will apply to all themes once they are loaded.
 
 Initially from Doom's `custom-theme-set-faces!'."
-  (declare (indent defun))
-
+  (declare (indent 1))
   ;; Make a function name for the hook based on THEME.
-  (let ((fn (gensym (concat "innit:theme:face:hook:"
-                            (str:normalize:name theme)
-                            ":"
-                            ;; `gensym' will suffix the name with `gensym-counter' for a unique name.
-                            ))))
-    ;; Create a function for applying the faces.
-    `(progn
-       (defun ,fn ()
-         (let (custom--inhibit-theme-enable)
-           (dolist (theme (elisp:list:listify (or ,theme 'user)))
-             (when (or (eq theme 'user)
-                       (custom-theme-enabled-p theme))
-               (apply #'custom-theme-set-faces theme
-                      (mapcan #'int<innit>:theme:face:set
-                              (list ,@specs)))))))
-       ;; Apply the changes immediately if the user is not using `innit' theme
-       ;; variables or the theme has already loaded. This allows you to evaluate
-       ;; these macros on the fly and customize your faces interactively.
-       (when innit:theme:feature
-         (funcall #',fn))
-       ;; Always add to the customize hook.
-       (add-hook 'innit:theme:customize:hook #',fn 100))))
+  (let ((macro<innit/theme>:func (gensym (concat "innit:theme:face:hook:"
+                                                 (str:normalize:name (elisp:unquote theme))
+                                                 ":"
+                                                 ;; `gensym' will suffix the name with `gensym-counter' for a unique name.
+                                                 ))))
+    ;; Only eval inputs once.
+    `(let ((macro<innit/theme>:themes (elisp:list:listify (or ,theme 'user)))
+           (macro<innit/theme>:specs  (list ,@specs)))
+       (progn
+         ;; Create a function for applying the faces.
+         (defun ,macro<innit/theme>:func ()
+           (let (custom--inhibit-theme-enable)
+             (dolist (theme/each macro<innit/theme>:themes)
+               (when (or (eq theme/each 'user)
+                         (custom-theme-enabled-p theme/each))
+                 (apply #'custom-theme-set-faces theme/each
+                        (mapcan #'int<innit>:theme:face:set
+                                macro<innit/theme>:specs))))))
+         ;; Apply the changes immediately if the user is not using `innit' theme
+         ;; variables or the theme has already loaded. This allows you to evaluate
+         ;; these macros on the fly and customize your faces interactively.
+         (when innit:theme:feature
+           (funcall #',macro<innit/theme>:func))
+         ;; Always add to the customize hook.
+         (add-hook 'innit:theme:customize:hook #',macro<innit/theme>:func 100)))))
 
 
 (defmacro innit:face:set (&rest specs)
   "Apply a list of face SPECS as user customizations.
 
 This is a convenience macro alternative to `custom-set-face' which allows for a
-simplified face format, and takes care of load order issues, so you can use
-doom-themes' API  worry.
+simplified face format, and takes care of load order issues. See
+`innit:theme:face:set' for details - this will set SPECS in the `user' theme.
 
 Initially from Doom's `custom-set-faces!'."
   (declare (indent defun))

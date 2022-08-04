@@ -70,6 +70,22 @@ From Doom's `doom-enlist'."
 
 
 ;;------------------------------------------------------------------------------
+;; Unquote List/Function
+;;------------------------------------------------------------------------------
+
+(defun elisp:unquote (arg)
+  "Return ARG unquoted.
+
+Removes both `quote' ('foo) and `function' (#'foo) style quoting.
+
+Originaly from `doom-unquote'."
+  (declare (pure t) (side-effect-free t))
+  (while (memq (car-safe arg) '(quote function))
+    (setq arg (cadr arg)))
+  arg)
+
+
+;;------------------------------------------------------------------------------
 ;; Functions for argument parsing.
 ;;------------------------------------------------------------------------------
 
