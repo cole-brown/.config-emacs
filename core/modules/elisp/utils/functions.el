@@ -1,6 +1,9 @@
 ;;; elisp/utils/functions.el -*- lexical-binding: t; -*-
 
 
+(imp:require :elisp 'utils 'types)
+
+
 ;;------------------------------------------------------------------------------
 ;; Imports
 ;;------------------------------------------------------------------------------
@@ -31,14 +34,39 @@
 ;;   - I think I have other list util functions hiding... somewhere.
 ;;     - Maybe in `alist'...
 (defun elisp:list:flatten (args)
-  "Return ARGS as a single, flat list."
-  ;; If it's a list, flatten it. Else it's a list now.
-  (if (and (listp args) (listp (cdr args)))
-      (seq-mapcat #'elisp:list:flatten args)
-    (list args)))
+  "Return ARGS as a single, flat list.
+
+If ARGS is a list, it must be a proper list (no circular lists or conses)."
+  (declare (pure t) (side-effect-free t))
+  (cond
+   ;; If it's a list, flatten it.
+   ((elisp:list/proper? args)
+    (seq-mapcat #'elisp:list:flatten args))
+   ;; If it's a cons, convert into a list and flatten.
+   ((elisp:cons? args)
+    (elisp:list:flatten (list (car args) (cdr args))))
+   ;; Else it's now a list.
+   (t
+    (list args))))
 ;; (elisp:list:flatten 1)
+;; (elisp:list:flatten '(1 . 2))
 ;; (elisp:list:flatten '(1 2 3))
 ;; (elisp:list:flatten '(1 (2 3)))
+
+
+;; TODO: move to a list utils module?
+;;   - I think I have other list util functions hiding... somewhere.
+;;     - Maybe in `alist'...
+(defun elisp:list:listify (args)
+  "Ensure ARGS is a list.
+
+Return ARGS wrapped in a list, or as-is if already a list.
+
+From Doom's `doom-enlist'."
+  (declare (pure t) (side-effect-free t))
+  (if (proper-list-p args)
+      args
+    (list args)))
 
 
 ;;------------------------------------------------------------------------------
