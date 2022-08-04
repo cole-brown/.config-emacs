@@ -44,34 +44,34 @@
      ;;---
      ;; "Good" Whitespace
      ;;---
-     (list 'whitespace-space :foreground 'zenburn-bg+2)
-     (list 'whitespace-newline :foreground 'zenburn-bg+2)
+     (list 'whitespace-space :foreground zenburn-bg+2)
+     (list 'whitespace-newline :foreground zenburn-bg+2)
      ;; whitespace-hspace - leave as-is?
      ;; whitespace-indentation - leave as-is?
 
      ;;---
      ;; "Ambivalent" Whitespace
      ;;---
-     (list 'whitespace-tab :foreground 'zenburn-orange)
+     (list 'whitespace-tab :foreground zenburn-orange)
      ;; whitespace-empty - what is this?
-     ;; (list 'whitespace-empty :foreground 'zenburn-red)
+     ;; (list 'whitespace-empty :foreground zenburn-red)
 
      ;;---
      ;; "Bad" Whitespace
      ;;---
      (list 'whitespace-line
-           :foreground 'zenburn-magenta
-           :background 'zenburn-bg-05) ;; Soften the bg color.
+           :foreground zenburn-magenta
+           :background zenburn-bg-05) ;; Soften the bg color.
      ;; whitespace-trailing - leave as-is?
      ;; whitespace-big-indent - Don't know if I've ever seen this... leave as-is for now.
      ;; Less eyebleedy.
      (list 'whitespace-space-after-tab
-           :foreground 'zenburn-bg-05
-           :background 'zenburn-magenta)
+           :foreground zenburn-bg-05
+           :background zenburn-magenta)
      ;; Less eyebleedy.
      (list 'whitespace-space-before-tab
-           :foreground 'zenburn-bg-05
-           :background 'zenburn-violet))))
+           :foreground zenburn-bg-05
+           :background zenburn-violet))))
 
 
 ;;------------------------------------------------------------------------------

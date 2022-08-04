@@ -191,28 +191,28 @@
      ;;---
      ;; Done states - little less dark.
      ;;---
-     (list 'org-done                     :foreground 'zenburn-green-3)
-     (list 'org-agenda-done              :foreground 'zenburn-bg+3)
-     (list 'org-checkbox-statistics-done :foreground 'zenburn-green-3)
+     (list 'org-done                     :foreground zenburn-green-3)
+     (list 'org-agenda-done              :foreground zenburn-bg+3)
+     (list 'org-checkbox-statistics-done :foreground zenburn-green-3)
      ;; "Done" Headlines - success/fail/info/etc.
      ;;    - Would be nice to have green, red, and gray... but we only have the one 'done' face.
      ;;    - So a lighter gray?
-     (list 'org-headline-done :foreground 'zenburn-fg-05)
-     ;; (list 'org-headline-done :foreground 'zenburn-green-3)
+     (list 'org-headline-done :foreground zenburn-fg-05)
+     ;; (list 'org-headline-done :foreground zenburn-green-3)
 
      ;;---
      ;; Org Headlines - adjust a few to be less dark.
      ;;---
      ;; Some unique, headliney colors.
-     (list 'outline-1 :foreground 'zenburn-orange)
-     (list 'outline-2 :foreground 'zenburn-green+2)
-     (list 'outline-3 :foreground 'zenburn-blue-1)
-     (list 'outline-4 :foreground 'zenburn-red-1)
+     (list 'outline-1 :foreground zenburn-orange)
+     (list 'outline-2 :foreground zenburn-green+2)
+     (list 'outline-3 :foreground zenburn-blue-1)
+     (list 'outline-4 :foreground zenburn-red-1)
      ;; ...and repeat.
-     (list 'outline-5 :foreground 'zenburn-orange)
-     (list 'outline-6 :foreground 'zenburn-green+2)
-     (list 'outline-7 :foreground 'zenburn-blue-1)
-     (list 'outline-8 :foreground 'zenburn-red-1)
+     (list 'outline-5 :foreground zenburn-orange)
+     (list 'outline-6 :foreground zenburn-green+2)
+     (list 'outline-7 :foreground zenburn-blue-1)
+     (list 'outline-8 :foreground zenburn-red-1)
      ;; ...and 9+ starts over at `outline-1'.
 
      ;;---
@@ -220,16 +220,16 @@
      ;;---
      ;; ├CURRENT┤
      (list 'mantle:theme:face:org.todo.keyword:active
-           :foreground 'zenburn-violet
-           :background 'zenburn-bg-05)
+           :foreground zenburn-violet
+           :background zenburn-bg-05)
      ;; ├WAITING┤, ├HOLDING┤
      (list 'mantle:theme:face:org.todo.keyword:holding
-           :foreground 'zenburn-magenta-03
-           :background 'zenburn-bg-05)
+           :foreground zenburn-magenta-03
+           :background zenburn-bg-05)
      ;; ├PROJECT┤
      (list 'mantle:theme:face:org.todo.keyword:project
-           :foreground 'zenburn-blue-3
-           :background 'zenburn-bg-05)
+           :foreground zenburn-blue-3
+           :background zenburn-bg-05)
 
      ;;---
      ;; Org ~inline code~ and =inline verbatim=
@@ -239,13 +239,13 @@
      ;;   - `org-verbatim' was similar to `outline-2' and to code comments (green).
      ;; Change to inheriting from `org-cite', a teal affair, with some background color, maybe.
      ;; TODO: Make the foreground color of these slightly different from each other.
-     (list 'org-code     :inherit 'org-cite :background 'zenburn-bg+05)
-     (list 'org-verbatim :inherit 'org-cite :background 'zenburn-bg-05)
+     (list 'org-code     :inherit 'org-cite :background zenburn-bg+05)
+     (list 'org-verbatim :inherit 'org-cite :background zenburn-bg-05)
 
      ;;---
      ;; "#+DOC_KEYWORD" - needs to be slightly lighter.
      ;;---
-     (list 'org-document-info-keyword :foreground 'zenburn-bg+3))
+     (list 'org-document-info-keyword :foreground zenburn-bg+3))
   ;; mantle:theme:face:org.todo.keyword:active  - bold green
   ;; mantle:theme:face:org.todo.keyword:holding  - orangey
   ;; mantle:theme:face:org.todo.keyword:project - darker green than bold green
