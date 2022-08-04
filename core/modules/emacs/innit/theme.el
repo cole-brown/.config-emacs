@@ -162,7 +162,9 @@ passed to `load-theme'."
 ;;------------------------------------------------------------------------------
 
 (defun int<innit>:theme:face:set (spec)
-  "Convert Doom's more user-friendly face SPEC into an Emacs' face spec."
+  "Convert Doom's more user-friendly face SPEC into an Emacs' face spec.
+
+Initially from Doom's `doom--custom-theme-set-face'."
   ;; Multiple faces, same spec:
   (cond ((listp (car spec))
          (cl-loop for face in (car spec)
@@ -181,7 +183,9 @@ passed to `load-theme'."
   "Apply a list of face SPECS as user customizations for THEME.
 
 THEME can be a single symbol or list thereof. If nil, apply these settings to
-all themes. It will apply to all themes once they are loaded."
+all themes. It will apply to all themes once they are loaded.
+
+Initially from Doom's `custom-theme-set-faces!'."
   (declare (indent defun))
 
   ;; Make a function name for the hook based on THEME.
@@ -193,7 +197,7 @@ all themes. It will apply to all themes once they are loaded."
     `(progn
        (defun ,fn ()
          (let (custom--inhibit-theme-enable)
-           (dolist (theme (doom-enlist (or ,theme 'user)))
+           (dolist (theme (elisp:list:listify (or ,theme 'user)))
              (when (or (eq theme 'user)
                        (custom-theme-enabled-p theme))
                (apply #'custom-theme-set-faces theme
@@ -213,7 +217,9 @@ all themes. It will apply to all themes once they are loaded."
 
 This is a convenience macro alternative to `custom-set-face' which allows for a
 simplified face format, and takes care of load order issues, so you can use
-doom-themes' API  worry."
+doom-themes' API  worry.
+
+Initially from Doom's `custom-set-faces!'."
   (declare (indent defun))
   `(innit:theme:face:set 'user ,@specs))
 

@@ -40,7 +40,7 @@
    ;; Like, ow, my eyeballs...
    ;;------------------------------
 
-   (innit:theme:face:set 'doom-zenburn
+   (innit:theme:face:set 'zenburn
      ;;---
      ;; "Good" Whitespace
      ;;---
