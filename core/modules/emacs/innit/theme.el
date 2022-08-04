@@ -190,9 +190,10 @@ Initially from Doom's `custom-theme-set-faces!'."
 
   ;; Make a function name for the hook based on THEME.
   (let ((fn (gensym (concat "innit:theme:face:hook:"
-                            (if (listp theme)
-                                (apply #'str:join "/" (str:normalize:name->list theme))
-                              (str:normalize:name theme))))))
+                            (str:normalize:name theme)
+                            ":"
+                            ;; `gensym' will suffix the name with `gensym-counter' for a unique name.
+                            ))))
     ;; Create a function for applying the faces.
     `(progn
        (defun ,fn ()
