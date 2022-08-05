@@ -40,7 +40,11 @@
 
 
 (defconst innit:path:module (path:join user-emacs-directory "modules/")
-  "Absolute path to the \"module\" subdirectory.")
+  "Absolute path to the \"modules\" subdirectory.")
+
+
+(defconst innit:path:snippet (path:join user-emacs-directory "snippets/")
+  "Absolute path to the \"snippets\" subdirectory.")
 
 
 (defconst innit:rx:filename

@@ -25,6 +25,10 @@
           :path     (imp:path:current:dir/relative :mantle)
           :filename "common")
 
+(imp:load :feature  '(:mantle config user dev-env snippets)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "snippets")
+
 
 ;;------------------------------------------------------------------------------
 ;; Version Control
