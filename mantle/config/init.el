@@ -132,13 +132,10 @@
 ;; Development Environment
 ;;------------------------------
 
-(imp:load :feature  '(:mantle config user version-control)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "version-control")
-
 (imp:load :feature  '(:mantle config user dev-env)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "dev-env")
+          :path     (imp:path:join (imp:path:current:dir/relative :mantle)
+                                   "dev-env")
+          :filename "init")
 
 
 ;;------------------------------------------------------------------------------
