@@ -23,10 +23,6 @@
 ;;------------------------------------------------------------------------------
 ;; Emacs Lisp
 ;;------------------------------------------------------------------------------
-;; TODO:
-;;   1. Pull out into "elisp.el"? Or probably better: "dev-env/elisp.el"?
-;;   2. In which case rename "dev-env.el" to "dev-env/common.el"?
-;;   3. And I guess have a "dev-env/init.el"?
 
 ;; Provides a very helpful elisp macro debugging tool: `macrostep-expand'
 (imp:use-package macrostep
