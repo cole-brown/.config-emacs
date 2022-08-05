@@ -267,4 +267,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'version-control)
+(imp:provide :mantle 'config 'user 'dev-env 'version-control)

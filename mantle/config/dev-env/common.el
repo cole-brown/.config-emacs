@@ -1,7 +1,5 @@
 ;;; mantle/config/common.el --- General Development Environment Stuff -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2022 Cole Brown
-;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-08-05
@@ -15,15 +13,6 @@
 ;;; Commentary:
 ;;
 ;;  General Development Environment Stuff
-;;
-;;; Code:
-
-;;; mantle/config/dev-env.el --- Development Environment -*- lexical-binding: t; -*-
-;;
-;;
-;;; Commentary:
-;;
-;;  Development Environment
 ;;
 ;;; Code:
 

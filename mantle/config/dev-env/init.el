@@ -21,7 +21,7 @@
 ;; General / Common / Whatever
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user dev-env emacs-lisp)
+(imp:load :feature  '(:mantle config user dev-env common)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "common")
 
@@ -32,7 +32,7 @@
 ;; Git and... well just Git, really.
 ;; And by "Git" I mean, of course, Magit (& friends).
 
-(imp:load :feature  '(:mantle config user version-control)
+(imp:load :feature  '(:mantle config user dev-env version-control)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "version-control")
 
