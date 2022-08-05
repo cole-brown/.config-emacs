@@ -34,22 +34,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Documents in General
-;;------------------------------------------------------------------------------
-
-;; Could move out of org-mode setup if we get more doc mode setups.
-
-(jerky:set 'docs 'tab 'short
-           :namespace :default
-           :value 2
-           :docstr "Short tab width is 2 spaces.")
-(jerky:set 'docs 'tab 'long
-           :namespace :default
-           :value 4
-           :docstr "Long tab width is 4 spaces.")
-
-
-;;------------------------------------------------------------------------------
 ;; Org-Mode
 ;;------------------------------------------------------------------------------
 
@@ -80,17 +64,19 @@
   ;; Create Org-Mode Hooks
   ;;---
   (innit:hook:defun
-      (list :name "org/jump-to-now-target"
-            :file (path:current:file)
+      (list :name   "org/jump-to-now-target"
+            :file   (path:current:file)
             :docstr "Jump point to \"now\" link, if it's in the first part of the file."
-            :quiet nil) ;; TODO: t)
+            :squelch t
+            :quiet   t)
     (buffer:cmd:search:header "[[--now"))
 
   (innit:hook:defun
-      (list :name "org/local-settings"
-            :file (path:current:file)
+      (list :name   "org/local-settings"
+            :file   (path:current:file)
             :docstr "Set up buffer local vars."
-            :quiet nil) ;; TODO: t)
+            :squelch t
+            :quiet  t)
     (setq-local yas-indent-line 'auto)
     ;; Automatically becomes buffer local.
     (setq tab-width (jerky:get 'docs 'tab 'short)))

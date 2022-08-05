@@ -18,7 +18,7 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Config: Basics & Prereqs
+;; Basics & Prereqs
 ;;------------------------------------------------------------------------------
 
 ;; Which-Key & Helpful
@@ -32,7 +32,7 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Config: Emacs, Files, Etc
+;; Emacs, Files, Etc
 ;;------------------------------------------------------------------------------
 
 (imp:load :feature  '(:mantle config user files)
@@ -41,7 +41,7 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Config: Input
+;; Input
 ;;------------------------------------------------------------------------------
 
 (imp:load :feature  '(:mantle config user hydra)
@@ -86,8 +86,21 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Config: Completion Frameworks
+;; General
 ;;------------------------------------------------------------------------------
+
+;;------------------------------
+;; Emacs
+;;------------------------------
+
+(imp:load :feature  '(:mantle config user whitespace)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "whitespace")
+
+
+;;------------------------------
+;; Completion Frameworks
+;;------------------------------
 ;; There's the standards like `ivy', `helm', `ido', etc...
 ;;
 ;; Or there's the new kids like the "SMOCE stack".
@@ -97,27 +110,27 @@
           :filename "completion")
 
 
-;;------------------------------------------------------------------------------
-;; Config: Secrets (Consts, Vars, Etc.)
-;;------------------------------------------------------------------------------
+;;------------------------------
+;; Secrets (Consts, Vars, Etc.)
+;;------------------------------
 
 (imp:load :feature  '(:mantle config user secret)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "secret")
 
 
-;;------------------------------------------------------------------------------
-;; Config: Modes
-;;------------------------------------------------------------------------------
+;;------------------------------
+;; Modes
+;;------------------------------
 
 (imp:load :feature  '(:mantle config user org-mode)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "org-mode")
 
 
-;;------------------------------------------------------------------------------
-;; Config: Development Environment
-;;------------------------------------------------------------------------------
+;;------------------------------
+;; Development Environment
+;;------------------------------
 
 (imp:load :feature  '(:mantle config user version-control)
           :path     (imp:path:current:dir/relative :mantle)
