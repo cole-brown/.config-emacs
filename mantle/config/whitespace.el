@@ -77,7 +77,7 @@
 
 ;; Make sure this is at it's default of nil, because:
 ;;   "A value of nil means a tab stop every `tab-width' columns."
-(customize-set-variable tab-stop-list nil)
+(customize-set-variable 'tab-stop-list nil)
 
 ;; NOTE: M-x tabify and M-x untabify exist and work on regions.
 
