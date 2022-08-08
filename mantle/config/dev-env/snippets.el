@@ -150,39 +150,40 @@
 ;; Snippet Helper Functions
 ;;------------------------------------------------------------------------------
 
-;; TODO: move to mis, rename `mis:input//number-somethnig-or-other' or however private vars are...
-(defvar sss:yas/number/parse-prevent-input-spam
+(defvar int<mantle/snippets>:number:cache
   nil
-  "For preventing yasnippet from spamming user too much during a snippet with `spy:yas/number/parse-or-default'.")
+  "Prevent spamming for an input number during a snippet expansion.
+
+Used by `mantle:snippet:number:parse'.")
+;; TODO: this doesn't really work? `sec//' still asks more than once most of the time.
 
 
-;; TODO: move to mis, rename `mis:input:clear' or something...
-(defun spy:yas/number/clear ()
-  "Resets `sss:yas/number/parse-prevent-input-spam' for a new snippet or after a snippet is done with it."
-  (setq sss:yas/number/parse-prevent-input-spam nil)
+(defun mantle:snippet:number:cache/clear ()
+  "Reset number cache for a new snippet or after a snippet is done with it."
+  (setq int<mantle/snippets>:number:cache nil)
+  ;; yasnippet will use whatever output is given, so give it an empty string.
   "")
 
 
-;; TODO: move to mis, rename `mis:input:number'?
-(defun spy:yas/number/parse-or-default (parse &optional default prompt)
-  "Returns PARSE as a number if `string-to-number' returns non-zero.
+(defun mantle:snippet:number:parse (parse &optional default prompt)
+  "Return cached number or PARSE string as a number.
 
 If PARSE is `:input' keyword, prompts for the string via `read-number'.
   - Will use PROMPT if it is a string (e.g. \"Column Width: \")
 
-If DEFAULT is non-nil and PARSE didn't parse to non-zero, returns DEFAULT.
+If DEFAULT is `numberp' and PARSE didn't parse to non-zero, returns DEFAULT.
   - Else returns zero.
 
 If PARSE is not a string, returns DEFAULT/0.
 
-Does some shenanigans with `sss:yas/number/parse-prevent-input-spam'
+Does some shenanigans with `int<mantle/snippets>:number:cache'
 to prevent yas from calling too many times."
-  (if sss:yas/number/parse-prevent-input-spam
+  (if int<mantle/snippets>:number:cache
       ;; User has already chosen - provide that choice.
-      sss:yas/number/parse-prevent-input-spam
+      int<mantle/snippets>:number:cache
 
     ;; Get the number and save to prevent spamming for it again.
-    (setq sss:yas/number/parse-prevent-input-spam
+    (setq int<mantle/snippets>:number:cache
           (let ((fallback (if (numberp default)
                               default
                             0)))
@@ -206,11 +207,11 @@ to prevent yas from calling too many times."
 
                   (t
                    fallback))))))
-;; (spy:yas/number/parse-or-default "80")
-;; (spy:yas/number/parse-or-default "jeff")
-;; (spy:yas/number/parse-or-default "jeff" 80)
-;; (spy:yas/number/parse-or-default :input 80)
-;; (spy:yas/number/parse-or-default :input 80 "Width: ")
+;; (mantle:snippet:number:parse "80")
+;; (mantle:snippet:number:parse "jeff")
+;; (mantle:snippet:number:parse "jeff" 80)
+;; (mantle:snippet:number:parse :input 80)
+;; (mantle:snippet:number:parse :input 80 "Width: ")
 
 
 ;;------------------------------------------------------------------------------
