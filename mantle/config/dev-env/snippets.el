@@ -31,6 +31,20 @@
   :init
   ;;--------------------
 
+  ;;---
+  ;; Default Snippets Location
+  ;;---
+
+  ;; Don't override if it was set in e.g. secrets init or system init or something.
+  (when (null (jerky:get 'path 'dev-env 'snippets))
+    (jerky:set 'path 'dev-env 'snippets
+               :value (path:abs:dir user-emacs-directory "snippets")
+               :docstr "Default path to snippets in `user-emacs-directory'."))
+
+  ;;---
+  ;; Hooks
+  ;;---
+
   (innit:hook:defun
       (list :name    "yasnippet"
             :file    (path:current:file)
