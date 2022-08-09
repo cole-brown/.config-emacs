@@ -146,20 +146,20 @@ Return indentation as an integer (number of spaces)."
     ;;------------------------------
     (cond ((and (not (stringp buffer))
                 (not (bufferp buffer)))
-           (int<mis>:error 'int<mis>:buffer:indent
+           (int<mis>:error 'int<mis>:format:indent:amount
                            "BUFFER must be a string or buffer object. Got a %S: %S"
                            (type-of buffer)
                            buffer))
 
           ((not (integer-or-marker-p position))
-           (int<mis>:error 'int<mis>:buffer:indent
+           (int<mis>:error 'int<mis>:format:indent:amount
                            "POSITION must be an integer or marker. Got a %S: %S"
                            (type-of position)
                            position))
 
           ((and (not (memq type '(:fixed :existing :auto)))
                 (not (integerp type)))
-           (int<mis>:error 'int<mis>:buffer:indent
+           (int<mis>:error 'int<mis>:format:indent:amount
                            "TYPE must be an integer or one of: %S. Got a %S: %S"
                            '(:fixed :existing :auto)
                            (type-of type)
@@ -168,7 +168,7 @@ Return indentation as an integer (number of spaces)."
           (t
            (setq buffer/curr (get-buffer buffer))
            (unless buffer/curr
-             (int<mis>:error 'int<mis>:buffer:indent
+             (int<mis>:error 'int<mis>:format:indent:amount
                              "Could not find BUFFER: %S"
                              buffer))))
 
@@ -207,7 +207,132 @@ Return indentation as an integer (number of spaces)."
 ;; Alignment
 ;;------------------------------------------------------------------------------
 
-;; TODO: Something like `-m//style/align' from ~/.config/doom/modules/output/mis0/args/style.el
+(cl-defun int<mis>:format:align (string &key align width padding)
+  "Align STRING based on ALIGN.
+
+STRING must be a string.
+
+ALIGN is required and must be one of:
+  `:center', `:left', `:right', `center', `left', `right'
+
+WIDTH is required and must be a positive integer.
+
+PADDING is optional. If not supplied/nil, it will default to a space. Else it
+should be a character or a string of length 1.
+
+Return a string of length WIDTH, aligned with PADDING characters. If STRING is
+too long, returns it as-is (un-truncated)."
+  (declare (pure t) (side-effect-free t))
+
+  ;;------------------------------
+  ;; Error Checks
+  ;;------------------------------
+  (cond ((not (stringp string))
+         (int<mis>:error 'int<mis>:format:align
+                         "STRING must be a string. Got a %S: %S"
+                         (type-of string)
+                         string))
+
+        ;; Must be a keyword or its symbol equivalent.
+        ((not (memq align '(:center center :left left :right right)))
+         (int<mis>:error 'int<mis>:format:align
+                         "ALIGN must be one of: %S. Got a %S: %S"
+                         '(:center center :left left :right right)
+                         (type-of align)
+                         align))
+
+        ;; Must be positive integer
+        ((or (not (integerp width))
+             (< width 1))
+         (int<mis>:error 'int<mis>:format:align
+                         "WIDTH must be a positive integer. Got a %S: %S"
+                         (type-of width)
+                         width))
+
+        ((and (not (null padding))
+              (not (stringp padding))
+              (not (characterp padding)))
+         (int<mis>:error 'int<mis>:format:align
+                         "PADDING must be nil, a character, or a string of length 1. Got a %S: %S"
+                         (type-of padding)
+                         padding))
+
+        ((and (stringp padding)
+              (not (= (length padding) 1)))
+         (int<mis>:error 'int<mis>:format:align
+                         '("PADDING must be nil, a character, or a string of length 1. "
+                           "Got a string of length %S: %S")
+                         (length padding)
+                         padding))
+
+        (t
+         nil))
+
+  ;;------------------------------
+  ;; Alignment
+  ;;------------------------------
+  (let ((padding (cond ((stringp padding)
+                        (string-to-char padding))
+                       ((characterp padding)
+                        padding)
+                       (t
+                        ;; Default: A space character.
+                        ?\s))))
+    ;; Choose the proper alignment function for the ALIGN keyword.
+    (cond ((> (length string) width)
+           ;; STRING is too long to align; just return as-is.
+           string)
+          ((memq align '(:center center))
+           (int<mis>:format:align/center string width padding))
+          ((memq align '(:left left))
+           (int<mis>:format:align/left string width padding))
+          ((memq align '(:right right))
+           (int<mis>:format:align/right string width padding))
+          (t
+           (int<mis>:error 'int<mis>:format:align
+                           "Unhandled ALIGN of %S!"
+                           align)))))
+
+
+(defun int<mis>:format:align/center (string width padding)
+  "Do not use this; use `int<mis>:format:align' instead.
+This function has no error checking.
+
+Pad string to WIDTH with PADDING character so that it is centered.
+
+If STRING is too long, just return it (as-is/un-truncated)."
+  (declare (pure t) (side-effect-free t))
+  (let ((pad-amt (max 0 (- width (length string)))))
+    (concat
+     (make-string (ceiling pad-amt 2) (string-to-char padding))
+     string
+     (make-string (floor pad-amt 2) (string-to-char padding)))))
+
+
+(defun int<mis>:format:align/left (string width padding)
+  "Do not use this; use `int<mis>:format:align' instead.
+This function has no error checking.
+
+Pad STRING with PADDING on the left up to WIDTH.
+
+If STRING is too long, just return it (as-is/un-truncated)."
+  (declare (pure t) (side-effect-free t))
+  (let ((pad-amt (max 0 (- width (length string)))))
+    (concat (make-string pad-amt (string-to-char padding))
+            string)))
+
+
+(defun int<mis>:format:align/right (string width padding)
+  "Do not use this; use `int<mis>:format:align' instead.
+This function has no error checking.
+
+Pad STRING with PADDING on the right up to WIDTH.
+
+If STRING is too long, just return it (as-is/un-truncated)."
+  (declare (pure t) (side-effect-free t))
+  (let ((pad-amt (max 0 (- width (length string)))))
+    (concat string
+            (make-string pad-amt (string-to-char padding)))))
 
 
 ;;------------------------------------------------------------------------------
@@ -228,6 +353,14 @@ LENGTH should be an integer greater than zero."
                          '("CHARACTER must be a string or character. "
                            "Got a %S: %S")
                          (type-of character)
+                         character))
+
+        ((and (stringp character)
+              (not (= (length character) 1)))
+         (int<mis>:error 'int<mis>:format:align
+                         '("CHARACTER must be a character or a string of length 1. "
+                           "Got a string of length %S: %S")
+                         (length character)
                          character))
 
         ((not (integerp length))
