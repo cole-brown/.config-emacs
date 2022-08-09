@@ -22,6 +22,7 @@
 
 (require 'mis-error)
 (require 'mis-format)
+(require 'mis-align)
 (require 'mis-message)
 
 

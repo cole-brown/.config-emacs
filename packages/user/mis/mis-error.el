@@ -16,6 +16,17 @@
 ;; Error Formatting
 ;;------------------------------------------------------------------------------
 
+(defun int<mis>:error:name (name)
+  "Return NAME as an uppercased string.
+
+NAME should be either:
+  - a string
+  - a quoted symbol"
+  ;; `format' handles both expected cases well, as well as pretty much anything
+  ;; else.
+  (upcase (format "%s" name)))
+
+
 (defun int<mis>:error:caller (caller)
   "Return CALLER as a string.
 
@@ -124,6 +135,51 @@ ARGS should be the `format' ARGS for MESSAGE."
                      "")
                    (cdr msg)))
          args))
+
+
+;;------------------------------------------------------------------------------
+;; Erroring "Predicates"
+;;------------------------------------------------------------------------------
+;; Signal an error on invalid input, instead of just returning nil.
+
+(defun int<mis>:validate:string? (caller name value)
+  "Signal an error if VALUE is not a string, else return VALUE.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol"
+  (if (stringp value)
+      value
+    (int<mis>:error caller
+                    "%s must be a string. Got a %S: %S"
+                    (int<mis>:error:name name)
+                    (type-of value)
+                    value)))
+
+
+(defun int<mis>:validate:member? (caller name value valids)
+  "Signal an error if VALUE is not a member of VALIDS, else return VALUE.
+
+VALIDS should be a list of valid values for VALUE; will use `memq' to evaluate
+membership.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol"
+  (if (memq value valids)
+      value
+    (int<mis>:error caller
+                    "%s must be one of: %S. Got a %S: %S"
+                    (int<mis>:error:name name)
+                    valids
+                    (type-of value)
+                    value)))
 
 
 ;;------------------------------------------------------------------------------

@@ -57,19 +57,13 @@ too long, returns it as-is (un-truncated)."
   ;;------------------------------
   ;; Error Checks
   ;;------------------------------
-  (cond ((not (stringp string))
-         (int<mis>:error 'int<mis>:align
-                         "STRING must be a string. Got a %S: %S"
-                         (type-of string)
-                         string))
+  (cond ((int<mis>:validate:string? 'int<mis>:align 'string string))
 
         ;; Must be a keyword or its symbol equivalent.
-        ((not (memq align int<mis>:align:types))
-         (int<mis>:error 'int<mis>:align
-                         "ALIGN must be one of: %S. Got a %S: %S"
-                         int<mis>:align:types
-                         (type-of align)
-                         align))
+        ((int<mis>:validate:member? 'int<mis>:align
+                                    'align
+                                    align
+                                    int<mis>:align:types))
 
         ;; Must be positive integer
         ((or (not (integerp width))
