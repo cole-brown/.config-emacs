@@ -113,8 +113,8 @@ MESSAGE should be one of:
     - will be concatenated with \"\n\"
 
 ARGS should be the `format' ARGS for MESSAGE."
-  ;; Format args into the finalized formatting string.
-  (apply #'format
+  ;; Raise error with args formatted into the finalized formatting string.
+  (apply #'error
          ;; Format CALLER and MESSAGE inputs.
          (let ((msg (int<mis>:error:message message)))
            (format "%s: %s%s"
