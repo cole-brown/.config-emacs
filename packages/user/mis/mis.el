@@ -21,6 +21,7 @@
 ;;------------------------------------------------------------------------------
 
 (require 'mis-error)
+(require 'mis-format)
 (require 'mis-message)
 
 
