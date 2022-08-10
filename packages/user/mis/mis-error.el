@@ -20,11 +20,24 @@
   "Return NAME as an uppercased string.
 
 NAME should be either:
+  - a keyword
   - a string
   - a quoted symbol"
-  ;; `format' handles both expected cases well, as well as pretty much anything
-  ;; else.
-  (upcase (format "%s" name)))
+  (cond ((keywordp name)
+         ;; Keywords will just be themselves, but strings. Add quotes?
+         (format "`%s'" name))
+
+        ((or (stringp name)
+             (symbolp name))
+         ;; Strings & symbols should be upcased, as we're expecting those to be
+         ;; function parameter names. `format' handles these well given "%s"
+         ;; formatting spec.
+         (upcase (format "%s" name)))
+
+        (t
+         ;; `format' so that we can return /something/. Throw in some extras so
+         ;; we can maybe track down what's wrong to here.
+         (format "¿(%s)?" name))))
 
 
 (defun int<mis>:error:caller (caller)
