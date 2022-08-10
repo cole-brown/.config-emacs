@@ -38,17 +38,19 @@
 (defun mis:style (&rest args)
   "Validate ARGS and return a Mis style list.
 
-ARGS should start off with styling keywords, key/values, etc before supplying
+ARGS should start off with styling key/values before supplying
 the format string and format args. Example:
   Valid styles:
-    (mis:style :bold \"hello world\")
-    (mis:style :bold :align 'center \"hello %s\" (get-greeted))
+    (mis:style :bold t \"hello world\")
+    (mis:style :bold t :align 'center \"hello %s\" (get-greeted))
   Invalid styles:
     (mis:style \"hello %s\" :bold :align 'center (get-greeted))
     (mis:style \"hello %s\" (get-greeted) :bold :align 'center)
 
-The \"invalid styles\" will just be interpreted as having no styling and extra
-message args."
+NOTE: The \"invalid styles\" will just be interpreted as having no styling and
+extra message args.
+
+NOTE: Styles must always have both a keyword and a value."
   ;;------------------------------
   ;; Error Checking
   ;;------------------------------
@@ -58,70 +60,45 @@ message args."
                     "ARGS must be a proper list (no circular references)! Got: %S"
                     args))
 
-
   (let ((parsing-styles t)
-        styling ; Normalized styles output list.
-        messaging           ; Message format string and/or args.
-        arg)                 ; Current item from ARGS being parsed.
+        styling   ; Validated/normalized styles output list.
+        (args/len (length args))
+        key
+        value)
 
     ;;------------------------------
     ;; Build normalized styles list?
     ;;------------------------------
     (while (and args
+                (> args/len 2)
                 parsing-styles)
-      (setq arg (pop args))
+      (if (not (keywordp (car args)))
+          ;;---
+          ;; Done; no more style kvps to parse; rest is messaging stuff.
+          ;;---
+          (setq parsing-styles nil)
 
-      ;; Is this a style keyword?
-      (if-let* ((key           (and (keywordp arg) arg)) ; ARG, if it is a valid Mis key.
-                (value         :if-let-placeholder)      ; Value of `key', from ARGS.
-                (valid?        (alist-get key int<mis>:valid:style))
-                (valid/fn      :if-let-placeholder)
-                (valid/members :if-let-placeholder)) ; Will just be nil for many things.
-          ;; Style keyword. Validate it.
-          (progn
-            (setq valid/fn       (nth 0 valid?)
-                  valid/members  (nth 1 valid?)) ; nil ok
-            (if (null valid/fn)
-                (progn
-                  ;; No value; just a keyword flag. It's been validated by virtue
-                  ;; of `if-let' finding it, so just add to styles.
-                  (push key styling)
-                  (push t styling)) ;; Normaliation of solo/flag keyword: set to true.
+        ;;---
+        ;; Validate a key/value pair.
+        ;;---
+        (setq key   (pop args)
+              value (int<mis>:valid:style/kvp? 'mis:style
+                                               key
+                                               (pop args))
+              args/len (- args/len 2))
 
-              ;; Grab key's value from ARGS, now that we know key is expected to
-              ;; have a value.
-              (setq value (pop args))
-
-              ;; Validate key/value pair. Validator should signal error on
-              ;; invalid so we don't need to check anything.
-              (funcall valid/fn
-                       'mis:style
-                       key
-                       value
-                       valid/members)
-
-              ;; Save to the normalized output.
-              (push key styling)
-              (push value styling)))
-
-        ;; Not a style keyword. Also not a style keyword's value, since we deal
-        ;; with those above too. So... Must mean we're done with style params
-        ;; and are at message/message-arg params.
-        (setq parsing-styles nil)))
-
-    ;;------------------------------
-    ;; Build message args.
-    ;;------------------------------
-    ;; Combine that last arg we were processing back together with the other
-    ;; messaging args.
-    (setq messaging (cons arg args))
+        ;; Save to the normalized output.
+        (push key   styling)
+        (push value styling)))
 
     ;;------------------------------
     ;; Return.
     ;;------------------------------
     (list :style   (nreverse styling)
-          :message messaging)))
+          :message args)))
 ;; (mis:style :align 'center "hello %s" "world")
+;; (mis:style :align 'center :width 11 "hello %s" "world")
+;; (mis:style :align 'center :width 11 "hello")
 
 
 ;;------------------------------------------------------------------------------
