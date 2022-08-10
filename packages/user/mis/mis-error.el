@@ -43,11 +43,20 @@ NAME should be either:
 (defun int<mis>:error:caller (caller)
   "Return CALLER as a string.
 
-CALLER should be calling function's name. It can be either:
+CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
-  - or a function-quoted symbol"
-  (cond ((stringp caller)
+  - a function-quoted symbol
+  - a list/cons of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (cond ((listp caller)
+         (let (names)
+           (dolist (name caller)
+             (push (int<mis>:error:caller name) names))
+           (mapconcat #'identity
+                      (nreverse names)
+                      " <- ")))
+        ((stringp caller)
          caller)
         ((memq (car-safe caller) '(quote function))
          ;; `format' handles quoted things well.
@@ -56,6 +65,7 @@ CALLER should be calling function's name. It can be either:
         ;; TODO: Could error but we're in the middle of erroring...
         (t
          (format "%s" caller))))
+;; (int<mis>:error:caller '(baz bar foo))
 
 
 ;; TODO: This is the Nub message way. Convert to the mis way of doing concat/newlines?
@@ -128,6 +138,8 @@ CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
+  - a list/cons of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
 
 MESSAGE should be one of:
   - a string that `format' understands
@@ -150,28 +162,63 @@ ARGS should be the `format' ARGS for MESSAGE."
          args))
 
 
+;; TODO:
 ;; TODO: Move validation to its own file?
+;; TODO:
+
+(defconst int<mis>:valid:align/types
+  ;; keyword / symbol
+  '(:left      left
+    :center    center
+    :right     right)
+  "Valid mis0 `:align' types.")
 
 ;;------------------------------------------------------------------------------
-;; Validation Registration
+;; Keyword Validation
 ;;------------------------------------------------------------------------------
 
-(defconst int<mis>:valid:style
-  '((:width int<mis>:valid:integer?)
-    (:align int<mis>:valid:member? int<mis>:align:types)
-    ;; :margin
-    ;; :border
-    ;; :padding
-    ;; :boxed
-    )
-  "Valid 'mis' styling keywords alist.
+(defun int<mis>:valid:style/kvp? (caller keyword value)
+  "Determine which validation predicate to call for KEYWORD, then call it.
 
-Each alist assoc should be:
-  - For solo keywords:   (keyword nil)
-  - For key/value pairs: (keyword #'validation-fn valids)
-    - `validation-fn' should signal an error on invalid values.
-    - `valids' is optional quoted symbol name of list of valid values,
-      if `validation-fn' accepts it.")
+VALUE should be keyword's value, if it has one, or nil if not.
+
+ARGS should be nil or any args the keyword needs to be able to validate its
+value using its validator function. For example, `int<mis>:valid:member?' takes
+a list of valid values.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list/cons of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Signal an error if invalid; return normalized value if valid."
+  (let ((caller (cons 'int<mis>:valid:keyword? caller)))
+    ;; Validators will return the valid value, if it's valid.
+    (pcase keyword
+      ;;------------------------------
+      ;; Keyword Validators
+      ;;------------------------------
+      (:width
+       (int<mis>:valid:integer? caller keyword value))
+
+      (:align
+       (int<mis>:valid:member? caller keyword value int<mis>:valid:align/types))
+
+      (:indent
+       (int<mis>:valid:indent? caller keyword value))
+
+      ((or :trim :trim:left :trim:right)
+       (int<mis>:valid:string-or-nil? caller keyword value))
+
+      ;;------------------------------
+      ;; Fallthrough / Error
+      ;;------------------------------
+      (_
+       (int<mis>:error caller
+                       "Don't know how to validate keyword %S"
+                       keyword)))))
 
 
 ;;------------------------------------------------------------------------------
@@ -187,7 +234,9 @@ NAME should be VALUE's symbol name as a symbol or string.
 CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
-  - a function-quoted symbol"
+  - a function-quoted symbol
+  - a list/cons of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (if (integerp value)
       value
     (int<mis>:error caller
@@ -205,7 +254,9 @@ NAME should be VALUE's symbol name as a symbol or string.
 CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
-  - a function-quoted symbol"
+  - a function-quoted symbol
+  - a list/cons of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (if (stringp value)
       value
     (int<mis>:error caller
@@ -215,23 +266,73 @@ CALLER should be calling function's name. It can be one of:
                     value)))
 
 
-(defun int<mis>:valid:member? (caller name value valids &rest _)
-  "Signal an error if VALUE is not a member of VALIDS, else return VALUE.
-
-VALIDS should be a quoted symbol of a list of valid values for VALUE; will use
-`memq' to evaluate membership.
+(defun int<mis>:valid:string-or-nil? (caller name value &rest _)
+  "Signal an error if VALUE is not a string or nil, else return VALUE.
 
 NAME should be VALUE's symbol name as a symbol or string.
 
 CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
-  - a function-quoted symbol"
-  (let ((valids (eval valids))) ;; 'foo-list -> (value of foo-list)
-    (if (memq value valids)
+  - a function-quoted symbol
+  - a list/cons of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (if (or (null value) (stringp value))
+      value
+    (int<mis>:error caller
+                    "%s must be nil or of type string. Got %S: %S"
+                    (int<mis>:error:name name)
+                    (type-of value)
+                    value)))
+
+
+(defun int<mis>:valid:member? (caller name value valids &rest _)
+  "Signal an error if VALUE is not a member of VALIDS, else return VALUE.
+
+VALIDS should be a list of valid values for VALUE; will use `memq' to evaluate
+membership.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list/cons of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (if (memq value valids)
+      value
+    (int<mis>:error caller
+                    "%s must be one of: %S. Got %S: %S"
+                    (int<mis>:error:name name)
+                    valids
+                    (type-of value)
+                    value)))
+
+
+(defun int<mis>:valid:indent? (caller name value &rest _)
+  "Signal an error if VALUE is not a valid indentation.
+
+VALUE can be:
+  - `:fixed'
+  - `:existing'
+  - `:auto'
+  - a positive integer
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list/cons of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((valids '(:fixed :existing :auto)))
+    (if (or (memq value valids)
+            (integerp value))
         value
       (int<mis>:error caller
-                      "%s must be one of: %S. Got %S: %S"
+                      "%S must be an integer or one of: %S. Got %S: %S"
                       (int<mis>:error:name name)
                       valids
                       (type-of value)

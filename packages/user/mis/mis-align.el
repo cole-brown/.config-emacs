@@ -17,23 +17,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Constants
-;;------------------------------------------------------------------------------
-
-(defconst int<mis>:align:keywords
-  '(:align)
-  "Valid 'mis' alignment keywords.")
-
-
-(defconst int<mis>:align:types
-  ;; keyword / symbol
-  '(:left      left
-    :center    center
-    :right     right)
-  "Valid mis0 `:align' types.")
-
-
-;;------------------------------------------------------------------------------
 ;; Alignment
 ;;------------------------------------------------------------------------------
 
@@ -63,7 +46,7 @@ too long, returns it as-is (un-truncated)."
         ((int<mis>:valid:member? 'int<mis>:align
                                  'align
                                  align
-                                 int<mis>:align:types))
+                                 int<mis>:valid:align/types))
 
         ;; Must be positive integer
         ((or (not (integerp width))
