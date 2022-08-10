@@ -57,13 +57,13 @@ too long, returns it as-is (un-truncated)."
   ;;------------------------------
   ;; Error Checks
   ;;------------------------------
-  (cond ((int<mis>:validate:string? 'int<mis>:align 'string string))
+  (cond ((int<mis>:valid:string? 'int<mis>:align 'string string))
 
         ;; Must be a keyword or its symbol equivalent.
-        ((int<mis>:validate:member? 'int<mis>:align
-                                    'align
-                                    align
-                                    int<mis>:align:types))
+        ((int<mis>:valid:member? 'int<mis>:align
+                                 'align
+                                 align
+                                 int<mis>:align:types))
 
         ;; Must be positive integer
         ((or (not (integerp width))

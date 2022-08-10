@@ -137,12 +137,54 @@ ARGS should be the `format' ARGS for MESSAGE."
          args))
 
 
+;; TODO: Move validation to its own file?
+
 ;;------------------------------------------------------------------------------
-;; Erroring "Predicates"
+;; Validation Registration
+;;------------------------------------------------------------------------------
+
+(defconst int<mis>:valid:style
+  '((:width int<mis>:valid:integer?)
+    (:align int<mis>:valid:member? int<mis>:align:types)
+    ;; :margin
+    ;; :border
+    ;; :padding
+    ;; :boxed
+    )
+  "Valid 'mis' styling keywords alist.
+
+Each alist assoc should be:
+  - For solo keywords:   (keyword nil)
+  - For key/value pairs: (keyword #'validation-fn valids)
+    - `validation-fn' should signal an error on invalid values.
+    - `valids' is optional quoted symbol name of list of valid values,
+      if `validation-fn' accepts it.")
+
+
+;;------------------------------------------------------------------------------
+;; Validation "Predicates"
 ;;------------------------------------------------------------------------------
 ;; Signal an error on invalid input, instead of just returning nil.
 
-(defun int<mis>:validate:string? (caller name value)
+(defun int<mis>:valid:integer? (caller name value &rest _)
+  "Signal an error if VALUE is not a integer, else return VALUE.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol"
+  (if (integerp value)
+      value
+    (int<mis>:error caller
+                    "%s must be of type integer. Got %S: %S"
+                    (int<mis>:error:name name)
+                    (type-of value)
+                    value)))
+
+
+(defun int<mis>:valid:string? (caller name value &rest _)
   "Signal an error if VALUE is not a string, else return VALUE.
 
 NAME should be VALUE's symbol name as a symbol or string.
@@ -154,17 +196,17 @@ CALLER should be calling function's name. It can be one of:
   (if (stringp value)
       value
     (int<mis>:error caller
-                    "%s must be a string. Got a %S: %S"
+                    "%s must be of type string. Got %S: %S"
                     (int<mis>:error:name name)
                     (type-of value)
                     value)))
 
 
-(defun int<mis>:validate:member? (caller name value valids)
+(defun int<mis>:valid:member? (caller name value valids &rest _)
   "Signal an error if VALUE is not a member of VALIDS, else return VALUE.
 
-VALIDS should be a list of valid values for VALUE; will use `memq' to evaluate
-membership.
+VALIDS should be a quoted symbol of a list of valid values for VALUE; will use
+`memq' to evaluate membership.
 
 NAME should be VALUE's symbol name as a symbol or string.
 
@@ -172,14 +214,15 @@ CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol"
-  (if (memq value valids)
-      value
-    (int<mis>:error caller
-                    "%s must be one of: %S. Got a %S: %S"
-                    (int<mis>:error:name name)
-                    valids
-                    (type-of value)
-                    value)))
+  (let ((valids (eval valids))) ;; 'foo-list -> (value of foo-list)
+    (if (memq value valids)
+        value
+      (int<mis>:error caller
+                      "%s must be one of: %S. Got %S: %S"
+                      (int<mis>:error:name name)
+                      valids
+                      (type-of value)
+                      value))))
 
 
 ;;------------------------------------------------------------------------------
