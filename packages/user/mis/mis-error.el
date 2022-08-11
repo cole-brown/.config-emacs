@@ -231,7 +231,7 @@ Signal an error if invalid; return normalized value if valid."
       ;; Keyword Validators
       ;;------------------------------
       (:width
-       (int<mis>:valid:integer? caller keyword value))
+       (int<mis>:valid:positive-integer? caller keyword value))
 
       (:align
        (int<mis>:valid:member? caller keyword value int<mis>:valid:align/types))
@@ -256,7 +256,7 @@ Signal an error if invalid; return normalized value if valid."
 ;;------------------------------------------------------------------------------
 ;; Signal an error on invalid input, instead of just returning nil.
 
-(defun int<mis>:valid:integer? (caller name value &rest _)
+(defun int<mis>:valid:positive-integer? (caller name value &rest _)
   "Signal an error if VALUE is not a integer, else return VALUE.
 
 NAME should be VALUE's symbol name as a symbol or string.
@@ -268,9 +268,35 @@ CALLER should be calling function's name. It can be one of:
   - a list/cons of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (if (integerp value)
-      value
+      (if (> value 0)
+          value
+        (int<mis>:error caller
+                    "%s must be a positive integer. Got: %d"
+                    (int<mis>:error:name name)
+                    value))
     (int<mis>:error caller
                     "%s must be of type integer. Got %S: %S"
+                    (int<mis>:error:name name)
+                    (type-of value)
+                    value)))
+
+
+(defun int<mis>:valid:string-or-char? (caller name value &rest _)
+  "Signal an error if VALUE is not a string or a character, else return VALUE.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list/cons of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (if (or (stringp value)
+          (characterp value))
+      value
+    (int<mis>:error caller
+                    "%s must be of type string. Got %S: %S"
                     (int<mis>:error:name name)
                     (type-of value)
                     value)))
