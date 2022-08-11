@@ -5,7 +5,7 @@
 ;;--                     What computer is this anyways?                       --
 ;;--------------------------(probably the wrong one)----------------------------
 
-(require 'cl-lib) ;; cl-defun for '&keys'
+(require 'cl-lib) ;; cl-defun for '&key'
 
 (imp:require :nub)
 (imp:require :jerky)
