@@ -96,9 +96,11 @@ NOTE: Styles must always have both a keyword and a value."
     ;;------------------------------
     (list :style   (nreverse styling)
           :message args)))
+;; (mis:style :align 'center "hello")
 ;; (mis:style :align 'center "hello %s" "world")
 ;; (mis:style :align 'center :width 11 "hello %s" "world")
 ;; (mis:style :align 'center :width 11 "hello")
+;; (mis:style :indent 'auto "hello")
 
 
 ;;------------------------------------------------------------------------------

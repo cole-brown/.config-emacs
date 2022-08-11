@@ -147,13 +147,10 @@ Return indentation as an integer (number of spaces)."
                            (type-of position)
                            position))
 
-          ((and (not (memq type '(:fixed :existing :auto)))
-                (not (integerp type)))
-           (int<mis>:error 'int<mis>:format:indent:amount
-                           "TYPE must be an integer or one of: %S. Got a %S: %S"
-                           '(:fixed :existing :auto)
-                           (type-of type)
-                           type))
+          ;; `int<mis>:valid:indent?' will signal error for invalid.
+          ((not (int<mis>:valid:indent? 'int<mis>:format:indent:amount
+                                        'type
+                                        type)))
 
           (t
            (setq buffer/curr (get-buffer buffer))

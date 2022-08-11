@@ -49,23 +49,53 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list/cons of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (cond ((listp caller)
-         (let (names)
-           (dolist (name caller)
-             (push (int<mis>:error:caller name) names))
-           (mapconcat #'identity
-                      (nreverse names)
-                      " <- ")))
-        ((stringp caller)
-         caller)
-        ((memq (car-safe caller) '(quote function))
-         ;; `format' handles quoted things well.
-         (format "%s" caller))
-        ;; Not sure? Hope `format' handles it ok?
-        ;; TODO: Could error but we're in the middle of erroring...
-        (t
-         (format "%s" caller))))
+  (cond
+   ;;------------------------------
+   ;; Expected end cases:
+   ;;------------------------------
+   ((memq (car-safe caller) '(quote function))
+    ;; `format' handles quoted things well.
+    (format "%s" caller))
+
+   ((stringp caller)
+    caller)
+
+   ;;------------------------------
+   ;; Recursive cases:
+   ;;------------------------------
+   ;; Want lists and conses treated separately so need to do it in a specific
+   ;; order as (lisp (cons 'x 'y) is true and (consp (list 'x 'y)) is also true.
+   ;;
+   ;;`proper-list-p' is nil for conses, so start with that.
+   ((proper-list-p caller)
+    (let (names)
+      (dolist (name caller)
+        (push (int<mis>:error:caller name) names))
+      (mapconcat #'identity
+                 (nreverse names)
+                 " <- ")))
+
+   ;; `consp' needs some help to catch "conses-but-not-lists".
+   ;; "Some help" being "don't use it at all", apparently.
+   ((and (listp caller)
+         (cdr caller)
+         (atom (cdr caller)))
+    (concat (int<mis>:error:caller (car caller))
+            " <- "
+            (int<mis>:error:caller (cdr caller))))
+
+   ;; Edge Case: A list with a cycle in it or something to make it "not a proper
+   ;; list"? Let this fall through.
+
+   ;;------------------------------
+   ;; Fallthrough:
+   ;;------------------------------
+   ;; Not sure? Hope `format' handles it ok?
+   ;; TODO: Could error but we're in the middle of erroring...
+   (t
+    (format "%s" caller))))
 ;; (int<mis>:error:caller '(baz bar foo))
+;; (int<mis>:error:caller '(bar . foo))
 
 
 ;; TODO: This is the Nub message way. Convert to the mis way of doing concat/newlines?
@@ -314,9 +344,9 @@ CALLER should be calling function's name. It can be one of:
   "Signal an error if VALUE is not a valid indentation.
 
 VALUE can be:
-  - `:fixed'
-  - `:existing'
-  - `:auto'
+  - `:fixed' / `fixed'
+  - `:existing' / `existing'
+  - `:auto' / `auto'
   - a positive integer
 
 NAME should be VALUE's symbol name as a symbol or string.
@@ -327,7 +357,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list/cons of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let ((valids '(:fixed :existing :auto)))
+  (let ((valids '(:fixed fixed :existing existing :auto auto )))
     (if (or (memq value valids)
             (integerp value))
         value
