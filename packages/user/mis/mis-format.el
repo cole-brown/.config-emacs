@@ -201,7 +201,9 @@ Return indentation as an integer (number of spaces)."
 CHARACTER should be a character or string of length 1.
 
 LENGTH should be an integer greater than zero."
-
+  ;;------------------------------
+  ;; Errors
+  ;;------------------------------
   (cond ((and (not (stringp character))
               (not (characterp character)))
          (int<mis>:error 'int<mis>:format:repeart
@@ -210,27 +212,40 @@ LENGTH should be an integer greater than zero."
                          (type-of character)
                          character))
 
-        ((and (stringp character)
-              (not (= (length character) 1)))
-         (int<mis>:error 'int<mis>:format:repeart
-                         '("CHARACTER must be a character or a string of length 1. "
-                           "Got a string of length %S: %S")
-                         (length character)
-                         character))
-
         ((not (integerp length))
          (int<mis>:error 'int<mis>:format:repeat
                          '("LENGTH must be an integer. "
                            "Got a %S: %S")
                          (type-of length)
                          length))
+        ;;------------------------------
+        ;; "Long" Strings
+        ;;------------------------------
+        ((and (stringp character)
+              (not (= (length character) 1)))
+         ;; Repeat multi-char string until at least a LENGTH string is created.
+         (let (repeats)
+           ;; `ceiling' / `float' shenanigans to ensure string created is long enough.
+           (dotimes (i (ceiling (/ (float length) (length character))))
+             (setq repeats (cons character repeats)))
+           ;; Now maybe truncate down to length.
+           (substring (apply 'concat repeats)
+                      0
+                      length)))
 
+        ;;------------------------------
+        ;; Chars / 1 Char Strings
+        ;;------------------------------
         (t
          (make-string length
                       (if (stringp character)
                           (string-to-char character)
                         character)
                       :multibyte))))
+;; (int<mis>:format:repeat "x" 5)
+;; (int<mis>:format:repeat ?x 6)
+;; (int<mis>:format:repeat "xx" 5)
+;; (int<mis>:format:repeat "xx" 6)
 
 
 ;;------------------------------------------------------------------------------
