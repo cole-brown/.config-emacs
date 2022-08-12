@@ -208,6 +208,20 @@ ARGS should be the `format' ARGS for MESSAGE."
 ;; TODO: Move validation to its own file?
 ;; TODO:
 
+(defconst int<mis>:keywords:style
+  '(:width
+    :align
+    :indent
+    :trim :trim:left :trim:right)
+  "Valid style keywords.")
+
+
+(defconst int<mis>:keywords:comment
+  '(:type
+    :language)
+  "Valid comment keywords.")
+
+
 (defconst int<mis>:valid:align/types
   ;; keyword / symbol
   '(:left      left
@@ -229,6 +243,46 @@ ARGS should be the `format' ARGS for MESSAGE."
 ;;------------------------------------------------------------------------------
 ;; Keyword Validation
 ;;------------------------------------------------------------------------------
+
+(defun int<mis>:valid:validator (caller keyword)
+  "Determine which category KEYWORD falls under, return validator func for it.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Signal an error if invalid; if valid, return cons 2-tuple of:
+  (category . validator-fn)"
+  (let ((caller (cons 'int<mis>:keyword:category caller)))
+    ;;------------------------------
+    ;; Error Checking
+    ;;------------------------------
+    (cond ((not (keywordp keyword))
+           (int<mis>:error caller
+                           "KEYWORD must be a keyword. Got %S: %S"
+                           (type-of keyword)
+                           keyword))
+
+          ;;------------------------------
+          ;; Actual Categories?
+          ;;------------------------------
+          ((memq keyword int<mis>:keywords:style)
+           '(:style . int<mis>:valid:style/kvp?))
+
+          ((memq keyword int<mis>:keywords:comment)
+           '(:comment . int<mis>:valid:comment/kvp?))
+
+          ;;------------------------------
+          ;; Fallthrough: Error
+          ;;------------------------------
+          (t
+           (int<mis>:error caller
+                           "Keyword has no known category: %S"
+                           keyword)))))
+
 
 (defun int<mis>:valid:style/kvp? (caller keyword value)
   "Determine which validation predicate to call for KEYWORD, then call it.
@@ -260,6 +314,40 @@ Signal an error if invalid; return normalized value if valid."
 
       ((or :trim :trim:left :trim:right)
        (int<mis>:valid:string-or-nil? caller keyword value))
+
+      ;;------------------------------
+      ;; Fallthrough / Error
+      ;;------------------------------
+      (_
+       (int<mis>:error caller
+                       "Don't know how to validate keyword %S"
+                       keyword)))))
+
+
+(defun int<mis>:valid:comment/kvp? (caller keyword value)
+  "Determine which validation predicate to call for KEYWORD, then call it.
+
+VALUE should be keyword's value, if it has one, or nil if not.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Signal an error if invalid; return normalized value if valid."
+  (let ((caller (cons 'int<mis>:valid:keyword? caller)))
+    ;; Validators will return the valid value, if it's valid.
+    (pcase keyword
+      ;;------------------------------
+      ;; Keyword Validators
+      ;;------------------------------
+      (:type
+       (int<mis>:valid:member? caller keyword value int<mis>:valid:align/types))
+
+      (:language
+       (int<mis>:valid:string-or-symbol? caller keyword value))
 
       ;;------------------------------
       ;; Fallthrough / Error
