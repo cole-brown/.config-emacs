@@ -40,62 +40,74 @@ NAME should be either:
          (format "¿(%s)?" name))))
 
 
-(defun int<mis>:error:caller (caller)
+(defun int<mis>:error:caller/normalize (&rest callers)
+  "Return CALLER & PARENTS as a list of callers.
+
+CALLERS should each be calling function's name. They can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let (normalized)
+    ;;------------------------------
+    ;; Process CALLERS into list of strings.
+    ;;------------------------------
+    (dolist (caller callers normalized)
+      (cond ((or (null caller)
+                 (eq caller 'quote)
+                 (eq caller 'function))
+             ;; Just ignore it.
+             nil)
+
+            ((proper-list-p caller)
+             (setq normalized (append (apply #'int<mis>:error:caller/normalize caller)
+                                      normalized)))
+
+            ;; `consp' needs some help to catch "conses-but-not-lists".
+            ;; "Some help" being "don't use it at all", apparently.
+            ((and (listp caller)
+                  (cdr caller)
+                  (atom (cdr caller)))
+             (setq normalized (append (int<mis>:error:caller/normalize (cdr caller))
+                                      (int<mis>:error:caller/normalize (car caller))
+                                      normalized)))
+
+            ;; Some sort of improper list that isn't a cons?
+            ((listp caller)
+             (push (format "%s" caller) normalized))
+
+            ;; Valids (strings, symbols)? Convert to string.
+            ((stringp caller)
+             (push caller normalized))
+            ((symbolp caller)
+             (push (format "%s" caller) normalized))
+
+            ;; Invalids?
+            (t
+             ;; ...we can't really error... Format differently?
+             (push (format "UNK:%S" caller) normalized))))))
+;; (int<mis>:error:caller/normalize "foo" 'bar '(baz qux) '(quux . quuux))
+
+
+(defun int<mis>:error:caller/string (caller)
   "Return CALLER as a string.
 
 CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
-  - a list/cons of the above, most recent first
+  - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (cond
-   ;;------------------------------
-   ;; Expected end cases:
-   ;;------------------------------
-   ((memq (car-safe caller) '(quote function))
-    ;; `format' handles quoted things well.
-    (format "%s" caller))
-
-   ((stringp caller)
-    caller)
-
-   ;;------------------------------
-   ;; Recursive cases:
-   ;;------------------------------
-   ;; Want lists and conses treated separately so need to do it in a specific
-   ;; order as (lisp (cons 'x 'y) is true and (consp (list 'x 'y)) is also true.
-   ;;
-   ;;`proper-list-p' is nil for conses, so start with that.
-   ((proper-list-p caller)
-    (let (names)
-      (dolist (name caller)
-        (push (int<mis>:error:caller name) names))
-      (mapconcat #'identity
-                 (nreverse names)
-                 " <- ")))
-
-   ;; `consp' needs some help to catch "conses-but-not-lists".
-   ;; "Some help" being "don't use it at all", apparently.
-   ((and (listp caller)
-         (cdr caller)
-         (atom (cdr caller)))
-    (concat (int<mis>:error:caller (car caller))
-            " <- "
-            (int<mis>:error:caller (cdr caller))))
-
-   ;; Edge Case: A list with a cycle in it or something to make it "not a proper
-   ;; list"? Let this fall through.
-
-   ;;------------------------------
-   ;; Fallthrough:
-   ;;------------------------------
-   ;; Not sure? Hope `format' handles it ok?
-   ;; TODO: Could error but we're in the middle of erroring...
-   (t
-    (format "%s" caller))))
-;; (int<mis>:error:caller '(baz bar foo))
-;; (int<mis>:error:caller '(bar . foo))
+  ;;------------------------------
+  ;; Combine list of strings into one.
+  ;;------------------------------
+  (mapconcat #'identity
+             (nreverse (int<mis>:error:caller/normalize caller))
+             " <- "))
+;; (int<mis>:error:caller/string '("foo" 'bar '(baz qux) '(quux . quuux)))
+;; (int<mis>:error:caller/string '(baz bar foo))
+;; (int<mis>:error:caller/string '(bar . foo))
 
 
 ;; TODO: This is the Nub message way. Convert to the mis way of doing concat/newlines?
@@ -168,7 +180,7 @@ CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
-  - a list/cons of the above, most recent first
+  - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)
 
 MESSAGE should be one of:
@@ -184,7 +196,7 @@ ARGS should be the `format' ARGS for MESSAGE."
          ;; Format CALLER and MESSAGE inputs.
          (let ((msg (int<mis>:error:message message)))
            (format "%s: %s%s"
-                   (int<mis>:error:caller caller)
+                   (int<mis>:error:caller/string caller)
                    (if (car msg)
                        (concat (car msg) "; ")
                      "")
@@ -231,7 +243,7 @@ CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
-  - a list/cons of the above, most recent first
+  - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)
 
 Signal an error if invalid; return normalized value if valid."
@@ -296,7 +308,7 @@ CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
-  - a list/cons of the above, most recent first
+  - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (if (integerp value)
       (if (> value 0)
@@ -321,7 +333,7 @@ CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
-  - a list/cons of the above, most recent first
+  - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (if (or (stringp value)
           (characterp value))
@@ -342,7 +354,7 @@ CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
-  - a list/cons of the above, most recent first
+  - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (if (stringp value)
       value
@@ -362,7 +374,7 @@ CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
-  - a list/cons of the above, most recent first
+  - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (if (or (null value) (stringp value))
       value
@@ -385,7 +397,7 @@ CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
-  - a list/cons of the above, most recent first
+  - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (if (memq value valids)
       value
@@ -412,7 +424,7 @@ CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
-  - a list/cons of the above, most recent first
+  - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let ((valids '(:fixed fixed :existing existing :auto auto )))
     (if (or (memq value valids)
