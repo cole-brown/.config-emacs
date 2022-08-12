@@ -88,6 +88,7 @@ CALLERS should each be calling function's name. They can be one of:
              ;; ...we can't really error... Format differently?
              (push (format "UNK:%S" caller) normalized))))))
 ;; (int<mis>:error:caller/normalize "foo" 'bar '(baz qux) '(quux . quuux))
+;; (int<mis>:error:caller/normalize '((int<mis>:parse . tester)))
 
 
 (defun int<mis>:error:caller/string (caller)
@@ -256,7 +257,7 @@ CALLER should be calling function's name. It can be one of:
 
 Signal an error if invalid; if valid, return cons 2-tuple of:
   (category . validator-fn)"
-  (let ((caller (cons 'int<mis>:keyword:category caller)))
+  (let ((caller (list 'int<mis>:keyword:category caller)))
     ;;------------------------------
     ;; Error Checking
     ;;------------------------------
@@ -297,7 +298,7 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)
 
 Signal an error if invalid; return normalized value if valid."
-  (let ((caller (list 'int<mis>:valid:keyword? caller)))
+  (let ((caller (list 'int<mis>:valid:style/kvp? caller)))
     ;; Validators will return the valid value, if it's valid.
     (pcase keyword
       ;;------------------------------
@@ -337,14 +338,14 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)
 
 Signal an error if invalid; return normalized value if valid."
-  (let ((caller (cons 'int<mis>:valid:keyword? caller)))
+  (let ((caller (list 'int<mis>:valid:keyword? caller)))
     ;; Validators will return the valid value, if it's valid.
     (pcase keyword
       ;;------------------------------
       ;; Keyword Validators
       ;;------------------------------
       (:type
-       (int<mis>:valid:member? caller keyword value int<mis>:valid:align/types))
+       (int<mis>:valid:member? caller keyword value int<mis>:valid:comment/types))
 
       (:language
        (int<mis>:valid:string-or-symbol? caller keyword value))
