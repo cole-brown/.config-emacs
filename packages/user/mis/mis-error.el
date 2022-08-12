@@ -201,7 +201,18 @@ ARGS should be the `format' ARGS for MESSAGE."
   '(:left      left
     :center    center
     :right     right)
-  "Valid mis0 `:align' types.")
+  "Valid Mis alignment types.")
+
+
+(defconst int<mis>:valid:comment/types
+  ;; keyword / symbol
+  '(:block  block
+    :inline inline)
+  "Valid Mis comment types.
+
+'block' is a multi-line comment.
+'inline' is a single-line comment.")
+
 
 ;;------------------------------------------------------------------------------
 ;; Keyword Validation
@@ -255,6 +266,26 @@ Signal an error if invalid; return normalized value if valid."
 ;; Validation "Predicates"
 ;;------------------------------------------------------------------------------
 ;; Signal an error on invalid input, instead of just returning nil.
+
+(defun int<mis>:valid:normalize->symbol (name keyword-or-symbol)
+  "Normalizes a keyword or a symbol to a symbol.
+That is, removes ':' from the symbol name if present.
+
+NAME should be KEYWORD-OR-SYMBOL's symbol name as a symbol or string.
+
+KEYWORD-OR-SYMBOL should be a keyword or a symbol."
+  (cond ((keywordp keyword-or-symbol)
+         (make-symbol (string-remove-prefix ":" (symbol-name keyword-or-symbol))))
+        ((symbolp keyword-or-symbol)
+         keyword-or-symbol)
+        (t
+         (int<mis>:error caller
+                         "%s must be a keyword or symbol. Got type %S: %S"
+                         (int<mis>:error:name keyword-or-symbol)
+                         value))))
+;; (int<mis>:valid:normalize->symbol 'type :foo)
+;; (int<mis>:valid:normalize->symbol 'type 'foo)
+
 
 (defun int<mis>:valid:positive-integer? (caller name value &rest _)
   "Signal an error if VALUE is not a integer, else return VALUE.

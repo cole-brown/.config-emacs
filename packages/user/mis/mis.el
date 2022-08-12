@@ -20,11 +20,19 @@
 ;; Mis Files
 ;;------------------------------------------------------------------------------
 
+;; Low level funcs.
 (require 'mis-error)
 (require 'mis-format)
+
+;; Contains at least one public APIs.
+;; Possibly some low level funcs.
 (require 'mis-align)
 (require 'mis-style)
+(require 'mis-art)
+
+;; Top level.
 (require 'mis-message)
+(require 'mis-comment)
 
 
 ;;------------------------------------------------------------------------------
