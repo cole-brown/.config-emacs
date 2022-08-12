@@ -235,10 +235,6 @@ ARGS should be the `format' ARGS for MESSAGE."
 
 VALUE should be keyword's value, if it has one, or nil if not.
 
-ARGS should be nil or any args the keyword needs to be able to validate its
-value using its validator function. For example, `int<mis>:valid:member?' takes
-a list of valid values.
-
 CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
@@ -247,7 +243,7 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)
 
 Signal an error if invalid; return normalized value if valid."
-  (let ((caller (cons 'int<mis>:valid:keyword? caller)))
+  (let ((caller (list 'int<mis>:valid:keyword? caller)))
     ;; Validators will return the valid value, if it's valid.
     (pcase keyword
       ;;------------------------------
@@ -324,27 +320,6 @@ CALLER should be calling function's name. It can be one of:
                     value)))
 
 
-(defun int<mis>:valid:string-or-char? (caller name value &rest _)
-  "Signal an error if VALUE is not a string or a character, else return VALUE.
-
-NAME should be VALUE's symbol name as a symbol or string.
-
-CALLER should be calling function's name. It can be one of:
-  - a string
-  - a quoted symbol
-  - a function-quoted symbol
-  - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (if (or (stringp value)
-          (characterp value))
-      value
-    (int<mis>:error caller
-                    "%s must be of type string. Got %S: %S"
-                    (int<mis>:error:name name)
-                    (type-of value)
-                    value)))
-
-
 (defun int<mis>:valid:string? (caller name value &rest _)
   "Signal an error if VALUE is not a string, else return VALUE.
 
@@ -365,6 +340,27 @@ CALLER should be calling function's name. It can be one of:
                     value)))
 
 
+(defun int<mis>:valid:string-or-char? (caller name value &rest _)
+  "Signal an error if VALUE is not a string or a character, else return VALUE.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (if (or (stringp value)
+          (characterp value))
+      value
+    (int<mis>:error caller
+                    "%s must be of type string or character. Got %S: %S"
+                    (int<mis>:error:name name)
+                    (type-of value)
+                    value)))
+
+
 (defun int<mis>:valid:string-or-nil? (caller name value &rest _)
   "Signal an error if VALUE is not a string or nil, else return VALUE.
 
@@ -380,6 +376,27 @@ CALLER should be calling function's name. It can be one of:
       value
     (int<mis>:error caller
                     "%s must be nil or of type string. Got %S: %S"
+                    (int<mis>:error:name name)
+                    (type-of value)
+                    value)))
+
+
+(defun int<mis>:valid:string-or-symbol? (caller name value &rest _)
+  "Signal an error if VALUE is not a string or a symbol, else return VALUE.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (if (or (stringp value)
+          (symbolp value))
+      value
+    (int<mis>:error caller
+                    "%s must be of type string or symbol. Got %S: %S"
                     (int<mis>:error:name name)
                     (type-of value)
                     value)))
