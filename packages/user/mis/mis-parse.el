@@ -50,24 +50,41 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)
 
-CATEGORY should be nil or a keyword in `int<mis>:keywords:category'.
-  - nil       - All categories are valid.
-  - a keyword - Only this category's keywords are valid"
+Optional CATEGORY should be:
+  - nil                - All categories are valid.
+  - a keyword          - Only this category's keywords are valid
+  - a list of keywords - Only these categories' keywords are valid"
   (let ((caller (list 'int<mis>:parse caller)))
     ;;------------------------------
     ;; Error Checking
     ;;------------------------------
-    (cond ((and (not (null category))
-                (not (keywordp category)))
+    ;; Is CATEGORY a valid type?
+    (cond ((and (not (null category)) ; nil
+                (not (keywordp category)) ; keyword
+                (not (and (listp category) ; list of keywords
+                          (seq-every-p #'keywordp category))))
            (int<mis>:error caller
-                           "CATEGORY must be nil or a keyword. Got %S: %S"
+                           '("CATEGORY must be nil, a keyword, or a list of keywords. "
+                             "Got %S: %S")
                            (type-of category)
                            category))
 
+          ;; Is the single keyword CATEGORY a valid keyword?
           ((and (keywordp category)
                 (not (memq category int<mis>:keywords:category)))
            (int<mis>:error caller
                            "CATEGORY must be a member of %S or nil. Got: %S"
+                           int<mis>:keywords:category
+                           category))
+
+          ;; Does the list of keywords CATEGORY contain only valid keywords?
+          ((and (listp category)
+                (not (seq-every-p (lambda (cat)
+                                    "Is every CATEGORY keyword valid?"
+                                    (memq cat int<mis>:keywords:category))
+                                  category)))
+           (int<mis>:error caller
+                           "All members of CATEGORY be a member of %S. CATEGORY: %S"
                            int<mis>:keywords:category
                            category))
 
@@ -79,6 +96,10 @@ CATEGORY should be nil or a keyword in `int<mis>:keywords:category'.
 
           (t
            nil))
+
+    ;; Normalize category to to a list of keywords.
+    (unless (listp category)
+      (setq category (list category)))
 
     (let ((parsing t)
           normalized ; Validated/normalized kvps alist by keyword category.
@@ -110,9 +131,9 @@ CATEGORY should be nil or a keyword in `int<mis>:keywords:category'.
               (let ((plist (alist-get validator-cat normalized)))
                 ;; Sanity check category.
                 (unless (or (null category)
-                            (eq category validator-cat))
+                            (memq validator-cat category))
                   (int<mis>:error caller
-                                  '("Keyword `%S' is not valid for category `%S'? "
+                                  '("Keyword `%S' is not valid for categories `%S'? "
                                     "Got category `%S' instead.")
                                   key
                                   category

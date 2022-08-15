@@ -86,8 +86,9 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)
 
 Optional CATEGORY should be:
-  - nil       - All categories are valid.
-  - a keyword - Only this category's keywords are valid
+  - nil                - All categories are valid.
+  - a keyword          - Only this category's keywords are valid
+  - a list of keywords - Only these categories' keywords are valid
 
 Signal an error if invalid; if valid, return cons 2-tuple of:
   (category . validator-fn)"
@@ -95,17 +96,33 @@ Signal an error if invalid; if valid, return cons 2-tuple of:
     ;;------------------------------
     ;; Error Checking
     ;;------------------------------
-    (cond ((and (not (null category))
-                (not (keywordp category)))
+    ;; Is CATEGORY a valid type?
+    (cond ((and (not (null category)) ; nil
+                (not (keywordp category)) ; keyword
+                (not (and (listp category) ; list of keywords
+                          (seq-every-p #'keywordp category))))
            (int<mis>:error caller
-                           "CATEGORY must be nil or a keyword. Got %S: %S"
+                           '("CATEGORY must be nil, a keyword, or a list of keywords. "
+                             "Got %S: %S")
                            (type-of category)
                            category))
 
+          ;; Is the single keyword CATEGORY a valid keyword?
           ((and (keywordp category)
                 (not (memq category int<mis>:keywords:category)))
            (int<mis>:error caller
                            "CATEGORY must be a member of %S or nil. Got: %S"
+                           int<mis>:keywords:category
+                           category))
+
+          ;; Does the list of keywords CATEGORY contain only valid keywords?
+          ((and (listp category)
+                (not (seq-every-p (lambda (cat)
+                                    "Is every CATEGORY keyword valid?"
+                                    (memq cat int<mis>:keywords:category))
+                                  category)))
+           (int<mis>:error caller
+                           "All members of CATEGORY be a member of %S. CATEGORY: %S"
                            int<mis>:keywords:category
                            category))
 
