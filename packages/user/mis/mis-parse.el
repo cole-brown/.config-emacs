@@ -151,12 +151,16 @@ CATEGORY should be nil or a keyword in `int<mis>:keywords:category'.
         (push (cdr assoc/category) ast)
         ;; Category's keyword.
         (push (car assoc/category) ast)))))
-;; (int<mis>:parse 'tester :align 'center "hello")
-;; (int<mis>:parse 'tester :align 'center "hello %s" "world")
-;; (int<mis>:parse 'tester :type 'block :align 'center "hello %s" "world")
-;; (int<mis>:parse 'tester :align 'center :width 11 "hello %s" "world")
-;; (int<mis>:parse 'tester :align 'center :width 11 "hello")
-;; (int<mis>:parse 'tester :indent 'auto "hello")
+;; (int<mis>:parse 'tester nil :align 'center "hello")
+;; (int<mis>:parse 'tester :style :align 'center "hello")
+;; (int<mis>:parse 'tester nil :align 'center "hello %s" "world")
+;; (int<mis>:parse 'tester nil :type 'block :align 'center "hello %s" "world")
+;; (int<mis>:parse 'tester nil :align 'center :width 11 "hello %s" "world")
+;; (int<mis>:parse 'tester nil :align 'center :width 11 "hello")
+;; (int<mis>:parse 'tester nil :indent 'auto "hello")
+;;
+;; Error: `:align' is a `:style', not a `:comment' category keyword.
+;;   (int<mis>:parse 'tester :comment :align 'center "hello")
 
 
 ;;------------------------------------------------------------------------------
