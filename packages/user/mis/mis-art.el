@@ -21,24 +21,24 @@
 ;; Lines
 ;;------------------------------------------------------------------------------
 
-(cl-defun mis:line (&key width length string str character char)
+(cl-defun mis:line (&key width string)
   "Create a line of characters width.
 
-WIDTH (or LENGTH) should be a positive integer.
-  - WIDTH and LENGTH are synonyms; WIDTH is preferred.
+WIDTH should be a positive integer.
 
-STRING (or STR, CHAR, CHARACTER) should be a character or a string.
-  - They are synonyms; STRING is preferred."
+STRING should be a character or a string."
+  ;; TODO: switch to `int<mis>:parse'?
+
   ;;------------------------------
   ;; Error Checking
   ;;------------------------------
   ;; Also collapse the synonym key params while we're at it.
   (let ((width (int<mis>:valid:positive-integer? 'mis:line
-                                                 (if width 'width 'length)
-                                                 (if width width length)))
-        (char (int<mis>:valid:string-or-char? 'mis:line
-                                              (if width 'width 'length)
-                                              (if width width length))))
+                                                 'width
+                                                 width))
+        (string (int<mis>:valid:string-or-char? 'mis:line
+                                                'string
+                                                string)))
 
     ;;------------------------------
     ;; Build & return normalized list.
@@ -47,6 +47,7 @@ STRING (or STR, CHAR, CHARACTER) should be a character or a string.
           :width  width
           :string string)))
 ;; (mis:line :width 10 :string "hi")
+;; (mis:line :length 10 :string "hi")
 
 
 ;;------------------------------------------------------------------------------
