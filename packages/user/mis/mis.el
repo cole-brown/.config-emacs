@@ -22,6 +22,7 @@
 
 ;; Low level funcs.
 (require 'mis-error)
+(require 'mis-valid)
 (require 'mis-format)
 
 ;; Contains at least one public APIs.
