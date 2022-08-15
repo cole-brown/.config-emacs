@@ -64,11 +64,13 @@
 (defconst int<mis>:valid:comment/types
   ;; keyword / symbol
   '(:block  block
-    :inline inline)
+    :inline inline
+    :default default)
   "Valid Mis comment types.
 
 'block' is a multi-line comment.
-'inline' is a single-line comment.")
+'inline' is a single-line comment.
+'default' depends on buffer's major-mode.")
 
 
 ;;------------------------------------------------------------------------------
@@ -213,7 +215,7 @@ Signal an error if invalid; return normalized value if valid."
        (int<mis>:valid:member? caller keyword value int<mis>:valid:comment/types))
 
       (:language
-       (int<mis>:valid:string-or-symbol? caller keyword value))
+       (int<mis>:valid:string-symbol-nil? caller keyword value))
 
       ;;------------------------------
       ;; Fallthrough / Error
@@ -351,6 +353,28 @@ CALLER should be calling function's name. It can be one of:
       value
     (int<mis>:error caller
                     "%s must be of type string or symbol. Got %S: %S"
+                    (int<mis>:error:name name)
+                    (type-of value)
+                    value)))
+
+
+(defun int<mis>:valid:string-symbol-nil? (caller name value &rest _)
+  "Signal an error if VALUE is not a string, a symbol, or nil; else return VALUE.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (if (or (stringp value)
+          (symbolp value)
+          (null value))
+      value
+    (int<mis>:error caller
+                    "%s must be either a string, a symbol, or nil. Got type %S: %S"
                     (int<mis>:error:name name)
                     (type-of value)
                     value)))
