@@ -27,7 +27,9 @@
 
 
 (require 'cl-lib)
+
 (require 'mis-error)
+(require 'mis-valid)
 (require 'mis-align)
 
 
