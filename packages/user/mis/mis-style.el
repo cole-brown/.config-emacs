@@ -30,7 +30,7 @@
 
 (require 'mis-error)
 (require 'mis-valid)
-(require 'mis-align)
+(require 'mis-parse)
 
 
 ;;------------------------------------------------------------------------------
@@ -53,51 +53,10 @@ NOTE: The \"invalid styles\" will just be interpreted as having no styling and
 extra message args.
 
 NOTE: Styles must always have both a keyword and a value."
-  ;;------------------------------
-  ;; Error Checking
-  ;;------------------------------
-  ;; Don't want any circular lists.
-  (unless (proper-list-p args)
-    (int<mis>:error 'mis:style
-                    "ARGS must be a proper list (no circular references)! Got: %S"
-                    args))
-
-  (let ((parsing-styles t)
-        styling   ; Validated/normalized styles output list.
-        (args/len (length args))
-        key
-        value)
-
-    ;;------------------------------
-    ;; Build normalized styles list?
-    ;;------------------------------
-    (while (and args
-                (> args/len 2)
-                parsing-styles)
-      (if (not (keywordp (car args)))
-          ;;---
-          ;; Done; no more style kvps to parse; rest is messaging stuff.
-          ;;---
-          (setq parsing-styles nil)
-
-        ;;---
-        ;; Validate a key/value pair.
-        ;;---
-        (setq key   (pop args)
-              value (int<mis>:valid:style/kvp? 'mis:style
-                                               key
-                                               (pop args))
-              args/len (- args/len 2))
-
-        ;; Save to the normalized output.
-        (push key   styling)
-        (push value styling)))
-
-    ;;------------------------------
-    ;; Return.
-    ;;------------------------------
-    (list :style   (nreverse styling)
-          :message args)))
+  (apply 'int<mis>:parse
+         'mis:style
+         :style ; Only allow style keywords.
+         args))
 ;; (mis:style :align 'center "hello")
 ;; (mis:style :align 'center "hello %s" "world")
 ;; (mis:style :align 'center :width 11 "hello %s" "world")
