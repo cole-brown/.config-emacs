@@ -22,8 +22,19 @@
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
+;; Categories for Validation/Parsing
+;;------------------------------
+
+(defconst int<mis>:keywords:category
+  '(:style
+    :comment)
+  "Valid Mis categories for parsing & validation.")
+
+
+;;------------------------------
 ;; Keywords for Mis type
 ;;------------------------------
+
 (defconst int<mis>:keywords:style
   '(:width
     :align
@@ -64,7 +75,7 @@
 ;; Keyword Validation
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:valid:validator (caller keyword)
+(defun int<mis>:valid:validator (caller category keyword)
   "Determine which category KEYWORD falls under, return validator func for it.
 
 CALLER should be calling function's name. It can be one of:
@@ -74,13 +85,31 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)
 
+Optional CATEGORY should be:
+  - nil       - All categories are valid.
+  - a keyword - Only this category's keywords are valid
+
 Signal an error if invalid; if valid, return cons 2-tuple of:
   (category . validator-fn)"
   (let ((caller (list 'int<mis>:keyword:category caller)))
     ;;------------------------------
     ;; Error Checking
     ;;------------------------------
-    (cond ((not (keywordp keyword))
+    (cond ((and (not (null category))
+                (not (keywordp category)))
+           (int<mis>:error caller
+                           "CATEGORY must be nil or a keyword. Got %S: %S"
+                           (type-of category)
+                           category))
+
+          ((and (keywordp category)
+                (not (memq category int<mis>:keywords:category)))
+           (int<mis>:error caller
+                           "CATEGORY must be a member of %S or nil. Got: %S"
+                           int<mis>:keywords:category
+                           category))
+
+          ((not (keywordp keyword))
            (int<mis>:error caller
                            "KEYWORD must be a keyword. Got %S: %S"
                            (type-of keyword)

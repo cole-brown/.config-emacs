@@ -31,6 +31,8 @@
 
 
 (require 'cl-lib)
+
+(require 'mis-valid)
 (require 'mis-error)
 
 
@@ -38,7 +40,7 @@
 ;; Parsing
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:parse (caller &rest args)
+(defun int<mis>:parse (caller category &rest args)
   "Parse ARGS into a Mis Abstract Syntax Tree.
 
 CALLER should be calling function's name. It can be one of:
@@ -46,16 +48,37 @@ CALLER should be calling function's name. It can be one of:
   - a quoted symbol
   - a function-quoted symbol
   - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+CATEGORY should be nil or a keyword in `int<mis>:keywords:category'.
+  - nil       - All categories are valid.
+  - a keyword - Only this category's keywords are valid"
   (let ((caller (list 'int<mis>:parse caller)))
     ;;------------------------------
     ;; Error Checking
     ;;------------------------------
-    ;; Don't want any circular lists.
-    (unless (proper-list-p args)
-      (int<mis>:error caller
-                      "ARGS must be a proper list (no circular references)! Got: %S"
-                      args))
+    (cond ((and (not (null category))
+                (not (keywordp category)))
+           (int<mis>:error caller
+                           "CATEGORY must be nil or a keyword. Got %S: %S"
+                           (type-of category)
+                           category))
+
+          ((and (keywordp category)
+                (not (memq category int<mis>:keywords:category)))
+           (int<mis>:error caller
+                           "CATEGORY must be a member of %S or nil. Got: %S"
+                           int<mis>:keywords:category
+                           category))
+
+          ;; Don't want any circular lists.
+          ((not (proper-list-p args))
+           (int<mis>:error caller
+                           "ARGS must be a proper list (no circular references)! Got: %S"
+                           args))
+
+          (t
+           nil))
 
     (let ((parsing t)
           normalized ; Validated/normalized kvps alist by keyword category.
@@ -78,29 +101,39 @@ CALLER should be calling function's name. It can be one of:
           ;; Validate a key/value pair.
           ;;---
           (setq args/len (- args/len 2))
-          (if-let* ((key          (pop args))
-                    (validator    (int<mis>:valid:validator caller key))
-                    (category     (car validator))
-                    (validator-fn (cdr validator))
-                    (value        (funcall validator-fn caller key (pop args))))
+          (if-let* ((key           (pop args))
+                    (validator     (int<mis>:valid:validator caller category key))
+                    (validator-cat (car validator))
+                    (validator-fn  (cdr validator))
+                    (value         (funcall validator-fn caller key (pop args))))
               ;; Key/value exist and are now known to be valid; save.
-              (let ((plist (alist-get category normalized)))
+              (let ((plist (alist-get validator-cat normalized)))
+                ;; Sanity check category.
+                (unless (or (null category)
+                            (eq category validator-cat))
+                  (int<mis>:error caller
+                                  '("Keyword `%S' is not valid for category `%S'? "
+                                    "Got category `%S' instead.")
+                                  key
+                                  category
+                                  validator-cat))
+
                 ;; Save to the normalized output forwards; not reversing the list(s) later.
                 (push value plist)
                 (push key   plist)
-                (setf (alist-get category normalized) plist))
+                (setf (alist-get validator-cat normalized) plist))
 
             ;; There /should/ have been an error raised?
             (int<mis>:error caller
                             '("Invalid key, value or something? "
                               "key: %S, "
                               "validator: %S, "
-                              "category: %S, "
+                              "validator-cat: %S, "
                               "validator-fn: %S, "
                               "value: %S")
                             key
                             validator
-                            category
+                            validator-cat
                             validator-fn
                             value))))
 
@@ -129,5 +162,5 @@ CALLER should be calling function's name. It can be one of:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(provide 'mis-style)
-;;; mis-style.el ends here
+(provide 'mis-parse)
+;;; mis-parse.el ends here
