@@ -22,7 +22,7 @@
 ;;------------------------------------------------------------------------------
 
 (cl-defun mis:line (&key width string)
-  "Create a line of characters width.
+  "Create a line with a maximum WIDTH by repeating STRING characters.
 
 WIDTH should be a positive integer.
 
@@ -48,6 +48,26 @@ STRING should be a character or a string."
           :string string)))
 ;; (mis:line :width 10 :string "hi")
 ;; (mis:line :length 10 :string "hi")
+
+
+;; TODO: this?    (defun mis:box (&key width corner:top/left corner:top/right corner:bottom/left corner:bottom/right horizontal vertical)
+;; TODO: or this? (defun mis:box (&key width corners horizontal vertical)
+;; (mis:box :width 80
+;;          :corner:top/left "┌"
+;;          :corner:top/right "┐"
+;;          :corner:bottom/left "└"
+;;          :corner:bottom/right "┘"
+;;          :horizontal "─"
+;;          :vertical "│")
+;; (mis:box :width 80
+;;          :corners '("┌" "┐" "└" "┘")
+;;          :horizontal "─"
+;;          :vertical "│")
+;; TODO: Actually I think this:
+;; (mis:box :width 80 :border 'hypen) ;; or `ascii'?
+;; (mis:box :width 80 :border 'line)
+;; (mis:box :width 80 :border 'double)
+
 
 
 ;;------------------------------------------------------------------------------
