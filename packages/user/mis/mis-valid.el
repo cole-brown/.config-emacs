@@ -490,10 +490,10 @@ CALLER should be calling function's name. It can be one of:
 ;; Sanity Checker
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:valid:syntax? (caller name tree)
-  "Signal an error if TREE fails any basic sanity checks for Mis syntax trees.
+(defun int<mis>:valid:syntax? (caller name key tree)
+  "Signal an error if KEY or TREE fails any basic sanity check for Mis syntax.
 
-NAME should be VALUE's symbol name as a symbol or string.
+NAME should be a symbol name as a symbol or string for the error message.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -502,20 +502,31 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   ;; TREE should be a plist.
-  (cond ((not (keywordp (car tree)))
+  (cond ((not (keywordp key))
          (int<mis>:error caller
-                      "Expected %S to start with a keyword, got %S %S from %S"
+                      '("Expected %S to be a keyword. "
+                        "Got %S %S for value %S")
                       (int<mis>:error:name name)
-                      (type-of (car tree))
-                      (car tree)
+                      (type-of key)
+                      key
                       tree))
         ;; TREE's keyword should be a valid one.
-        ((not (memq (car tree) int<mis>:keywords:category/internal))
+        ((not (memq key int<mis>:keywords:category/internal))
          (int<mis>:error caller
-                      "Expected %S to start with a valid Mis keyword, got keyword %S from %S"
+                      '("Expected %S to start with a valid Mis keyword. "
+                        "Got keyword %S for %S")
                       (int<mis>:error:name name)
-                      (car tree)
+                      key
                       tree))
+        ;; TREE should be... something. A list of something.
+        ((or (not (listp tree))
+             (null (car tree)))
+         (int<mis>:error caller
+                         '("Expected value for %S to be a list of... something. "
+                           "Got %S")
+                         key
+                         tree))
+
         (t
          nil)))
 
