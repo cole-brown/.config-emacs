@@ -71,21 +71,21 @@ Optional CATEGORY should be:
 
           ;; Is the single keyword CATEGORY a valid keyword?
           ((and (keywordp category)
-                (not (memq category int<mis>:keywords:category)))
+                (not (memq category int<mis>:keywords:category/input)))
            (int<mis>:error caller
                            "CATEGORY must be a member of %S or nil. Got: %S"
-                           int<mis>:keywords:category
+                           int<mis>:keywords:category/input
                            category))
 
           ;; Does the list of keywords CATEGORY contain only valid keywords?
           ((and (listp category)
                 (not (seq-every-p (lambda (cat)
                                     "Is every CATEGORY keyword valid?"
-                                    (memq cat int<mis>:keywords:category))
+                                    (memq cat int<mis>:keywords:category/input))
                                   category)))
            (int<mis>:error caller
                            "All members of CATEGORY be a member of %S. CATEGORY: %S"
-                           int<mis>:keywords:category
+                           int<mis>:keywords:category/input
                            category))
 
           ;; Don't want any circular lists.

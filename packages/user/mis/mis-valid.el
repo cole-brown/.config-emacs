@@ -22,13 +22,23 @@
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
-;; Categories for Validation/Parsing
+;; Categories
 ;;------------------------------
 
-(defconst int<mis>:keywords:category
+;; User Input Categories
+(defconst int<mis>:keywords:category/input
   '(:style
     :comment
     :line)
+  "Valid Mis categories for parsing & validation.")
+
+
+;; Mis Syntax Tree Categories
+(defconst int<mis>:keywords:category/internal
+  '(:style
+    :comment
+    :format
+    :message)
   "Valid Mis categories for parsing & validation.")
 
 
@@ -117,21 +127,21 @@ Signal an error if invalid; if valid, return cons 2-tuple of:
 
           ;; Is the single keyword CATEGORY a valid keyword?
           ((and (keywordp category)
-                (not (memq category int<mis>:keywords:category)))
+                (not (memq category int<mis>:keywords:category/input)))
            (int<mis>:error caller
                            "CATEGORY must be a member of %S or nil. Got: %S"
-                           int<mis>:keywords:category
+                           int<mis>:keywords:category/input
                            category))
 
           ;; Does the list of keywords CATEGORY contain only valid keywords?
           ((and (listp category)
                 (not (seq-every-p (lambda (cat)
                                     "Is every CATEGORY keyword valid?"
-                                    (memq cat int<mis>:keywords:category))
+                                    (memq cat int<mis>:keywords:category/input))
                                   category)))
            (int<mis>:error caller
                            "All members of CATEGORY be a member of %S. CATEGORY: %S"
-                           int<mis>:keywords:category
+                           int<mis>:keywords:category/input
                            category))
 
           ((not (keywordp keyword))
@@ -474,6 +484,40 @@ CALLER should be calling function's name. It can be one of:
                       valids
                       (type-of value)
                       value))))
+
+
+;;------------------------------------------------------------------------------
+;; Sanity Checker
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:valid:syntax? (caller name tree)
+  "Signal an error if TREE fails any basic sanity checks for Mis syntax trees.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  ;; TREE should be a plist.
+  (cond ((not (keywordp (car tree)))
+         (int<mis>:error caller
+                      "Expected %S to start with a keyword, got %S %S from %S"
+                      (int<mis>:error:name name)
+                      (type-of (car tree))
+                      (car tree)
+                      tree))
+        ;; TREE's keyword should be a valid one.
+        ((not (memq (car tree) int<mis>:keywords:category/internal))
+         (int<mis>:error caller
+                      "Expected %S to start with a valid Mis keyword, got keyword %S from %S"
+                      (int<mis>:error:name name)
+                      (car tree)
+                      tree))
+        (t
+         nil)))
 
 
 ;;------------------------------------------------------------------------------
