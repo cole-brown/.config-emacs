@@ -27,7 +27,8 @@
 
 (defconst int<mis>:keywords:category
   '(:style
-    :comment)
+    :comment
+    :line)
   "Valid Mis categories for parsing & validation.")
 
 
@@ -47,6 +48,11 @@
   '(:type
     :language)
   "Valid comment keywords.")
+
+
+(defconst int<mis>:keywords:line
+  '(:string)
+  "Valid line keywords.")
 
 
 ;;------------------------------
@@ -143,6 +149,9 @@ Signal an error if invalid; if valid, return cons 2-tuple of:
           ((memq keyword int<mis>:keywords:comment)
            '(:comment . int<mis>:valid:comment/kvp?))
 
+          ((memq keyword int<mis>:keywords:line)
+           '(:line . int<mis>:valid:line/kvp?))
+
           ;;------------------------------
           ;; Fallthrough: Error
           ;;------------------------------
@@ -216,6 +225,40 @@ Signal an error if invalid; return normalized value if valid."
 
       (:language
        (int<mis>:valid:string-symbol-nil? caller keyword value))
+
+      ;;------------------------------
+      ;; Fallthrough / Error
+      ;;------------------------------
+      (_
+       (int<mis>:error caller
+                       "Don't know how to validate keyword %S"
+                       keyword)))))
+
+
+(defun int<mis>:valid:line/kvp? (caller keyword value)
+  "Determine which validation predicate to call for KEYWORD, then call it.
+
+VALUE should be keyword's value, if it has one, or nil if not.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Signal an error if invalid; return normalized value if valid."
+  (let ((caller (list 'int<mis>:valid:line/kvp? caller)))
+    ;; Validators will return the valid value, if it's valid.
+    (pcase keyword
+      ;;------------------------------
+      ;; Keyword Validators
+      ;;------------------------------
+      (:width
+       (int<mis>:valid:positive-integer? caller keyword value))
+
+      (:string
+       (int<mis>:valid:string? caller keyword value))
 
       ;;------------------------------
       ;; Fallthrough / Error
