@@ -110,7 +110,7 @@ Optional CATEGORY should be:
       ;; Build normalized plists out of args.
       ;;------------------------------
       (while (and args
-                  (> args/len 2)
+                  (> args/len 1)
                   parsing)
         (if (not (keywordp (car args)))
             ;;---
