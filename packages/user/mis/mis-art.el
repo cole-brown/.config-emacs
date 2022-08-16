@@ -26,23 +26,67 @@
 
 ARGS should be a plist of:
   - Any valid `mis:style' args (e.g. `:width' for a max line width).
-  - `:string' - A string or character to repeat."
+  - `:string' - A string or character to repeat.
+    - Or if no `:string', keyword, just the string/character value.
+
+Examples:
+  (mis:line :width 10 :string \"xX\")
+  (mis:line \"-\")"
   (let* ((parsed (apply 'int<mis>:parse
                         'mis:line
                         '(:line :style)
                         args))
          (line (plist-get parsed :line))
          (string (plist-get line :string))
+         (message (plist-get parsed :message))
          key
          value
          ast)
 
-    ;; Must have a string to create the line.
-    (unless string
-      (int<mis>:error 'mis:line
-                      "Invalid ARGS; no `:string' found! %S -> %S"
-                      args
-                      parsed))
+    ;;------------------------------
+    ;; String Error Checking / Normalization
+    ;;------------------------------
+    ;; Have an explicit `:string' in `:line'?
+    (cond ((not (null string))
+           ;; `:message' not allowed in this case.
+           (when message
+             (int<mis>:error 'mis:line
+                             "Invalid ARGS; cannot have both `:string' and `:message'."
+                             "`:string': %S, `:message': %S, ARGS: %S"
+                             string
+                             message
+                             args)))
+
+          ;; No `:string' but do have `:message'? Convert `:message' to `:string'.
+          ((and (null string)
+                (not (null message)))
+           ;; Only allow a message that is a char or string without extra args.
+           (cond ((> (length message) 1)
+                  (int<mis>:error 'mis:line
+                                  '("Invalid ARGS; line string can only be a "
+                                    "simple string, not a format string w/ args. "
+                                    "Got: %S, ARGS: %S")
+                                  message
+                                  args))
+                 ((and (not (stringp (car message)))
+                       (not (characterp (car message))))
+                  (int<mis>:error 'mis:line
+                                  '("Invalid ARGS; line string can only be a "
+                                    "string or character. "
+                                    "Got %S %S, ARGS: %S")
+                                  (type-of (car message))
+                                  (car message)
+                                  args))
+                 (t
+                  (setq string (car message)))))
+
+          ;; No `:string', no `:message'...?
+          (t
+           (int<mis>:error 'mis:line
+                           '("Invalid ARGS; line must have a string/character to repeat. "
+                             "Found nothing in ARGS: %S -> %S")
+                           args
+                           parsed)))
 
     ;;------------------------------
     ;; Build & return normalized list.
@@ -51,7 +95,7 @@ ARGS should be a plist of:
     (setq ast (list :format (list :formatter 'repeat
                                   :string    string)))
 
-    ;; Leave `:style' and anything else as-is.
+    ;; Delete `:message' but leave `:style' and anything else as-is.
     (while parsed
       (setq key (pop parsed)
             value (pop parsed))
@@ -63,7 +107,7 @@ ARGS should be a plist of:
                       key
                       value))
 
-            ((eq key :line)
+            ((memq key '(:line :message))
              ;; Already dealt with this parsed plist entry.
              nil)
 
@@ -74,6 +118,8 @@ ARGS should be a plist of:
 
     ast))
 ;; (mis:line :width 10 :string "hi")
+;; (mis:line :string "hi")
+;; (mis:line "-")
 
 
 ;; TODO: this?    (defun mis:box (&key width corner:top/left corner:top/right corner:bottom/left corner:bottom/right horizontal vertical)
