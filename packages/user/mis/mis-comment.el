@@ -20,8 +20,48 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Constants
+;;------------------------------------------------------------------------------
+
+(defconst int<mis>:comment:type/defaults
+  '((prog-mode     . inline)
+    (org-mode      . block)
+    (markdown-mode . block))
+  "Alist of major mode symbols to `block'/`inline' comment types.
+
+Will check for the major mode or modes derived from it.
+
+Try to put the most common modes at the beginning of the list.")
+
+
+;;------------------------------------------------------------------------------
 ;; Helper Functions
 ;;------------------------------------------------------------------------------
+
+(defun int<mis>:comment:type/auto (buffer)
+  "Figure out what comment type (block/inline) to use for the current BUFFER.
+
+BUFFER should be a buffer object or a buffer name string."
+  (with-current-buffer (get-buffer buffer)
+    ;; Can't do a simple `alist-get', since we also need to know about derived
+    ;; modes. So do a linear search.
+    (let ((modes int<mis>:comment:type/defaults)
+          mode-assoc
+          mode
+          type
+          type/found)
+      (while (and modes
+                  (null type/found))
+        (setq mode-assoc (pop modes)
+              mode (car mode-assoc)
+              type (cdr mode-assoc))
+        (when (derived-mode-p mode)
+          (setq type/found type)))
+      ;; Default to inline if no type known?
+      (or type/found
+          'inline))))
+;; (int<mis>:comment:type/auto (current-buffer))
+
 
 (defun int<mis>:comment:start (type &optional language)
   "Figure out what to use as start of comment.
@@ -170,13 +210,11 @@ NOTE: Comment keyword args must always have both a keyword and a value."
          (language (plist-get comment :language)))
 
     ;; Set `type'/`language' to a default if they are nil?
+    ;; Not yet... right now just record that we'll be doing that eventually.
     (unless type
       (setq type 'default)
       (push type comment)
       (push :type comment))
-
-    ;; Or allow nil in `int<mis>:comment:...' funcs.
-
 
     ;; Update `:comment' value in `parsed' with start/end comment strings, etc.
     (push (int<mis>:comment:end type language) comment)
