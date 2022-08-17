@@ -16,6 +16,7 @@
 
 (require 'mis-error)
 (require 'mis-valid)
+(require 'mis-buffer)
 (require 'mis-style)
 
 
@@ -41,8 +42,8 @@ Try to put the most common modes at the beginning of the list.")
 (defun int<mis>:comment:type/auto (buffer)
   "Figure out what comment type (block/inline) to use for the current BUFFER.
 
-BUFFER should be a buffer object or a buffer name string."
-  (with-current-buffer (get-buffer buffer)
+BUFFER should be something `int<mis>:buffer:get' understands."
+  (with-current-buffer (int<mis>:buffer:get buffer)
     ;; Can't do a simple `alist-get', since we also need to know about derived
     ;; modes. So do a linear search.
     (let ((modes int<mis>:comment:type/defaults)
