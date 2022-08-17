@@ -208,7 +208,7 @@ LENGTH should be an integer greater than zero."
   ;;------------------------------
   (cond ((and (not (stringp character))
               (not (characterp character)))
-         (int<mis>:error 'int<mis>:format:repeart
+         (int<mis>:error 'int<mis>:format:repeat
                          '("CHARACTER must be a string or character. "
                            "Got a %S: %S")
                          (type-of character)
@@ -248,6 +248,57 @@ LENGTH should be an integer greater than zero."
 ;; (int<mis>:format:repeat ?x 6)
 ;; (int<mis>:format:repeat "xx" 5)
 ;; (int<mis>:format:repeat "xx" 6)
+
+
+;;------------------------------------------------------------------------------
+;; Output Builder
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:compile:format (caller ast style)
+  "Format Mis syntax plist AST using Mis STYLE plist; return string.
+
+AST should be a `:format' value plist.
+Example: (:formatter repeat :string \"-\")
+
+STYLE should be nil a `:style' value plist.
+Example: (:width 80)
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((func/name  (list 'int<mis>:format:compile caller))
+         (formatter  (plist-get ast :formatter)))
+    ;;------------------------------
+    ;; Sanity Checks
+    ;;------------------------------
+    (cond ((null formatter)
+           (int<mis>:error func/name
+                           '("AST should have some sort of `:formatter'? "
+                             "Got %S from %S")
+                           formatter
+                           ast))
+
+          (t
+           nil))
+
+    ;;------------------------------
+    ;; Format output string.
+    ;;------------------------------
+    (pcase formatter
+      ('repeat
+       ;; Build & return the repeated string.
+       (int<mis>:format:repeat (plist-get ast :string)
+                               (or (plist-get style :width)
+                                   fill-column)))
+
+      (_
+       (int<mis>:error func/name
+                       '("Unhandled formatter case `%S'!")
+                       formatter)))))
+;; (int<mis>:compile:format 'test '(:formatter repeat :string "-") '(:width 80))
 
 
 ;;------------------------------------------------------------------------------
