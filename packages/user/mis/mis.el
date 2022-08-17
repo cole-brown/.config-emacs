@@ -31,10 +31,10 @@
 (require 'mis-align)
 (require 'mis-style)
 (require 'mis-art)
+(require 'mis-comment)
 
 ;; Top level.
 (require 'mis-message)
-(require 'mis-comment)
 
 
 ;;------------------------------------------------------------------------------

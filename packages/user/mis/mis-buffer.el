@@ -48,6 +48,46 @@ if it does not exist.")
 ;; Buffer Functions
 ;;------------------------------------------------------------------------------
 
+(defun int<mis>:buffer:type (caller &optional name)
+  "Get a type keyword for buffer NAME.
+
+NAME can be nil, a string, or a few different keywords/symbols.
+If nil, use `mis:buffer:default'.
+Allowable keywords/symbols:
+  - `:messages', `messages'
+    - Send to *Messages* buffer.
+  - `:message', `message'
+    - Send to *Messages* buffer.
+  - `:mis', `mis'
+    - Send to `mis:buffer:name' buffer.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Return:
+  - `:messages'
+  - `:standard'"
+  ;; NOTE: Keep in sync with `int<mis>:buffer:name'!
+  (let ((name (or name mis:buffer:default)))
+    (pcase name
+      ((or :messages 'messages :message 'message)
+       :messages)
+      ((or :mis 'mis)
+       :standard)
+      ((pred bufferp)
+       :standard)
+      ((pred stringp)
+       name)
+      (_
+       (int<mis>:error (list 'int<mis>:buffer:name caller)
+                       "Cannot determine buffer type from `%S'."
+                       name)))))
+
+
 (defun int<mis>:buffer:name (caller &optional name)
   "Get buffer name to use for output.
 
@@ -67,6 +107,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  ;; NOTE: Keep in sync with `int<mis>:buffer:name'!
   (let ((name (or name mis:buffer:default)))
     (pcase name
       ((or :messages 'messages :message 'message)
