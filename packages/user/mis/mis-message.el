@@ -108,10 +108,15 @@ CALLER should be calling function's name. It can be one of:
 ;; TODO: Move this to "mis.el"?
 (defun mis (&rest args)
   "Output a message built from ARGS."
-  (let (style
+  (let (styling
         content
         output
         buffer)
+
+    ;; (message "\nargs!!!")
+    ;; (message (pp-to-string args))
+    ;; (message "\n\n")
+
     ;;------------------------------
     ;; Parsing & Validation
     ;;------------------------------
@@ -119,31 +124,35 @@ CALLER should be calling function's name. It can be one of:
     ;; to skim off (e.g. `:buffer').
     (while args
       (let ((arg (pop args)))
-        (cond ((listp arg)
-               ;; Think this is a Mis syntax tree? Should be anyways.
+        ;; Is this /only/ styling info? Save it for use on all its siblings.
+        (cond ((int<mis>:style:exclusive? arg)
+               ;; Make sure it's valid...ish.
+               (int<mis>:valid:syntax? 'mis 'arg arg)
+
+               (if styling
+                   ;; There can be only one.
+                   (int<mis>:error 'mis
+                                   '("Only one Mis `:style' allowed per level in ARGS. "
+                                     "have: %S, found: %S, args: %S")
+                                   styling
+                                   value
+                                   args)
+                 ;; Save the styling (just the `:style' key's value).
+                 (setq styling (nth 1 args))))
+
+              ((listp arg)
+               ;; Think this is a Mis syntax tree? Should be anyways; error if not.
+               (int<mis>:valid:syntax? 'mis 'arg arg)
                (let ((key   (nth 0 arg))
                      (value (nth 1 arg)))
-                 ;; At this point, everything should be a Mis syntax tree. Error if not.
-                 (int<mis>:valid:syntax? 'mis 'arg arg)
+                 ;; Save off this mis content type (messages, comments, arts...) in
+                 ;; key, value order so it can be used as-is in next step. The pairs as
+                 ;; a whole will be in reverse order but that'll be righted in
+                 ;; finalization/printing.
+                 (push value content)
+                 (push key content)))
 
-                 (if (eq :style key)
-                     ;; Save off style or error.
-                     (if style
-                         (int<mis>:error 'mis
-                                         '("Only one Mis `:style' allowed per level in ARGS. "
-                                           "have: %S, found: %S, args: %S")
-                                         style
-                                         value
-                                         args)
-                       (setq style value))
-
-                   ;; Save off this mis content type (messages, comments, arts...) in
-                   ;; key, value order so it can be used as-is in next step. The pairs as
-                   ;; a whole will be in reverse order but that'll be righted in
-                   ;; finalization/printing.
-                   (push value content)
-                   (push key content))))
-
+              ;; Top-level arg? Example: `:buffer'
               ((keywordp arg)
                (let ((key arg)
                      (value (pop arg)))
@@ -167,6 +176,7 @@ CALLER should be calling function's name. It can be one of:
                                     value
                                     args)))))
 
+              ;; Fallthrough: Error!
               (t
                (int<mis>:error 'mis
                                '("Unknown/unhandled argument!"
@@ -183,12 +193,12 @@ CALLER should be calling function's name. It can be one of:
       (let ((key (pop content))
             (value (pop content)))
         ;; Find compiler for mis type.
-        ;; Pass it the type's tree and the current style.
+        ;; Pass it the type's tree and the current styling.
         (pcase key
           (:format
            (push (int<mis>:compile:format 'mis
                                           value
-                                          style)
+                                          styling)
                  output))
 
           (_
@@ -213,6 +223,18 @@ CALLER should be calling function's name. It can be one of:
 ;;   (mis:comment (mis:line "-"))
 ;;   (mis:comment :align 'center "Hello there.")
 ;;   (mis:comment (mis:line "-")))
+;; (mis
+;;   (mis:style :width 80)
+;;   (mis:comment (mis:line "-")
+;;                (mis:style :align 'center "Hello there.")
+;;                (mis:line "-")))
+;; (mis
+;;   (mis:comment :width 80
+;;                (mis:line "-")
+;;                (mis:style :align 'center "Hello there.")
+;;                (mis:line "-")))
+
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.
