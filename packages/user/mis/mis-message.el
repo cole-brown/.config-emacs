@@ -28,28 +28,35 @@
 ;; Output Helpers
 ;;------------------------------------------------------------------------------
 
-;; TODO: delete?
-(defun int<mis>:message:propertized/messages (message &rest args)
-  "Output formatted/propertized MESSAGE & ARGS to *Messages* buffer.
+(defun mis:print:message (buffer message &rest args)
+  "Output formatted/propertized MESSAGE & ARGS to BUFFER.
 
-Act like `message' but preserve MESSAGE's string properties /in the *Messages*
-buffer/.
+NOTE: Hacks/shenanigans for outputting propertized message/args to the
+*Messages* buffer, which is normally plain strings only.
+
+BUFFER should be nil, a string, or a few different keywords/symbols.
+See `int<mis>:buffer:name'.
 
 MESSAGE should be a string that `format' understands.
 
 ARGS should be the `format' ARGS for MESSAGE."
-  (let ((output (apply #'format message args)))
-    ;; Send the OUTPUT string through `message' for minibuffer
-    ;; display, but set `message-log-max' to `nil' so it _will not_ be output to
-    ;; *Messages* buffer.
-    (let ((message-log-max nil))
-      (message output))
-
-    ;; Now disable *Messages* buffer's read-only property so we can add the
-    ;; properly OUTPUT at the end manually.
-    (with-current-buffer (get-buffer "*Messages*")
+  (let ((func/name (list 'mis caller))
+        (output    (apply #'format message args)))
+    (with-current-buffer (int<mis>:buffer:get-or-create func/name buffer)
       (save-mark-and-excursion
+        ;; Special Shenanigans™ Part 01: *Messages*
+        ;; Set `message-log-max' to nothing and then `message' so normal stuff
+        ;; happens /EXCEPT/ for `output' getting printed to *Messages*.
+        (when (eq (int<mis>:buffer:type func/name buffer) :messages)
+          (let ((message-log-max nil))
+            (message output)))
+
         (goto-char (point-max))
+
+        ;; Special Shenanigans™ Part 02: Read-Only Buffers (e.g. *Messages*)
+        ;; Ignore read-only status of buffer while we output to it. Need this to
+        ;; be able to actually print our output to *Messages* with its properties
+        ;; intact.
         (let ((inhibit-read-only t))
           ;; TODO: Test this to make sure we don't get extra newlines. It looks correct?
           (unless (zerop (current-column))
@@ -57,27 +64,7 @@ ARGS should be the `format' ARGS for MESSAGE."
           (insert output "\n"))))))
 
 
-;; TODO: delete?
-(defun int<mis>:message:propertized/buffer (buffer message &rest args)
-  "Output formatted/propertized MESSAGE & ARGS to BUFFER.
-
-BUFFER should be a buffer or string.
-
-MESSAGE should be a string that `format' understands.
-
-ARGS should be the `format' ARGS for MESSAGE."
-  (let ((output (apply #'format message args)))
-    (with-current-buffer (get-buffer-create buffer)
-      (save-mark-and-excursion
-        (goto-char (point-max))
-        ;; TODO: Test this to make sure we don't get extra newlines. It looks correct?
-        (unless (zerop (current-column))
-          (insert "\n"))
-        (insert output "\n"))
-      output)))
-
-
-(defun int<mis>:message:print (caller buffer strings)
+(defun mis:print:strings (caller buffer strings)
   "Output formatted/propertized MESSAGES to current buffer.
 
 BUFFER should be a buffer or string.
@@ -94,13 +81,14 @@ CALLER should be calling function's name. It can be one of:
     (with-current-buffer (int<mis>:buffer:get-or-create func/name buffer)
       (save-mark-and-excursion
         (dolist (string strings)
-          (goto-char (point-max))
           ;; Special Shenanigans™ Part 01: *Messages*
           ;; Set `message-log-max' to nothing and then `message' so normal stuff
           ;; happens /EXCEPT/ for STRING getting printed to *Messages*.
           (when (eq (int<mis>:buffer:type func/name buffer) :messages)
             (let ((message-log-max nil))
               (message string)))
+
+          (goto-char (point-max))
 
           ;; Special Shenanigans™ Part 02: Read-Only Buffers (e.g. *Messages*)
           ;; Ignore read-only status of buffer while we output to it. Need this to
@@ -214,9 +202,9 @@ CALLER should be calling function's name. It can be one of:
     ;; Print Output
     ;;------------------------------
     ;; Now that we only have output left, switch to output buffer and print.
-    (int<mis>:message:print 'mis
-                            buffer
-                            output)))
+    (mis:print:strings 'mis
+                       buffer
+                       output)))
 ;; (mis
 ;;  (mis:style :width 80)
 ;;  (mis:line "-"))
@@ -225,7 +213,6 @@ CALLER should be calling function's name. It can be one of:
 ;;   (mis:comment (mis:line "-"))
 ;;   (mis:comment :align 'center "Hello there.")
 ;;   (mis:comment (mis:line "-")))
-
 
 ;;------------------------------------------------------------------------------
 ;; The End.
