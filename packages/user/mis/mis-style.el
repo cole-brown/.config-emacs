@@ -34,7 +34,25 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Styling
+;; Style Helpers
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:style:exclusive? (ast)
+  "Return AST if AST is _only_ styling; return nil otherwise."
+  ;; We are expecting a list.
+  (and (listp ast)
+       ;; If it's only styling, the first thing _has_ to be the `:style' keyword.
+       (eq :style (nth 0 ast))
+       ;; ...and the next thing _has_ to be a list.
+       (listp (nth 1 ast))
+       ;; ...and that _has_ to be the end; no more things.
+       (eq 2 (length ast))
+       ;; So, return AST if we made it this far.
+       ast))
+
+
+;;------------------------------------------------------------------------------
+;; API: Styling
 ;;------------------------------------------------------------------------------
 
 (defun mis:style (&rest args)
