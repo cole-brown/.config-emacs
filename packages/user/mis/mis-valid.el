@@ -35,10 +35,10 @@
 
 ;; Mis Syntax Tree Categories
 (defconst int<mis>:keywords:category/internal
-  '(:style
-    :comment
-    :format
-    :message)
+  '(:mis:style
+    :mis:comment
+    :mis:format
+    :mis:message)
   "Valid Mis categories for parsing & validation.")
 
 
@@ -487,10 +487,10 @@ CALLER should be calling function's name. It can be one of:
 
 
 ;;------------------------------------------------------------------------------
-;; Sanity Checker
+;; Mis Syntax
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:valid:syntax? (caller name key tree)
+(defun int<mis>:valid:syntax? (caller name key tree &optional no-error?)
   "Signal an error if KEY or TREE fails any basic sanity check for Mis syntax.
 
 NAME should be a symbol name as a symbol or string for the error message.
@@ -500,35 +500,45 @@ CALLER should be calling function's name. It can be one of:
   - a quoted symbol
   - a function-quoted symbol
   - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+NO-ERROR? should be nil/non-nil. If non-nil, will return nil instead of
+signaling an error."
   ;; TREE should be a plist.
   (cond ((not (keywordp key))
-         (int<mis>:error caller
-                      '("Expected %S to be a keyword. "
-                        "Got %S %S for value %S")
-                      (int<mis>:error:name name)
-                      (type-of key)
-                      key
-                      tree))
+         (if no-error?
+             nil
+           (int<mis>:error caller
+                           '("Expected %S to be a keyword. "
+                             "Got %S %S for value %S")
+                           (int<mis>:error:name name)
+                           (type-of key)
+                           key
+                           tree)))
         ;; TREE's keyword should be a valid one.
         ((not (memq key int<mis>:keywords:category/internal))
-         (int<mis>:error caller
-                      '("Expected %S to start with a valid Mis keyword. "
-                        "Got keyword %S for %S")
-                      (int<mis>:error:name name)
-                      key
-                      tree))
+         (if no-error?
+             nil
+           (int<mis>:error caller
+                           '("Expected %S to start with a valid Mis keyword. "
+                             "Got keyword %S for %S")
+                           (int<mis>:error:name name)
+                           key
+                           tree)))
         ;; TREE should be... something. A list of something.
         ((or (not (listp tree))
              (null (car tree)))
-         (int<mis>:error caller
-                         '("Expected value for %S to be a list of... something. "
-                           "Got %S")
-                         key
-                         tree))
+         (if no-error?
+             nil
+           (int<mis>:error caller
+                           '("Expected value for %S to be a list of... something. "
+                             "Got %S")
+                           key
+                           tree)))
 
         (t
-         nil)))
+         ;; Valid; return something non-nil.
+         :valid)))
 
 
 ;;------------------------------------------------------------------------------
