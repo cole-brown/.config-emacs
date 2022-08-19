@@ -38,7 +38,8 @@
   '(:mis:style
     :mis:comment
     :mis:format
-    :mis:message)
+    :mis:message
+    :mis:string)
   "Valid Mis categories for parsing & validation.")
 
 
@@ -154,13 +155,14 @@ Signal an error if invalid; if valid, return cons 2-tuple of:
           ;; Actual Categories?
           ;;------------------------------
           ((memq keyword int<mis>:keywords:style)
-           '(:style . int<mis>:valid:style/kvp?))
+           '(:mis:style . int<mis>:valid:style/kvp?))
 
           ((memq keyword int<mis>:keywords:comment)
-           '(:comment . int<mis>:valid:comment/kvp?))
+           '(:mis:comment . int<mis>:valid:comment/kvp?))
 
           ((memq keyword int<mis>:keywords:line)
-           '(:line . int<mis>:valid:line/kvp?))
+           ;; Lines get converted into `:mis:format' after parsing, so they're just temporary.
+           '(:tmp:line . int<mis>:valid:line/kvp?))
 
           ;;------------------------------
           ;; Fallthrough: Error
