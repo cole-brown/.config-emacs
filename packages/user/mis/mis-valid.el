@@ -14,6 +14,7 @@
 ;;; Code:
 
 
+(require 'subr)
 (require 'mis-error)
 
 
@@ -41,6 +42,18 @@
     :mis:message
     :mis:string)
   "Valid Mis categories for parsing & validation.")
+
+
+(defconst int<mis>:keywords:category
+  '((:style   :mis:style)
+    (:comment :mis:comment)
+    (:line    :mis:format)
+    ;; ???    :mis:message
+    ;; ???    :mis:string
+    )
+  "Alist of keyword to keyword list conses.
+
+Cons: (input-category-keyword . (internal-category-keyword-0 ...))")
 
 
 ;;------------------------------
@@ -93,6 +106,75 @@
 ;;------------------------------------------------------------------------------
 ;; Keyword Validation
 ;;------------------------------------------------------------------------------
+
+(defun int<mis>:valid:category? (caller check valid/inputs)
+  "Ensure CHECK category keyword is valid according to VALID/INPUTS list.
+
+CHECK should be:
+  - an internal keyword - prefix `:mis:'
+                        - from `int<mis>:keywords:category/internal'
+  - a temp keyword      - prefix `:tmp:'
+                        - any valid
+
+VALID/INPUTS should be nil (all internal/temp keywords valid), or a list of
+valid internal/temp keywords.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:valid:category? caller)))
+    (unless (keywordp check)
+      (int<mis>:error caller
+                      "CHECK must be a keyword. Got %S: %S"
+                      (type-of check)
+                      check))
+
+    (let* ((check/str (symbol-name check))
+           (check/len (length check/str)) ; Avoid out of range errorrs in `substring'.
+           (type      (substring check/str 0 (min 5 check/len)))) ; ":mis:" or ":tmp:"?
+
+      ;;------------------------------
+      ;; Validate & Return
+      ;;------------------------------
+      ;; Validate `:mis:...'
+      (cond ((string= type ":mis:")
+             (if (null valid/inputs)
+                 ;; Any existing `:mis:...' keyword is valid if VALID/INPUTS is nil.
+                 (not (null (memq check int<mis>:keywords:category/internal)))
+
+               ;; Make sure the CHECK keyword belongs in one of the VALID categories.
+               (let (validated?)
+                 (dolist (valid/input valid/inputs)
+                   ;; CHECK must be in at least one of the valid-internals-per-input keyword lists.
+                   (setq validated? (or validated?
+                                        (not (null (memq check (alist-get valid/input int<mis>:keywords:category)))))))
+                 validated?)))
+
+            ;; Validate `:tmp:...'
+            ((string= type ":tmp:")
+             ;; Any `:tmp:...' keyword is valid if VALID/INPUTS is nil.
+             (if (null valid/inputs)
+                 :tmp
+               ;; Else, it must match, exactly, something in VALID/INPUTS.
+               (not (null (memq check valid/inputs)))))
+
+            ;; Fallthrough: Error.
+            (t
+             (int<mis>:error caller
+                             "CHECK must start with %S or %S. Got: %S from %S"
+                             "mis"
+                             "tmp"
+                             type
+                             check/str))))))
+;; (int<mis>:valid:category? 'test :mis:style nil)
+;; (int<mis>:valid:category? 'test :mis:style '(:style :tmp:bar :tmp:foo))
+;; (int<mis>:valid:category? 'test :tmp:foo nil)
+;; (int<mis>:valid:category? 'test :tmp:foo '(:tmp:bar :tmp:foo))
+;; (int<mis>:valid:category? 'test :tmp:foo '(:tmp:bar))
+
 
 (defun int<mis>:valid:validator (caller category keyword)
   "Determine which category KEYWORD falls under, return validator func for it.
