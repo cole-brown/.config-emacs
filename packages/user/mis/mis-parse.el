@@ -1,9 +1,9 @@
 ;;; mis-parse.el --- Parsing for Mis function calls -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
+;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:  2019-10-23
-;; Modified: 2022-08-09
+;; Created:    2019-10-23
+;; Modified:   2022-08-18
 ;;
 ;;; Commentary:
 ;;
@@ -16,16 +16,25 @@
 ;;                           "."))
 ;;
 ;; We want Mis to evaluate args so that the caller's variables and functions are
-;; resolved, but the top-level function (`mis', `mis:comment', etc) needs the
-;; full, unaltered tree structure to correctly compile the output.
+;; resolved, but the top-level function (`mis', etc) needs the full, unaltered
+;; tree structure to correctly compile the output.
 ;;
-;; So Mis functions like `mis:style' must:
+;; So Mis functions like `mis:comment' must:
 ;;   - Evaluate their arguments.
-;;   - Return themselves, basically.
+;;   - Return an Abstract Syntax Tree of themselves, basically.
 ;; E.g.
-;;   (mis:style :bold (get-greeted))
-;;     -> '(mis:style :bold "world")
-;;        or simiar, like: '(:styles '(:bold) "world")
+;;   (mis:comment :align 'center (get-greeted))
+;;    -> '((:mis:comment
+;;          (:mis:style (:align center))
+;;          (:mis:string "world")))
+;;
+;; NOTE: A Mis AST is an alist:
+;;   - the key must be from `int<mis>:keywords:category/internal'
+;;   - the value must be a list
+;;
+;; This file is dedicated to the common functionality related to parsing user
+;; inputs and building Mis ASTs.
+;;
 ;;
 ;;; Code:
 
@@ -52,8 +61,10 @@ CALLER should be calling function's name. It can be one of:
 
 Optional CATEGORY should be:
   - nil                - All categories are valid.
-  - a keyword          - Only this category's keywords are valid
-  - a list of keywords - Only these categories' keywords are valid"
+  - a keyword          - Only this category's keywords are valid.
+  - a list of keywords - Only these categories' keywords are valid.
+                       - Must be from `int<mis>:keywords:category/input' or
+                         `int<mis>:keywords:category/internal'."
   (let ((caller (list 'int<mis>:parse caller))
         category/input
         category/internal)
@@ -122,11 +133,11 @@ Optional CATEGORY should be:
           (push cat category/internal))))
 
     ;;------------------------------
-    ;; Build normalized plists out of args.
+    ;; Parse Args
     ;;------------------------------
     (let ((parsing t)
           (args/len (length args))
-          normalized ; Validated/normalized kvps alist by keyword category.
+          ast/parsed ; Validated/normalized kvps alist by keyword category.
           ast/in     ; Input Mis ASTs.
           ast/out)   ; Output Mis Abstract Syntax Tree.
 
@@ -149,8 +160,8 @@ Optional CATEGORY should be:
                     (validator-fn  (cdr validator))
                     (value         (funcall validator-fn caller key (pop args))))
               ;; Key/value exist and are now known to be valid; save.
-              (let ((plist (alist-get validator-cat normalized)))
-                ;; Sanity check category.
+              (let ((ast/cat (alist-get validator-cat ast/parsed)))
+                ;; ...but first is the category allowed?
                 (unless (or (null category/input)
                             (memq validator-cat category/input))
                   (int<mis>:error caller
@@ -160,12 +171,11 @@ Optional CATEGORY should be:
                                   category/input
                                   validator-cat))
 
-                ;; Save to the normalized output forwards; not reversing the list(s) later.
-                (push value plist)
-                (push key   plist)
-                (setf (alist-get validator-cat normalized) plist))
+                ;; Save to the AST for this category.
+                (setf (alist-get key ast/cat) value)
+                (setf (alist-get validator-cat ast/parsed) ast/cat))
 
-            ;; There /should/ have been an error raised?
+            ;; `if-let' failure... There /should/ have been an error raised already?
             (int<mis>:error caller
                             '("Invalid key, value or something? "
                               "key: %S, "
@@ -202,9 +212,12 @@ Optional CATEGORY should be:
       ;; Build AST: Presume that the rest of ARGS are message/formatting.
       ;;------------------------------
       (when args
-        ;; Any message string and/or message args go into the `:message' kvp.
-        (push args ast/out)
-        (push :message ast/out))
+        (if (and (= (length args) 1)
+                 (stringp (nth 0 args)))
+            ;; Just a single string; use `:mis:string' to simplify things later.
+            (push (cons :mis:string (nth 0 args)) ast/out)
+          ;; Generic message format string and/or args go into the `:mis:message'.
+          (push (cons :mis:message args) ast/out)))
 
       ;;------------------------------
       ;; Build AST: Add pre-existing ASTs.
@@ -216,11 +229,11 @@ Optional CATEGORY should be:
       ;;------------------------------
       ;; Build AST: Add new ASTs.
       ;;------------------------------
-      (dolist (assoc/category normalized ast/out)
-        ;; Category's key/value pairs plist.
-        (push (cdr assoc/category) ast/out)
-        ;; Category's keyword.
-        (push (car assoc/category) ast/out)))))
+      ;; Keep separate from the parsing so we enforce a more human-friendly
+      ;; ordering to the alists, though it won't matter to the builder/compiler.
+      ;; Just friendly to the programmer to have these first in the output alist.
+      (dolist (ast ast/parsed ast/out)
+        (push ast ast/out)))))
 ;; (int<mis>:parse 'tester nil :align 'center "hello")
 ;; (int<mis>:parse 'tester :style :align 'center "hello")
 ;; (int<mis>:parse 'tester nil :align 'center "hello %s" "world")
