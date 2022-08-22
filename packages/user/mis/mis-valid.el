@@ -655,10 +655,16 @@ CALLER should be calling function's name. It can be one of:
 ;; Mis Syntax
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:valid:syntax? (caller name key tree &optional no-error?)
-  "Signal an error if KEY or TREE fails any basic sanity check for Mis syntax.
+;; TODO: Do we need to recursively check the syntax tree? Currently only check top level.
+;; If we do want that, rename `int<mis>:valid:syntax?' to
+;; `int<mis>:valid:syntax/alist?' or something, and make a new "is this a
+;; completely valid syntax?"
 
-NAME should be a symbol name as a symbol or string for the error message.
+
+(defun int<mis>:valid:syntax? (caller name syntax &optional no-error?)
+  "Error if SYNTAX fails any basic sanity check for Mis abstract syntax trees.
+
+NAME should be VALUE's symbol name as a symbol or string.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -669,42 +675,51 @@ CALLER should be calling function's name. It can be one of:
 
 NO-ERROR? should be nil/non-nil. If non-nil, will return nil instead of
 signaling an error."
-  ;; TREE should be a plist.
-  (cond ((not (keywordp key))
-         (if no-error?
-             nil
-           (int<mis>:error caller
-                           '("Expected %S to be a keyword. "
-                             "Got %S %S for value %S")
-                           (int<mis>:error:name name)
-                           (type-of key)
-                           key
-                           tree)))
-        ;; TREE's keyword should be a valid one.
-        ((not (memq key int<mis>:keywords:category/internal))
-         (if no-error?
-             nil
-           (int<mis>:error caller
-                           '("Expected %S to start with a valid Mis keyword. "
-                             "Got keyword %S for %S")
-                           (int<mis>:error:name name)
-                           key
-                           tree)))
-        ;; TREE should be... something. A list of something.
-        ((or (not (listp tree))
-             (null (car tree)))
-         (if no-error?
-             nil
-           (int<mis>:error caller
-                           '("Expected value for %S to be a list of... something. "
-                             "Got %S")
-                           key
-                           tree)))
+  (let ((caller (list 'int<mis>:valid:syntax? caller)))
+    ;; TODO: Should we consider `nil' a valid alist?
+    ;; Don't think we need any nil ASTs, so... no?
+    ;; Check for explicit nil first sot we can then check for lists.
+    (cond ((null syntax)
+           (if no-error?
+               nil
+             (int<mis>:error caller
+                             "%S must be... something. Got: %S"
+                             (int<mis>:error:name name)
+                             syntax)))
 
-        (t
-         ;; Valid; return something non-nil.
-         :valid)))
+          ;; An alist has to be a list.
+          ((not (listp syntax))
+           (if no-error?
+               nil
+             (int<mis>:error caller
+                             "%S be a list. Got %S: %S"
+                             (int<mis>:error:name name)
+                             (type-of syntax)
+                             syntax)))
 
+          ;; An alist has to have only lists (or cons, which are lists).
+          ((not (seq-every-p #'listp syntax))
+           (if no-error?
+               nil
+             (int<mis>:error caller
+                             "%S be a list of lists. Got: %S"
+                             (int<mis>:error:name name)
+                             syntax)))
+
+          ;; And we require all of them to have keywords as keys.
+          ((not (seq-every-p (lambda (syntax/assoc) "Ensure alist keys are keywords."
+                               (keywordp (car syntax/assoc)))
+                             syntax))
+           (if no-error?
+               nil
+             (int<mis>:error caller
+                             "%S be an alist with keyword keys. Got: %S"
+                             (int<mis>:error:name name)
+                             syntax)))
+
+          ;; Fallthrough: Failed to find a reason it's invalid so it must be valid?
+          (t))))
+(int<mis>:valid:syntax? 'test 'syntax '((:mis:format (:formatter repeat :string "-"))))
 
 ;;------------------------------------------------------------------------------
 ;; The End.
