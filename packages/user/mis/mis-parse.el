@@ -60,20 +60,18 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)
 
 Optional CATEGORY should be:
-  - nil                - All categories are valid.
+  - nil                - All (existing) categories are valid.
   - a keyword          - Only this category's keywords are valid.
   - a list of keywords - Only these categories' keywords are valid.
                        - Must be from `int<mis>:keywords:category/input' or
                          `int<mis>:keywords:category/internal'."
-  (let ((caller (list 'int<mis>:parse caller))
-        category/input
-        category/internal)
+  (let ((caller (list 'int<mis>:parse caller)))
     ;;------------------------------
     ;; Error Checking
     ;;------------------------------
     ;; Is CATEGORY a valid type?
-    (cond ((and (not (null category)) ; nil
-                (not (keywordp category)) ; keyword
+    (cond ((and (not (null category))      ; nil
+                (not (keywordp category))  ; keyword
                 (not (and (listp category) ; list of keywords
                           (seq-every-p #'keywordp category))))
            (int<mis>:error caller
@@ -84,25 +82,20 @@ Optional CATEGORY should be:
 
           ;; Is the single keyword CATEGORY a valid keyword?
           ((and (keywordp category)
-                (not (memq category int<mis>:keywords:category/input))
-                (not (memq category int<mis>:keywords:category/internal)))
+                (not (int<mis>:valid:category/mis/input? 'mis category)))
            (int<mis>:error caller
-                           "CATEGORY must be a member of %S, %S, or nil. Got: %S"
+                           "CATEGORY keyword must be a member of %S or nil. Got: %S"
                            int<mis>:keywords:category/input
-                           int<mis>:keywords:category/internal
                            category))
 
           ;; Does the list of keywords CATEGORY contain only valid keywords?
           ((and (listp category)
                 (not (seq-every-p (lambda (cat)
                                     "Is every CATEGORY keyword valid?"
-                                    (or (memq cat int<mis>:keywords:category/input)
-                                        (memq cat int<mis>:keywords:category/internal)))
+                                    (int<mis>:valid:category/mis/input? 'mis cat))
                                   category)))
            (int<mis>:error caller
-                           "All members of CATEGORY be a member of %S or %S. CATEGORY: %S"
                            int<mis>:keywords:category/input
-                           int<mis>:keywords:category/internal
                            category))
 
           ;; Don't want any circular lists.
@@ -117,20 +110,9 @@ Optional CATEGORY should be:
     ;;------------------------------
     ;; Normalize Categories
     ;;------------------------------
-    ;; Normalize category to two lists of keywords.
-    (if (keywordp category)
-        ;; Single keyword: Put in correct var as a list.
-        (if (memq category int<mis>:keywords:category/input)
-            (setq category/input (list category)
-                  category/internal nil)
-          (setq category/input nil
-                category/internal (list category)))
-
-      ;; List of keywords; spit each out into correct list.
-      (dolist (cat category)
-        (if (memq cat int<mis>:keywords:category/input)
-            (push cat category/input)
-          (push cat category/internal))))
+    ;; Normalize to list of keywords.
+    (when (keywordp category)
+      (setq category (list category)))
 
     ;;------------------------------
     ;; Parse Args
@@ -155,23 +137,13 @@ Optional CATEGORY should be:
           ;;---
           (setq args/len (- args/len 2))
           (if-let* ((key           (pop args))
-                    (validator     (int<mis>:valid:validator caller category/input key))
-                    (validator-cat (car validator))
+                    (validator     (int<mis>:valid:validator caller category key))
+                    (validator-cat (car validator)) ; parsed category (internal or tmp)
                     (validator-fn  (cdr validator))
                     (value         (funcall validator-fn caller key (pop args))))
-              ;; Key/value exist and are now known to be valid; save.
+              ;; Key/value exist and are now known to be valid; save to the AST
+              ;; for this parsed category.
               (let ((ast/cat (alist-get validator-cat ast/parsed)))
-                ;; ...but first is the category allowed?
-                (unless (or (null category/input)
-                            (memq validator-cat category/input))
-                  (int<mis>:error caller
-                                  '("Keyword `%S' is not valid for categories `%S'? "
-                                    "Got category `%S' instead.")
-                                  key
-                                  category/input
-                                  validator-cat))
-
-                ;; Save to the AST for this category.
                 (setf (alist-get key ast/cat) value)
                 (setf (alist-get validator-cat ast/parsed) ast/cat))
 
@@ -196,13 +168,8 @@ Optional CATEGORY should be:
         (let (misc)
           ;; Split Mis ASTs out into `ast/in' var.
           (dolist (arg args)
-            (if (and (listp arg)
-                     (int<mis>:valid:syntax? caller
-                                             'arg
-                                             (nth 0 arg)
-                                             (nth 1 arg)
-                                             :no-error))
-                (push arg ast/in)
+            (if (int<mis>:valid:syntax? caller 'arg arg :no-error)
+                (push (cons :mis arg) ast/in)
               (push arg misc)))
 
           ;; Set ARGS as "everything left over now".
@@ -242,14 +209,16 @@ Optional CATEGORY should be:
 ;; (int<mis>:parse 'tester nil :align 'center :width 11 "hello")
 ;; (int<mis>:parse 'tester nil :indent 'auto "hello")
 ;;
-;; Should just turn '(...) into '((...)).
-;; (int<mis>:parse 'test '(:comment :style :mis:format) '(:mis:format (:formatter repeat :string "-")))
+;; Parse an AST -> Get a `:mis' AST.
+;; (int<mis>:parse 'test '(:comment :style) '((:mis:format (:formatter repeat :string "-"))))
+;;   -get-> ((:mis (:mis:format (:formatter repeat :string "-"))))
+;;   -aka-> ((:mis . ((:mis:format (:formatter repeat :string "-")))))
 ;;
-;; More complicated:
+;; TODO: More complicated:
 ;; (int<mis>:parse 'test '(:comment :style :mis:format) :type 'inline "hello" '(:mis:format (:formatter repeat :string "-")))
 ;;
-;; Error: `:align' is a `:style', not a `:comment' category keyword.
-;;   (int<mis>:parse 'tester :comment :align 'center "hello")
+;; Error: `:align' is a `:mis:style', not a `:mis:comment' category keyword.
+;;   (int<mis>:parse 'tester :comment :mis:comment :align 'center "hello")
 
 
 ;;------------------------------------------------------------------------------
