@@ -37,18 +37,30 @@
 ;; Style Helpers
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:style:exclusive? (ast)
-  "Return AST if AST is _only_ styling; return nil otherwise."
-  ;; We are expecting a list.
-  (and (listp ast)
-       ;; If it's only styling, the first thing _has_ to be the `:style' keyword.
-       (eq :style (nth 0 ast))
-       ;; ...and the next thing _has_ to be a list.
-       (listp (nth 1 ast))
-       ;; ...and that _has_ to be the end; no more things.
-       (eq 2 (length ast))
-       ;; So, return AST if we made it this far.
-       ast))
+(defun int<mis>:style:exclusive? (syntax)
+  "Return SYNTAX if SYNTAX is _only_ styling; return nil otherwise."
+  ;; Must have valid syntax.
+  (cond ((not (int<mis>:valid:syntax? 'int<mis>:style:exclusive?
+                                      'syntax
+                                      syntax
+                                      :no-error))
+         nil)
+
+        ;; (Alist) syntax should contain only 1 element.
+        ((not (eq 1 (length syntax)))
+         nil)
+
+        ;; Key should be `:mis:style'.
+        ((int<mis>:syntax:find 'int<mis>:style:exclusive?
+                               syntax
+                               :mis:style)
+         syntax)
+
+        ;; Fallthrough: not styling so return nil.
+        (t
+         nil)))
+;; (int<mis>:style:exclusive? (mis:style :width 80))
+;; (int<mis>:style:exclusive? '((:mis:style (:align . center)) (:mis:string . "hello")))
 
 
 ;;------------------------------------------------------------------------------
