@@ -254,14 +254,16 @@ LENGTH should be an integer greater than zero."
 ;; Output Builder
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:compile:format (caller ast style)
-  "Format Mis syntax plist AST using Mis STYLE plist; return string.
+(defun int<mis>:compile:format (caller syntax style)
+  "Format Mis SYNTAX Tree using STYLE; return string.
 
-AST should be a `:format' value plist.
-Example: (:formatter repeat :string \"-\")
+SYNTAX should be `:mis:format' syntax tree.
+Example: '((:mis:format (:formatter . repeat) (:string . \"-\")))
 
-STYLE should be nil a `:style' value plist.
-Example: (:width 80)
+STYLE should be nil or a `:mis:style' syntax tree.
+Example: (mis:style :width 80) -> '((:mis:style (:width . 80)))
+
+Only STYLE will be checked for styling; style in SYNTAX is ignored.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -269,17 +271,19 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((func/name  (list 'int<mis>:format:compile caller))
-         (formatter  (plist-get ast :formatter)))
+  (let* ((caller    (list 'int<mis>:format:compile caller))
+         (formatter (int<mis>:syntax:find caller
+                                          syntax
+                                          :mis:format :formatter)))
     ;;------------------------------
     ;; Sanity Checks
     ;;------------------------------
     (cond ((null formatter)
-           (int<mis>:error func/name
-                           '("AST should have some sort of `:formatter'? "
+           (int<mis>:error caller
+                           '("SYNTAX should have some sort of `:formatter'? "
                              "Got %S from %S")
                            formatter
-                           ast))
+                           syntax))
 
           (t
            nil))
@@ -290,15 +294,19 @@ CALLER should be calling function's name. It can be one of:
     (pcase formatter
       ('repeat
        ;; Build & return the repeated string.
-       (int<mis>:format:repeat (plist-get ast :string)
-                               (or (plist-get style :width)
+       (int<mis>:format:repeat (int<mis>:syntax:find caller
+                                                     syntax
+                                                     :mis:format :string)
+                               (or (int<mis>:syntax:find caller
+                                                         style
+                                                         :mis:style :width)
                                    fill-column)))
 
       (_
-       (int<mis>:error func/name
+       (int<mis>:error caller
                        '("Unhandled formatter case `%S'!")
                        formatter)))))
-;; (int<mis>:compile:format 'test '(:formatter repeat :string "-") '(:width 80))
+;; (int<mis>:compile:format 'test '((:mis:format (:formatter . repeat) (:string . "-"))) '((:mis:style (:width . 80))))
 
 
 ;;------------------------------------------------------------------------------
