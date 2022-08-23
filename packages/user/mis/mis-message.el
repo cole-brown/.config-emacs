@@ -154,7 +154,8 @@ CALLER should be calling function's name. It can be one of:
                            key
                            (cdr child))))))
 
-    output))
+    ;; Just concat for final return string?
+    (apply #'concat output)))
 ;; (int<mis>:compile 'test
 ;;                   '((:mis:format (:formatter . repeat) (:string . "-")))
 ;;                   (mis:style :width 80))
@@ -197,7 +198,7 @@ CALLER should be calling function's name. It can be one of:
                                    value
                                    args)
                  ;; Save the styling.
-                 (setq styling args)))
+                 (setq styling arg)))
 
               ((listp arg)
                ;; Think this is a Mis syntax tree? Should be anyways; error if not.
@@ -260,6 +261,7 @@ CALLER should be calling function's name. It can be one of:
 ;; (mis
 ;;  (mis:style :width 80)
 ;;  (mis:line "-"))
+;; TODO YOU ARE HERE:
 ;; (mis
 ;;   (mis:style :width 80)
 ;;   (mis:comment (mis:line "-"))
