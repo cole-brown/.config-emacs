@@ -46,6 +46,135 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Syntax Trees
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:syntax:get (caller key syntax &optional default)
+  "Get KEY value from Mis SYNTAX Tree.
+
+KEY should be:
+  - an internal keyword  - Starts with `:mis:`
+                         - From `int<mis>:keywords:key`
+  - a tempororay keyword - Starts with `:tmp:`
+
+Optional DEFAULT can be a value to return if KEY is not present.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (alist-get key syntax default))
+;; (int<mis>:syntax:get 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
+
+
+(defun int<mis>:syntax:create (caller category/syntax &rest kvp)
+  "Create a Mis Syntax Tree for CATEGORY/SYNTAX with KVPs.
+
+CATEGORY/SYNTAX should be:
+  - an internal keyword  - Starts with `:mis:`
+                         - From `int<mis>:keywords:category/syntax`
+  - a tempororay keyword - Starts with `:tmp:`
+
+KVP should (each) be a cons of a CATEGORY/SYNTAX keyword and its value.
+example: '(:width . 10)
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  ;; Make an alist out of the inputs.
+  (list (cons category/syntax kvp)))
+;; (alist-get :width (alist-get :mis:style (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))))
+
+
+(defun int<mis>:syntax:update (caller key syntax &rest kvp)
+  "Add/overwrite KVPs to Mis SYNTAX tree under KEY.
+
+KVP should (each) be a cons of a KEY keyword and its value.
+example: '(:width . 10)
+
+SYNTAX should be a Mis abstract syntax tree. It will be updated with KVPs and
+the updated value returned. Caller should set the return value back to the input
+arg as the update is not guaranteed to be in-place.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:syntax:update caller))
+         (syntax/cat (int<mis>:syntax:get caller key syntax)))
+  (dolist (pair kvp)
+      (setf (alist-get (car pair) syntax/cat) (cdr pair)))
+  (setf (alist-get key syntax) syntax/cat)
+  syntax))
+;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))) '(:align . :right))
+;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))) '(:align . :right) '(:trim . t))
+
+
+(defun int<mis>:syntax:find (caller syntax &rest key)
+  "Find a value from Mis SYNTAX Tree by following KEYs.
+
+SYNTAX should be a Mis abstract syntax tree. It will be updated with KVPs and
+the updated value returned. Caller should set the return value back to the input
+arg as the update is not guaranteed to be in-place.
+
+KEYs should be keywords to follow down the SYNTAX tree to find the value.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:syntax:find caller))
+        (value syntax))
+    (dolist (find key)
+      (setq value (int<mis>:syntax:get caller find value)))
+    value))
+;; (int<mis>:syntax:find 'test '((:mis:style (:width . 10)) (:tmp:line (:string . "xX"))) :tmp:line :string)
+
+
+(defun int<mis>:syntax:merge (caller syntax/to syntax/from &rest ignore/from)
+  "Merge two Mis Syntax Trees, ignoring IGNORE/FROM keys.
+
+SYNTAX/TO and SYNTAX/FROM should be Mis abstract syntax trees. SYNTAX/FROM will
+be merged into SYNTAX/TO, except any keywords from IGNORE/FROM.
+
+NOTE: Assumes SYNTAX/TO and SYNTAX/FROM are valid. Caller should call
+`int<mis>:valid:syntax?' before this if needed.
+
+Return a Mis Syntax Tree combination of SYNTAX/TO and SYNTAX/FROM.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:syntax:merge caller)))
+    (dolist (assoc/from syntax/from)
+      (let ((key/from   (car assoc/from))
+            (value/from (cdr assoc/from)))
+        ;; Ignore?
+        (unless (memq key/from ignore/from)
+          ;; Merge this into SYNTAX/TO.
+          (setf (alist-get key/from syntax/to) value/from))))
+    ;; Return the updated syntax.
+    syntax/to))
+;; (int<mis>:syntax:merge 'test
+;;                         '((:mis:style (:width . 10) (:align . :center)) (:mis:message "hello there"))
+;;                         '((:mis:style (:width . 11) (:align . :right)) (:tmp:line (:string . "xxx")))
+;;                         :tmp:line)
+
+
+;;------------------------------------------------------------------------------
 ;; Parsing
 ;;------------------------------------------------------------------------------
 
