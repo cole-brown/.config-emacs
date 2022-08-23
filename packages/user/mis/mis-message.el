@@ -16,6 +16,7 @@
 (require 'mis-valid)
 (require 'mis-buffer)
 (require 'mis-format)
+(require 'mis-parse)
 
 (require 'mis-align)
 (require 'mis-style)
@@ -102,6 +103,64 @@ CALLER should be calling function's name. It can be one of:
 
 
 ;;------------------------------------------------------------------------------
+;; Compiling
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:compile (caller syntax &optional style)
+  "Compile SYNTAX into a propertized string for output using STYLE.
+
+SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
+will override any styling in STYLE.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  ;; Figure out complete styling given STYLE and any `:mis:style' in SYNTAX.
+  (let* ((caller (list 'int<mis>:compile caller))
+         (styling (int<mis>:syntax:set caller
+                                       :mis:style
+                                       (int<mis>:syntax:merge
+                                        caller
+                                        (int<mis>:syntax:get/value caller
+                                                                   :mis:style
+                                                                   style)
+                                        (int<mis>:syntax:get/value caller
+                                                                   :mis:style
+                                                                   syntax))))
+         output)
+
+    ;; Our job is just to find the compiler for the mis type and tell it to do its
+    ;; thing.
+    (dolist (child syntax)
+      (let ((key (car child))
+            (child/syntax (list child)))
+        (pcase key
+          (:mis:style
+           ;; Ignore; already dealt with styling.
+           nil)
+
+          (:mis:format
+           (push (int<mis>:compile:format 'mis
+                                          child/syntax
+                                          styling)
+                 output))
+
+          (_
+           (int<mis>:error 'mis
+                           "Unhandled mis content type `%S' with value: %S"
+                           key
+                           (cdr child))))))
+
+    output))
+;; (int<mis>:compile 'test
+;;                   '((:mis:format (:formatter . repeat) (:string . "-")))
+;;                   (mis:style :width 80))
+
+
+;;------------------------------------------------------------------------------
 ;; Output API
 ;;------------------------------------------------------------------------------
 
@@ -137,20 +196,14 @@ CALLER should be calling function's name. It can be one of:
                                    styling
                                    value
                                    args)
-                 ;; Save the styling (just the `:style' key's value).
-                 (setq styling (nth 1 args))))
+                 ;; Save the styling.
+                 (setq styling args)))
 
               ((listp arg)
                ;; Think this is a Mis syntax tree? Should be anyways; error if not.
                (int<mis>:valid:syntax? 'mis 'arg arg)
-               (let ((key   (nth 0 arg))
-                     (value (nth 1 arg)))
-                 ;; Save off this mis content type (messages, comments, arts...) in
-                 ;; key, value order so it can be used as-is in next step. The pairs as
-                 ;; a whole will be in reverse order but that'll be righted in
-                 ;; finalization/printing.
-                 (push value content)
-                 (push key content)))
+               ;; Save off this mis content type (messages, comments, arts...).
+               (push arg content))
 
               ;; Top-level arg? Example: `:buffer'
               ((keywordp arg)
@@ -168,6 +221,7 @@ CALLER should be calling function's name. It can be one of:
                                         args)
                       ;; Validate value later (when used)?
                       (setq buffer value)))
+                   ;; TODO: Other top-level keywords?
                    (_
                     (int<mis>:error 'mis
                                     '("Unknown/unhandled args keyword/value pair!"
@@ -190,23 +244,11 @@ CALLER should be calling function's name. It can be one of:
     ;; Compile each piece of `content' in current (reverse) order & push to
     ;; `output' list. Final step will then have `output' in forwards order.
     (while content
-      (let ((key (pop content))
-            (value (pop content)))
-        ;; Find compiler for mis type.
-        ;; Pass it the type's tree and the current styling.
-        (pcase key
-          (:format
-           (push (int<mis>:compile:format 'mis
-                                          value
-                                          styling)
-                 output))
-
-          (_
-           (int<mis>:error 'mis
-                           '("Unhandled mis content type: %S "
-                             "values: %S")
-                           key
-                           value)))))
+      ;; Get a syntax tree; turn into a string.
+      (push (int<mis>:compile 'mis
+                              (pop content)
+                              styling)
+            output))
 
     ;;------------------------------
     ;; Print Output
