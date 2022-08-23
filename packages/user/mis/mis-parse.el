@@ -49,7 +49,7 @@
 ;; Syntax Trees
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:syntax:get (caller key syntax &optional default)
+(defun int<mis>:syntax:get/value (caller key syntax &optional default)
   "Get KEY value from Mis SYNTAX Tree.
 
 KEY should be:
@@ -66,7 +66,71 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (alist-get key syntax default))
-;; (int<mis>:syntax:get 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:get/value 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
+
+
+(defun int<mis>:syntax:get/pair (caller key syntax)
+  "Get KEY's assoc (key/value pair) from Mis SYNTAX Tree.
+
+KEY should be:
+  - an internal keyword  - Starts with `:mis:`
+                         - From `int<mis>:keywords:key`
+  - a tempororay keyword - Starts with `:tmp:`
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (assoc key syntax))
+;; (int<mis>:syntax:get/pair 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
+
+
+(defun int<mis>:syntax:get/syntax (caller key syntax)
+  "Get KEY's assoc (key/value pair) _as a Mis Syntax Tree_ from Mis SYNTAX Tree.
+
+KEY should be:
+  - an internal keyword  - Starts with `:mis:`
+                         - From `int<mis>:keywords:key`
+  - a tempororay keyword - Starts with `:tmp:`
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (when-let ((pair (int<mis>:syntax:get/pair (list 'int<mis>:syntax:get/syntax caller)
+                                           key
+                                           syntax)))
+    (list (assoc key syntax))))
+;; (int<mis>:syntax:get/syntax 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
+
+(defun int<mis>:syntax:set (caller key syntax)
+  "Create a new 1 element Mis Syntax Tree with key KEY and value SYNTAX.
+
+KEY should be a keyword.
+
+SYNTAX should be a Mis Syntax Tree.
+
+Similar to `int<mis>:syntax:create' but for a single alist child instead of KVPs
+that need to be turned into a syntax tree.
+Equivalent Output:
+  (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))
+  (int<mis>:syntax:set 'test :mis:style '((:width . 10) (:align . :center)))
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  ;; Make an alist out of the inputs.
+  (list (cons key syntax)))
+;; (alist-get :width (alist-get :mis:style (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))))
+;; (alist-get :width (alist-get :mis:style (int<mis>:syntax:set 'test :mis:style '((:width . 10) (:align . :center)))))
+;; (int<mis>:syntax:create 'test :mis:style '((:width . 10) (:align . :center)))
 
 
 (defun int<mis>:syntax:create (caller category/syntax &rest kvp)
@@ -80,6 +144,13 @@ CATEGORY/SYNTAX should be:
 KVP should (each) be a cons of a CATEGORY/SYNTAX keyword and its value.
 example: '(:width . 10)
 
+Similar to `int<mis>:syntax:set' but for one or more KVPs that need to be turned
+into a syntax tree instead of just a single child that is already a proper
+syntax tree alist.
+Equivalent Output:
+  (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))
+  (int<mis>:syntax:set 'test :mis:style '((:width . 10) (:align . :center)))
+
 CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
@@ -89,6 +160,7 @@ CALLER should be calling function's name. It can be one of:
   ;; Make an alist out of the inputs.
   (list (cons category/syntax kvp)))
 ;; (alist-get :width (alist-get :mis:style (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))))
+;; (int<mis>:syntax:create 'test :mis:style '((:width . 10) (:align . :center)))
 
 
 (defun int<mis>:syntax:update (caller key syntax &rest kvp)
@@ -108,7 +180,7 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:syntax:update caller))
-         (syntax/cat (int<mis>:syntax:get caller key syntax)))
+         (syntax/cat (int<mis>:syntax:get/value caller key syntax)))
   (dolist (pair kvp)
       (setf (alist-get (car pair) syntax/cat) (cdr pair)))
   (setf (alist-get key syntax) syntax/cat)
@@ -121,9 +193,7 @@ CALLER should be calling function's name. It can be one of:
 (defun int<mis>:syntax:find (caller syntax &rest key)
   "Find a value from Mis SYNTAX Tree by following KEYs.
 
-SYNTAX should be a Mis abstract syntax tree. It will be updated with KVPs and
-the updated value returned. Caller should set the return value back to the input
-arg as the update is not guaranteed to be in-place.
+SYNTAX should be a Mis abstract syntax tree.
 
 KEYs should be keywords to follow down the SYNTAX tree to find the value.
 
@@ -136,9 +206,10 @@ CALLER should be calling function's name. It can be one of:
   (let ((caller (list 'int<mis>:syntax:find caller))
         (value syntax))
     (dolist (find key)
-      (setq value (int<mis>:syntax:get caller find value)))
+      (setq value (int<mis>:syntax:get/value caller find value)))
     value))
 ;; (int<mis>:syntax:find 'test '((:mis:style (:width . 10)) (:tmp:line (:string . "xX"))) :tmp:line :string)
+;; (int<mis>:syntax:find 'test '((:mis:style (:width . 10)) (:tmp:line (:string . "xX"))) :mis:style)
 
 
 (defun int<mis>:syntax:merge (caller syntax/to syntax/from &rest ignore/from)
