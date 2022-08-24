@@ -16,6 +16,7 @@
 
 (require 'mis-error)
 (require 'mis-valid)
+(require 'mis-parse)
 (require 'mis-buffer)
 (require 'mis-style)
 
@@ -202,29 +203,32 @@ NOTE: The \"invalids\" will just be interpreted as having no comment args and
 extra message args.
 
 NOTE: Comment keyword args must always have both a keyword and a value."
-  (let* ((parsed   (apply 'int<mis>:parse
+  (let* ((syntax   (apply 'int<mis>:parse
                           'mis:comment
                           '(:comment :style) ; Also allow styling in our comments.
                           args))
-         (comment  (plist-get parsed :comment))
-         (type     (plist-get comment :type))
-         (language (plist-get comment :language)))
+         ;; Block or inline comment?
+         (type     (or (int<mis>:syntax:find 'mis:comment
+                                             syntax
+                                             :mis:comment :type)
+                       'default))
+         ;; Explicit comment language (e.g. for org-mode source blocks)?
+         (language (int<mis>:syntax:find 'mis:comment
+                                         syntax
+                                         :mis:comment :language)))
 
-    ;; Set `type'/`language' to a default if they are nil?
-    ;; Not yet... right now just record that we'll be doing that eventually.
-    (unless type
-      (setq type 'default)
-      (push type comment)
-      (push :type comment))
-
-    ;; Update `:comment' value in `parsed' with start/end comment strings, etc.
-    (push (int<mis>:comment:end type language) comment)
-    (push :postfix comment)
-    (push (int<mis>:comment:start type language) comment)
-    (push :prefix comment)
-
-    (setq parsed (plist-put parsed :comment comment))))
+    ;; Update `:comment' value in `syntax' with start/end comment strings, etc.
+    (int<mis>:syntax:update 'mis:comment
+                            :mis:comment
+                            syntax
+                            (when language
+                              (cons :language language))
+                            (cons :type    type)
+                            (cons :postfix (int<mis>:comment:end type language))
+                            (cons :prefix  (int<mis>:comment:start type language)))))
 ;; (mis:comment :align 'center "hello")
+;;   -> '((:mis:comment (:prefix . ";;") (:postfix . "") (:type . default)) (:mis:style (:align . center)) (:mis:string . "hello"))
+;;
 ;; (mis:comment :type 'inline "hello")
 ;; (mis:comment :type 'block :align 'center "hello %s" "world")
 ;; (mis:comment :type 'block :language 'csharp :align 'center :width 11 "hello %s" "world")
