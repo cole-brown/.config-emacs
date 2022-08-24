@@ -102,8 +102,8 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (when-let ((pair (int<mis>:syntax:get/pair (list 'int<mis>:syntax:get/syntax caller)
-                                           key
-                                           syntax)))
+                                             key
+                                             syntax)))
     (list (assoc key syntax))))
 ;; (int<mis>:syntax:get/syntax 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
 
@@ -181,13 +181,15 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:syntax:update caller))
          (syntax/cat (int<mis>:syntax:get/value caller key syntax)))
-  (dolist (pair kvp)
-      (setf (alist-get (car pair) syntax/cat) (cdr pair)))
-  (setf (alist-get key syntax) syntax/cat)
-  syntax))
+    (dolist (pair kvp)
+      ;; Skip anything that's just a nil.
+      (when pair
+        (setf (alist-get (car pair) syntax/cat) (cdr pair))))
+    (setf (alist-get key syntax) syntax/cat)
+    syntax))
 ;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
 ;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))) '(:align . :right))
-;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))) '(:align . :right) '(:trim . t))
+;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))) '(:align . :right) nil '(:trim . t))
 
 
 (defun int<mis>:syntax:find (caller syntax &rest key)
@@ -210,6 +212,7 @@ CALLER should be calling function's name. It can be one of:
     value))
 ;; (int<mis>:syntax:find 'test '((:mis:style (:width . 10)) (:tmp:line (:string . "xX"))) :tmp:line :string)
 ;; (int<mis>:syntax:find 'test '((:mis:style (:width . 10)) (:tmp:line (:string . "xX"))) :mis:style)
+;; (int<mis>:syntax:find 'test '((:mis:style (:width . 10)) (:tmp:line (:string . "xX"))) :dne)
 
 
 (defun int<mis>:syntax:merge (caller syntax/to syntax/from &rest ignore/from)
@@ -379,12 +382,19 @@ Optional CATEGORY should be:
       ;; Build AST: Presume that the rest of ARGS are message/formatting.
       ;;------------------------------
       (when args
-        (if (and (= (length args) 1)
-                 (stringp (nth 0 args)))
-            ;; Just a single string; use `:mis:string' to simplify things later.
-            (push (cons :mis:string (nth 0 args)) ast/out)
-          ;; Generic message format string and/or args go into the `:mis:message'.
-          (push (cons :mis:message args) ast/out)))
+        (cond ((and (= (length args) 1)
+                    (stringp (nth 0 args)))
+               ;; Just a single string; use `:mis:string' to simplify things later.
+               (push (cons :mis:string (nth 0 args)) ast/out))
+
+              ((and (= (length args) 1)
+                    (characterp (nth 0 args)))
+               ;; Just a single string; use `:mis:string' to simplify things later.
+               (push (cons :mis:char (nth 0 args)) ast/out))
+
+              (t
+               ;; Generic message format string and/or args go into the `:mis:message'.
+               (push (cons :mis:message args) ast/out))))
 
       ;;------------------------------
       ;; Build AST: Add pre-existing ASTs.
