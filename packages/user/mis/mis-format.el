@@ -309,6 +309,74 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:compile:format 'test '((:mis:format (:formatter . repeat) (:string . "-"))) '((:mis:style (:width . 80))))
 
 
+(defun int<mis>:format:syntax (caller syntax &rest key)
+  "Get a string from the Mis SYNTAX Tree.
+
+SYNTAX should be a Mis abstract syntax tree.
+
+Each KEY provided should be a single keyword or a list of keywords to traverse
+down the tree branches (see `int<mis>:syntax:find').
+
+Will look for, in order of preference:
+  - Anything provided in KEYs.
+    - e.g. (int<mis>:syntax:string 'test
+                                   (mis:line ?-)
+                                   '(:tmp:line :char)
+                                   '(:tmp:line :string))
+    - Higher priority should be first in KEYs.
+  - `:mis:string'
+  - `:mis:char'
+  - `:mis:message'
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:syntax:string caller))
+         value
+         out/string)
+
+    ;; Check for KEYs first.
+    (while (and key
+                (not value))
+      (let ((check (pop key)))
+        (setq value (if (keywordp check)
+                        (int<mis>:syntax:find caller syntax check)
+                      (apply #'int<mis>:syntax:find caller syntax check)))))
+
+    ;; Now check for the `:mis:...' keywords...
+    (unless value
+      (setq value (or (int<mis>:syntax:find caller syntax :mis:string)
+                      (int<mis>:syntax:find caller syntax :mis:char)
+                      (int<mis>:syntax:find caller syntax :mis:message))))
+
+    ;; Need to convert to a string, now...
+    (cond ((stringp value)
+           value)
+
+          ((characterp value)
+           (make-string 1 value))
+
+          ;; `value' found is a list (and not "a list" as in "nil")?
+          ((and (not (null value))
+                (listp value))
+           ;; list should be '(message-string arg-0 ...)
+           (apply #'int<mis>:format:message
+                  caller
+                  value))
+
+          ;; Fallthrough: Error
+          (t
+           (int<mis>:error caller
+                           "No Mis string found in SYNTAX! %S"
+                           syntax)))))
+;; (int<mis>:format:syntax 'test (mis:line "-") '(:mis:format :string))
+;; (int<mis>:format:syntax 'test '((:mis:format (:formatter . repeat) (:char . ?-))) '(:mis:format :string) '(:mis:format :char))
+;; (int<mis>:format:syntax 'test '((:mis:message  "hello %s" "there")))
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
