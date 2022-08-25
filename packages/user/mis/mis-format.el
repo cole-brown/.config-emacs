@@ -271,7 +271,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller    (list 'int<mis>:format:compile caller))
+  (let* ((caller    (list 'int<mis>:compile:format caller))
          (formatter (int<mis>:syntax:find caller
                                           syntax
                                           :mis:format :formatter)))
@@ -373,6 +373,7 @@ CALLER should be calling function's name. It can be one of:
                            "No Mis string found in SYNTAX! %S"
                            syntax)))))
 ;; (int<mis>:format:syntax 'test (mis:line "-") '(:mis:format :string))
+;; (int<mis>:format:syntax 'test (mis:comment "hi"))
 ;; (int<mis>:format:syntax 'test '((:mis:format (:formatter . repeat) (:char . ?-))) '(:mis:format :string) '(:mis:format :char))
 ;; (int<mis>:format:syntax 'test '((:mis:message  "hello %s" "there")))
 

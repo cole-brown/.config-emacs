@@ -18,6 +18,7 @@
 (require 'mis-valid)
 (require 'mis-parse)
 (require 'mis-buffer)
+(require 'mis-string)
 (require 'mis-style)
 
 
@@ -27,8 +28,8 @@
 
 (defconst int<mis>:comment:type/defaults
   '((prog-mode     . inline)
-    (org-mode      . block)
-    (markdown-mode . block))
+    (org-mode      . quote)
+    (markdown-mode . quote))
   "Alist of major mode symbols to `block'/`inline' comment types.
 
 Will check for the major mode or modes derived from it.
@@ -40,8 +41,30 @@ Try to put the most common modes at the beginning of the list.")
 ;; Helper Functions
 ;;------------------------------------------------------------------------------
 
+(defun int<mis>:comment:type/get (type)
+  "Finalize TYPE into one of: `inline', `block', `quote'.
+
+Must be run in context of output buffer."
+  (if (not (eq type 'default))
+      ;; The specific types are already finalized.
+      type
+    ;; Need to figure out what "default" means...
+    (let (final)
+      (dolist (mode/assoc int<mis>:comment:type/defaults)
+        (let ((mode (car mode/assoc))
+              (default (cdr mode/assoc)))
+          (when (and (null final)
+                     (derived-mode-p mode))
+            (setq final default))))
+      ;; Final guess: inline
+      (or final
+          'inline))))
+;; (int<mis>:comment:type/get 'default)
+
+
+;; TODO: Use this somewhere?
 (defun int<mis>:comment:type/auto (buffer)
-  "Figure out what comment type (block/inline) to use for the current BUFFER.
+  "Figure out what comment type to use for the current BUFFER.
 
 BUFFER should be something `int<mis>:buffer:get' understands."
   (with-current-buffer (int<mis>:buffer:get buffer)
@@ -73,6 +96,7 @@ Must be run in context of desired buffer.
 TYPE should be one of:
   - `:block', `block':   Multi-line comments.
   - `:inline', `inline': Single line comments.
+  - `:quote', `quote':   Multi-line comments for e.g. org, markdown.
 
 LANGUAGE should be nil, string, or symbol:
   - a language name for e.g. markdown source blocks?
@@ -99,26 +123,28 @@ LANGUAGE should be nil, string, or symbol:
   ;; Emacs already knows: If `comment-start' variable is set, that is the
   ;; correct thing to use.
   (cond (comment-start ;; TODO: block vs inline?
-         (int<mis>:format:repeat comment-start (1+ (comment-add nil))))
+         (concat (int<mis>:format:repeat comment-start (1+ (comment-add nil)))
+                 ;; TODO: avoid space padding via `mis:comment' param?
+                 " "))
 
         ;; Figure it out ourselves?
         ((eq major-mode 'org-mode)
-         (if (eq type :block)
-             (apply #'concat
-                    "#+begin_src"
-                    (if language
-                        (list " " language)
-                      nil))
-           "~"))
+         (if (eq type 'inline)
+             "~"
+           (apply #'concat
+                  "#+begin_src"
+                  (if language
+                      (list " " language)
+                    nil))))
 
         ((eq major-mode 'markdown-mode)
-         (if (eq type :block)
-             (apply #'concat
-                    "```"
-                    (if language
-                        (list " " language)
-                      nil))
-           "`"))
+         (if (eq type 'inline)
+             "`"
+           (apply #'concat
+                  "```"
+                  (if language
+                      (list " " language)
+                    nil))))
 
         ;; Fallthrough... error?
         (t
@@ -135,6 +161,7 @@ Must be run in context of desired buffer.
 TYPE should be one of:
   - `:block', `block':   Multi-line comments.
   - `:inline', `inline': Single line comments.
+  - `:quote', `quote':   Multi-line comments for e.g. org, markdown.
 
 LANGUAGE should be nil or string:
   - a language name for e.g. markdown source blocks?
@@ -159,18 +186,22 @@ LANGUAGE should be nil or string:
 
   ;; Emacs already knows: If `comment-end' variable is set, that is the
   ;; correct thing to use.
-  (cond (comment-end) ;; TODO: block vs inline?
+  (cond (comment-end ;; TODO: block vs inline?
+         (if (string-empty-p comment-end)
+             comment-end
+           ;; TODO: avoid space padding via `mis:comment' param?
+           (concat " " comment-end)))
 
         ;; Figure it out ourselves?
         ((eq major-mode 'org-mode)
-         (if (eq type 'block)
-             "#+end_src"
-           "~"))
+         (if (eq type 'inline)
+             "~"
+           "#+end_src"))
 
         ((eq major-mode 'markdown-mode)
-         (if (eq type 'block)
-             "```"
-           "`"))
+         (if (eq type 'inline)
+             "`"
+           "```"))
 
         ;; Fallthrough... error?
         (t
@@ -181,6 +212,75 @@ LANGUAGE should be nil or string:
 
 ;; TODO: a func or something for "if type==block, insert-or-don't a newline
 ;; before-or-after-depending to separate from surrounding stuff"
+
+
+;;------------------------------------------------------------------------------
+;; Output Builders
+;;------------------------------------------------------------------------------
+
+;; TODO: Handle style!
+(defun int<mis>:compile:comment (caller syntax style)
+  "Format Mis SYNTAX Tree using STYLE; return string.
+
+SYNTAX should be `:mis:comment' syntax tree.
+
+STYLE should be nil or a `:mis:style' syntax tree.
+Example: (mis:style :width 80) -> '((:mis:style (:width . 80)))
+
+Only STYLE will be checked for styling; style in SYNTAX is ignored.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller  (list 'int<mis>:compile:comment caller))
+         (type    (int<mis>:comment:type/get
+                   (int<mis>:syntax:find caller syntax :mis:comment :type)))
+         (prefix  (or (int<mis>:syntax:find caller syntax :mis:comment :prefix) ""))
+         (postfix (or (int<mis>:syntax:find caller syntax :mis:comment :postfix) ""))
+         (comment (int<mis>:format:syntax caller syntax)))
+
+    ;;------------------------------
+    ;; Format into a comment.
+    ;;------------------------------
+    ;; TODO: Indent? Trim? Etc?
+    (cond ((eq type 'quote)
+           ;; Simpler: Just prefix line, the string, and postfix line.
+           (int<mis>:string:join/lines prefix comment postfix))
+
+          ((eq type 'inline)
+           ;; Each line gets treated the same.
+           (apply #'int<mis>:string:combine/lines
+                  prefix
+                  postfix
+                  (int<mis>:string:split/lines comment)))
+
+          ((eq type 'block)
+           ;; Prefix is just for first line; postfix is just for last line.
+           ;; TODO: a prefix for the rest of the lines?
+           ;; TODO: e.g. C-style:
+           ;; TODO:   /* line 1
+           ;; TODO:    * line 2 */
+           ;; TODO: The 'rest of lines' prefix is " *".
+           (concat prefix comment postfix))
+
+          ((eq type 'default)
+           ;; Special error cuz it shouldn't be `default' after `int<mis>:comment:type/get'.
+           (int<mis>:error caller
+                           "Comment type (%S) should not still be `default'! %S"
+                           type
+                           syntax))
+
+          (t
+           (int<mis>:error caller
+                           "Unhandled comment type `%S' in: %S"
+                           type
+                           syntax)))))
+;; (int<mis>:compile:comment 'test (mis:comment "hi") '((:mis:style (:width . 80))))
+;; (mis:comment "hi")
+;;   -> ((:mis:comment (:prefix . ";;") (:postfix . "") (:type . default)) (:mis:string . "hi"))
 
 
 ;;------------------------------------------------------------------------------
@@ -227,8 +327,6 @@ NOTE: Comment keyword args must always have both a keyword and a value."
                             (cons :postfix (int<mis>:comment:end type language))
                             (cons :prefix  (int<mis>:comment:start type language)))))
 ;; (mis:comment :align 'center "hello")
-;;   -> '((:mis:comment (:prefix . ";;") (:postfix . "") (:type . default)) (:mis:style (:align . center)) (:mis:string . "hello"))
-;;
 ;; (mis:comment :type 'inline "hello")
 ;; (mis:comment :type 'block :align 'center "hello %s" "world")
 ;; (mis:comment :type 'block :language 'csharp :align 'center :width 11 "hello %s" "world")

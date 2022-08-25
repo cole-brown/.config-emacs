@@ -92,13 +92,15 @@ Cons: (input-category-keyword . (internal-category-keyword-0 ...))")
 
 (defconst int<mis>:valid:comment/types
   ;; keyword / symbol
-  '(:block  block
-    :inline inline
+  '(:inline inline
+    :block  block
+    :quote quote
     :default default)
   "Valid Mis comment types.
 
-'block' is a multi-line comment.
-'inline' is a single-line comment.
+'inline' is a standard single-line comment.
+'block' is a standard multi-line comment.
+'quote' is a multi-line comments for e.g. org, markdown.
 'default' depends on buffer's major-mode.")
 
 
