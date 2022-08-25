@@ -172,6 +172,7 @@ example: '(:width . 10)
 SYNTAX should be a Mis abstract syntax tree. It will be updated with KVPs and
 the updated value returned. Caller should set the return value back to the input
 arg as the update is not guaranteed to be in-place.
+Example: (setq syntax (int<mis>:syntax:update 'test :mis:style syntax '(:align . :center)))
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -190,6 +191,27 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
 ;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))) '(:align . :right))
 ;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))) '(:align . :right) nil '(:trim . t))
+
+
+(defun int<mis>:syntax:delete (caller key syntax)
+  "Remove KEY from Mis SYNTAX tree.
+
+KEY should be a keyword.
+
+SYNTAX should be a Mis abstract syntax tree. Caller should set the return value
+back to the input arg as the delete is not guaranteed to be in-place.
+Example: (setq syntax (int<mis>:syntax:delete 'test :mis:style syntax))
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (setf (alist-get key syntax nil :remove) nil)
+  syntax)
+;; (int<mis>:syntax:delete 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:delete 'test :mis:style '((:mis:style (:width . 10) (:align . :center)) (:mis:string . "hi")))
 
 
 (defun int<mis>:syntax:find (caller syntax &rest key)
