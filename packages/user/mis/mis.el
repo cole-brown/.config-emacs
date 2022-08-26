@@ -30,7 +30,12 @@
 (require 'mis-format)
 
 ;;------------------------------
-;; Input APIs
+;; Output API & Main Compiler
+;;------------------------------
+(require 'mis-compile)
+
+;;------------------------------
+;; Input APIs & Mis Type Compilers
 ;;------------------------------
 (require 'mis-align)
 (require 'mis-style)
@@ -38,11 +43,6 @@
 (require 'mis-art)
 (require 'mis-comment)
 (require 'mis-message)
-
-;;------------------------------
-;; Output API
-;;------------------------------
-(require 'mis-compile)
 
 
 ;;------------------------------------------------------------------------------

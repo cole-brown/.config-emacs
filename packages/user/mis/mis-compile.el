@@ -17,16 +17,93 @@
 (require 'mis-buffer)
 (require 'mis-format)
 
-(require 'mis-align)
-(require 'mis-style)
-(require 'mis-string)
-(require 'mis-art)
-(require 'mis-comment)
-(require 'mis-message)
 
+;;------------------------------------------------------------------------------
+;; TODO: Generators?
+;;------------------------------------------------------------------------------
 
 ;; TODO: Change to generators?
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Generators.html
+;;
+;; (require 'generator)
+;;
+;; (iter-defun int<mis>:compile/iter (caller syntax &optional style)
+;;   "Compile any `:mis' SYNTAX using STYLE; replace the result in SYNTAX.
+;;
+;; SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
+;; will override any styling in STYLE.
+;;
+;; CALLER should be calling function's name. It can be one of:
+;;   - a string
+;;   - a quoted symbol
+;;   - a function-quoted symbol
+;;   - a list of the above, most recent first
+;;     - e.g. '(#'error-caller \"parent\" 'grandparent)"
+;;   (iter-yield "TODO 0")
+;;   (iter-yield "TODO 1")
+;;   (iter-yield "TODO 2")
+;;   "TODO NORMAL RETURNED?")
+;;
+;; (iter-do (syntax (int<mis>:compile/iter 'test (mis:comment (mis:line "-"))))
+;;   (message "iter syntax: %S" syntax))
+
+
+;;------------------------------------------------------------------------------
+;; Compilers
+;;------------------------------------------------------------------------------
+
+(defvar int<mis>:compilers
+  nil
+  "Alist of Mis keyword to compiler function.
+
+Keyword must be a member of `int<mis>:keywords:category/internal'.
+
+Function must have params: (CALLER SYNTAX STYLE)
+
+SYNTAX should be `:mis:comment' syntax tree.
+
+STYLE should be nil or a `:mis:style' syntax tree.
+Example: (mis:style :width 80) -> '((:mis:style (:width . 80)))
+
+Only STYLE will be checked for styling; style in SYNTAX is ignored.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)")
+
+
+(defun int<mis>:register:compiler (category function)
+  "Register FUNCTION as the compiler for CATEGORY.
+
+CATEGORY must be a member of `int<mis>:keywords:category/internal'.
+
+Function must have params: (CALLER SYNTAX STYLE)
+
+SYNTAX should be `:mis:comment' syntax tree.
+
+STYLE should be nil or a `:mis:style' syntax tree.
+Example: (mis:style :width 80) -> '((:mis:style (:width . 80)))
+
+Only STYLE will be checked for styling; style in SYNTAX is ignored.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (if-let ((existing (alist-get category int<mis>:compilers)))
+      ;; Just ignore re-registrations...
+      (unless (eq existing function)
+        (int<mis>:error 'int<mis>:compile:register
+                        "Compiler already exists for `%S'! Have: %S, attempted: %S"
+                        category
+                        existing
+                        function))
+    (push (cons category function) int<mis>:compilers)))
 
 
 ;;------------------------------------------------------------------------------
@@ -66,6 +143,9 @@ CALLER should be calling function's name. It can be one of:
     ;; Return in correct order.
     (nreverse syntax/out)))
 ;; (int<mis>:compile:mis 'test (mis:comment (mis:line "-")))
+
+
+(int<mis>:register:compiler :mis #'int<mis>:compile:mis)
 
 
 (defun int<mis>:compile (caller syntax &optional style)
