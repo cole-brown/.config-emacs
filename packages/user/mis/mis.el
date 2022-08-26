@@ -23,14 +23,15 @@
 ;; Low level funcs.
 (require 'mis-error)
 (require 'mis-valid)
+(require 'mis-parse)
 (require 'mis-buffer)
-(require 'mis-string)
 (require 'mis-format)
 
 ;; Contains at least one public APIs.
 ;; Possibly some low level funcs.
 (require 'mis-align)
 (require 'mis-style)
+(require 'mis-string)
 (require 'mis-art)
 (require 'mis-comment)
 

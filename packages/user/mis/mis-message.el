@@ -232,32 +232,6 @@ CALLER should be calling function's name. It can be one of:
 ;; Output API
 ;;------------------------------------------------------------------------------
 
-(defun mis:string (&rest args)
-  "Parse ARGS into a Mis message/string syntax tree.
-
-ARGS should start off with styling key/values before supplying
-the format string and format args. Example:
-  Valid:
-    (mis:string :type 'inline \"hello world\")
-    (mis:string :type 'inline :language 'emacs-lisp \"hello %s\" (get-greeted))
-  Invalid:
-    (mis:string \"hello %s\" :type 'inline (get-greeted))
-    (mis:string \"hello %s\" (get-greeted) :type 'inline :language 'emacs-lisp)
-
-NOTE: The \"invalids\" will just be interpreted as having extra message string
-formatting args.
-
-NOTE: Mis keyword args must always have both a keyword and a value."
-  (apply 'int<mis>:parse
-         'mis:string
-         '(:style) ; Also allow styling in our string.
-         args))
-;; (mis:string "hello %S" "there")
-;; (mis:string :width 80 "hello there")
-
-(defalias 'mis:message 'mis:string)
-
-
 ;; TODO: Move this to "mis.el"?
 (defun mis (&rest args)
   "Output a message built from ARGS."
