@@ -309,6 +309,10 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:compile:format 'test '((:mis:format (:formatter . repeat) (:string . "-"))) '((:mis:style (:width . 80))))
 
 
+(int<mis>:register:compiler :mis:format #'int<mis>:compile:comment)
+
+
+;; TODO: Convert callers to `int<mis>:compile:string' / `int<mis>:compile:char' / `int<mis>:compile:message'?
 (defun int<mis>:format:syntax (caller syntax &rest key)
   "Get a string from the Mis SYNTAX Tree.
 

@@ -283,6 +283,9 @@ CALLER should be calling function's name. It can be one of:
 ;;   -> ((:mis:comment (:prefix . ";;") (:postfix . "") (:type . default)) (:mis:string . "hi"))
 
 
+(int<mis>:register:compiler :mis:comment #'int<mis>:compile:comment)
+
+
 ;;------------------------------------------------------------------------------
 ;; Output API
 ;;------------------------------------------------------------------------------
