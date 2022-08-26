@@ -28,12 +28,12 @@
 ;;          (:mis:style (:align center))
 ;;          (:mis:string "world")))
 ;;
-;; NOTE: A Mis AST is an alist:
+;; NOTE: A Mis Syntax Tree is an alist:
 ;;   - the key must be from `int<mis>:keywords:category/internal'
 ;;   - the value must be a list
 ;;
 ;; This file is dedicated to the common functionality related to parsing user
-;; inputs and building Mis ASTs.
+;; inputs and building Mis Syntax Trees.
 ;;
 ;;
 ;;; Code:
@@ -365,16 +365,16 @@ Optional CATEGORY should be:
     ;;------------------------------
     (let ((parsing t)
           (args/len (length args))
-          ast/parsed ; Validated/normalized kvps alist by keyword category.
-          ast/in     ; Input Mis ASTs.
-          ast/out)   ; Output Mis Abstract Syntax Tree.
+          syntax/parsed ; Validated/normalized kvps alist by keyword category.
+          syntax/in
+          syntax/out)
 
       (while (and args
                   (> args/len 1)
                   parsing)
         (if (not (keywordp (car args)))
             ;;---
-            ;; Done; no more kvps to parse; rest is either Mis ASTs or messaging stuff.
+            ;; Done; no more kvps to parse; rest is either Mis Syntax Trees or messaging stuff.
             ;;---
             (setq parsing nil)
 
@@ -387,11 +387,11 @@ Optional CATEGORY should be:
                     (validator-cat (car validator)) ; parsed category (internal or tmp)
                     (validator-fn  (cdr validator))
                     (value         (funcall validator-fn caller key (pop args))))
-              ;; Key/value exist and are now known to be valid; save to the AST
+              ;; Key/value exist and are now known to be valid; save to the syntax tree
               ;; for this parsed category.
-              (let ((ast/cat (alist-get validator-cat ast/parsed)))
-                (setf (alist-get key ast/cat) value)
-                (setf (alist-get validator-cat ast/parsed) ast/cat))
+              (let ((syntax/cat (alist-get validator-cat syntax/parsed)))
+                (setf (alist-get key syntax/cat) value)
+                (setf (alist-get validator-cat syntax/parsed) syntax/cat))
 
             ;; `if-let' failure... There /should/ have been an error raised already?
             (int<mis>:error caller
@@ -408,46 +408,47 @@ Optional CATEGORY should be:
                             value))))
 
       ;;------------------------------
-      ;; Deal with any pre-parsed ASTs in ARGS.
+      ;; Deal with any pre-parsed Mis Syntax Trees in ARGS.
       ;;------------------------------
+
       (when args
         (let (misc)
-          ;; Split Mis ASTs out into `ast/in' var.
+          ;; Split Mis Syntax Trees out into `syntax/in' var.
           (dolist (arg args)
             (if (int<mis>:valid:syntax? caller 'arg arg :no-error)
-                (push (cons :mis arg) ast/in)
+                (push (cons :mis arg) syntax/in)
               (push arg misc)))
 
           ;; Set ARGS as "everything left over now".
           (setq args (nreverse misc))))
 
       ;;------------------------------
-      ;; Build AST: Presume that the rest of ARGS are message/formatting.
+      ;; Build Syntax Tree: Presume that the rest of ARGS are message/formatting.
       ;;------------------------------
       (when args
         (cond ((and (= (length args) 1)
                     (stringp (nth 0 args)))
                ;; Just a single string; use `:mis:string' to simplify things later.
-               (push (cons :mis:string (nth 0 args)) ast/out))
+               (push (cons :mis:string (nth 0 args)) syntax/out))
 
               ((and (= (length args) 1)
                     (characterp (nth 0 args)))
                ;; Just a single string; use `:mis:string' to simplify things later.
-               (push (cons :mis:char (nth 0 args)) ast/out))
+               (push (cons :mis:char (nth 0 args)) syntax/out))
 
               (t
                ;; Generic message format string and/or args go into the `:mis:message'.
-               (push (cons :mis:message args) ast/out))))
+               (push (cons :mis:message args) syntax/out))))
 
       ;;------------------------------
-      ;; Build AST: Add pre-existing ASTs.
+      ;; Build Syntax Tree: Add pre-existing syntax trees.
       ;;------------------------------
-      ;; Insert each as a child AST of `ast/out'.
-      (dolist (child ast/in)
-        (push child ast/out))
+      ;; Insert each as a child tree of `syntax/out'.
+      (dolist (child syntax/in)
+        (push child syntax/out))
 
       ;;------------------------------
-      ;; Build AST: Add new ASTs.
+      ;; Build Syntax Tree: Add new trees.
       ;;------------------------------
       ;; Keep separate from the parsing so we enforce a more human-friendly
       ;; ordering to the alists, though it won't matter to the builder/compiler.
