@@ -163,6 +163,27 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:syntax:create 'test :mis:style '((:width . 10) (:align . :center)))
 
 
+(defun int<mis>:syntax:append (caller existing new)
+  "Append NEW Mis Syntax Tree to EXISTING Mis Syntax Tree.
+
+Return a newly created Mis Syntax Tree of results; caller should set output to
+the appropriate variable if calling in a loop.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (if (null existing)
+      new
+    (dolist (syntax/assoc new)
+      (push syntax/assoc existing))
+    existing))
+;; (int<mis>:syntax:append 'test nil '((:mis:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:append 'test '((:mis:comment (:prefix . ";; ") (:postfix . "") (:type . default)) (:mis (:mis:format (:formatter . repeat) (:string . "-")))) '((:mis:style (:width . 10) (:align . :center))))
+
+
 (defun int<mis>:syntax:update (caller key syntax &rest kvp)
   "Add/overwrite KVPs to Mis SYNTAX tree under KEY.
 

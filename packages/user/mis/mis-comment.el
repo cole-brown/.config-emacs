@@ -220,7 +220,7 @@ LANGUAGE should be nil or string:
 
 ;; TODO: Handle style!
 (defun int<mis>:compile:comment (caller syntax style)
-  "Format Mis SYNTAX Tree using STYLE; return string.
+  "Compile `:mis:comment' SYNTAX using STYLE; return string.
 
 SYNTAX should be `:mis:comment' syntax tree.
 

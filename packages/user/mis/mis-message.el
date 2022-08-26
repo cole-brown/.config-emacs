@@ -106,6 +106,41 @@ CALLER should be calling function's name. It can be one of:
 ;; Compiling
 ;;------------------------------------------------------------------------------
 
+(defun int<mis>:compile:mis (caller syntax &optional style)
+  "Compile any `:mis' SYNTAX using STYLE; replace the result in SYNTAX.
+
+SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
+will override any styling in STYLE.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:compile:wrapped caller))
+        syntax/out)
+    ;; Only look at top level.
+    (dolist (assoc/child syntax)
+      (let ((key   (car assoc/child))
+            (value (cdr assoc/child)))
+        (if (eq key :mis)
+            ;; Compile whatever this wrapped thing is!
+            (setq syntax/out (int<mis>:syntax:append caller
+                                                     syntax/out
+                                                     (int<mis>:syntax:create caller
+                                                                             :mis:string
+                                                                             (int<mis>:compile caller value style))))
+          ;; Just put it back.
+          (setq syntax/out (int<mis>:syntax:append caller
+                                                   syntax/out
+                                                   (int<mis>:syntax:set caller key value))))))
+
+    ;; Return in correct order.
+    (nreverse syntax/out)))
+;; (int<mis>:compile:mis 'test (mis:comment (mis:line "-")))
+
+
 (defun int<mis>:compile (caller syntax &optional style)
   "Compile SYNTAX into a propertized string for output using STYLE.
 
@@ -136,12 +171,34 @@ CALLER should be calling function's name. It can be one of:
                                          syntax))
          output)
 
+    ;;------------------------------
+    ;; Compile!
+    ;;------------------------------
     ;; Our job is just to find the compiler for the mis type and tell it to do
     ;; its job. In some (most?) cases, we want to just send the whole of SYNTAX
     ;; to a compiler. For example, `:mis:comment' only contains the comment data
     ;; and needs a sibling string to actually wrap the comment start/end strings
     ;; around.
+    ;;------------------------------
+
+    ;; First check for any wrapped children.
+    (when (int<mis>:syntax:find caller
+                                syntax
+                                :mis)
+      (setq syntax (int<mis>:compile:mis caller
+                                         syntax
+                                         styling)))
+
+    ;; Next check for the main compiler...
     (cond ((int<mis>:syntax:find caller
+                                 syntax
+                                 :mis:comment)
+           (push (int<mis>:compile:comment caller
+                                           syntax
+                                           styling)
+                 output))
+
+          ((int<mis>:syntax:find caller
                                  syntax
                                  :mis:comment)
            (push (int<mis>:compile:comment caller
@@ -168,10 +225,38 @@ CALLER should be calling function's name. It can be one of:
 ;;                   '((:mis:format (:formatter . repeat) (:string . "-")))
 ;;                   (mis:style :width 80))
 ;; (int<mis>:compile 'test (mis:comment "hi") (mis:style :width 80))
+;; (int<mis>:compile 'test (mis:comment (mis:line "-")))
+
 
 ;;------------------------------------------------------------------------------
 ;; Output API
 ;;------------------------------------------------------------------------------
+
+(defun mis:string (&rest args)
+  "Parse ARGS into a Mis message/string syntax tree.
+
+ARGS should start off with styling key/values before supplying
+the format string and format args. Example:
+  Valid:
+    (mis:string :type 'inline \"hello world\")
+    (mis:string :type 'inline :language 'emacs-lisp \"hello %s\" (get-greeted))
+  Invalid:
+    (mis:string \"hello %s\" :type 'inline (get-greeted))
+    (mis:string \"hello %s\" (get-greeted) :type 'inline :language 'emacs-lisp)
+
+NOTE: The \"invalids\" will just be interpreted as having extra message string
+formatting args.
+
+NOTE: Mis keyword args must always have both a keyword and a value."
+  (apply 'int<mis>:parse
+         'mis:string
+         '(:style) ; Also allow styling in our string.
+         args))
+;; (mis:string "hello %S" "there")
+;; (mis:string :width 80 "hello there")
+
+(defalias 'mis:message 'mis:string)
+
 
 ;; TODO: Move this to "mis.el"?
 (defun mis (&rest args)
@@ -269,17 +354,18 @@ CALLER should be calling function's name. It can be one of:
 ;; (mis
 ;;  (mis:style :width 80)
 ;;  (mis:line "-"))
-;; TODO-mis: YOU ARE HERE:
+;; (mis (mis:comment (mis:line "-")))
 ;; (mis
 ;;   (mis:style :width 80)
 ;;   (mis:comment (mis:line "-"))
 ;;   (mis:comment :align 'center "Hello there.")
 ;;   (mis:comment (mis:line "-")))
-;; (mis
-;;   (mis:style :width 80)
-;;   (mis:comment (mis:line "-")
-;;                (mis:style :align 'center "Hello there.")
-;;                (mis:line "-")))
+;; TODO-mis: YOU ARE HERE:
+(mis
+  (mis:style :width 80)
+  (mis:comment (mis:line "-")
+               (mis:message :align 'center "Hello there.")
+               (mis:line "-")))
 ;; (mis
 ;;   (mis:comment :width 80
 ;;                (mis:line "-")
