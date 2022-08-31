@@ -29,7 +29,8 @@
 (defconst int<mis>:keywords:category/input
   '(:style
     :comment
-    :line)
+    :line
+    :string)
   "Valid Mis categories for parsing & validation.")
 
 
@@ -39,7 +40,8 @@
     :mis:comment
     :mis:format
     :mis:message
-    :mis:string)
+    :mis:string
+    :mis:char)
   "Valid Mis categories for parsing & validation.")
 
 
@@ -47,12 +49,11 @@
   '((:style   :mis:style)
     (:comment :mis:comment)
     (:line    :mis:format)
-    ;; ???    :mis:message
-    ;; ???    :mis:string
-    )
-  "Alist of keyword to keyword list conses.
+    (:string  :mis:format))
+  "Alist of cons of keyword to keyword list.
 
-Cons: (input-category-keyword . (internal-category-keyword-0 ...))")
+Cons: (input-category-keyword . (internal-category-keyword-0 ...))
+AKA:  (input-category-keyword internal-category-keyword-0 ...)")
 
 
 ;;------------------------------
@@ -194,6 +195,69 @@ Return nil/non-nil."
 ;; (int<mis>:valid:category/mis/input? 'test :style nil)
 ;; (int<mis>:valid:category/mis/input? 'test :mis:style nil)
 ;; (int<mis>:valid:category/mis/input? 'test :style '(:style :tmp:bar :tmp:foo))
+
+
+(defun int<mis>:valid:category/mis/input:param? (caller check &optional valids)
+  "Ensure CHECK as a function param is valid according to VALIDS list.
+
+CHECK should be:
+  - nil
+    - All (existing) categories are valid.
+  - an input keyword
+    - Must be from `int<mis>:keywords:category/input'.
+  - a list of input keywords
+    - Each must be from `int<mis>:keywords:category/input'.
+
+VALIDS should be nil (all input keywords are valid), or a list of
+exactly which keywords are valid.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Return non-nil or signal an error."
+  (let ((caller (list 'int<mis>:valid:category/mis/input:param? caller)))
+    ;; Nil is just valid.
+    (cond ((null check)
+           t)
+
+          ;; Since it's not null, it has to be a keyword or a list of keywords.
+          ((and (not (keywordp check))  ; keyword
+                (not (and (listp check) ; list of keywords
+                          (seq-every-p #'keywordp check))))
+           (int<mis>:error caller
+                           '("CHECK must be nil, a keyword, or a list of keywords. "
+                             "Got %S: %S")
+                           (type-of check)
+                           check))
+
+          ;; Is the single keyword CHECK a valid keyword?
+          ((and (keywordp check)
+                (not (int<mis>:valid:category/mis/input? 'mis check valids)))
+           (int<mis>:error caller
+                           "CHECK keyword must be a member of %S or nil. Got: %S"
+                           (or valids
+                               int<mis>:keywords:category/input)
+                           check))
+
+          ;; Does the list of keywords CHECK contain only valid keywords?
+          ((and (listp check)
+                (not (seq-every-p (lambda (each)
+                                    "Is EACH keyword in CHECK valid?"
+                                    (int<mis>:valid:category/mis/input? 'mis each valids))
+                                  check)))
+           (int<mis>:error caller
+                           "Each keyword in CHECK must be a member of %S. Got: %S"
+                           int<mis>:keywords:category/input
+                           check))
+
+          ;; Valid; got through all the invalid checks.
+          (t
+           t))))
+;; (int<mis>:valid:category/mis/input:param? 'test '(:comment :style :string))
 
 
 (defun int<mis>:valid:category/mis/internal? (caller check &optional valids)
@@ -678,9 +742,8 @@ CALLER should be calling function's name. It can be one of:
 NO-ERROR? should be nil/non-nil. If non-nil, will return nil instead of
 signaling an error."
   (let ((caller (list 'int<mis>:valid:syntax? caller)))
-    ;; TODO: Should we consider `nil' a valid alist?
-    ;; Don't think we need any nil ASTs, so... no?
-    ;; Check for explicit nil first sot we can then check for lists.
+    ;; NOTE: We do not consider `nil' a valid syntax tree,
+    ;; so check for explicit nil first sot we can then check for lists.
     (cond ((null syntax)
            (if no-error?
                nil

@@ -107,6 +107,7 @@ CALLER should be calling function's name. It can be one of:
     (list (assoc key syntax))))
 ;; (int<mis>:syntax:get/syntax 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
 
+
 (defun int<mis>:syntax:set (caller key syntax)
   "Create a new 1 element Mis Syntax Tree with key KEY and value SYNTAX.
 
@@ -130,7 +131,7 @@ CALLER should be calling function's name. It can be one of:
   (list (cons key syntax)))
 ;; (alist-get :width (alist-get :mis:style (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))))
 ;; (alist-get :width (alist-get :mis:style (int<mis>:syntax:set 'test :mis:style '((:width . 10) (:align . :center)))))
-;; (int<mis>:syntax:create 'test :mis:style '((:width . 10) (:align . :center)))
+;; (int<mis>:syntax:set 'test :mis:style '((:width . 10) (:align . :center)))
 
 
 (defun int<mis>:syntax:create (caller category/syntax &rest kvp)
@@ -161,6 +162,8 @@ CALLER should be calling function's name. It can be one of:
   (list (cons category/syntax kvp)))
 ;; (alist-get :width (alist-get :mis:style (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))))
 ;; (int<mis>:syntax:create 'test :mis:style '((:width . 10) (:align . :center)))
+;; (int<mis>:syntax:create 'test :mis:string :value "hello")
+;; (int<mis>:syntax:create 'test :mis:comment)
 
 
 (defun int<mis>:syntax:append (caller existing new)
@@ -258,6 +261,7 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:syntax:find 'test '((:mis:style (:width . 10)) (:tmp:line (:string . "xX"))) :dne)
 
 
+;; TODO: Delete? Change?
 (defun int<mis>:syntax:merge (caller syntax/to syntax/from &rest ignore/from)
   "Merge two Mis Syntax Trees, ignoring IGNORE/FROM keys.
 
@@ -291,11 +295,55 @@ CALLER should be calling function's name. It can be one of:
 ;;                         :tmp:line)
 
 
+(defun int<mis>:syntax:children (caller key syntax &rest kvp)
+  "Add each CHILD into SYNTAX under KEY's `:children'.
+
+KEY should be a keyword.
+
+SYNTAX should be a Mis abstract syntax trees.
+
+KVP should (each) be a cons of a KEY keyword and its value.
+example: '(:width . 10)
+
+Return a Mis Syntax Tree. Caller should set this return value back to their
+syntax variable.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:syntax:children caller))
+        (children (int<mis>:syntax:get/value caller
+                                             :children
+                                             (int<mis>:syntax:get/value caller
+                                                                        key
+                                                                        syntax))))
+    ;; Update the list of children with all the KVPs.
+    (dolist (each kvp)
+      (push each children))
+    ;; Update the syntax tree with the children.
+    (setf (alist-get :children
+                     (alist-get key syntax))
+          children)
+    ;; Return updated syntax tree.
+    syntax))
+;; (int<mis>:syntax:children 'test
+;;                           :mis:comment
+;;                           '((:mis:comment))
+;;                           '(:mis:format (:formatter . string) (:value . "hello")))
+;; (int<mis>:syntax:children 'test
+;;                           :mis:comment
+;;                           '((:mis:comment (:children (:mis:test :hello 'there))))
+;;                           '(:mis:format (:formatter . string) (:value . "hello")))
+
+
 ;;------------------------------------------------------------------------------
 ;; Parsing
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:parse (caller category &rest args)
+(defun int<mis>:parse (caller category valid &rest args)
   "Parse ARGS into a Mis Abstract Syntax Tree.
 
 CALLER should be calling function's name. It can be one of:
@@ -305,68 +353,45 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)
 
-Optional CATEGORY should be:
+CATEGORY must be a keyword from `int<mis>:keywords:category/input'.
+
+Optional VALID parameter is for valid/expected category keywords. It should be:
   - nil                - All (existing) categories are valid.
   - a keyword          - Only this category's keywords are valid.
   - a list of keywords - Only these categories' keywords are valid.
-                       - Must be from `int<mis>:keywords:category/input' or
-                         `int<mis>:keywords:category/internal'."
+                       - Must be from `int<mis>:keywords:category/input'."
   (let ((caller (list 'int<mis>:parse caller)))
     ;;------------------------------
     ;; Error Checking
     ;;------------------------------
-    ;; Is CATEGORY a valid type?
-    (cond ((and (not (null category))      ; nil
-                (not (keywordp category))  ; keyword
-                (not (and (listp category) ; list of keywords
-                          (seq-every-p #'keywordp category))))
-           (int<mis>:error caller
-                           '("CATEGORY must be nil, a keyword, or a list of keywords. "
-                             "Got %S: %S")
-                           (type-of category)
-                           category))
-
-          ;; Is the single keyword CATEGORY a valid keyword?
-          ((and (keywordp category)
-                (not (int<mis>:valid:category/mis/input? 'mis category)))
-           (int<mis>:error caller
-                           "CATEGORY keyword must be a member of %S or nil. Got: %S"
-                           int<mis>:keywords:category/input
-                           category))
-
-          ;; Does the list of keywords CATEGORY contain only valid keywords?
-          ((and (listp category)
-                (not (seq-every-p (lambda (cat)
-                                    "Is every CATEGORY keyword valid?"
-                                    (int<mis>:valid:category/mis/input? 'mis cat))
-                                  category)))
-           (int<mis>:error caller
-                           int<mis>:keywords:category/input
-                           category))
-
-          ;; Don't want any circular lists.
-          ((not (proper-list-p args))
-           (int<mis>:error caller
-                           "ARGS must be a proper list (no circular references)! Got: %S"
-                           args))
-
-          (t
-           nil))
+    ;; Are VALID & CATEGORY valid?
+    (int<mis>:valid:category/mis/input:param? caller valid)
+    (int<mis>:valid:category/mis/input?       caller category)
+    ;; Don't want to parse any circular lists.
+    (unless (proper-list-p args)
+      (int<mis>:error caller
+                      "ARGS must be a proper list (no circular references)! Got: %S"
+                      args))
 
     ;;------------------------------
     ;; Normalize Categories
     ;;------------------------------
     ;; Normalize to list of keywords.
-    (when (keywordp category)
-      (setq category (list category)))
+    (when (keywordp valid)
+      (setq valid (list valid)))
 
     ;;------------------------------
     ;; Parse Args
     ;;------------------------------
     (let ((parsing t)
           (args/len (length args))
+          (category/valid-roots (alist-get category int<mis>:keywords:category))
+          category/out
           syntax/parsed ; Validated/normalized kvps alist by keyword category.
           syntax/in
+          formatting/in
+          syntax/out/format
+          syntax/out/children
           syntax/out)
 
       (while (and args
@@ -383,13 +408,26 @@ Optional CATEGORY should be:
           ;;---
           (setq args/len (- args/len 2))
           (if-let* ((key           (pop args))
-                    (validator     (int<mis>:valid:validator caller category key))
+                    (validator     (int<mis>:valid:validator caller valid key))
                     (validator-cat (car validator)) ; parsed category (internal or tmp)
                     (validator-fn  (cdr validator))
                     (value         (funcall validator-fn caller key (pop args))))
               ;; Key/value exist and are now known to be valid; save to the syntax tree
               ;; for this parsed category.
               (let ((syntax/cat (alist-get validator-cat syntax/parsed)))
+                ;; Is this the root category? We'll need to know it when building the final syntax tree.
+                (when (memq syntax/cat category/valid-roots)
+                  (if category/out
+                      ;; Can't print out full input ARGS cuz we're popping. :|
+                      ;; NOTE: Change this loop to pop from a copy of args if we need better error output here.
+                      (int<mis>:error caller
+                                      '("Found two output roots while parsing! "
+                                        "Have: %S, Found: %S")
+                                      category/out
+                                      syntax/cat
+                                      args)
+                    (setq category/out syntax/cat)))
+                ;; Save the parsed key/value.
                 (setf (alist-get key syntax/cat) value)
                 (setf (alist-get validator-cat syntax/parsed) syntax/cat))
 
@@ -407,45 +445,75 @@ Optional CATEGORY should be:
                             validator-fn
                             value))))
 
+      ;; Do we need to default to an output category?
+      ;; In general, we shouldn't...
+      (unless category/out
+        (setq category/out (nth 0 category/valid-roots)))
+
       ;;------------------------------
       ;; Deal with any pre-parsed Mis Syntax Trees in ARGS.
       ;;------------------------------
-
       (when args
-        (let (misc)
-          ;; Split Mis Syntax Trees out into `syntax/in' var.
-          (dolist (arg args)
-            (if (int<mis>:valid:syntax? caller 'arg arg :no-error)
-                (push (cons :mis arg) syntax/in)
-              (push arg misc)))
+        ;; Split Mis Syntax Trees out into `syntax/in' var & non-syntax into
+        ;; `formatting/in'.
+        (dolist (arg args)
+          (if (int<mis>:valid:syntax? caller 'arg arg :no-error)
+              (setq syntax/in (int<mis>:syntax:append caller
+                                                      syntax/in
+                                                      arg))
+            (push arg formatting/in))
 
-          ;; Set ARGS as "everything left over now".
-          (setq args (nreverse misc))))
+          ;; Get the string/formatting in the correct order again.
+          (setq formatting/in (nreverse formatting/in)))
+
+        ;; Correct `syntax/in' to a proper Mis syntax tree for branches.
+        (when syntax/in
+          (setq syntax/out/children (apply #'int<mis>:syntax:create
+                                           caller
+                                           :children
+                                           syntax/in))))
 
       ;;------------------------------
-      ;; Build Syntax Tree: Presume that the rest of ARGS are message/formatting.
+      ;; Build Syntax Tree: Presume that all the `formatting/in' are message/formatting.
       ;;------------------------------
-      (when args
-        (cond ((and (= (length args) 1)
-                    (stringp (nth 0 args)))
-               ;; Just a single string; use `:mis:string' to simplify things later.
-               (push (cons :mis:string (nth 0 args)) syntax/out))
+      (when formatting/in
+        (cond ((and (= (length formatting/in) 1)
+                    (stringp (nth 0 formatting/in)))
+               ;; Just a single string.
+               (setq syntax/out/format (int<mis>:syntax:create caller
+                                                               :mis:format
+                                                               (cons :formatter 'string)
+                                                               (cons :value (nth 0 formatting/in)))))
 
-              ((and (= (length args) 1)
-                    (characterp (nth 0 args)))
+              ((and (= (length formatting/in) 1)
+                    (characterp (nth 0 formatting/in)))
                ;; Just a single string; use `:mis:string' to simplify things later.
-               (push (cons :mis:char (nth 0 args)) syntax/out))
+               (setq syntax/out/format (int<mis>:syntax:create caller
+                                                               :mis:format
+                                                               (cons :formatter 'char)
+                                                               (cons :value (nth 0 formatting/in)))))
 
               (t
                ;; Generic message format string and/or args go into the `:mis:message'.
-               (push (cons :mis:message args) syntax/out))))
+               (setq syntax/out/format (int<mis>:syntax:create caller
+                                                               :mis:format
+                                                               (cons :formatter 'message)
+                                                               (cons :value (nth 0 formatting/in)))))))
 
       ;;------------------------------
-      ;; Build Syntax Tree: Add pre-existing syntax trees.
+      ;; Build Syntax Tree: Place `syntax/out/format' appropriately.
       ;;------------------------------
-      ;; Insert each as a child tree of `syntax/out'.
-      (dolist (child syntax/in)
-        (push child syntax/out))
+      ;; Is the parsing CATEGORY `:string'? Then `syntax/out/format' is the root
+      ;; output, otherwise it's a child syntax tree.
+      (when syntax/out/format
+        (if (eq category :string)
+            (setq syntax/out syntax/out/format)
+          (setq syntax/out/children (int<mis>:syntax:update caller
+                                                            :children
+                                                            syntax/out/children
+                                                            (int<mis>:syntax:get/pair caller
+                                                                                      :mis:format
+                                                                                      syntax/out/format)))))
 
       ;;------------------------------
       ;; Build Syntax Tree: Add new trees.
@@ -453,26 +521,51 @@ Optional CATEGORY should be:
       ;; Keep separate from the parsing so we enforce a more human-friendly
       ;; ordering to the alists, though it won't matter to the builder/compiler.
       ;; Just friendly to the programmer to have these first in the output alist.
-      (dolist (ast ast/parsed ast/out)
-        (push ast ast/out)))))
-;; (int<mis>:parse 'tester nil :align 'center "hello")
-;; (int<mis>:parse 'tester :style :align 'center "hello")
-;; (int<mis>:parse 'tester nil :align 'center "hello %s" "world")
-;; (int<mis>:parse 'tester nil :type 'block :align 'center "hello %s" "world")
-;; (int<mis>:parse 'tester nil :align 'center :width 11 "hello %s" "world")
-;; (int<mis>:parse 'tester nil :align 'center :width 11 "hello")
-;; (int<mis>:parse 'tester nil :indent 'auto "hello")
+      (if syntax/parsed
+          (if syntax/out
+              (setq syntax/out (apply #'int<mis>:syntax:update
+                                      caller
+                                      category/out
+                                      syntax/out
+                                      syntax/parsed))
+
+            (setq syntax/out (apply #'int<mis>:syntax:create
+                                    caller
+                                    category/out
+                                    syntax/parsed)))
+        ;; Nothing special parsed for `category/out', but we need to make
+        ;; `syntax/out' have a root of `category/out'...
+        (unless syntax/out
+          (setq syntax/out (int<mis>:syntax:create caller
+                                                   category/out))))
+
+      ;;------------------------------
+      ;; Build Syntax Tree: Add pre-existing syntax trees.
+      ;;------------------------------
+      (when syntax/out/children
+        (setq syntax (apply #'int<mis>:syntax:children
+                            caller
+                            category/out
+                            syntax/out
+                            (int<mis>:syntax:get/value caller
+                                                       :children
+                                                       syntax/out/children))))
+      syntax/out)))
+;; (int<mis>:parse 'test :string '(:style :string) "hello")
+;; (int<mis>:parse 'test :comment '(:comment :style :string) "hello")
+;; (int<mis>:parse 'test :string nil :align 'center "hello")
+;; (int<mis>:parse 'test :string :style :align 'center "hello")
+;; (int<mis>:parse 'test :string nil :align 'center "hello %s" "world")
+;; (int<mis>:parse 'test :string nil :type 'block :align 'center "hello %s" "world")
+;; (int<mis>:parse 'test :string nil :align 'center :width 11 "hello %s" "world")
+;; (int<mis>:parse 'test :string nil :align 'center :width 11 "hello")
+;; (int<mis>:parse 'test :string nil :indent 'auto "hello")
 ;;
-;; Parse an AST -> Get a `:mis' AST.
-;; (int<mis>:parse 'test '(:comment :style) '((:mis:format (:formatter repeat :string "-"))))
-;;   -get-> ((:mis (:mis:format (:formatter repeat :string "-"))))
-;;   -aka-> ((:mis . ((:mis:format (:formatter repeat :string "-")))))
-;;
-;; TODO: More complicated:
-;; (int<mis>:parse 'test '(:comment :style :mis:format) :type 'inline "hello" '(:mis:format (:formatter repeat :string "-")))
+;; Parse a syntax tree -> Get a `:mis' SYNTAX.
+;; (int<mis>:parse 'test :comment '(:comment :style) '((:mis:format (:formatter repeat :string "-"))))
 ;;
 ;; Error: `:align' is a `:mis:style', not a `:mis:comment' category keyword.
-;;   (int<mis>:parse 'tester :comment :mis:comment :align 'center "hello")
+;;   (int<mis>:parse 'test :comment :comment :align 'center "hello")
 
 
 ;;------------------------------------------------------------------------------
