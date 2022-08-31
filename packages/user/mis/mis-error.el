@@ -141,8 +141,9 @@ Return cons 2-tuple of:
         ((and (listp message)
               (keywordp (car message)))
          (cond ((not (eq (car message) :newlines))
-                (cons (format "(mis: error message has invalid keyword: %S)"
-                              (car message))
+                (cons (format "(mis: error message has invalid keyword %S; message: %S)"
+                              (car message)
+                              message)
                       ;; Haven't checked MESSAGE to make sure it's valid, so
                       ;; just send it as its full list of keywords plus
                       ;; whatever.
