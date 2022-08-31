@@ -33,14 +33,13 @@ ARGS should be a plist of:
 Examples:
   (mis:line :width 10 :string \"xX\")
   (mis:line \"-\")"
-  (let* ((syntax/parsed (apply 'int<mis>:parse
+  (let* ((syntax/parsed (apply #'int<mis>:parse
                                'mis:line
+                               :line
                                '(:line :style)
                                args))
          (line/string (int<mis>:format:syntax 'mis:line
-                                              syntax/parsed
-                                              '(:tmp:line :string)
-                                              '(tmp:line :char)))
+                                              syntax/parsed))
          syntax/out)
 
     ;;------------------------------
@@ -69,6 +68,7 @@ Examples:
                            syntax/out
                            syntax/parsed
                            :tmp:line :mis:char :mis:string :mis:message)))
+;; (mis:line "-")
 ;; (mis:line :width 10 :string "xX")
 ;;   -> '((:mis:style (:width . 10)) (:mis:format (:formatter . repeat) (:string . "xX")))
 ;; (mis:line "-")

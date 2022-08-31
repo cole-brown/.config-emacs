@@ -560,6 +560,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
 ;; (int<mis>:parse 'test :string nil :align 'center :width 11 "hello %s" "world")
 ;; (int<mis>:parse 'test :string nil :align 'center :width 11 "hello")
 ;; (int<mis>:parse 'test :string nil :indent 'auto "hello")
+;; (int<mis>:parse 'test :line '(:line :style) "-")
 ;;
 ;; Parse a syntax tree -> Get a `:mis' SYNTAX.
 ;; (int<mis>:parse 'test :comment '(:comment :style) '((:mis:format (:formatter repeat :string "-"))))

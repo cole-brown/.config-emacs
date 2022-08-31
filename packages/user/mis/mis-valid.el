@@ -48,7 +48,7 @@
 (defconst int<mis>:keywords:category
   '((:style   :mis:style)
     (:comment :mis:comment)
-    (:line    :mis:format)
+    (:line    :line)
     (:string  :mis:format))
   "Alist of cons of keyword to keyword list.
 
