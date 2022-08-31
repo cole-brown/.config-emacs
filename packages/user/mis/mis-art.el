@@ -33,41 +33,37 @@ ARGS should be a plist of:
 Examples:
   (mis:line :width 10 :string \"xX\")
   (mis:line \"-\")"
-  (let* ((syntax/parsed (apply #'int<mis>:parse
-                               'mis:line
-                               :line
-                               '(:line :style)
-                               args))
-         (line/string (int<mis>:format:syntax 'mis:line
-                                              syntax/parsed))
-         syntax/out)
+  (let* ((syntax (apply #'int<mis>:parse
+                        'mis:line
+                        :line
+                        '(:line :style)
+                        args))
+         (syntax/line (int<mis>:syntax:get/value 'mis:line
+                                                 :line
+                                                 syntax)))
 
     ;;------------------------------
-    ;; Error Checking
+    ;; Error checking.
     ;;------------------------------
-
-    ;; Have an explicit `:string' in `:tmp:line'?
-    (unless line/string
+    (unless syntax/line
       (int<mis>:error 'mis:line
-                      '("Invalid ARGS; line must have a string/character to repeat. "
-                        "Found nothing in ARGS: %S -> %S")
+                      '("Invalid ARGS; did not find a `:line' in parsed syntax! "
+                        "ARGS: %S -> %S")
                       args
-                      syntax/parsed))
+                      syntax))
 
     ;;------------------------------
-    ;; Build & return the SYNTAX.
+    ;; Create output syntax.
     ;;------------------------------
-    ;; Convert `:tmp:line' from parsing into `:mis:format'.
-    (setq syntax/out (int<mis>:syntax:create 'mis:line
-                                             :mis:format
-                                             (cons :formatter 'repeat)
-                                             (cons :string    line/string)))
-
-    ;; Add `:style', etc to our output syntax (but ignore message/string).
-    (int<mis>:syntax:merge 'mis:line
-                           syntax/out
-                           syntax/parsed
-                           :tmp:line :mis:char :mis:string :mis:message)))
+    ;; Convert `:line' from parsing into `:mis:format'.
+    (setq syntax/out (apply #'int<mis>:syntax:create
+                            'mis:line
+                            :mis:format
+                            (cons :formatter 'repeat)
+                            ;; Just assume there's a string somewhere in `:children'; will error at compile time.
+                            (cons :value     :child)
+                            ;; And just stuff the rest of what was parsed into our output.
+                            syntax/line))))
 ;; (mis:line "-")
 ;; (mis:line :width 10 :string "xX")
 ;;   -> '((:mis:style (:width . 10)) (:mis:format (:formatter . repeat) (:string . "xX")))
