@@ -240,7 +240,9 @@ CALLER should be calling function's name. It can be one of:
                    (int<mis>:syntax:find caller syntax :mis:comment :type)))
          (prefix  (or (int<mis>:syntax:find caller syntax :mis:comment :prefix) ""))
          (postfix (or (int<mis>:syntax:find caller syntax :mis:comment :postfix) ""))
-         (comment (int<mis>:format:syntax caller syntax)))
+         ;; TODO: need to get the comment string from somewhere in `:children'.
+         ;;(comment (int<mis>:format:syntax caller syntax))
+         )
 
     ;;------------------------------
     ;; Format into a comment.

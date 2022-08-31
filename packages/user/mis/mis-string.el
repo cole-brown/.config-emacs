@@ -44,40 +44,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Output Builder
-;;------------------------------------------------------------------------------
-
-(defun int<mis>:compile:string (caller syntax style)
-  "Compile `:mis:string' SYNTAX using STYLE; return string.
-
-SYNTAX should be `:mis:string' syntax tree.
-
-STYLE should be nil or a `:mis:style' syntax tree.
-Example: (mis:style :width 80) -> '((:mis:style (:width . 80)))
-
-Only STYLE will be checked for styling; style in SYNTAX is ignored.
-
-CALLER should be calling function's name. It can be one of:
-  - a string
-  - a quoted symbol
-  - a function-quoted symbol
-  - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller (list 'int<mis>:compile:string caller)))
-
-    ;;------------------------------
-    ;; Format into a string.
-    ;;------------------------------
-    ;; TODO: Style: Align? Indent? Trim? Etc?
-    (int<mis>:format:syntax caller syntax)))
-
-
-(int<mis>:register:compiler :mis:string  #'int<mis>:compile:string)
-(int<mis>:register:compiler :mis:message #'int<mis>:compile:string)
-(int<mis>:register:compiler :mis:char    #'int<mis>:compile:string)
-
-
-;;------------------------------------------------------------------------------
 ;; Output API
 ;;------------------------------------------------------------------------------
 
