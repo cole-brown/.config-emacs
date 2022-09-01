@@ -65,6 +65,7 @@ formatting args.
 NOTE: Mis keyword args must always have both a keyword and a value."
   (apply 'int<mis>:parse
          'mis:string
+         :string
          '(:style) ; Also allow styling in our string.
          args))
 ;; (mis:string "hello %S" "there")

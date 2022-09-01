@@ -85,6 +85,7 @@ extra message args.
 NOTE: Styles must always have both a keyword and a value."
   (apply 'int<mis>:parse
          'mis:style
+         :style
          :style ; Only allow style keywords.
          args))
 ;; (mis:style :align 'center "hello")

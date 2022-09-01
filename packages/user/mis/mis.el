@@ -27,7 +27,6 @@
 (require 'mis-valid)
 (require 'mis-parse)
 (require 'mis-buffer)
-(require 'mis-format)
 
 ;;------------------------------
 ;; Output API & Main Compiler
@@ -37,6 +36,7 @@
 ;;------------------------------
 ;; Input APIs & Mis Type Compilers
 ;;------------------------------
+(require 'mis-format)
 (require 'mis-align)
 (require 'mis-style)
 (require 'mis-string)

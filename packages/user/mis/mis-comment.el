@@ -310,6 +310,7 @@ extra message args.
 NOTE: Comment keyword args must always have both a keyword and a value."
   (let* ((syntax   (apply 'int<mis>:parse
                           'mis:comment
+                          :comment
                           '(:comment :style) ; Also allow styling in our comments.
                           args))
          ;; Block or inline comment?
@@ -338,7 +339,7 @@ NOTE: Comment keyword args must always have both a keyword and a value."
 ;; (mis:comment :width 80 "foobar")
 ;; (mis:comment :width 80 :align 'center "foobar")
 ;; (mis:comment "foobar")
-
+;; (mis:comment (mis:line "-"))
 
 
 ;;------------------------------------------------------------------------------
