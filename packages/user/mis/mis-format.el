@@ -257,11 +257,11 @@ LENGTH should be an integer greater than zero."
 (defun int<mis>:compile:format (caller syntax style)
   "Format Mis SYNTAX Tree using STYLE; return string.
 
-SYNTAX should be `:mis:format' syntax tree.
-Example: '((:mis:format (:formatter . repeat) (:string . \"-\")))
+SYNTAX should be `:format' syntax tree.
+Example: '((:format (:formatter . repeat) (:string . \"-\")))
 
-STYLE should be nil or a `:mis:style' syntax tree.
-Example: (mis:style :width 80) -> '((:mis:style (:width . 80)))
+STYLE should be nil or a `:style' syntax tree.
+Example: (mis:style :width 80) -> '((:style (:width . 80)))
 
 Only STYLE will be checked for styling; style in SYNTAX is ignored.
 
@@ -274,10 +274,10 @@ CALLER should be calling function's name. It can be one of:
   (let* ((caller    (list 'int<mis>:compile:format caller))
          (formatter (int<mis>:syntax:find caller
                                           syntax
-                                          :mis:format :formatter))
+                                          :format :formatter))
          (value (int<mis>:syntax:find caller
                                       syntax
-                                      :mis:format :value)))
+                                      :format :value)))
     ;; TODO: If value is `:child', need to recurse into children for a string first.
 
     ;;------------------------------
@@ -302,7 +302,7 @@ CALLER should be calling function's name. It can be one of:
        (int<mis>:format:repeat value
                                (or (int<mis>:syntax:find caller
                                                          style
-                                                         :mis:style :width)
+                                                         :style :width)
                                    fill-column)))
 
       ('message
@@ -330,10 +330,10 @@ CALLER should be calling function's name. It can be one of:
        (int<mis>:error caller
                        '("Unhandled formatter case `%S'!")
                        formatter)))))
-;; (int<mis>:compile:format 'test '((:mis:format (:formatter . repeat) (:string . "-"))) '((:mis:style (:width . 80))))
+;; (int<mis>:compile:format 'test '((:format (:formatter . repeat) (:string . "-"))) '((:style (:width . 80))))
 
 
-(int<mis>:register:compiler :mis:format #'int<mis>:compile:comment)
+(int<mis>:register:compiler :format #'int<mis>:compile:comment)
 
 
 ;;------------------------------------------------------------------------------

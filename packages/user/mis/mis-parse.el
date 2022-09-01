@@ -24,9 +24,9 @@
 ;;   - Return an Abstract Syntax Tree of themselves, basically.
 ;; E.g.
 ;;   (mis:comment :align 'center (get-greeted))
-;;    -> '((:mis:comment
-;;          (:mis:style (:align center))
-;;          (:mis:string "world")))
+;;    -> '((:comment
+;;          (:style (:align center))
+;;          (:children (:format (:formatter . string) (:value . "world")))))
 ;;
 ;; NOTE: A Mis Syntax Tree is an alist:
 ;;   - the key must be from `int<mis>:keywords:category/internal'
@@ -53,9 +53,8 @@
   "Get KEY value from Mis SYNTAX Tree.
 
 KEY should be:
-  - an internal keyword  - Starts with `:mis:`
-                         - From `int<mis>:keywords:key`
-  - a tempororay keyword - Starts with `:tmp:`
+  - an internal keyword  - From `int<mis>:keywords:category/internal`
+  - a temporary keyword - Starts with `:tmp:`
 
 Optional DEFAULT can be a value to return if KEY is not present.
 
@@ -66,15 +65,14 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (alist-get key syntax default))
-;; (int<mis>:syntax:get/value 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:get/value 'test :style '((:style (:width . 10) (:align . :center))))
 
 
 (defun int<mis>:syntax:get/pair (caller key syntax)
   "Get KEY's assoc (key/value pair) from Mis SYNTAX Tree.
 
 KEY should be:
-  - an internal keyword  - Starts with `:mis:`
-                         - From `int<mis>:keywords:key`
+  - an internal keyword  - From `int<mis>:keywords:category/internal`
   - a tempororay keyword - Starts with `:tmp:`
 
 CALLER should be calling function's name. It can be one of:
@@ -84,15 +82,14 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (assoc key syntax))
-;; (int<mis>:syntax:get/pair 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:get/pair 'test :style '((:style (:width . 10) (:align . :center))))
 
 
 (defun int<mis>:syntax:get/syntax (caller key syntax)
   "Get KEY's assoc (key/value pair) _as a Mis Syntax Tree_ from Mis SYNTAX Tree.
 
 KEY should be:
-  - an internal keyword  - Starts with `:mis:`
-                         - From `int<mis>:keywords:key`
+  - an internal keyword  - From `int<mis>:keywords:category/internal`
   - a tempororay keyword - Starts with `:tmp:`
 
 CALLER should be calling function's name. It can be one of:
@@ -105,7 +102,7 @@ CALLER should be calling function's name. It can be one of:
                                              key
                                              syntax)))
     (list (assoc key syntax))))
-;; (int<mis>:syntax:get/syntax 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:get/syntax 'test :style '((:style (:width . 10) (:align . :center))))
 
 
 (defun int<mis>:syntax:set (caller key syntax)
@@ -118,8 +115,8 @@ SYNTAX should be a Mis Syntax Tree.
 Similar to `int<mis>:syntax:create' but for a single alist child instead of KVPs
 that need to be turned into a syntax tree.
 Equivalent Output:
-  (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))
-  (int<mis>:syntax:set 'test :mis:style '((:width . 10) (:align . :center)))
+  (int<mis>:syntax:create 'test :style '(:width . 10) '(:align . :center))
+  (int<mis>:syntax:set    'test :style '((:width . 10) (:align . :center)))
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -129,17 +126,16 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   ;; Make an alist out of the inputs.
   (list (cons key syntax)))
-;; (alist-get :width (alist-get :mis:style (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))))
-;; (alist-get :width (alist-get :mis:style (int<mis>:syntax:set 'test :mis:style '((:width . 10) (:align . :center)))))
-;; (int<mis>:syntax:set 'test :mis:style '((:width . 10) (:align . :center)))
+;; (alist-get :width (alist-get :style (int<mis>:syntax:create 'test :style '(:width . 10) '(:align . :center))))
+;; (alist-get :width (alist-get :style (int<mis>:syntax:set 'test :style '((:width . 10) (:align . :center)))))
+;; (int<mis>:syntax:set 'test :style '((:width . 10) (:align . :center)))
 
 
 (defun int<mis>:syntax:create (caller category/syntax &rest kvp)
   "Create a Mis Syntax Tree for CATEGORY/SYNTAX with KVPs.
 
 CATEGORY/SYNTAX should be:
-  - an internal keyword  - Starts with `:mis:`
-                         - From `int<mis>:keywords:category/syntax`
+  - an internal keyword  - From `int<mis>:keywords:category/internal`
   - a tempororay keyword - Starts with `:tmp:`
 
 KVP should (each) be a cons of a CATEGORY/SYNTAX keyword and its value.
@@ -149,8 +145,8 @@ Similar to `int<mis>:syntax:set' but for one or more KVPs that need to be turned
 into a syntax tree instead of just a single child that is already a proper
 syntax tree alist.
 Equivalent Output:
-  (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))
-  (int<mis>:syntax:set 'test :mis:style '((:width . 10) (:align . :center)))
+  (int<mis>:syntax:create 'test :style '(:width . 10) '(:align . :center))
+  (int<mis>:syntax:set 'test :style '((:width . 10) (:align . :center)))
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -160,10 +156,10 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   ;; Make an alist out of the inputs.
   (list (cons category/syntax kvp)))
-;; (alist-get :width (alist-get :mis:style (int<mis>:syntax:create 'test :mis:style '(:width . 10) '(:align . :center))))
-;; (int<mis>:syntax:create 'test :mis:style '((:width . 10) (:align . :center)))
-;; (int<mis>:syntax:create 'test :mis:string :value "hello")
-;; (int<mis>:syntax:create 'test :mis:comment)
+;; (alist-get :width (alist-get :style (int<mis>:syntax:create 'test :style '(:width . 10) '(:align . :center))))
+;; (int<mis>:syntax:create 'test :style '((:width . 10) (:align . :center)))
+;; (int<mis>:syntax:create 'test :string :value "hello")
+;; (int<mis>:syntax:create 'test :comment)
 
 
 (defun int<mis>:syntax:append (caller existing new)
@@ -183,8 +179,8 @@ CALLER should be calling function's name. It can be one of:
     (dolist (syntax/assoc new)
       (push syntax/assoc existing))
     existing))
-;; (int<mis>:syntax:append 'test nil '((:mis:style (:width . 10) (:align . :center))))
-;; (int<mis>:syntax:append 'test '((:mis:comment (:prefix . ";; ") (:postfix . "") (:type . default)) (:mis (:mis:format (:formatter . repeat) (:string . "-")))) '((:mis:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:append 'test nil '((:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:append 'test '((:comment (:prefix . ";; ") (:postfix . "") (:type . default))) '((:style (:width . 10) (:align . :center))))
 
 
 (defun int<mis>:syntax:update (caller key syntax &rest kvp)
@@ -196,7 +192,7 @@ example: '(:width . 10)
 SYNTAX should be a Mis abstract syntax tree. It will be updated with KVPs and
 the updated value returned. Caller should set the return value back to the input
 arg as the update is not guaranteed to be in-place.
-Example: (setq syntax (int<mis>:syntax:update 'test :mis:style syntax '(:align . :center)))
+Example: (setq syntax (int<mis>:syntax:update 'test :style syntax '(:align . :center)))
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -212,9 +208,9 @@ CALLER should be calling function's name. It can be one of:
         (setf (alist-get (car pair) syntax/cat) (cdr pair))))
     (setf (alist-get key syntax) syntax/cat)
     syntax))
-;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
-;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))) '(:align . :right))
-;; (int<mis>:syntax:update 'test :mis:style '((:mis:style (:width . 10) (:align . :center))) '(:align . :right) nil '(:trim . t))
+;; (int<mis>:syntax:update 'test :style '((:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:update 'test :style '((:style (:width . 10) (:align . :center))) '(:align . :right))
+;; (int<mis>:syntax:update 'test :style '((:style (:width . 10) (:align . :center))) '(:align . :right) nil '(:trim . t))
 
 
 (defun int<mis>:syntax:delete (caller key syntax)
@@ -224,7 +220,7 @@ KEY should be a keyword.
 
 SYNTAX should be a Mis abstract syntax tree. Caller should set the return value
 back to the input arg as the delete is not guaranteed to be in-place.
-Example: (setq syntax (int<mis>:syntax:delete 'test :mis:style syntax))
+Example: (setq syntax (int<mis>:syntax:delete 'test :style syntax))
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -234,8 +230,8 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (setf (alist-get key syntax nil :remove) nil)
   syntax)
-;; (int<mis>:syntax:delete 'test :mis:style '((:mis:style (:width . 10) (:align . :center))))
-;; (int<mis>:syntax:delete 'test :mis:style '((:mis:style (:width . 10) (:align . :center)) (:mis:string . "hi")))
+;; (int<mis>:syntax:delete 'test :style '((:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:delete 'test :style '((:style (:width . 10) (:align . :center)) (:string . "hi")))
 
 
 (defun int<mis>:syntax:find (caller syntax &rest key)
@@ -256,9 +252,9 @@ CALLER should be calling function's name. It can be one of:
     (dolist (find key)
       (setq value (int<mis>:syntax:get/value caller find value)))
     value))
-;; (int<mis>:syntax:find 'test '((:mis:style (:width . 10)) (:tmp:line (:string . "xX"))) :tmp:line :string)
-;; (int<mis>:syntax:find 'test '((:mis:style (:width . 10)) (:tmp:line (:string . "xX"))) :mis:style)
-;; (int<mis>:syntax:find 'test '((:mis:style (:width . 10)) (:tmp:line (:string . "xX"))) :dne)
+;; (int<mis>:syntax:find 'test '((:style (:width . 10)) (:tmp:line (:string . "xX"))) :tmp:line :string)
+;; (int<mis>:syntax:find 'test '((:style (:width . 10)) (:tmp:line (:string . "xX"))) :style)
+;; (int<mis>:syntax:find 'test '((:style (:width . 10)) (:tmp:line (:string . "xX"))) :dne)
 
 
 ;; TODO: Delete? Change?
@@ -290,8 +286,8 @@ CALLER should be calling function's name. It can be one of:
     ;; Return the updated syntax.
     syntax/to))
 ;; (int<mis>:syntax:merge 'test
-;;                         '((:mis:style (:width . 10) (:align . :center)) (:mis:message "hello there"))
-;;                         '((:mis:style (:width . 11) (:align . :right)) (:tmp:line (:string . "xxx")))
+;;                         '((:style (:width . 10) (:align . :center)) (:message "hello there"))
+;;                         '((:style (:width . 11) (:align . :right)) (:tmp:line (:string . "xxx")))
 ;;                         :tmp:line)
 
 
@@ -330,13 +326,13 @@ CALLER should be calling function's name. It can be one of:
     ;; Return updated syntax tree.
     syntax))
 ;; (int<mis>:syntax:children 'test
-;;                           :mis:comment
-;;                           '((:mis:comment))
-;;                           '(:mis:format (:formatter . string) (:value . "hello")))
+;;                           :comment
+;;                           '((:comment))
+;;                           '(:format (:formatter . string) (:value . "hello")))
 ;; (int<mis>:syntax:children 'test
-;;                           :mis:comment
-;;                           '((:mis:comment (:children (:mis:test :hello 'there))))
-;;                           '(:mis:format (:formatter . string) (:value . "hello")))
+;;                           :comment
+;;                           '((:comment (:children (:test :hello 'there))))
+;;                           '(:format (:formatter . string) (:value . "hello")))
 
 
 ;;------------------------------------------------------------------------------
@@ -481,22 +477,22 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                     (stringp (nth 0 formatting/in)))
                ;; Just a single string.
                (setq syntax/out/format (int<mis>:syntax:create caller
-                                                               :mis:format
+                                                               :format
                                                                (cons :formatter 'string)
                                                                (cons :value (nth 0 formatting/in)))))
 
               ((and (= (length formatting/in) 1)
                     (characterp (nth 0 formatting/in)))
-               ;; Just a single string; use `:mis:string' to simplify things later.
+               ;; Just a single character.
                (setq syntax/out/format (int<mis>:syntax:create caller
-                                                               :mis:format
+                                                               :format
                                                                (cons :formatter 'char)
                                                                (cons :value (nth 0 formatting/in)))))
 
               (t
-               ;; Generic message format string and/or args go into the `:mis:message'.
+               ;; Generic message format string and args.
                (setq syntax/out/format (int<mis>:syntax:create caller
-                                                               :mis:format
+                                                               :format
                                                                (cons :formatter 'message)
                                                                (cons :value (nth 0 formatting/in)))))))
 
@@ -512,7 +508,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                                                             :children
                                                             syntax/out/children
                                                             (int<mis>:syntax:get/pair caller
-                                                                                      :mis:format
+                                                                                      :format
                                                                                       syntax/out/format)))))
 
       ;;------------------------------
@@ -562,10 +558,10 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
 ;; (int<mis>:parse 'test :string nil :indent 'auto "hello")
 ;; (int<mis>:parse 'test :line '(:line :style) "-")
 ;;
-;; Parse a syntax tree -> Get a `:mis' SYNTAX.
-;; (int<mis>:parse 'test :comment '(:comment :style) '((:mis:format (:formatter repeat :string "-"))))
+;; Parse a syntax tree -> Get a syntax tree.
+;; (int<mis>:parse 'test :comment '(:comment :style) '((:format (:formatter repeat :string "-"))))
 ;;
-;; Error: `:align' is a `:mis:style', not a `:mis:comment' category keyword.
+;; Error: `:align' is a `:style', not a `:comment' category keyword.
 ;;   (int<mis>:parse 'test :comment :comment :align 'center "hello")
 
 

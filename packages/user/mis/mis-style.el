@@ -50,17 +50,17 @@
         ((not (eq 1 (length syntax)))
          nil)
 
-        ;; Key should be `:mis:style'.
+        ;; Key should be `:style'.
         ((int<mis>:syntax:find 'int<mis>:style:exclusive?
                                syntax
-                               :mis:style)
+                               :style)
          syntax)
 
         ;; Fallthrough: not styling so return nil.
         (t
          nil)))
 ;; (int<mis>:style:exclusive? (mis:style :width 80))
-;; (int<mis>:style:exclusive? '((:mis:style (:align . center)) (:mis:string . "hello")))
+;; (int<mis>:style:exclusive? '((:style (:align . center)) (:string . "hello")))
 
 
 ;;------------------------------------------------------------------------------

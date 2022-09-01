@@ -55,10 +55,10 @@ Examples:
     ;;------------------------------
     ;; Create output syntax.
     ;;------------------------------
-    ;; Convert `:line' from parsing into `:mis:format'.
+    ;; Convert `:line' from parsing into `:format'.
     (setq syntax/out (apply #'int<mis>:syntax:create
                             'mis:line
-                            :mis:format
+                            :format
                             (cons :formatter 'repeat)
                             ;; Just assume there's a string somewhere in `:children'; will error at compile time.
                             (cons :value     :child)
@@ -66,9 +66,9 @@ Examples:
                             syntax/line))))
 ;; (mis:line "-")
 ;; (mis:line :width 10 :string "xX")
-;;   -> '((:mis:style (:width . 10)) (:mis:format (:formatter . repeat) (:string . "xX")))
+;;   -> '((:style (:width . 10)) (:format (:formatter . repeat) (:string . "xX")))
 ;; (mis:line "-")
-;;   -> '((:mis:format (:formatter . repeat) (:string . "-")))
+;;   -> '((:format (:formatter . repeat) (:string . "-")))
 ;; (mis:line ?-)
 ;; (mis:line :width 10 :string "hi")
 ;; (mis:line :string "hi")

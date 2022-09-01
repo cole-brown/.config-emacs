@@ -36,20 +36,20 @@
 
 ;; Mis Syntax Tree Categories
 (defconst int<mis>:keywords:category/internal
-  '(:mis:style
-    :mis:comment
-    :mis:format
-    :mis:message
-    :mis:string
-    :mis:char)
+  '(:style
+    :comment
+    :format
+    :message
+    :string
+    :char)
   "Valid Mis categories for parsing & validation.")
 
 
 (defconst int<mis>:keywords:category
-  '((:style   :mis:style)
-    (:comment :mis:comment)
+  '((:style   :style)
+    (:comment :comment)
     (:line    :line)
-    (:string  :mis:format))
+    (:string  :format))
   "Alist of cons of keyword to keyword list.
 
 Cons: (input-category-keyword . (internal-category-keyword-0 ...))
@@ -145,7 +145,7 @@ Return nil/non-nil."
       ;; Validate in general.
       (let* ((check/str (symbol-name check))
              (check/len (length check/str)) ; Avoid out of range errorrs in `substring'.
-             (type      (substring check/str 0 (min 5 check/len)))) ; ":mis:" or ":tmp:"?
+             (type      (substring check/str 0 (min 5 check/len)))) ; Get enough to check for ":tmp:".
         ;; Any `:tmp:...' keyword is valid. They should have more after ":tmp:",
         ;; but whatever.
         (string= type ":tmp:")))))
@@ -158,8 +158,7 @@ Return nil/non-nil."
   "Ensure CHECK category keyword is valid according to VALIDS list.
 
 CHECK should be:
-  - an input keyword - no `:mis:' prefix
-                     - from `int<mis>:keywords:category/input'
+  - an input keyword - from `int<mis>:keywords:category/input'
 
 VALIDS should be nil (all input keywords are valid), or a list of
 exactly which keywords are valid.
@@ -193,7 +192,7 @@ Return nil/non-nil."
              (not (null (memq check valids))))))))
 ;; (int<mis>:valid:category/mis/input? 'test :style)
 ;; (int<mis>:valid:category/mis/input? 'test :style nil)
-;; (int<mis>:valid:category/mis/input? 'test :mis:style nil)
+;; (int<mis>:valid:category/mis/input? 'test :tmp:keyword nil)
 ;; (int<mis>:valid:category/mis/input? 'test :style '(:style :tmp:bar :tmp:foo))
 
 
@@ -264,8 +263,7 @@ Return non-nil or signal an error."
   "Ensure CHECK category keyword is valid according to VALIDS list.
 
 CHECK should be:
-  - an internal keyword - prefix `:mis:'
-                        - from `int<mis>:keywords:category/internal'
+  - an internal keyword - from `int<mis>:keywords:category/internal'
 
 VALIDS should be nil (all internal keywords are valid), or a list of
 exactly which internal keywords are valid.
@@ -297,10 +295,10 @@ Return nil/non-nil."
         ;; Needs to be both an existing keyword and in the VALIDS set.
         (and existing?
              (not (null (memq check valids))))))))
-;; (int<mis>:valid:category/mis/internal? 'test :mis:style)
-;; (int<mis>:valid:category/mis/internal? 'test :mis:style nil)
+;; (int<mis>:valid:category/mis/internal? 'test :style)
 ;; (int<mis>:valid:category/mis/internal? 'test :style nil)
-;; (int<mis>:valid:category/mis/internal? 'test :mis:style '(:mis:style :tmp:bar :tmp:foo))
+;; (int<mis>:valid:category/mis/internal? 'test :style nil)
+;; (int<mis>:valid:category/mis/internal? 'test :style '(:style :tmp:bar :tmp:foo))
 
 
 (defun int<mis>:valid:validator (caller category keyword)
@@ -364,16 +362,16 @@ Signal an error if invalid; if valid, return cons 2-tuple of:
           ((memq keyword int<mis>:keywords:style)
            ;; Set the validation/return values.
            (setq check/category     :style
-                 validator/category :mis:style
+                 validator/category :style
                  validator/func     #'int<mis>:valid:style/kvp?))
 
           ((memq keyword int<mis>:keywords:comment)
            (setq check/category     :comment
-                 validator/category :mis:comment
+                 validator/category :comment
                  validator/func     #'int<mis>:valid:comment/kvp?))
 
           ((memq keyword int<mis>:keywords:line)
-           ;; Lines get converted into `:mis:format' after parsing, so they're just temporary.
+           ;; Lines get converted into `:format' after parsing, so they're just temporary.
            (setq check/category     :line
                  validator/category :tmp:line
                  validator/func     #'int<mis>:valid:line/kvp?))
@@ -784,7 +782,8 @@ signaling an error."
 
           ;; Fallthrough: Failed to find a reason it's invalid so it must be valid?
           (t))))
-(int<mis>:valid:syntax? 'test 'syntax '((:mis:format (:formatter repeat :string "-"))))
+;; (int<mis>:valid:syntax? 'test 'syntax '((:format (:formatter repeat :string "-"))))
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.

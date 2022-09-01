@@ -220,12 +220,12 @@ LANGUAGE should be nil or string:
 
 ;; TODO: Handle style!
 (defun int<mis>:compile:comment (caller syntax style)
-  "Compile `:mis:comment' SYNTAX using STYLE; return string.
+  "Compile `:comment' SYNTAX using STYLE; return string.
 
-SYNTAX should be `:mis:comment' syntax tree.
+SYNTAX should be `:comment' syntax tree.
 
-STYLE should be nil or a `:mis:style' syntax tree.
-Example: (mis:style :width 80) -> '((:mis:style (:width . 80)))
+STYLE should be nil or a `:style' syntax tree.
+Example: (mis:style :width 80) -> '((:style (:width . 80)))
 
 Only STYLE will be checked for styling; style in SYNTAX is ignored.
 
@@ -237,9 +237,9 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller  (list 'int<mis>:compile:comment caller))
          (type    (int<mis>:comment:type/get
-                   (int<mis>:syntax:find caller syntax :mis:comment :type)))
-         (prefix  (or (int<mis>:syntax:find caller syntax :mis:comment :prefix) ""))
-         (postfix (or (int<mis>:syntax:find caller syntax :mis:comment :postfix) ""))
+                   (int<mis>:syntax:find caller syntax :comment :type)))
+         (prefix  (or (int<mis>:syntax:find caller syntax :comment :prefix) ""))
+         (postfix (or (int<mis>:syntax:find caller syntax :comment :postfix) ""))
          ;; TODO: need to get the comment string from somewhere in `:children'.
          ;;(comment (int<mis>:format:syntax caller syntax))
          )
@@ -280,12 +280,12 @@ CALLER should be calling function's name. It can be one of:
                            "Unhandled comment type `%S' in: %S"
                            type
                            syntax)))))
-;; (int<mis>:compile:comment 'test (mis:comment "hi") '((:mis:style (:width . 80))))
+;; (int<mis>:compile:comment 'test (mis:comment "hi") '((:style (:width . 80))))
 ;; (mis:comment "hi")
-;;   -> ((:mis:comment (:prefix . ";;") (:postfix . "") (:type . default)) (:mis:string . "hi"))
+;;   -> ((:comment (:prefix . ";;") (:postfix . "") (:type . default)) (:string . "hi"))
 
 
-(int<mis>:register:compiler :mis:comment #'int<mis>:compile:comment)
+(int<mis>:register:compiler :comment #'int<mis>:compile:comment)
 
 
 ;;------------------------------------------------------------------------------
@@ -315,16 +315,16 @@ NOTE: Comment keyword args must always have both a keyword and a value."
          ;; Block or inline comment?
          (type     (or (int<mis>:syntax:find 'mis:comment
                                              syntax
-                                             :mis:comment :type)
+                                             :comment :type)
                        'default))
          ;; Explicit comment language (e.g. for org-mode source blocks)?
          (language (int<mis>:syntax:find 'mis:comment
                                          syntax
-                                         :mis:comment :language)))
+                                         :comment :language)))
 
     ;; Update `:comment' value in `syntax' with start/end comment strings, etc.
     (int<mis>:syntax:update 'mis:comment
-                            :mis:comment
+                            :comment
                             syntax
                             (when language
                               (cons :language language))

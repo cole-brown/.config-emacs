@@ -86,6 +86,7 @@ Return:
        (int<mis>:error (list 'int<mis>:buffer:name caller)
                        "Cannot determine buffer type from `%S'."
                        name)))))
+;; (int<mis>:buffer:type 'test :mis)
 
 
 (defun int<mis>:buffer:name (caller &optional name)

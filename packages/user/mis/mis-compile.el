@@ -28,7 +28,7 @@
 ;; (require 'generator)
 ;;
 ;; (iter-defun int<mis>:compile/iter (caller syntax &optional style)
-;;   "Compile any `:mis' SYNTAX using STYLE; replace the result in SYNTAX.
+;;   "Compile SYNTAX using STYLE; replace the result in SYNTAX.
 ;;
 ;; SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
 ;; will override any styling in STYLE.
@@ -60,12 +60,10 @@ Keyword must be a member of `int<mis>:keywords:category/internal'.
 
 Function must have params: (CALLER SYNTAX STYLE)
 
-SYNTAX should be `:mis:comment' syntax tree.
+SYNTAX should be a Mis Syntax Tree.
 
-STYLE should be nil or a `:mis:style' syntax tree.
-Example: (mis:style :width 80) -> '((:mis:style (:width . 80)))
-
-Only STYLE will be checked for styling; style in SYNTAX is ignored.
+STYLE should be nil or a Mis `:style' Syntax Tree.
+Example: (mis:style :width 80) -> '((:style (:width . 80)))
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -82,12 +80,10 @@ CATEGORY must be a member of `int<mis>:keywords:category/internal'.
 
 Function must have params: (CALLER SYNTAX STYLE)
 
-SYNTAX should be `:mis:comment' syntax tree.
+SYNTAX should be a Mis Syntax Tree.
 
-STYLE should be nil or a `:mis:style' syntax tree.
-Example: (mis:style :width 80) -> '((:mis:style (:width . 80)))
-
-Only STYLE will be checked for styling; style in SYNTAX is ignored.
+STYLE should be nil or a Mis `:style' Syntax Tree.
+Example: (mis:style :width 80) -> '((:style (:width . 80)))
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -111,7 +107,7 @@ CALLER should be calling function's name. It can be one of:
 ;;------------------------------------------------------------------------------
 
 (defun int<mis>:compile:mis (caller syntax &optional style)
-  "Compile any `:mis' SYNTAX using STYLE; replace the result in SYNTAX.
+  "Compile Mis SYNTAX Tree using STYLE; replace the result in SYNTAX.
 
 SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
 will override any styling in STYLE.
@@ -161,20 +157,20 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:compile caller))
-         ;; Figure out complete styling given STYLE and any `:mis:style' in SYNTAX.
+         ;; Figure out complete styling given STYLE and any `:style' in SYNTAX.
          (styling (int<mis>:syntax:set caller
-                                       :mis:style
+                                       :style
                                        (int<mis>:syntax:merge
                                         caller
                                         (int<mis>:syntax:get/value caller
-                                                                   :mis:style
+                                                                   :style
                                                                    style)
                                         (int<mis>:syntax:get/value caller
-                                                                   :mis:style
+                                                                   :style
                                                                    syntax))))
          ;; Delete styling so we don't get confused about needing it or not.
          (syntax (int<mis>:syntax:delete caller
-                                         :mis:style
+                                         :style
                                          syntax))
          output)
 
@@ -183,7 +179,7 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Our job is just to find the compiler for the mis type and tell it to do
     ;; its job. In some (most?) cases, we want to just send the whole of SYNTAX
-    ;; to a compiler. For example, `:mis:comment' only contains the comment data
+    ;; to a compiler. For example, `:comment' only contains the comment data
     ;; and needs a sibling string to actually wrap the comment start/end strings
     ;; around.
     ;;------------------------------
@@ -199,7 +195,7 @@ CALLER should be calling function's name. It can be one of:
     ;; Next check for the main compiler...
     (cond ((int<mis>:syntax:find caller
                                  syntax
-                                 :mis:comment)
+                                 :comment)
            (push (int<mis>:compile:comment caller
                                            syntax
                                            styling)
@@ -207,7 +203,7 @@ CALLER should be calling function's name. It can be one of:
 
           ((int<mis>:syntax:find caller
                                  syntax
-                                 :mis:comment)
+                                 :comment)
            (push (int<mis>:compile:comment caller
                                            syntax
                                            styling)
@@ -215,7 +211,7 @@ CALLER should be calling function's name. It can be one of:
 
           ((int<mis>:syntax:find caller
                                  syntax
-                                 :mis:format)
+                                 :format)
             (push (int<mis>:compile:format caller
                                            syntax
                                            styling)
@@ -229,7 +225,7 @@ CALLER should be calling function's name. It can be one of:
     ;; Just concat for final return string?
     (apply #'concat output)))
 ;; (int<mis>:compile 'test
-;;                   '((:mis:format (:formatter . repeat) (:string . "-")))
+;;                   '((:format (:formatter . repeat) (:string . "-")))
 ;;                   (mis:style :width 80))
 ;; (int<mis>:compile 'test (mis:comment "hi") (mis:style :width 80))
 ;; (int<mis>:compile 'test (mis:comment (mis:line "-")))
