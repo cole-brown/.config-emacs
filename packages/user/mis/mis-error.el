@@ -125,50 +125,56 @@ MESSAGE should be one of:
 Return cons 2-tuple of:
   - nil or an error string about MESSAGE arg
   - formatted MESSAGE string"
-  ;; Can't really error, since we're in the middle of erroring, so try to stuff
-  ;; our error into the returned string. But try even harder not to call
-  ;; anything that will error, as we want the caller to be able to error with
-  ;; this string we're building.
-  (cond ((stringp message)
-         (cons nil message))
+  (let (string/error
+        string/message)
+    ;; Can't really error, since we're in the middle of erroring, so try to stuff
+    ;; our error into the returned string. But try even harder not to call
+    ;; anything that will error, as we want the caller to be able to error with
+    ;; this string we're building.
+    (cond ((stringp message)
+           (setq string/error nil
+                 string/message message))
 
-        ((and (listp message)
-              (seq-every-p #'stringp message))
-         (cons nil
-               ;; Concat, no separator.
-               (apply #'concat message)))
+          ((and (listp message)
+                (seq-every-p #'stringp message))
+           ;; Concat, no separator.
+           (setq string/error nil
+                 string/message (apply #'concat message)))
 
-        ((and (listp message)
-              (keywordp (car message)))
-         (cond ((not (eq (car message) :newlines))
-                (cons (format "(mis: error message has invalid keyword %S; message: %S)"
-                              (car message)
-                              message)
-                      ;; Haven't checked MESSAGE to make sure it's valid, so
-                      ;; just send it as its full list of keywords plus
-                      ;; whatever.
-                      (format "%S" message)))
+          ((and (listp message)
+                (keywordp (car message)))
+           (cond ((not (seq-every-p #'stringp (cdr message)))
+                  (setq string/error (format "(mis: message should be strings: %S)"
+                                             (cdr message))
+                        ;; Can't use it as-is so just try to use it somehow..?
+                        string/message (format "%S" message)))
 
-               ((not (seq-every-p #'stringp (cdr message)))
-                (cons (format "(mis: error message should be strings: %S)"
-                              (cdr message))
-                      ;; Haven't checked MESSAGE to make sure it's valid, so
-                      ;; just send it as its full list of keywords plus
-                      ;; whatever.
-                      (format "%S" message)))
+                 ;; `:newlines' means append w/ newline separator.
+                 ((eq (car message) :newlines)
+                  (setq string/error nil
+                        ;; Concat with newlines.
+                        string/message (mapconcat #'identity
+                                                  (cdr message)
+                                                  "\n")))
 
-               (t
-                (cons nil
-                      ;; Concat with newlines.
-                      (mapconcat #'identity
-                                 (cdr message)
-                                 "\n")))))
+                 ;; Fallthrough: Don't know what to do with this keyword...
+                 (t
+                  (setq string/error (format "(mis: message has invalid/unhandled keyword %S)"
+                                             (car message))
+                        ;; Can't use it as-is so just try to use it somehow..?
+                        string/message (format "%S" message)))))
 
-        (t
-         ;; Dunno what this is.
-         (cons (format "(mis: cannot handle error message: %S)"
-                       message)
-               (format "%S" message)))))
+          ;; Fallthrough: Dunno what this is.
+          (t
+           (setq string/error (format "(mis: cannot handle message: %S)"
+                                      message)
+                 string/message (format "%S" message))))
+
+    (format "%s%s"
+            (if (stringp string/error)
+                string/error
+              "")
+            string/message)))
 
 
 ;;------------------------------------------------------------------------------
@@ -196,14 +202,47 @@ ARGS should be the `format' ARGS for MESSAGE."
   ;; Raise error with args formatted into the finalized formatting string.
   (apply #'error
          ;; Format CALLER and MESSAGE inputs.
-         (let ((msg (int<mis>:error:message message)))
-           (format "%s: %s%s"
-                   (int<mis>:error:caller/string caller)
-                   (if (car msg)
-                       (concat (car msg) "; ")
-                     "")
-                   (cdr msg)))
+         (format "%s: %s"
+                 (int<mis>:error:caller/string caller)
+                 (int<mis>:error:message message))
          args))
+
+
+;;------------------------------------------------------------------------------
+;; Debugging
+;;------------------------------------------------------------------------------
+
+(defvar int<mis>:debugging? nil
+  "Set to non-nil to enable `int<mis>:debug' output.")
+
+
+(defun int<mis>:debug (caller message &rest args)
+  "If debugging, output a debug MESSAGE, formatted with ARGS, from CALLER.
+
+Will only output if `int<mis>:debugging?' is non-nil.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+MESSAGE should be one of:
+  - a string that `format' understands
+  - a list of strings
+    - will be concatenated without a separator (so use spaces where needed)
+  - a list of strings that starts with the `:newlines' keyword
+    - will be concatenated with \"\n\"
+
+ARGS should be the `format' ARGS for MESSAGE."
+  (when int<mis>:debugging?
+    (apply #'message
+           (format "[mis:DEBUG] %s: %s"
+                   (int<mis>:error:caller/string caller)
+                   (int<mis>:error:message message))
+           args)))
+;; (let ((int<mis>:debugging? t)) (int<mis>:debug 'test "hello %S" :there))
 
 
 ;;------------------------------------------------------------------------------
