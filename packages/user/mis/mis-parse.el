@@ -467,6 +467,11 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
               ;; Key/value exist and are now known to be valid; save to the syntax tree
               ;; for this parsed category.
               (let ((syntax/cat (alist-get category/validator syntax/parsed)))
+                (int<mis>:debug caller "parsing...: %S" key)
+                (int<mis>:debug caller "  - category: . . . . . . %S" category/validator)
+                (int<mis>:debug caller "  - value:                %S" value)
+                (int<mis>:debug caller "  - syntax/cat: . . . . . %S" syntax/cat)
+                (int<mis>:debug caller "  - category/valid-roots: %S" category/valid-roots)
                 ;; Is this the root category? We'll need to know it when building the final syntax tree.
                 (when (memq category/validator category/valid-roots)
                   (if (and category/out
@@ -479,7 +484,8 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                                       category/out
                                       syntax/cat
                                       args)
-                    (setq category/out category/validator)))
+                    (setq category/out category/validator))
+                  (int<mis>:debug caller "  <---category/out:       %S" category/out))
                 ;; Save the parsed key/value.
                 (setf (alist-get key syntax/cat) value)
                 (setf (alist-get category/validator syntax/parsed) syntax/cat))
@@ -498,6 +504,9 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                             function/validator
                             value))))
 
+      (int<mis>:debug caller "syntax/parsed initial: %S" syntax/parsed)
+      (int<mis>:debug caller "category/out:          %S" category/out)
+
       ;;------------------------------
       ;; What did we parse?
       ;;------------------------------
@@ -505,20 +514,26 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
       ;; Do we need to default to an output category?
       ;; In general, we shouldn't...
       (unless category/out
-        (setq category/out (nth 0 category/valid-roots)))
+        (setq category/out (nth 0 category/valid-roots))
+        (int<mis>:debug caller "category/out default:  %S" category/out))
 
       ;; Do we need to promote `syntax/parsed' to top level? E.g. if we parsed a
       ;; `:style' category then its `:style' keyword and styling key/value pairs
       ;; should be at the top.
+      (int<mis>:debug caller "parsed has out cat?:   %S" (int<mis>:syntax:has caller category/out syntax/parsed))
       (when (int<mis>:syntax:has caller
                                  category/out
                                  syntax/parsed)
+        (int<mis>:debug caller "move: syntax/parsed:   %S" syntax/parsed)
         ;; Move `syntax/parsed' to `syntax/out'.
         (setq syntax/out (int<mis>:syntax:merge caller
                                                 syntax/out
                                                 syntax/parsed)
               ;; Clear so rest of the function can check it correctly.
-              syntax/parsed nil))
+              syntax/parsed nil)
+        (int<mis>:debug caller "to: syntax/out:        %S" syntax/out))
+      (int<mis>:debug caller "syntax/parsed final:   %S" syntax/parsed)
+      (int<mis>:debug caller "args left over:        %S" args)
 
       ;;------------------------------
       ;; Deal with any pre-parsed Mis Syntax Trees in ARGS.
@@ -542,6 +557,8 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                                            caller
                                            :children
                                            syntax/in))))
+      (int<mis>:debug caller "formatting/in:         %S" formatting/in)
+      (int<mis>:debug caller "syntax/out/children:   %S" syntax/out/children)
 
       ;;------------------------------
       ;; Build Syntax Tree: Presume that all the `formatting/in' are message/formatting.
@@ -553,6 +570,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                (setq syntax/out/format (int<mis>:syntax:create caller
                                                                :format
                                                                (cons :formatter 'string)
+                                                               ;; Just the one string.
                                                                (cons :value (nth 0 formatting/in)))))
 
               ((and (= (length formatting/in) 1)
@@ -561,6 +579,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                (setq syntax/out/format (int<mis>:syntax:create caller
                                                                :format
                                                                (cons :formatter 'char)
+                                                               ;; Just the one string.
                                                                (cons :value (nth 0 formatting/in)))))
 
               (t
@@ -568,7 +587,9 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                (setq syntax/out/format (int<mis>:syntax:create caller
                                                                :format
                                                                (cons :formatter 'message)
-                                                               (cons :value (nth 0 formatting/in)))))))
+                                                               ;; Everything!
+                                                               (cons :value formatting/in))))))
+      (int<mis>:debug caller "syntax/out/format:     %S" syntax/out/format)
 
       ;;------------------------------
       ;; Build Syntax Tree: Place `syntax/out/format' appropriately.
@@ -586,6 +607,8 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                                                             (int<mis>:syntax:get/pair caller
                                                                                       :format
                                                                                       syntax/out/format)))))
+      (int<mis>:debug caller "syntax/out:            %S" syntax/out)
+      (int<mis>:debug caller "syntax/out/children:   %S" syntax/out/children)
 
       ;;------------------------------
       ;; Build Syntax Tree: Add new trees.
@@ -618,6 +641,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                                                        :children
                                                        syntax/out/children))))
       syntax/out)))
+;; (int<mis>:parse 'test :string nil "hello %s" "world")
 ;; (int<mis>:parse 'test :string '(:style :string) "hello")
 ;; (int<mis>:parse 'test :comment '(:comment :style :string) "hello")
 ;; (int<mis>:parse 'test :string nil :align 'center "hello")
