@@ -38,10 +38,7 @@
 (defconst int<mis>:keywords:category/internal
   '(:style
     :comment
-    :format
-    :message
-    :string
-    :char)
+    :format)
   "Valid Mis categories for parsing & validation.")
 
 

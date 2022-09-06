@@ -49,12 +49,34 @@
 ;; Syntax Trees
 ;;------------------------------------------------------------------------------
 
+(defun int<mis>:syntax:has (caller key syntax)
+  "Return non-nil if KEY is a top-level alist key for Mis SYNTAX Tree.
+
+KEY should a keyword.
+
+SYNTAX should be a Mis Syntax Tree.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (not (eq :mis:does-not-exist
+           (alist-get key syntax :mis:does-not-exist))))
+;; (int<mis>:syntax:has 'test :style '((:style (:width . 10) (:align . :center))))
+;; No; only top-level.
+;;   (int<mis>:syntax:has 'test :width '((:style (:width . 10) (:align . :center))))
+
+
 (defun int<mis>:syntax:get/value (caller key syntax &optional default)
   "Get KEY value from Mis SYNTAX Tree.
 
 KEY should be:
   - an internal keyword  - From `int<mis>:keywords:category/internal`
   - a temporary keyword - Starts with `:tmp:`
+
+SYNTAX should be a Mis Syntax Tree.
 
 Optional DEFAULT can be a value to return if KEY is not present.
 
@@ -74,6 +96,8 @@ CALLER should be calling function's name. It can be one of:
 KEY should be:
   - an internal keyword  - From `int<mis>:keywords:category/internal`
   - a tempororay keyword - Starts with `:tmp:`
+
+SYNTAX should be a Mis Syntax Tree.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -213,6 +237,38 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:syntax:update 'test :style '((:style (:width . 10) (:align . :center))) '(:align . :right) nil '(:trim . t))
 
 
+(defun int<mis>:syntax:create-or-update (caller key syntax &rest kvp)
+  "Create or update the Mis SYNTAX tree, depending on if it exists currently.
+
+Will call either `int<mis>:syntax:create' or `int<mis>:syntax:update'.
+
+KVP should (each) be a cons of a KEY keyword and its value.
+example: '(:width . 10)
+
+SYNTAX should be a Mis abstract syntax tree. It will be updated with KVPs and
+the updated value returned. Caller should set the return value back to the input
+arg as the update is not guaranteed to be in-place.
+Example:
+  (setq syntax (int<mis>:syntax:create-or-update 'test
+                                                 :style
+                                                 syntax
+                                                 '(:align . :center)))
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (apply (if syntax
+             #'int<mis>:syntax:update
+           #'int<mis>:syntax:create)
+         (list 'int<mis>:syntax:create-or-update caller)
+         key
+         syntax
+         kvp))
+
+
 (defun int<mis>:syntax:delete (caller key syntax)
   "Remove KEY from Mis SYNTAX tree.
 
@@ -287,8 +343,8 @@ CALLER should be calling function's name. It can be one of:
     syntax/to))
 ;; (int<mis>:syntax:merge 'test
 ;;                         '((:style (:width . 10) (:align . :center)) (:message "hello there"))
-;;                         '((:style (:width . 11) (:align . :right)) (:tmp:line (:string . "xxx")))
-;;                         :tmp:line)
+;;                         '((:style (:width . 11)) (:ignored (:string . "xxx")))
+;;                         :ignored)
 
 
 (defun int<mis>:syntax:children (caller key syntax &rest kvp)
@@ -403,48 +459,66 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
           ;; Validate a key/value pair.
           ;;---
           (setq args/len (- args/len 2))
-          (if-let* ((key           (pop args))
-                    (validator     (int<mis>:valid:validator caller valid key))
-                    (validator-cat (car validator)) ; parsed category (internal or tmp)
-                    (validator-fn  (cdr validator))
-                    (value         (funcall validator-fn caller key (pop args))))
+          (if-let* ((key                (pop args))
+                    (validator          (int<mis>:valid:validator caller valid key))
+                    (category/validator (car validator)) ; parsed category (internal or tmp)
+                    (function/validator (cdr validator))
+                    (value              (funcall function/validator caller key (pop args))))
               ;; Key/value exist and are now known to be valid; save to the syntax tree
               ;; for this parsed category.
-              (let ((syntax/cat (alist-get validator-cat syntax/parsed)))
+              (let ((syntax/cat (alist-get category/validator syntax/parsed)))
                 ;; Is this the root category? We'll need to know it when building the final syntax tree.
-                (when (memq syntax/cat category/valid-roots)
-                  (if category/out
-                      ;; Can't print out full input ARGS cuz we're popping. :|
-                      ;; NOTE: Change this loop to pop from a copy of args if we need better error output here.
+                (when (memq category/validator category/valid-roots)
+                  (if (and category/out
+                           (not (eq category/out category/validator)))
+                      ;; Can't print out full input ARGS in error message cuz we're popping them off.
+                      ;; NOTE: Change this loop to `pop' from a copy of args if we need better error output here.
                       (int<mis>:error caller
                                       '("Found two output roots while parsing! "
                                         "Have: %S, Found: %S")
                                       category/out
                                       syntax/cat
                                       args)
-                    (setq category/out syntax/cat)))
+                    (setq category/out category/validator)))
                 ;; Save the parsed key/value.
                 (setf (alist-get key syntax/cat) value)
-                (setf (alist-get validator-cat syntax/parsed) syntax/cat))
+                (setf (alist-get category/validator syntax/parsed) syntax/cat))
 
             ;; `if-let' failure... There /should/ have been an error raised already?
             (int<mis>:error caller
                             '("Invalid key, value or something? "
                               "key: %S, "
                               "validator: %S, "
-                              "validator-cat: %S, "
-                              "validator-fn: %S, "
+                              "category/validator: %S, "
+                              "function/validator: %S, "
                               "value: %S")
                             key
                             validator
-                            validator-cat
-                            validator-fn
+                            category/validator
+                            function/validator
                             value))))
+
+      ;;------------------------------
+      ;; What did we parse?
+      ;;------------------------------
 
       ;; Do we need to default to an output category?
       ;; In general, we shouldn't...
       (unless category/out
         (setq category/out (nth 0 category/valid-roots)))
+
+      ;; Do we need to promote `syntax/parsed' to top level? E.g. if we parsed a
+      ;; `:style' category then its `:style' keyword and styling key/value pairs
+      ;; should be at the top.
+      (when (int<mis>:syntax:has caller
+                                 category/out
+                                 syntax/parsed)
+        ;; Move `syntax/parsed' to `syntax/out'.
+        (setq syntax/out (int<mis>:syntax:merge caller
+                                                syntax/out
+                                                syntax/parsed)
+              ;; Clear so rest of the function can check it correctly.
+              syntax/parsed nil))
 
       ;;------------------------------
       ;; Deal with any pre-parsed Mis Syntax Trees in ARGS.
@@ -503,7 +577,9 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
       ;; output, otherwise it's a child syntax tree.
       (when syntax/out/format
         (if (eq category :string)
-            (setq syntax/out syntax/out/format)
+            (setq syntax/out (int<mis>:syntax:merge caller
+                                                    syntax/out
+                                                    syntax/out/format))
           (setq syntax/out/children (int<mis>:syntax:update caller
                                                             :children
                                                             syntax/out/children
@@ -518,17 +594,12 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
       ;; ordering to the alists, though it won't matter to the builder/compiler.
       ;; Just friendly to the programmer to have these first in the output alist.
       (if syntax/parsed
-          (if syntax/out
-              (setq syntax/out (apply #'int<mis>:syntax:update
-                                      caller
-                                      category/out
-                                      syntax/out
-                                      syntax/parsed))
+          (setq syntax/out (apply #'int<mis>:syntax:create-or-update
+                                  caller
+                                  category/out
+                                  syntax/out
+                                  syntax/parsed))
 
-            (setq syntax/out (apply #'int<mis>:syntax:create
-                                    caller
-                                    category/out
-                                    syntax/parsed)))
         ;; Nothing special parsed for `category/out', but we need to make
         ;; `syntax/out' have a root of `category/out'...
         (unless syntax/out
@@ -552,11 +623,11 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
 ;; (int<mis>:parse 'test :string nil :align 'center "hello")
 ;; (int<mis>:parse 'test :string :style :align 'center "hello")
 ;; (int<mis>:parse 'test :string nil :align 'center "hello %s" "world")
-;; (int<mis>:parse 'test :string nil :type 'block :align 'center "hello %s" "world")
 ;; (int<mis>:parse 'test :string nil :align 'center :width 11 "hello %s" "world")
 ;; (int<mis>:parse 'test :string nil :align 'center :width 11 "hello")
 ;; (int<mis>:parse 'test :string nil :indent 'auto "hello")
 ;; (int<mis>:parse 'test :line '(:line :style) "-")
+;; (int<mis>:parse 'test :style :style :width 80)
 ;;
 ;; Parse a syntax tree -> Get a syntax tree.
 ;; (int<mis>:parse 'test :comment '(:comment :style) '((:format (:formatter repeat :string "-"))))
