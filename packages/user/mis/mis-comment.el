@@ -247,27 +247,6 @@ LANGUAGE should be nil or string:
                                 (or language
                                     'default)))))
 
-        ((not (eq language major-mode)) ;; Are we embedding one language in another?
-         (cond ((eq major-mode 'org-mode)
-                (if (eq type 'inline)
-                    "~"
-                  (apply #'concat
-                         "#+end_src"
-                         (if language
-                             (list " " language)
-                           nil))))
-
-               ((and (eq major-mode 'markdown-mode)
-                     (not (eq language major-mode)))
-                (if (eq type 'inline)
-                    "`"
-                  "```"))
-
-               (t
-                (int<mis>:error 'int<mis>:comment:end
-                                "Don't know how to do an embedded language comment for mode `%S'."
-                                major-mode))))
-
         ;;------------------------------
         ;; Normal Case: Plain Ole Regular Normal Comments
         ;;------------------------------
