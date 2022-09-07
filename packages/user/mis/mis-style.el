@@ -88,6 +88,7 @@ NOTE: Styles must always have both a keyword and a value."
          :style
          :style ; Only allow style keywords.
          args))
+;; (mis:style :width 80)
 ;; (mis:style :align 'center "hello")
 ;; (mis:style :align 'center "hello %s" "world")
 ;; (mis:style :align 'center :width 11 "hello %s" "world")

@@ -278,7 +278,8 @@ CALLER should be calling function's name. It can be one of:
          (value (int<mis>:syntax:find caller
                                       syntax
                                       :format :value)))
-    ;; TODO: If value is `:child', need to recurse into children for a string first.
+    (int<mis>:debug caller "formatter: %S" formatter)
+    (int<mis>:debug caller "value:     %S" value)
 
     ;;------------------------------
     ;; Sanity Checks
@@ -292,6 +293,24 @@ CALLER should be calling function's name. It can be one of:
 
           (t
            nil))
+
+    ;;------------------------------
+    ;; Do we have the output string?
+    ;;------------------------------
+    ;; If the value is `child', we first have to go get a string from our children.
+    (when (eq value 'child)
+      (int<mis>:debug caller "Get string from child...")
+      (int<mis>:debug caller
+                      "children: %S"
+                      (int<mis>:syntax:find caller
+                                            syntax
+                                            :format :children))
+      (setq value (int<mis>:compile caller
+                                    (int<mis>:syntax:find caller
+                                                          syntax
+                                                          :format :children)
+                                    style))
+      (int<mis>:debug caller "<--value:  %S" value))
 
     ;;------------------------------
     ;; Format output string.
@@ -331,9 +350,9 @@ CALLER should be calling function's name. It can be one of:
                        '("Unhandled formatter case `%S'!")
                        formatter)))))
 ;; (int<mis>:compile:format 'test '((:format (:formatter . repeat) (:string . "-"))) '((:style (:width . 80))))
+;; (int<mis>:compile:format 'test (mis:line "-") (mis:style :width 80))
 
-
-(int<mis>:register:compiler :format #'int<mis>:compile:comment)
+(int<mis>:compiler:register :format #'int<mis>:compile:format)
 
 
 ;;------------------------------------------------------------------------------

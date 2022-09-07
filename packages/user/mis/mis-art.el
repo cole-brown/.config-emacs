@@ -61,7 +61,7 @@ Examples:
                             :format
                             (cons :formatter 'repeat)
                             ;; Just assume there's a string somewhere in `:children'; will error at compile time.
-                            (cons :value     :child)
+                            (cons :value     'child)
                             ;; And just stuff the rest of what was parsed into our output.
                             syntax/line))))
 ;; (mis:line "-")

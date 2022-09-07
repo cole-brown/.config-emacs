@@ -73,7 +73,7 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)")
 
 
-(defun int<mis>:register:compiler (category function)
+(defun int<mis>:compiler:register (category function)
   "Register FUNCTION as the compiler for CATEGORY.
 
 CATEGORY must be a member of `int<mis>:keywords:category/internal'.
@@ -91,23 +91,36 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (if-let ((existing (alist-get category int<mis>:compilers)))
-      ;; Just ignore re-registrations...
-      (unless (eq existing function)
-        (int<mis>:error 'int<mis>:compile:register
-                        "Compiler already exists for `%S'! Have: %S, attempted: %S"
-                        category
-                        existing
-                        function))
-    (push (cons category function) int<mis>:compilers)))
+  ;; Just overwrite re-registrations.
+  (setf (alist-get category int<mis>:compilers) function))
+
+
+(defun int<mis>:compiler:get (category)
+  "Get registered compiler function for CATEGORY.
+
+CATEGORY must be a member of `int<mis>:keywords:category/internal'.
+
+Function must have params: (CALLER SYNTAX STYLE)
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (or (alist-get category int<mis>:compilers)
+      (int<mis>:error 'int<mis>:compile:get
+                      "No compiler found for `%S'!"
+                      category)))
+;; (int<mis>:compiler:get :comment)
 
 
 ;;------------------------------------------------------------------------------
 ;; Compiling
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:compile:mis (caller syntax &optional style)
-  "Compile Mis SYNTAX Tree using STYLE; replace the result in SYNTAX.
+(defun int<mis>:compile:syntax (caller syntax &optional style)
+  "Compile SYNTAX into a propertized string for output using STYLE.
 
 SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
 will override any styling in STYLE.
@@ -118,30 +131,111 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let ((caller (list 'int<mis>:compile:wrapped caller))
-        syntax/out)
-    ;; Only look at top level.
-    (dolist (assoc/child syntax)
-      (let ((key   (car assoc/child))
-            (value (cdr assoc/child)))
-        (if (eq key :mis)
-            ;; Compile whatever this wrapped thing is!
-            (setq syntax/out (int<mis>:syntax:append caller
-                                                     syntax/out
-                                                     (int<mis>:syntax:create caller
-                                                                             :mis:string
-                                                                             (int<mis>:compile caller value style))))
-          ;; Just put it back.
-          (setq syntax/out (int<mis>:syntax:append caller
-                                                   syntax/out
-                                                   (int<mis>:syntax:set caller key value))))))
+  (let* ((caller (list 'int<mis>:compile:syntax caller))
+         ;; Figure out complete styling given STYLE and any `:style' in SYNTAX.
+         (styling (int<mis>:syntax:set caller
+                                       :style
+                                       (int<mis>:syntax:merge caller
+                                                              (int<mis>:syntax:get/value caller :style style)
+                                                              (int<mis>:syntax:get/value caller :style syntax))))
+         ;; Delete styling so we don't get confused about needing it or not.
+         (syntax (int<mis>:syntax:delete caller
+                                         :style
+                                         syntax))
+         output)
 
-    ;; Return in correct order.
-    (nreverse syntax/out)))
-;; (int<mis>:compile:mis 'test (mis:comment (mis:line "-")))
+    ;;------------------------------
+    ;; Compile!
+    ;;------------------------------
+    ;; Our job is just to find the compiler for the mis type and tell it to do
+    ;; its job.
+    ;;------------------------------
+    (dolist (branch syntax)
+      (let* ((category      (car branch))
+             (syntax/branch (int<mis>:syntax:set caller
+                                                 category
+                                                 (cdr branch)))
+             ;; Error checking for category's compiler func done in `int<mis>:compiler:get'.
+             (compiler      (int<mis>:compiler:get category)))
+        (push (funcall compiler
+                       caller
+                       syntax/branch
+                       styling)
+              output)))
+
+    ;;------------------------------
+    ;; Finalize
+    ;;------------------------------
+    (when (not (seq-every-p #'stringp output))
+      (int<mis>:error caller
+                      "Syntax should have been compiled to strings, got: %S"
+                      output))
+    (apply #'concat (nreverse output))))
+;; (int<mis>:compile:syntax 'test (mis:string "-"))
+;; TODO: THIS ONE!!! (int<mis>:compile:syntax 'test (mis:line "-"))
 
 
-(int<mis>:register:compiler :mis #'int<mis>:compile:mis)
+(defun int<mis>:compile:children (caller syntax &optional style)
+  "Compile SYNTAX into a propertized string for output using STYLE.
+
+SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
+will override any styling in STYLE.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:compile:children caller))
+         (syntax/children (int<mis>:syntax:get/value caller
+                                                     :children
+                                                     syntax)))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (unless syntax/children
+      (int<mis>:error caller
+                      "No children to compile: %S"
+                      syntax))
+
+    ;;------------------------------
+    ;; Compile
+    ;;------------------------------
+    ;; Figure out complete styling given STYLE and any `:style' in SYNTAX.
+    (let* ((styling (int<mis>:syntax:set caller :style
+                                         (int<mis>:syntax:merge caller
+                                                                (int<mis>:syntax:get/value caller :style style)
+                                                                (int<mis>:syntax:get/value caller :style syntax/children))))
+         ;; Delete styling so we don't get confused about needing it or not.
+           (syntax/children (int<mis>:syntax:delete caller
+                                                    :style
+                                                    syntax/children))
+           output)
+
+      ;; And now we can just loop into the core compiling function.
+      (dolist (child syntax/children)
+        (let* ((category     (car child))
+               (syntax/child (int<mis>:syntax:set caller
+                                                  category
+                                                  (cdr child))))
+          (push (int<mis>:compile:syntax caller
+                                         syntax/child
+                                         styling)
+                output)))
+
+      ;;------------------------------
+      ;; Finalize
+      ;;------------------------------
+      (when (not (seq-every-p #'stringp output))
+        (int<mis>:error caller
+                        "Children should have been compiled to strings, got: %S"
+                        output))
+      (apply #'concat (nreverse output)))))
+;; (int<mis>:compile:children 'test '((:children (:format (:formatter . string) (:value . "-")))))
+
+
+(int<mis>:register:compiler :children #'int<mis>:compile:children)
 
 
 (defun int<mis>:compile (caller syntax &optional style)

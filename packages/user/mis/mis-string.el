@@ -70,6 +70,7 @@ NOTE: Mis keyword args must always have both a keyword and a value."
          args))
 ;; (mis:string "hello %S" "there")
 ;; (mis:string :width 80 "hello there")
+;; (mis:string :width 80 "hello %S" "there")
 
 
 (defalias 'mis:message 'mis:string)
