@@ -114,39 +114,67 @@ LANGUAGE should be nil, string, or symbol:
                                 int<mis>:valid:comment/types)
     (setq type (int<mis>:valid:normalize->symbol 'type type)))
 
-
   ;;------------------------------
-  ;; Return comment start string.
+  ;; Set-up.
   ;;------------------------------
   (comment-normalize-vars)
 
-  ;; Emacs already knows: If `comment-start' variable is set, that is the
-  ;; correct thing to use.
-  (cond (comment-start ;; TODO: block vs inline?
+  (int<mis>:debug 'int<mis>:comment:end
+                  "language: %S"
+                  language)
+  (int<mis>:debug 'int<mis>:comment:end
+                  "type: %S"
+                  type)
+  (int<mis>:debug 'int<mis>:comment:start
+                  "major-mode: %S"
+                  major-mode)
+  (int<mis>:debug 'int<mis>:comment:start
+                  "comment-start: %S"
+                  comment-start)
+
+  ;;------------------------------
+  ;; Embedded Languages
+  ;;------------------------------
+  (cond ((eq type 'quote) ;; Are we embedding one language in another?
+         (cond ((eq major-mode 'org-mode)
+                (if (eq type 'inline)
+                    "~"
+                  (apply #'concat
+                         "#+begin_src"
+                         (if language
+                             (list " " language)
+                           nil))))
+
+               ((and (eq major-mode 'markdown-mode)
+                     (not (eq language major-mode)))
+                (if (eq type 'inline)
+                    "`"
+                  (apply #'concat
+                         "```"
+                         (if language
+                             (list " " language)
+                           nil))))
+
+               (t
+                (int<mis>:error 'int<mis>:comment:start
+                                "Don't know how to do an embedded/quoted language comment for language `%S' in mode `%S'."
+                                major-mode
+                                (or language
+                                    'default)))))
+
+        ;;------------------------------
+        ;; Normal Case: Plain Ole Regular Normal Comments
+        ;;------------------------------
+        ;; Emacs already knows: If `comment-start' variable is set, that is the
+        ;; correct thing to use.
+        (comment-start ;; TODO: block vs inline?
          (concat (int<mis>:format:repeat comment-start (1+ (comment-add nil)))
                  ;; TODO: avoid space padding via `mis:comment' param?
                  " "))
 
-        ;; Figure it out ourselves?
-        ((eq major-mode 'org-mode)
-         (if (eq type 'inline)
-             "~"
-           (apply #'concat
-                  "#+begin_src"
-                  (if language
-                      (list " " language)
-                    nil))))
-
-        ((eq major-mode 'markdown-mode)
-         (if (eq type 'inline)
-             "`"
-           (apply #'concat
-                  "```"
-                  (if language
-                      (list " " language)
-                    nil))))
-
-        ;; Fallthrough... error?
+        ;;------------------------------
+        ;; Fallthrough: Error
+        ;;------------------------------
         (t
          (int<mis>:error 'int<mis>:comment:start
                          "Don't know what to use for start of comments in `%S' mode."
@@ -169,41 +197,91 @@ LANGUAGE should be nil or string:
   ;;------------------------------
   ;; Error checks.
   ;;------------------------------
-  (int<mis>:valid:string-symbol-nil? 'int<mis>:comment:start
+  (int<mis>:valid:string-symbol-nil? 'int<mis>:comment:end
                                      'language
                                      language)
 
-  (when (int<mis>:valid:member? 'int<mis>:comment:start
+  (when (int<mis>:valid:member? 'int<mis>:comment:end
                                 'type
                                 type
                                 int<mis>:valid:comment/types)
     (setq type (int<mis>:valid:normalize->symbol 'type type)))
 
   ;;------------------------------
-  ;; Return comment end string.
+  ;; Set-up.
   ;;------------------------------
   (comment-normalize-vars)
 
-  ;; Emacs already knows: If `comment-end' variable is set, that is the
-  ;; correct thing to use.
-  (cond (comment-end ;; TODO: block vs inline?
+  (int<mis>:debug 'int<mis>:comment:end
+                  "language: %S"
+                  language)
+  (int<mis>:debug 'int<mis>:comment:end
+                  "type: %S"
+                  type)
+  (int<mis>:debug 'int<mis>:comment:end
+                  "major-mode: %S"
+                  major-mode)
+  (int<mis>:debug 'int<mis>:comment:end
+                  "comment-end: %S"
+                  comment-end)
+
+  ;;------------------------------
+  ;; Embedded Languages
+  ;;------------------------------
+  (cond ((eq type 'quote) ;; Are we embedding one language in another?
+         (cond ((eq major-mode 'org-mode)
+                (if (eq type 'inline)
+                    "~"
+                  "#+end_src"))
+
+               ((and (eq major-mode 'markdown-mode)
+                     (not (eq language major-mode)))
+                (if (eq type 'inline)
+                    "`"
+                  "```"))
+
+               (t
+                (int<mis>:error 'int<mis>:comment:end
+                                "Don't know how to do an embedded/quoted language comment for language `%S' in mode `%S'."
+                                major-mode
+                                (or language
+                                    'default)))))
+
+        ((not (eq language major-mode)) ;; Are we embedding one language in another?
+         (cond ((eq major-mode 'org-mode)
+                (if (eq type 'inline)
+                    "~"
+                  (apply #'concat
+                         "#+end_src"
+                         (if language
+                             (list " " language)
+                           nil))))
+
+               ((and (eq major-mode 'markdown-mode)
+                     (not (eq language major-mode)))
+                (if (eq type 'inline)
+                    "`"
+                  "```"))
+
+               (t
+                (int<mis>:error 'int<mis>:comment:end
+                                "Don't know how to do an embedded language comment for mode `%S'."
+                                major-mode))))
+
+        ;;------------------------------
+        ;; Normal Case: Plain Ole Regular Normal Comments
+        ;;------------------------------
+        ;; Emacs already knows: If `comment-end' variable is set, that is the
+        ;; correct thing to use.
+        (comment-end ;; TODO: block vs inline?
          (if (string-empty-p comment-end)
              comment-end
            ;; TODO: avoid space padding via `mis:comment' param?
            (concat " " comment-end)))
 
-        ;; Figure it out ourselves?
-        ((eq major-mode 'org-mode)
-         (if (eq type 'inline)
-             "~"
-           "#+end_src"))
-
-        ((eq major-mode 'markdown-mode)
-         (if (eq type 'inline)
-             "`"
-           "```"))
-
-        ;; Fallthrough... error?
+        ;;------------------------------
+        ;; Fallthrough: Error
+        ;;------------------------------
         (t
          (int<mis>:error 'int<mis>:comment:end
                          "Don't know what to use for end of comments in `%S' mode."
@@ -315,11 +393,12 @@ NOTE: Comment keyword args must always have both a keyword and a value."
                           :comment
                           '(:comment :style) ; Also allow styling in our comments.
                           args))
-         ;; Block or inline comment?
-         (type     (or (int<mis>:syntax:find 'mis:comment
-                                             syntax
-                                             :comment :type)
-                       'default))
+         ;; Block or inline comment? Need comment `type' decided (i.e. not `default')
+         ;; before prefix/postfix are made.
+         (type     (int<mis>:comment:type/get (or (int<mis>:syntax:find 'mis:comment
+                                                                        syntax
+                                                                        :comment :type)
+                                                  'default)))
          ;; Explicit comment language (e.g. for org-mode source blocks)?
          (language (int<mis>:syntax:find 'mis:comment
                                          syntax
