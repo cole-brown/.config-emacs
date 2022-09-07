@@ -363,7 +363,7 @@ CALLER should be calling function's name. It can be one of:
 ;; (mis
 ;;   (mis:style :width 80)
 ;;   (mis:comment (mis:line "-"))
-;;   (mis:comment :align 'center "Hello there.")
+;;   (mis:comment "Hello there.")
 ;;   (mis:comment (mis:line "-")))
 ;; TODO-mis: YOU ARE HERE:
 ;; (mis (mis:comment (mis:string :align 'center "Hello there.")))
@@ -375,7 +375,7 @@ CALLER should be calling function's name. It can be one of:
 ;; (mis
 ;;   (mis:comment :width 80
 ;;                (mis:line "-")
-;;                (mis:style :align 'center "Hello there.")
+;;                (mis:string :align 'center "Hello there.")
 ;;                (mis:line "-")))
 
 
