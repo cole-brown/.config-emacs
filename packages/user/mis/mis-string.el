@@ -23,24 +23,26 @@
 ;; Helper Functions
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:string:split/lines (string)
+(defun int<mis>:string:lines/split (string)
   "Split STRING on newline character into a list on strings."
   (split-string string "\n"))
 
 
-(defun int<mis>:string:join/lines (&rest string)
+(defun int<mis>:string:lines/join (&rest string)
   "Join STRINGs with newline character."
   (mapconcat #'identity
              string
              "\n"))
 
-(defun int<mis>:string:combine/lines (prefix postfix &rest line)
-  "Append PREFIX and POSTFIX to each LINE, then join with newlines into a string."
-  (mapconcat (lambda (str) "Combine prefix, str, and postfix."
+(defun int<mis>:string:lines/affix (prefix postfix &rest line)
+  "Attach PREFIX and POSTFIX to each LINE, then join with newlines into a string.
+
+Does not split LINE; caller should split before calling."
+  (mapconcat (lambda (str) "Combine PREFIX, STR, and POSTFIX."
                (concat (or prefix "") str (or postfix "")))
              line
              "\n"))
-;; (int<mis>:string:combine/lines ";; " "" "foo" "bar" "baz")
+;; (int<mis>:string:lines/affix ";; " "" "foo" "bar" "baz")
 
 
 ;;------------------------------------------------------------------------------

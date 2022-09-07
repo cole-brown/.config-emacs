@@ -172,7 +172,7 @@ CALLER should be calling function's name. It can be one of:
                       output))
     (apply #'concat (nreverse output))))
 ;; (int<mis>:compile:syntax 'test (mis:string "-"))
-;; TODO: THIS ONE!!! (int<mis>:compile:syntax 'test (mis:line "-"))
+;; (int<mis>:compile:syntax 'test (mis:line "-"))
 
 
 (defun int<mis>:compile:children (caller syntax &optional style)

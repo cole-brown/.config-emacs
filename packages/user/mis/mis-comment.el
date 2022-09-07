@@ -240,24 +240,28 @@ CALLER should be calling function's name. It can be one of:
                    (int<mis>:syntax:find caller syntax :comment :type)))
          (prefix  (or (int<mis>:syntax:find caller syntax :comment :prefix) ""))
          (postfix (or (int<mis>:syntax:find caller syntax :comment :postfix) ""))
-         ;; TODO: need to get the comment string from somewhere in `:children'.
-         ;;(comment (int<mis>:format:syntax caller syntax))
-         )
+         ;; Compile our children to get the string that should be commented.
+         (comment (or (int<mis>:compile caller
+                                        (int<mis>:syntax:find caller
+                                                              syntax
+                                                              :comment :children)
+                                        style)
+                      "")))
+    ;; TODO: Indent? Trim? Etc?
 
     ;;------------------------------
     ;; Format into a comment.
     ;;------------------------------
-    ;; TODO: Indent? Trim? Etc?
     (cond ((eq type 'quote)
            ;; Simpler: Just prefix line, the string, and postfix line.
-           (int<mis>:string:join/lines prefix comment postfix))
+           (int<mis>:string:lines/join prefix comment postfix))
 
           ((eq type 'inline)
            ;; Each line gets treated the same.
-           (apply #'int<mis>:string:combine/lines
+           (apply #'int<mis>:string:lines/affix
                   prefix
                   postfix
-                  (int<mis>:string:split/lines comment)))
+                  (int<mis>:string:lines/split comment)))
 
           ((eq type 'block)
            ;; Prefix is just for first line; postfix is just for last line.
@@ -281,8 +285,6 @@ CALLER should be calling function's name. It can be one of:
                            type
                            syntax)))))
 ;; (int<mis>:compile:comment 'test (mis:comment "hi") '((:style (:width . 80))))
-;; (mis:comment "hi")
-;;   -> ((:comment (:prefix . ";;") (:postfix . "") (:type . default)) (:string . "hi"))
 
 
 (int<mis>:compiler:register :comment #'int<mis>:compile:comment)
