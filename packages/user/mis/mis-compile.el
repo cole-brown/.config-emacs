@@ -250,77 +250,12 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller (list 'int<mis>:compile caller))
-         ;; Figure out complete styling given STYLE and any `:style' in SYNTAX.
-         (styling (int<mis>:syntax:set caller
-                                       :style
-                                       (int<mis>:syntax:merge
-                                        caller
-                                        (int<mis>:syntax:get/value caller
-                                                                   :style
-                                                                   style)
-                                        (int<mis>:syntax:get/value caller
-                                                                   :style
-                                                                   syntax))))
-         ;; Delete styling so we don't get confused about needing it or not.
-         (syntax (int<mis>:syntax:delete caller
-                                         :style
-                                         syntax))
-         output)
-
-    ;;------------------------------
-    ;; Compile!
-    ;;------------------------------
-    ;; Our job is just to find the compiler for the mis type and tell it to do
-    ;; its job. In some (most?) cases, we want to just send the whole of SYNTAX
-    ;; to a compiler. For example, `:comment' only contains the comment data
-    ;; and needs a sibling string to actually wrap the comment start/end strings
-    ;; around.
-    ;;------------------------------
-
-    ;; First check for any wrapped children.
-    (when (int<mis>:syntax:find caller
-                                syntax
-                                :mis)
-      (setq syntax (int<mis>:compile:mis caller
-                                         syntax
-                                         styling)))
-
-    ;; Next check for the main compiler...
-    (cond ((int<mis>:syntax:find caller
-                                 syntax
-                                 :comment)
-           (push (int<mis>:compile:comment caller
-                                           syntax
-                                           styling)
-                 output))
-
-          ((int<mis>:syntax:find caller
-                                 syntax
-                                 :comment)
-           (push (int<mis>:compile:comment caller
-                                           syntax
-                                           styling)
-                 output))
-
-          ((int<mis>:syntax:find caller
-                                 syntax
-                                 :format)
-            (push (int<mis>:compile:format caller
-                                           syntax
-                                           styling)
-                  output))
-
-          (t
-           (int<mis>:error caller
-                           "Unhandled Mis syntax: %S"
-                           syntax)))
-
-    ;; Just concat for final return string?
-    (apply #'concat output)))
-;; (int<mis>:compile 'test
-;;                   '((:format (:formatter . repeat) (:string . "-")))
-;;                   (mis:style :width 80))
+  ;; Just find the registered compiler and tell them to do it. Which is what
+  ;; this function does, so just tell it to do it.
+  (int<mis>:compile:syntax (list 'int<mis>:compile caller)
+                           syntax
+                           style))
+;; (int<mis>:compile 'test '((:format (:formatter . repeat) (:value . "-"))) (mis:style :width 80))
 ;; (int<mis>:compile 'test (mis:comment "hi") (mis:style :width 80))
 ;; (int<mis>:compile 'test (mis:comment (mis:line "-")))
 
