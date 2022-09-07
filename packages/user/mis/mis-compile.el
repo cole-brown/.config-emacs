@@ -345,6 +345,10 @@ CALLER should be calling function's name. It can be one of:
                               styling)
             output))
 
+    (int<mis>:debug 'mis
+                    "compiled output: %S"
+                    output)
+
     ;;------------------------------
     ;; Print Output
     ;;------------------------------
