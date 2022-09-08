@@ -26,11 +26,180 @@
 ;;; Code:
 
 
-(require 'cl-lib)
-
 (require 'mis-error)
 (require 'mis-valid)
 (require 'mis-parse)
+
+
+;;------------------------------------------------------------------------------
+;; Styling Registration
+;;------------------------------------------------------------------------------
+
+(defvar int<mis>:stylers
+  nil
+  "Alist of Mis keyword to styler/styling function.
+
+Keyword must be a member of `int<mis>:keywords:style'.
+
+Function must have params: (CALLER STRING &optional KEY VALUE)
+Or if function doesn't care about key/value: (CALLER STRING &rest _)
+  - STRING will be the string to be styled.
+  - KEY will be the styling keyword encountered.
+    - Allows one func to handle multiple keywords, like `:trim', `:trim:left'...
+  - VALUE will be whatever the KEY's value is.")
+
+
+(defun int<mis>:styler:register (style function)
+  "Register FUNCTION as the styler for STYLE.
+
+STYLE must be a keyword and a member of `int<mis>:keywords:style'.
+
+Styler FUNCTION must have params: (CALLER STRING &optional KEY VALUE)
+Or if function doesn't care about key/value: (CALLER STRING &rest _)
+  - STRING will be the string to be styled.
+  - KEY will be the styling keyword encountered.
+    - Allows one func to handle multiple keywords, like `:trim', `:trim:left'...
+  - VALUE will be whatever the KEY's value is."
+  ;; Just overwrite re-registrations.
+  (setf (alist-get style int<mis>:stylers) function))
+
+
+(defun int<mis>:styler:get (style)
+  "Get registered styler function for STYLE.
+
+STYLE must be a keyword and a member of `int<mis>:keywords:style'.
+
+Styler function must have params: (CALLER STRING &optional KEY VALUE)
+Or if function doesn't care about key/value: (CALLER STRING &rest _)
+  - STRING will be the string to be styled.
+  - KEY will be the styling keyword encountered.
+    - Allows one func to handle multiple keywords, like `:trim', `:trim:left'...
+  - VALUE will be whatever the KEY's value is."
+  (or (alist-get style int<mis>:stylers)
+      (int<mis>:error 'int<mis>:style:get
+                      "No styler found for `%S'!"
+                      style)))
+;; (int<mis>:styler:get :align)
+
+
+;;------------------------------------------------------------------------------
+;; Styling
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:style:styler/as-is (caller string &rest _)
+  "A do-nothing-and-return-STRING-as-is styler.
+
+STRING must be the string to not be styled and just return as-is.
+
+Doesn't register as a styler directly; others register to use this if they have
+no direct styling.
+Example: `:width' is a directive for other stylers to use.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  string)
+
+
+;; Register our users of the no-op styler:
+(int<mis>:styler:register :width   #'int<mis>:style:styler/as-is)
+(int<mis>:styler:register :padding #'int<mis>:style:styler/as-is)
+
+
+(defun int<mis>:style (caller string &optional style)
+  "Format/propertize/style STRING using Mis Syntax Tree STYLE.
+
+STYLE should be nil or a `:style' syntax tree.
+Example: (mis:style :width 80) -> '((:style (:width . 80)))
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:style caller)))
+
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (cond ((or (null style)
+               (not (int<mis>:style:exclusive? style)))
+           (int<mis>:error caller
+                           "STYLE must be nil or exclusively styling. Got: %S"
+                           style))
+
+          ;; NOTE: If a null string is ok, just remove this check.
+          ((or (null string)
+               (not (stringp string)))
+           (int<mis>:error caller
+                           "STRING must be a string. Got %S: %S"
+                           (type-of string)
+                           string))
+
+          (t
+           nil))
+
+    (int<mis>:debug caller
+                    "style:         %S"
+                    style)
+
+    ;;------------------------------
+    ;; Style!
+    ;;------------------------------
+    (let ((styling (int<mis>:syntax:find 'int<mis>:style:exclusive?
+                                         style
+                                         :style))
+          ;; Initial assumption: it's already styled or nothing more to do.
+          (string/styled string))
+
+    (int<mis>:debug caller
+                    "styling:       %S"
+                    styling)
+
+    ;; Check each styling keyword in STYLE to see if it wants to mutate the
+    ;; output string any.
+    (dolist (kvp styling)
+      (int<mis>:debug caller
+                      "styling kvp:   %S"
+                      kvp)
+      (let* ((key    (car kvp))
+             (value  (cdr kvp))
+             (styler (int<mis>:styler:get key)))
+        (int<mis>:debug caller
+                        "styling key:   %S"
+                        key)
+        (int<mis>:debug caller
+                        "styling value: %S"
+                        value)
+        (int<mis>:debug caller
+                        "styler func:   %S"
+                        styler)
+
+        (unless (functionp styler)
+          (int<mis>:error caller
+                          '("No valid styler found! "
+                            "keyword: %S, "
+                            "value: %S, "
+                            "styler: %S")
+                          key
+                          value
+                          styler))
+        ;; `key' & `value' should have already been validated during parsing, so
+        ;; just use 'em as-is.
+        (setq string/styled (funcall styler
+                                     caller
+                                     string/styled
+                                     key
+                                     value))))
+
+    ;; Done; return the styled string.
+    string/styled)))
+;; (int<mis>:style 'test "hello" (mis:style :width 10))
+;; (int<mis>:style 'test "hello" (mis:style :width 10 :align 'center))
 
 
 ;;------------------------------------------------------------------------------

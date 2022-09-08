@@ -29,16 +29,20 @@
 (require 'mis-buffer)
 
 ;;------------------------------
-;; Output API & Main Compiler
+;; Output API & Type Compiler
 ;;------------------------------
 (require 'mis-compile)
 
 ;;------------------------------
-;; Input APIs & Mis Type Compilers
+;; Input API & Output Styler
+;;------------------------------
+(require 'mis-style)
+
+;;------------------------------
+;; Input APIs, Type Compilers, & Stylers
 ;;------------------------------
 (require 'mis-format)
 (require 'mis-align)
-(require 'mis-style)
 (require 'mis-string)
 (require 'mis-art)
 (require 'mis-comment)
