@@ -319,10 +319,7 @@ CALLER should be calling function's name. It can be one of:
       ('repeat
        ;; Build & return the repeated string.
        (int<mis>:format:repeat value
-                               (or (int<mis>:syntax:find caller
-                                                         style
-                                                         :style :width)
-                                   fill-column)))
+                               (int<mis>:style:width caller style)))
 
       ('message
        (apply #'int<mis>:format:message
@@ -349,7 +346,7 @@ CALLER should be calling function's name. It can be one of:
        (int<mis>:error caller
                        '("Unhandled formatter case `%S'!")
                        formatter)))))
-;; (int<mis>:compile:format 'test '((:format (:formatter . repeat) (:string . "-"))) '((:style (:width . 80))))
+;; (int<mis>:compile:format 'test '((:format (:formatter . repeat) (:value . "-"))) '((:style (:width . 80))))
 ;; (int<mis>:compile:format 'test (mis:line "-") (mis:style :width 80))
 
 (int<mis>:compiler:register :format #'int<mis>:compile:format)
