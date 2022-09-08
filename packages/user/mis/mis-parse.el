@@ -459,17 +459,37 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
           ;; Validate a key/value pair.
           ;;---
           (setq args/len (- args/len 2))
-          (if-let* ((key                (pop args))
-                    (validator          (int<mis>:valid:validator caller valid key))
-                    (category/validator (car validator)) ; parsed category (internal or tmp)
-                    (function/validator (cdr validator))
-                    (value              (funcall function/validator caller key (pop args))))
-              ;; Key/value exist and are now known to be valid; save to the syntax tree
-              ;; for this parsed category.
-              (let ((syntax/cat (alist-get category/validator syntax/parsed)))
+          (let* ((key                (pop args))
+                 (value              (pop args))
+                 (validator          (int<mis>:valid:validator caller valid key))
+                 (category/validator (car validator)) ; parsed category (internal or tmp)
+                 (function/validator (cdr validator)))
+            ;; Don't check value yet...
+            (if (or (null key)
+                    (null category/validator)
+                    (null function/validator))
+                ;; Can't parse it if we don't know about it.
+                (int<mis>:error caller
+                                '("Parsing Error: Invalid key, or validator... or something? "
+                                  "key: %S, "
+                                  "validator: %S, "
+                                  "category/validator: %S, "
+                                  "function/validator: %S, "
+                                  "(unvalidated) value: %S")
+                                key
+                                validator
+                                category/validator
+                                function/validator
+                                value)
+
+              ;; Key/value exist; validate and then save to the syntax tree for
+              ;; this parsed category.
+              (let ((value      (funcall function/validator caller key value))
+                    (syntax/cat (alist-get category/validator syntax/parsed)))
                 (int<mis>:debug caller "parsing...: %S" key)
-                (int<mis>:debug caller "  - category: . . . . . . %S" category/validator)
+                (int<mis>:debug caller "  - key:                  %S" key)
                 (int<mis>:debug caller "  - value:                %S" value)
+                (int<mis>:debug caller "  - category: . . . . . . %S" category/validator)
                 (int<mis>:debug caller "  - syntax/cat: . . . . . %S" syntax/cat)
                 (int<mis>:debug caller "  - category/valid-roots: %S" category/valid-roots)
                 ;; Is this the root category? We'll need to know it when building the final syntax tree.
@@ -488,21 +508,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                   (int<mis>:debug caller "  <---category/out:       %S" category/out))
                 ;; Save the parsed key/value.
                 (setf (alist-get key syntax/cat) value)
-                (setf (alist-get category/validator syntax/parsed) syntax/cat))
-
-            ;; `if-let' failure... There /should/ have been an error raised already?
-            (int<mis>:error caller
-                            '("Invalid key, value or something? "
-                              "key: %S, "
-                              "validator: %S, "
-                              "category/validator: %S, "
-                              "function/validator: %S, "
-                              "value: %S")
-                            key
-                            validator
-                            category/validator
-                            function/validator
-                            value))))
+                (setf (alist-get category/validator syntax/parsed) syntax/cat))))))
 
       (int<mis>:debug caller "syntax/parsed initial: %S" syntax/parsed)
       (int<mis>:debug caller "category/out:          %S" category/out)
@@ -652,6 +658,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
 ;; (int<mis>:parse 'test :string nil :indent 'auto "hello")
 ;; (int<mis>:parse 'test :line '(:line :style) "-")
 ;; (int<mis>:parse 'test :style :style :width 80)
+;; (int<mis>:parse 'test :style :style :padding "?")
 ;;
 ;; Parse a syntax tree -> Get a syntax tree.
 ;; (int<mis>:parse 'test :comment '(:comment :style) '((:format (:formatter repeat :string "-"))))

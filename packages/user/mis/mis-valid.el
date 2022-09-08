@@ -59,7 +59,8 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
 
 (defconst int<mis>:keywords:style
   '(:width
-    :align
+    :padding
+    :align ;; Uses: `:width', `:padding'
     :indent
     :trim :trim:left :trim:right)
   "Valid style keywords.")
@@ -418,6 +419,18 @@ Signal an error if invalid; return normalized value if valid."
       ;;------------------------------
       (:width
        (int<mis>:valid:positive-integer? caller keyword value))
+
+      (:padding
+       (int<mis>:valid:string-or-char? caller keyword value)
+       (when (and (stringp value)
+                  (not (= (length value) 1)))
+         (int<mis>:error 'int<mis>:align
+                         "%s must be a character or a string of length 1. Got a string of length %d: %S"
+                         (int<mis>:error:name keyword)
+                         (length padding)
+                         padding))
+       ;; Must return the value if it's valid, so:
+       value)
 
       (:align
        (int<mis>:valid:member? caller keyword value int<mis>:valid:align/types))

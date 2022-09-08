@@ -63,14 +63,7 @@ Function must have params: (CALLER SYNTAX STYLE)
 SYNTAX should be a Mis Syntax Tree.
 
 STYLE should be nil or a Mis `:style' Syntax Tree.
-Example: (mis:style :width 80) -> '((:style (:width . 80)))
-
-CALLER should be calling function's name. It can be one of:
-  - a string
-  - a quoted symbol
-  - a function-quoted symbol
-  - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)")
+Example: (mis:style :width 80) -> '((:style (:width . 80)))")
 
 
 (defun int<mis>:compiler:register (category function)
@@ -83,14 +76,7 @@ Function must have params: (CALLER SYNTAX STYLE)
 SYNTAX should be a Mis Syntax Tree.
 
 STYLE should be nil or a Mis `:style' Syntax Tree.
-Example: (mis:style :width 80) -> '((:style (:width . 80)))
-
-CALLER should be calling function's name. It can be one of:
-  - a string
-  - a quoted symbol
-  - a function-quoted symbol
-  - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+Example: (mis:style :width 80) -> '((:style (:width . 80)))"
   ;; Just overwrite re-registrations.
   (setf (alist-get category int<mis>:compilers) function))
 
@@ -100,14 +86,7 @@ CALLER should be calling function's name. It can be one of:
 
 CATEGORY must be a member of `int<mis>:keywords:category/internal'.
 
-Function must have params: (CALLER SYNTAX STYLE)
-
-CALLER should be calling function's name. It can be one of:
-  - a string
-  - a quoted symbol
-  - a function-quoted symbol
-  - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+Function must have params: (CALLER SYNTAX STYLE)"
   (or (alist-get category int<mis>:compilers)
       (int<mis>:error 'int<mis>:compile:get
                       "No compiler found for `%S'!"
