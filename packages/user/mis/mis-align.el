@@ -12,8 +12,6 @@
 ;;; Code:
 
 
-(require 'cl-lib)
-
 (require 'mis-error)
 (require 'mis-valid)
 
@@ -22,85 +20,75 @@
 ;; Alignment
 ;;------------------------------------------------------------------------------
 
-(cl-defun int<mis>:align (string &key align width padding)
-  "Align STRING based on ALIGN.
 
-STRING must be a string.
+(defun int<mis>:style:align (caller string style &optional _ alignment)
+  "Align STRING based ALIGNMENT.
 
-ALIGN is required and must be one of:
-  `:center', `:left', `:right', `center', `left', `right'
+STRING should be the string to be aligned.
 
-WIDTH is required and must be a positive integer.
+STYLE should be a Mis Syntax Tree of styling.
+  - Optional:
+    - `:width'
+      - Must be a positive integer. If not provided, will default to
+        `fill-column'.
+    - `:padding'
+      - Must be a character or a string of length 1.
+      - If not supplied, it will default to a space (\" \").
+      - Used to pad/fill STRING to correct ALIGNMENT.
 
-PADDING is optional. If not supplied/nil, it will default to a space. Else it
-should be a character or a string of length 1.
+ALIGNMENT should be one of these symbols: `center', `left', `right'
 
-Return a string of length WIDTH, aligned with PADDING characters. If STRING is
-too long, returns it as-is (un-truncated)."
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Return an aligned string. If STRING is too long, returns it as-is
+\(un-aligned, un-truncated)."
   (declare (pure t) (side-effect-free t))
 
-  ;;------------------------------
-  ;; Error Checks
-  ;;------------------------------
-  (cond ((int<mis>:valid:string? 'int<mis>:align 'string string))
+  (let* ((caller        (list 'int<mis>:style:align caller))
+         (width         (int<mis>:style:width caller style))
+         (padding       (int<mis>:style:padding caller style " ")))
 
-        ;; Must be a keyword or its symbol equivalent.
-        ((int<mis>:valid:member? 'int<mis>:align
-                                 'align
-                                 align
-                                 int<mis>:valid:align/types))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    ;; `width' & `padding' error checked in their getters.
 
-        ;; Must be positive integer
-        ((or (not (integerp width))
-             (< width 1))
-         (int<mis>:error 'int<mis>:align
-                         "WIDTH must be a positive integer. Got a %S: %S"
-                         (type-of width)
-                         width))
+    ;; These will signal an error if invalid.
+    (int<mis>:valid:string? caller
+                            'string
+                            string)
+    (int<mis>:valid:member? caller
+                            'alignment
+                            alignment
+                            int<mis>:valid:align/types)
 
-        ((and (not (null padding))
-              (not (stringp padding))
-              (not (characterp padding)))
-         (int<mis>:error 'int<mis>:align
-                         "PADDING must be nil, a character, or a string of length 1. Got a %S: %S"
-                         (type-of padding)
-                         padding))
-
-        ((and (stringp padding)
-              (not (= (length padding) 1)))
-         (int<mis>:error 'int<mis>:align
-                         '("PADDING must be nil, a character, or a string of length 1. "
-                           "Got a string of length %S: %S")
-                         (length padding)
-                         padding))
-
-        (t
-         nil))
-
-  ;;------------------------------
-  ;; Alignment
-  ;;------------------------------
-  (let ((padding (cond ((stringp padding)
-                        (string-to-char padding))
-                       ((characterp padding)
-                        padding)
-                       (t
-                        ;; Default: A space character.
-                        ?\s))))
-    ;; Choose the proper alignment function for the ALIGN keyword.
-    (cond ((> (length string) width)
+    ;;------------------------------
+    ;; Align String & Return
+    ;;------------------------------
+    ;; Choose the proper alignment function for the ALIGNMENT type.
+    (cond ((>= (length string) width)
            ;; STRING is too long to align; just return as-is.
            string)
-          ((memq align '(:center center))
+          ((eq alignment 'center)
            (int<mis>:align/center string width padding))
-          ((memq align '(:left left))
+          ((eq alignment 'left)
            (int<mis>:align/left string width padding))
-          ((memq align '(:right right))
+          ((eq alignment 'right)
            (int<mis>:align/right string width padding))
           (t
-           (int<mis>:error 'int<mis>:align
-                           "Unhandled ALIGN of %S!"
-                           align)))))
+           (int<mis>:error caller
+                           "Unhandled ALIGNMENT of %S!"
+                           alignment)))))
+;; (int<mis>:style:align 'test "hello" (mis:style :width 20) :align 'center)
+
+
+;; Register our users of the no-op styler:
+(int<mis>:styler:register :align #'int<mis>:style:align)
 
 
 (defun int<mis>:align/center (string width padding)
@@ -113,9 +101,9 @@ If STRING is too long, just return it (as-is/un-truncated)."
   (declare (pure t) (side-effect-free t))
   (let ((pad-amt (max 0 (- width (length string)))))
     (concat
-     (make-string (ceiling pad-amt 2) (string-to-char padding))
+     (make-string (floor pad-amt 2) (string-to-char padding))
      string
-     (make-string (floor pad-amt 2) (string-to-char padding)))))
+     (make-string (ceiling pad-amt 2) (string-to-char padding)))))
 
 
 (defun int<mis>:align/left (string width padding)

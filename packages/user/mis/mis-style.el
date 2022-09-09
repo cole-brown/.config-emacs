@@ -41,9 +41,11 @@
 
 Keyword must be a member of `int<mis>:keywords:style'.
 
-Function must have params: (CALLER STRING &optional KEY VALUE)
-Or if function doesn't care about key/value: (CALLER STRING &rest _)
+Styler FUNCTION must have params: (CALLER STRING STYLE &optional KEY VALUE)
+Or if function doesn't care about key/value: (CALLER STRING STYLE &rest _)
+Or if function doesn't care about anything: (CALLER STRING &rest _)
   - STRING will be the string to be styled.
+  - STYLE will be the current Mis Style Syntax Tree.
   - KEY will be the styling keyword encountered.
     - Allows one func to handle multiple keywords, like `:trim', `:trim:left'...
   - VALUE will be whatever the KEY's value is.")
@@ -54,9 +56,11 @@ Or if function doesn't care about key/value: (CALLER STRING &rest _)
 
 STYLE must be a keyword and a member of `int<mis>:keywords:style'.
 
-Styler FUNCTION must have params: (CALLER STRING &optional KEY VALUE)
-Or if function doesn't care about key/value: (CALLER STRING &rest _)
+Styler FUNCTION must have params: (CALLER STRING STYLE &optional KEY VALUE)
+Or if function doesn't care about key/value: (CALLER STRING STYLE &rest _)
+Or if function doesn't care about anything: (CALLER STRING &rest _)
   - STRING will be the string to be styled.
+  - STYLE will be the current Mis Style Syntax Tree.
   - KEY will be the styling keyword encountered.
     - Allows one func to handle multiple keywords, like `:trim', `:trim:left'...
   - VALUE will be whatever the KEY's value is."
@@ -69,9 +73,11 @@ Or if function doesn't care about key/value: (CALLER STRING &rest _)
 
 STYLE must be a keyword and a member of `int<mis>:keywords:style'.
 
-Styler function must have params: (CALLER STRING &optional KEY VALUE)
-Or if function doesn't care about key/value: (CALLER STRING &rest _)
+Styler FUNCTION must have params: (CALLER STRING STYLE &optional KEY VALUE)
+Or if function doesn't care about key/value: (CALLER STRING STYLE &rest _)
+Or if function doesn't care about anything: (CALLER STRING &rest _)
   - STRING will be the string to be styled.
+  - STYLE will be the current Mis Style Syntax Tree.
   - KEY will be the styling keyword encountered.
     - Allows one func to handle multiple keywords, like `:trim', `:trim:left'...
   - VALUE will be whatever the KEY's value is."
@@ -86,7 +92,7 @@ Or if function doesn't care about key/value: (CALLER STRING &rest _)
 ;; Styling
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:style:styler/as-is (caller string &rest _)
+(defun int<mis>:style:styler/no-op (caller string &rest _)
   "A do-nothing-and-return-STRING-as-is styler.
 
 STRING must be the string to not be styled and just return as-is.
@@ -105,8 +111,8 @@ CALLER should be calling function's name. It can be one of:
 
 
 ;; Register our users of the no-op styler:
-(int<mis>:styler:register :width   #'int<mis>:style:styler/as-is)
-(int<mis>:styler:register :padding #'int<mis>:style:styler/as-is)
+(int<mis>:styler:register :width   #'int<mis>:style:styler/no-op)
+(int<mis>:styler:register :padding #'int<mis>:style:styler/no-op)
 
 
 (defun int<mis>:style (caller string &optional style)
@@ -156,48 +162,52 @@ CALLER should be calling function's name. It can be one of:
           ;; Initial assumption: it's already styled or nothing more to do.
           (string/styled string))
 
-    (int<mis>:debug caller
-                    "styling:       %S"
-                    styling)
-
-    ;; Check each styling keyword in STYLE to see if it wants to mutate the
-    ;; output string any.
-    (dolist (kvp styling)
       (int<mis>:debug caller
-                      "styling kvp:   %S"
-                      kvp)
-      (let* ((key    (car kvp))
-             (value  (cdr kvp))
-             (styler (int<mis>:styler:get key)))
-        (int<mis>:debug caller
-                        "styling key:   %S"
-                        key)
-        (int<mis>:debug caller
-                        "styling value: %S"
-                        value)
-        (int<mis>:debug caller
-                        "styler func:   %S"
-                        styler)
+                      "styling:       %S"
+                      styling)
 
-        (unless (functionp styler)
-          (int<mis>:error caller
-                          '("No valid styler found! "
-                            "keyword: %S, "
-                            "value: %S, "
-                            "styler: %S")
-                          key
-                          value
-                          styler))
-        ;; `key' & `value' should have already been validated during parsing, so
-        ;; just use 'em as-is.
-        (setq string/styled (funcall styler
-                                     caller
-                                     string/styled
-                                     key
-                                     value))))
+      ;; Check each styling keyword in STYLE to see if it wants to mutate the
+      ;; output string any.
+      (dolist (kvp styling)
+        (int<mis>:debug caller
+                        "styling kvp:   %S"
+                        kvp)
+        (let* ((key    (car kvp))
+               (value  (cdr kvp))
+               (styler (int<mis>:styler:get key)))
+          (int<mis>:debug caller
+                          "styling key:   %S"
+                          key)
+          (int<mis>:debug caller
+                          "styling value: %S"
+                          value)
+          (int<mis>:debug caller
+                          "styler func:   %S"
+                          styler)
 
-    ;; Done; return the styled string.
-    string/styled)))
+          (unless (functionp styler)
+            (int<mis>:error caller
+                            '("No valid styler found! "
+                              "keyword: %S, "
+                              "value: %S, "
+                              "styler: %S")
+                            key
+                            value
+                            styler))
+          ;; `key' & `value' should have already been validated during parsing, so
+          ;; just use 'em as-is.
+          (setq string/styled (funcall styler
+                                       caller
+                                       string/styled
+                                       key
+                                       value))
+
+          (int<mis>:debug caller
+                          "<--string:     %S"
+                          string/styled)))
+
+      ;; Done; return the styled string.
+      string/styled)))
 ;; (int<mis>:style 'test "hello" (mis:style :width 10))
 ;; (int<mis>:style 'test "hello" (mis:style :width 10 :align 'center))
 
@@ -251,15 +261,31 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (or (int<mis>:syntax:find caller
-                            style
-                            :style :width)
-      ;; Fallback to default if it's an integer > 0.
-      (and (integerp default)
-           (> default 0)
-           default)
-      ;; Fallback to buffer's `fill-column'.
-      fill-column))
+  ;;------------------------------
+  ;; Get Width
+  ;;------------------------------
+  (let ((width (or (int<mis>:syntax:find caller
+                                         style
+                                         :style :width)
+                   ;; Fallback to default if it's an integer > 0.
+                   (and (integerp default)
+                        (> default 0)
+                        default)
+                   ;; Fallback to buffer's `fill-column'.
+                   fill-column)))
+    ;;------------------------------
+    ;; Error Check
+    ;;------------------------------
+    (when (or (not (integerp width))
+              (< width 1))
+      (int<mis>:error caller
+                      "WIDTH must be a positive integer. Got a %S: %S"
+                      (type-of width)
+                      width))
+    ;;------------------------------
+    ;; Return
+    ;;------------------------------
+    width))
 
 
 (defun int<mis>:style:padding (caller style &optional default)
@@ -277,7 +303,12 @@ CALLER should be calling function's name. It can be one of:
   - a quoted symbol
   - a function-quoted symbol
   - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Return padding as a string."
+  ;;------------------------------
+  ;; Get Padding
+  ;;------------------------------
   (let ((padding (int<mis>:syntax:find caller
                                        style
                                        :style :padding)))
