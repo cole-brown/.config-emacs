@@ -33,129 +33,149 @@
 ;; Indentation Helpers
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:indent:amount (buffer position type)
-  "Figure out indentation for BUFFER at POSITION according to indent TYPE.
+(defun int<mis>:indent:amount (indentation &optional buffer position)
+  "Figure out indentation for BUFFER at POSITION according to INDENTATION.
 
-BUFFER should be a buffer object or a buffer name string.
-
-POSITION should be an integer or buffer marker.
-
-TYPE can be:
-  :fixed     -> indent to `current-column'
-  :existing  -> do not indent; use `current-column' as indent amount.
-  :auto      -> indent according to `indent-according-to-mode'
+INDENTATION should be:
+  `fixed'    -> indent to `current-column'
+  `existing' -> do not indent; use `current-column' as indent amount.
+  `auto'     -> indent according to `indent-according-to-mode'
   an integer -> that number of spaces
 
-Return indentation as an integer (number of spaces)."
-  (let (buffer/curr
-        indent/amount)
+BUFFER should be:
+  - nil -> the `current-buffer'
+  - a buffer object or a buffer name string
+
+POSITION should be:
+  - nil -> the current position in BUFFER
+  - an integer or buffer marker
+
+Return indentation amount as an integer (number of padding characters)."
+  ;;------------------------------
+  ;; Error Checks
+  ;;------------------------------
+  (when (and (not (null buffer))
+             (not (stringp buffer))
+             (not (bufferp buffer)))
+    (int<mis>:error 'int<mis>:format:indent:amount
+                    "BUFFER must be nil, a string, or a buffer object. Got a %S: %S"
+                    (type-of buffer)
+                    buffer))
+
+  (when (and (not (null position))
+             (not (integer-or-marker-p position)))
+    (int<mis>:error 'int<mis>:format:indent:amount
+                    "POSITION must be nil, an integer, or a marker. Got a %S: %S"
+                    (type-of position)
+                    position))
+
+  ;; `int<mis>:valid:indent?' will signal error for invalid.
+  (int<mis>:valid:indent? 'int<mis>:format:indent:amount
+                          'indentation
+                          indentation)
+
+  ;; Make sure `buffer' is a buffer object now.
+  (let ((buffer (if buffer
+                    (get-buffer buffer)
+                  (current-buffer))))
+
     ;;------------------------------
-    ;; Error Checks
+    ;; Determine Indentation & Return Amount
     ;;------------------------------
-    (cond ((and (not (stringp buffer))
-                (not (bufferp buffer)))
-           (int<mis>:error 'int<mis>:format:indent:amount
-                           "BUFFER must be a string or buffer object. Got a %S: %S"
-                           (type-of buffer)
-                           buffer))
+    (cond ((integerp indentation)
+           indentation)
 
-          ((not (integer-or-marker-p position))
-           (int<mis>:error 'int<mis>:format:indent:amount
-                           "POSITION must be an integer or marker. Got a %S: %S"
-                           (type-of position)
-                           position))
+          ((stringp indentation)
+           (length indentation))
 
-          ;; `int<mis>:valid:indent?' will signal error for invalid.
-          ((not (int<mis>:valid:indent? 'int<mis>:format:indent:amount
-                                        'type
-                                        type)))
+          ((memq indentation int<mis>:valid:indent/types)
+           ;; Else need to ask the buffer about indentation.
+           (let (amount)
+             (with-current-buffer buffer/curr
+               (save-excursion
+                 ;; Want to back out our changes as we're only interested in the indent
+                 ;; _amount_ right now.
+                 (let ((change-group (prepare-change-group)))
+                   (goto-char position)
+                   (beginning-of-line-text)
 
+                   ;; `:fixed' and `:existing' have nothing to do; they're already at the
+                   ;; correct column, presumably. `:auto' needs to figure out what the
+                   ;; buffer's mode wants.
+                   (when (eq indent :auto)
+                     (indent-according-to-mode)
+                     (beginning-of-line-text))
+
+                   ;; Save indent amount.
+                   (setq amount (current-column))
+
+                   ;; Unilaterally cancel any changes made.
+                   (cancel-change-group change-group))))
+
+             ;; Done; return the indentation amount.
+             amount))
+
+          ;;------------------------------
+          ;; ???
+          ;;------------------------------
           (t
-           (setq buffer/curr (get-buffer buffer))
-           (unless buffer/curr
-             (int<mis>:error 'int<mis>:format:indent:amount
-                             "Could not find BUFFER: %S"
-                             buffer))))
-
-    ;;------------------------------
-    ;; Determine Indentation
-    ;;------------------------------
-    (if (integerp type)
-        (setq indent/amount type)
-      ;; Else need to ask the buffer about indentation.
-      (with-current-buffer buffer/curr
-        (save-excursion
-          ;; Want to back out our changes as we're only interested in the indent
-          ;; _amount_ right now.
-          (let ((change-group (prepare-change-group)))
-            (goto-char position)
-            (beginning-of-line-text)
-
-            ;; `:fixed' and `:existing' have nothing to do; they're already at the
-            ;; correct column, presumably. `:auto' needs to figure out what the
-            ;; buffer's mode wants.
-            (when (eq indent :auto)
-              (indent-according-to-mode)
-              (beginning-of-line-text))
-
-            ;; Save indent amount.
-            (setq indent/amount (current-column))
-
-            ;; Unilaterally cancel any changes made.
-            (cancel-change-group change-group)))))
-
-    ;; Return discovered indent amount.
-    indent/amount))
+           (int<mis>:error 'int<mis>:indent:string
+                           "Unhandled indentation %S!"
+                           indentation)))))
 
 
-(defun int<mis>:indent:string (string indent padding)
-  "Indent STRING according to INDENT & PADDING.
+(defun int<mis>:indent:string (string indentation padding &optional buffer position)
+  "Indent STRING according to INDENTATION & PADDING.
 
-INDENT should be one of:
-  - any positive integer
-  - a string
-  - a member of `int<mis>:valid:indent/types'
-    - it should be normalized to a non-keyword member
+INDENTATION should be:
+  `fixed'    -> indent to `current-column'
+  `existing' -> do not indent; use `current-column' as indent amount.
+  `auto'     -> indent according to `indent-according-to-mode'
+  an integer -> that number of spaces
 
-PADDING /must/ be a string of length 1 and will only be used if INDENT is an
-integer.
+PADDING /must/ be a string of length 1 and will only be used if INDENTATION is
+an integer.
 
-Return indented string."
-  (declare (pure t) (side-effect-free t))
+BUFFER should be:
+  - nil -> the `current-buffer'
+  - a buffer object or a buffer name string
 
+POSITION should be:
+  - nil -> the current position in BUFFER
+  - an integer or buffer marker
+
+Return indentation string."
   ;;------------------------------
-  ;; Indent a specific amonut?
+  ;; Build & Return Indentation String
   ;;------------------------------
-  (cond ((stringp indent)
+  (cond ((stringp indentation)
          ;; Already ready; return as-is.
-         indent)
+         indentation)
 
-        ((integerp indent)
-         ;; Want to create an amount of indent, so we'll need padding...
-         (make-string indent (string-to-char padding)))
+        ((integerp indentation)
+         ;; Want to create an amount of indentation, so we'll need padding...
+         (make-string indentation (string-to-char padding)))
 
-        ((eq indent 'fixed)
-         (int<mis>:format:repeat padding (current-column)))
-
-
-        ;;------------------------------
-        ;; Indent to a specific place?
-        ;;------------------------------
         ;; `existing' means:
         ;;   a) the indentation is already there
-        ;;   b) find out what it is
-        ;;   c) don't create it
-        ((eq indent 'existing)
+        ;;   b) don't create it
+        ((eq indentation 'existing)
          ;; We don't care about finding out what it is, so... just... don't indent at all.
          "")
 
-        ;; TODO: Implement `auto' if I end up needing it.
-        ;; `auto' means: "Do what `indent-according-to-mode' does, but to the Mis
-        ;; String, not to the buffer's contents."
-        ((eq indent 'auto)
-         ;; TODO: Implement `auto' if I end up needing it.
+        ;; `fixed' and `auto' can both just use `int<mis>:indent:amount' to
+        ;; figure out their indentation.
+        ((eq indentation 'fixed)
+         (int<mis>:format:repeat padding
+                                 (int<mis>:indent:amount indentation buffer position)))
+
+        ;;------------------------------
+        ;; ???
+        ;;------------------------------
+        (t
          (int<mis>:error 'int<mis>:indent:string
-                         "TODO: Implement `auto' indentation!"))))
+                         "Unhandled indentation %S!"
+                         indentation))))
 
 
 ;;------------------------------------------------------------------------------
