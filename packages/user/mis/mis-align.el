@@ -20,6 +20,46 @@
 ;; Alignment
 ;;------------------------------------------------------------------------------
 
+(defun int<mis>:align/center (string width padding)
+  "Do not use this; use `int<mis>:align' instead.
+This function has no error checking.
+
+Pad string to WIDTH with PADDING character so that it is centered.
+
+If STRING is too long, just return it (as-is/un-truncated)."
+  (declare (pure t) (side-effect-free t))
+  (let ((pad-amt (max 0 (- width (length string)))))
+    (concat
+     (make-string (floor pad-amt 2) (string-to-char padding))
+     string
+     (make-string (ceiling pad-amt 2) (string-to-char padding)))))
+
+
+(defun int<mis>:align/left (string width padding)
+  "Do not use this; use `int<mis>:align' instead.
+This function has no error checking.
+
+Pad STRING with PADDING on the left up to WIDTH.
+
+If STRING is too long, just return it (as-is/un-truncated)."
+  (declare (pure t) (side-effect-free t))
+  (let ((pad-amt (max 0 (- width (length string)))))
+    (concat (make-string pad-amt (string-to-char padding))
+            string)))
+
+
+(defun int<mis>:align/right (string width padding)
+  "Do not use this; use `int<mis>:align' instead.
+This function has no error checking.
+
+Pad STRING with PADDING on the right up to WIDTH.
+
+If STRING is too long, just return it (as-is/un-truncated)."
+  (declare (pure t) (side-effect-free t))
+  (let ((pad-amt (max 0 (- width (length string)))))
+    (concat string
+            (make-string pad-amt (string-to-char padding)))))
+
 
 (defun int<mis>:style:align (caller string style &optional _ alignment)
   "Align STRING based ALIGNMENT.
@@ -89,47 +129,6 @@ Return an aligned string. If STRING is too long, returns it as-is
 
 ;; Register our users of the no-op styler:
 (int<mis>:styler:register :align #'int<mis>:style:align)
-
-
-(defun int<mis>:align/center (string width padding)
-  "Do not use this; use `int<mis>:align' instead.
-This function has no error checking.
-
-Pad string to WIDTH with PADDING character so that it is centered.
-
-If STRING is too long, just return it (as-is/un-truncated)."
-  (declare (pure t) (side-effect-free t))
-  (let ((pad-amt (max 0 (- width (length string)))))
-    (concat
-     (make-string (floor pad-amt 2) (string-to-char padding))
-     string
-     (make-string (ceiling pad-amt 2) (string-to-char padding)))))
-
-
-(defun int<mis>:align/left (string width padding)
-  "Do not use this; use `int<mis>:align' instead.
-This function has no error checking.
-
-Pad STRING with PADDING on the left up to WIDTH.
-
-If STRING is too long, just return it (as-is/un-truncated)."
-  (declare (pure t) (side-effect-free t))
-  (let ((pad-amt (max 0 (- width (length string)))))
-    (concat (make-string pad-amt (string-to-char padding))
-            string)))
-
-
-(defun int<mis>:align/right (string width padding)
-  "Do not use this; use `int<mis>:align' instead.
-This function has no error checking.
-
-Pad STRING with PADDING on the right up to WIDTH.
-
-If STRING is too long, just return it (as-is/un-truncated)."
-  (declare (pure t) (side-effect-free t))
-  (let ((pad-amt (max 0 (- width (length string)))))
-    (concat string
-            (make-string pad-amt (string-to-char padding)))))
 
 
 ;;------------------------------------------------------------------------------
