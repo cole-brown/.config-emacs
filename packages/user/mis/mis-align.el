@@ -14,6 +14,7 @@
 
 (require 'mis-error)
 (require 'mis-valid)
+(require 'mis-style)
 
 
 ;;------------------------------------------------------------------------------
@@ -89,9 +90,9 @@ Return an aligned string. If STRING is too long, returns it as-is
 \(un-aligned, un-truncated)."
   (declare (pure t) (side-effect-free t))
 
-  (let* ((caller        (list 'int<mis>:style:align caller))
-         (width         (int<mis>:style:width caller style))
-         (padding       (int<mis>:style:padding caller style " ")))
+  (let* ((caller  (list 'int<mis>:style:align caller))
+         (width   (int<mis>:style:width caller style))
+         (padding (int<mis>:style:padding caller style " ")))
 
     ;;------------------------------
     ;; Error Checks

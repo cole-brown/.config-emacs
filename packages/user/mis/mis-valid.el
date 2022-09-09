@@ -91,9 +91,9 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
 
 (defconst int<mis>:valid:comment/types
   ;; keyword / symbol
-  '(:inline inline
-    :block  block
-    :quote quote
+  '(:inline  inline
+    :block   block
+    :quote   quote
     :default default)
   "Valid Mis comment types.
 
@@ -101,6 +101,20 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
 'block' is a standard multi-line comment.
 'quote' is a multi-line comments for e.g. org, markdown.
 'default' depends on buffer's major-mode.")
+
+
+(defconst int<mis>:valid:indent/types
+  ;; keyword / symbol
+  '(:fixed    fixed
+    :existing existing
+    :auto     auto)
+  "Valid Mis indent types.
+
+See indent's styler, `int<mis>:style:indent' for what indent symbols mean.
+
+Also valid is:
+  - any positive integer
+  - a string")
 
 
 ;;------------------------------------------------------------------------------
@@ -704,6 +718,7 @@ VALUE can be:
   - `:existing' / `existing'
   - `:auto' / `auto'
   - a positive integer
+  - a string
 
 NAME should be VALUE's symbol name as a symbol or string.
 
@@ -713,16 +728,28 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let ((valids '(:fixed fixed :existing existing :auto auto )))
-    (if (or (memq value valids)
-            (integerp value))
-        value
-      (int<mis>:error caller
-                      "%S must be an integer or one of: %S. Got %S: %S"
-                      (int<mis>:error:name name)
-                      valids
-                      (type-of value)
-                      value))))
+  (cond ((integerp value)
+         ;; Ensure it's the right kind of integer & return.
+         (int<mis>:valid:positive-integer? (list 'int<mis>:valid:indent? caller)
+                                           name
+                                           value))
+
+        ((stringp value)
+         ;; Could check for empty strings if we want, but let's try just
+         ;; allowing anything for now...
+         value)
+
+        ((memq value int<mis>:valid:indent/types)
+         ;; It's the right kind of symbol, so return it.
+         value)
+
+        (t
+         (int<mis>:error caller
+                         "%S must be an integer or one of: %S. Got %S: %S"
+                         (int<mis>:error:name name)
+                         int<mis>:valid:indent/types
+                         (type-of value)
+                         value))))
 
 
 ;;------------------------------------------------------------------------------

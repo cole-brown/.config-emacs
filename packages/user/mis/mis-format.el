@@ -196,7 +196,7 @@ Return indentation as an integer (number of spaces)."
 ;; Lines
 ;;------------------------------------------------------------------------------
 
-(cl-defun int<mis>:format:repeat (character length)
+(defun int<mis>:format:repeat (character length)
   "Create a line separators or what have you, like:
 --------
 

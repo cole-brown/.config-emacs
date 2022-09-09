@@ -29,6 +29,11 @@
 (require 'mis-buffer)
 
 ;;------------------------------
+;; Might should split into internal & API?
+;;------------------------------
+(require 'mis-string)
+
+;;------------------------------
 ;; Output API & Type Compiler
 ;;------------------------------
 (require 'mis-compile)
@@ -43,7 +48,6 @@
 ;;------------------------------
 (require 'mis-format)
 (require 'mis-align)
-(require 'mis-string)
 (require 'mis-art)
 (require 'mis-comment)
 (require 'mis-message)
