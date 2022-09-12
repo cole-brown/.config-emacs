@@ -199,6 +199,7 @@ CALLER should be calling function's name. It can be one of:
           (setq string/styled (funcall styler
                                        caller
                                        string/styled
+                                       style
                                        key
                                        value))
 
