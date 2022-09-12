@@ -130,6 +130,8 @@ CALLER should be calling function's name. It can be one of:
          (value (int<mis>:syntax:find caller
                                       syntax
                                       :format :value)))
+    (int<mis>:debug caller "syntax:    %S" syntax)
+    (int<mis>:debug caller "style:     %S" style)
     (int<mis>:debug caller "formatter: %S" formatter)
     (int<mis>:debug caller "value:     %S" value)
 
@@ -157,11 +159,7 @@ CALLER should be calling function's name. It can be one of:
                       (int<mis>:syntax:find caller
                                             syntax
                                             :format :children))
-      (setq value (int<mis>:compile caller
-                                    (int<mis>:syntax:find caller
-                                                          syntax
-                                                          :format :children)
-                                    style))
+      (setq value (int<mis>:compile:children caller :format syntax style))
       (int<mis>:debug caller "<--value:  %S" value))
 
     ;;------------------------------

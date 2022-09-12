@@ -134,8 +134,7 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
-    (cond ((or (null style)
-               (not (int<mis>:style:exclusive? style)))
+    (cond ((not (int<mis>:style:exclusive? style))
            (int<mis>:error caller
                            "STYLE must be nil or exclusively styling. Got: %S"
                            style))
@@ -160,9 +159,7 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Style!
     ;;------------------------------
-    (let ((styling (int<mis>:syntax:find 'int<mis>:style:exclusive?
-                                         style
-                                         :style))
+    (let ((styling (int<mis>:syntax:find caller style :style))
           ;; Initial assumption: it's already styled or nothing more to do.
           (string/styled (apply #'concat strings)))
 
@@ -247,7 +244,8 @@ CALLER should be calling function's name. It can be one of:
                                syntax
                                :style)
          (int<mis>:debug 'int<mis>:style:exclusive?
-                         "Ok; style SYNTAX seems valid.")
+                         "Ok; style SYNTAX seems valid: %S"
+                         syntax)
          syntax)
 
         ;; Fallthrough: not styling so return nil.

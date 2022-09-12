@@ -298,12 +298,7 @@ CALLER should be calling function's name. It can be one of:
          (prefix  (or (int<mis>:syntax:find caller syntax :comment :prefix) ""))
          (postfix (or (int<mis>:syntax:find caller syntax :comment :postfix) ""))
          ;; Compile our children to get the string that should be commented.
-         (comment (or (int<mis>:compile caller
-                                        (int<mis>:syntax:find caller
-                                                              syntax
-                                                              :comment :children)
-                                        style)
-                      "")))
+         (comment (or (int<mis>:compile:children caller :comment syntax style) "")))
     ;; TODO: Indent? Trim? Etc?
 
     ;;------------------------------

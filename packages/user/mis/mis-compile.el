@@ -111,16 +111,6 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:compile:syntax caller))
-         ;; Figure out complete styling given STYLE and any `:style' in SYNTAX.
-         (style/merged (int<mis>:syntax:set caller
-                                            :style
-                                            (int<mis>:syntax:merge caller
-                                                                   (int<mis>:syntax:get/value caller :style style)
-                                                                   (int<mis>:syntax:get/value caller :style syntax))))
-         ;; Delete styling so we don't get confused about needing it or not.
-         (syntax (int<mis>:syntax:delete caller
-                                         :style
-                                         syntax))
          output)
 
     ;;------------------------------
@@ -157,11 +147,13 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:compile:syntax 'test (mis:line "-"))
 
 
-(defun int<mis>:compile:children (caller syntax &optional style)
-  "Compile SYNTAX into a propertized string for output using STYLE.
+(defun int<mis>:compile:children (caller parent syntax &optional style/parents)
+  "Compile SYNTAX into a propertized string for output using STYLE/PARENTS.
+
+PARENT must be a keyword & member of `int<mis>:keywords:category/internal'.
 
 SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
-will override any styling in STYLE.
+will override any styling in STYLE/PARENTS.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -170,9 +162,10 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:compile:children caller))
-         (syntax/children (int<mis>:syntax:get/value caller
-                                                     :children
-                                                     syntax)))
+         (syntax/children (int<mis>:syntax:find caller
+                                                syntax
+                                                parent
+                                                :children)))
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
@@ -184,16 +177,7 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Compile
     ;;------------------------------
-    ;; Figure out complete styling given STYLE and any `:style' in SYNTAX.
-    (let* ((style/merged (int<mis>:syntax:set caller :style
-                                              (int<mis>:syntax:merge caller
-                                                                     (int<mis>:syntax:get/value caller :style style)
-                                                                     (int<mis>:syntax:get/value caller :style syntax/children))))
-           ;; Delete styling so we don't get confused about needing it or not.
-           (syntax/children (int<mis>:syntax:delete caller
-                                                    :style
-                                                    syntax/children))
-           output)
+    (let* (output)
 
       ;; And now we can just loop into the core compiling function.
       (dolist (child syntax/children)
@@ -202,8 +186,8 @@ CALLER should be calling function's name. It can be one of:
                                                   category
                                                   (cdr child))))
           (push (int<mis>:compile:syntax caller
-                                         syntax/child
-                                         style/merged)
+                                         syntax/child   ;; Childrens' styling will come from their syntax.
+                                         style/parents) ;; Parents' styling cascades into children.
                 output)))
 
       ;;------------------------------
@@ -215,8 +199,8 @@ CALLER should be calling function's name. It can be one of:
                         output))
       (int<mis>:style caller
                       (nreverse output)
-                      style/merged))))
-;; (int<mis>:compile:children 'test '((:children (:format (:formatter . string) (:value . "-")))))
+                      style/parents))))
+;; (int<mis>:compile:children 'test :parent '((:parent (:children (:format (:formatter . string) (:value . "-"))))))
 
 
 (int<mis>:compiler:register :children #'int<mis>:compile:children)
@@ -323,6 +307,9 @@ CALLER should be calling function's name. It can be one of:
     ;; Compile each piece of `content' in current (reverse) order & push to
     ;; `output' list. Final step will then have `output' in forwards order.
     (while content
+      (int<mis>:debug 'mis
+                      "compile: %S"
+                      (nth 0 content))
       ;; Get a syntax tree; turn into a string.
       (push (int<mis>:compile 'mis
                               (pop content)

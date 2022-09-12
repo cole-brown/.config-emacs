@@ -497,8 +497,8 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                     (syntax/cat (alist-get category/validator syntax/parsed)))
                 (int<mis>:debug caller "parsing...: %S" key)
                 (int<mis>:debug caller "  - key:                  %S" key)
-                (int<mis>:debug caller "  - value:                %S" value)
                 (int<mis>:debug caller "  - category: . . . . . . %S" category/validator)
+                (int<mis>:debug caller "  - value:                %S" value)
                 (int<mis>:debug caller "  - syntax/cat: . . . . . %S" syntax/cat)
                 (int<mis>:debug caller "  - category/valid-roots: %S" category/valid-roots)
                 ;; Is this the root category? We'll need to know it when building the final syntax tree.
@@ -655,6 +655,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                             (int<mis>:syntax:get/value caller
                                                        :children
                                                        syntax/out/children))))
+      (int<mis>:debug caller "<--parsed syntax:   %S" syntax/out)
       syntax/out)))
 ;; (int<mis>:parse 'test :string nil "hello %s" "world")
 ;; (int<mis>:parse 'test :string '(:style :string) "hello")

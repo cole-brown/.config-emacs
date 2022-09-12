@@ -126,6 +126,7 @@ Return an aligned string. If STRING is too long, returns it as-is
                            "Unhandled ALIGNMENT of %S!"
                            alignment)))))
 ;; (int<mis>:style:align 'test "hello" (mis:style :width 20) :align 'center)
+;; (int<mis>:style:align 'test "hello" nil :align 'center)
 
 
 ;; Register our users of the no-op styler:
