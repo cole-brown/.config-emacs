@@ -49,26 +49,6 @@
 ;; Syntax Trees
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:syntax:has (caller key syntax)
-  "Return non-nil if KEY is a top-level alist key for Mis SYNTAX Tree.
-
-KEY should a keyword.
-
-SYNTAX should be a Mis Syntax Tree.
-
-CALLER should be calling function's name. It can be one of:
-  - a string
-  - a quoted symbol
-  - a function-quoted symbol
-  - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (not (eq :mis:does-not-exist
-           (alist-get key syntax :mis:does-not-exist))))
-;; (int<mis>:syntax:has 'test :style '((:style (:width . 10) (:align . :center))))
-;; No; only top-level.
-;;   (int<mis>:syntax:has 'test :width '((:style (:width . 10) (:align . :center))))
-
-
 (defun int<mis>:syntax:get/value (caller key syntax &optional default)
   "Get KEY value from Mis SYNTAX Tree.
 
@@ -293,7 +273,7 @@ CALLER should be calling function's name. It can be one of:
 (defun int<mis>:syntax:find (caller syntax &rest key)
   "Find a value from Mis SYNTAX Tree by following KEYs.
 
-SYNTAX should be a Mis abstract syntax tree.
+SYNTAX should be a Mis Syntax Tree.
 
 KEYs should be keywords to follow down the SYNTAX tree to find the value.
 
@@ -311,6 +291,35 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:syntax:find 'test '((:style (:width . 10)) (:tmp:line (:string . "xX"))) :tmp:line :string)
 ;; (int<mis>:syntax:find 'test '((:style (:width . 10)) (:tmp:line (:string . "xX"))) :style)
 ;; (int<mis>:syntax:find 'test '((:style (:width . 10)) (:tmp:line (:string . "xX"))) :dne)
+
+
+(defun int<mis>:syntax:has (caller syntax &rest key)
+  "Return non-nil if KEY is a top-level alist key for Mis SYNTAX Tree.
+Return non-nil if KEYs are a valid path into the Mis SYNTAX Tree.
+\"Valid\" includes having the keys but the value being nil.
+Example:
+  (int<mis>:syntax:has 'test (mis:style) :style)
+
+SYNTAX should be a Mis Syntax Tree.
+
+KEYs should be keywords to follow down the SYNTAX tree to find the value.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:syntax:has caller))
+        (value syntax))
+    (dolist (find key)
+      (setq value (int<mis>:syntax:get/value caller find value :mis:does-not-exist)))
+    ;; Return non-nil if we found that sequence of keys in the tree.
+    (not (eq value :mis:does-not-exist))))
+;; (int<mis>:syntax:has 'test '((:style (:width . 10) (:align . :center))) :style)
+;; (int<mis>:syntax:has 'test '((:style (:width . 10) (:align . :center))) :jeff)
+;; (int<mis>:syntax:has 'test '((:style (:width . 10) (:align . :center))) :style :width)
+;; (int<mis>:syntax:has 'test '((:style (:width . 10) (:align . :center))) :style :width :left)
 
 
 ;; TODO: Delete? Change?
@@ -526,10 +535,10 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
       ;; Do we need to promote `syntax/parsed' to top level? E.g. if we parsed a
       ;; `:style' category then its `:style' keyword and styling key/value pairs
       ;; should be at the top.
-      (int<mis>:debug caller "parsed has out cat?:   %S" (int<mis>:syntax:has caller category/out syntax/parsed))
+      (int<mis>:debug caller "parsed has out cat?:   %S" (int<mis>:syntax:has caller syntax/parsed category/out))
       (when (int<mis>:syntax:has caller
-                                 category/out
-                                 syntax/parsed)
+                                 syntax/parsed
+                                 category/out)
         (int<mis>:debug caller "move: syntax/parsed:   %S" syntax/parsed)
         ;; Move `syntax/parsed' to `syntax/out'.
         (setq syntax/out (int<mis>:syntax:merge caller

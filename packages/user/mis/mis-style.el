@@ -223,22 +223,35 @@ CALLER should be calling function's name. It can be one of:
                                       'syntax
                                       syntax
                                       :no-error))
+         (int<mis>:debug 'int<mis>:style:exclusive?
+                         "Invalid mis SYNTAX! %S"
+                         syntax)
          nil)
 
         ;; (Alist) syntax should contain only 1 element.
         ((not (eq 1 (length syntax)))
+         (int<mis>:debug 'int<mis>:style:exclusive?
+                         "Style SYNTAX should be length 1, got %d: %S"
+                         (length syntax)
+                         syntax)
          nil)
 
         ;; Key should be `:style'.
-        ((int<mis>:syntax:find 'int<mis>:style:exclusive?
+        ((int<mis>:syntax:has 'int<mis>:style:exclusive?
                                syntax
                                :style)
+         (int<mis>:debug 'int<mis>:style:exclusive?
+                         "Ok; style SYNTAX seems valid.")
          syntax)
 
         ;; Fallthrough: not styling so return nil.
         (t
+         (int<mis>:debug 'int<mis>:style:exclusive?
+                         "Style SYNTAX doesn't seem to be a Mis Styling Syntax Tree? %S"
+                         syntax)
          nil)))
 ;; (int<mis>:style:exclusive? (mis:style :width 80))
+;; (int<mis>:style:exclusive? (mis:style))
 ;; (int<mis>:style:exclusive? '((:style (:align . center)) (:string . "hello")))
 
 
