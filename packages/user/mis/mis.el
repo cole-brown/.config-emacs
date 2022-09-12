@@ -47,6 +47,8 @@
 ;; Input APIs, Type Compilers, & Stylers
 ;;------------------------------
 (require 'mis-format)
+(require 'mis-trim)
+(require 'mis-indent)
 (require 'mis-align)
 (require 'mis-art)
 (require 'mis-comment)
