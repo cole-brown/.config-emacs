@@ -115,8 +115,10 @@ CALLER should be calling function's name. It can be one of:
 (int<mis>:styler:register :padding #'int<mis>:style:styler/no-op)
 
 
-(defun int<mis>:style (caller string &optional style)
-  "Format/propertize/style STRING using Mis Syntax Tree STYLE.
+(defun int<mis>:style (caller strings &optional style)
+  "Format/propertize/style list of STRINGS using Mis Syntax Tree STYLE.
+
+STRINGS should be a list of compiled strings to be styled.
 
 STYLE should be nil or a `:style' syntax tree.
 Example: (mis:style :width 80) -> '((:style (:width . 80)))
@@ -138,17 +140,19 @@ CALLER should be calling function's name. It can be one of:
                            "STYLE must be nil or exclusively styling. Got: %S"
                            style))
 
-          ;; NOTE: If a null string is ok, just remove this check.
-          ((or (null string)
-               (not (stringp string)))
+          ((or (not (listp strings))
+               ;; NOTE: If a null string is ok, update this.
+               (not (seq-every-p #'stringp strings)))
            (int<mis>:error caller
-                           "STRING must be a string. Got %S: %S"
-                           (type-of string)
-                           string))
+                           "STRINGS must be a list of strings. Got: %S"
+                           strings))
 
           (t
            nil))
 
+    (int<mis>:debug caller
+                    "strings:       %S"
+                    strings)
     (int<mis>:debug caller
                     "style:         %S"
                     style)
@@ -160,7 +164,7 @@ CALLER should be calling function's name. It can be one of:
                                          style
                                          :style))
           ;; Initial assumption: it's already styled or nothing more to do.
-          (string/styled string))
+          (string/styled (apply #'concat strings)))
 
       (int<mis>:debug caller
                       "styling:       %S"
@@ -209,8 +213,9 @@ CALLER should be calling function's name. It can be one of:
 
       ;; Done; return the styled string.
       string/styled)))
-;; (int<mis>:style 'test "hello" (mis:style :width 10))
-;; (int<mis>:style 'test "hello" (mis:style :width 10 :align 'center))
+;; (int<mis>:style 'test '("hello") (mis:style :width 10))
+;; (int<mis>:style 'test '("hello") (mis:style :width 10 :padding 1))
+;; (int<mis>:style 'test '("hello") (mis:style :width 10 :align 'center))
 
 
 ;;------------------------------------------------------------------------------

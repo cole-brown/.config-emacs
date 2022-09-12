@@ -112,11 +112,11 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:compile:syntax caller))
          ;; Figure out complete styling given STYLE and any `:style' in SYNTAX.
-         (styling (int<mis>:syntax:set caller
-                                       :style
-                                       (int<mis>:syntax:merge caller
-                                                              (int<mis>:syntax:get/value caller :style style)
-                                                              (int<mis>:syntax:get/value caller :style syntax))))
+         (style/merged (int<mis>:syntax:set caller
+                                            :style
+                                            (int<mis>:syntax:merge caller
+                                                                   (int<mis>:syntax:get/value caller :style style)
+                                                                   (int<mis>:syntax:get/value caller :style syntax))))
          ;; Delete styling so we don't get confused about needing it or not.
          (syntax (int<mis>:syntax:delete caller
                                          :style
@@ -139,7 +139,7 @@ CALLER should be calling function's name. It can be one of:
         (push (funcall compiler
                        caller
                        syntax/branch
-                       styling)
+                       style/merged)
               output)))
 
     ;;------------------------------
@@ -149,7 +149,10 @@ CALLER should be calling function's name. It can be one of:
       (int<mis>:error caller
                       "Syntax should have been compiled to strings, got: %S"
                       output))
-    (apply #'concat (nreverse output))))
+    ;; Concat pieces into final string, and we can finally style it.
+    (int<mis>:style caller
+                    (nreverse output)
+                    style/merged)))
 ;; (int<mis>:compile:syntax 'test (mis:string "-"))
 ;; (int<mis>:compile:syntax 'test (mis:line "-"))
 
@@ -182,11 +185,11 @@ CALLER should be calling function's name. It can be one of:
     ;; Compile
     ;;------------------------------
     ;; Figure out complete styling given STYLE and any `:style' in SYNTAX.
-    (let* ((styling (int<mis>:syntax:set caller :style
-                                         (int<mis>:syntax:merge caller
-                                                                (int<mis>:syntax:get/value caller :style style)
-                                                                (int<mis>:syntax:get/value caller :style syntax/children))))
-         ;; Delete styling so we don't get confused about needing it or not.
+    (let* ((style/merged (int<mis>:syntax:set caller :style
+                                              (int<mis>:syntax:merge caller
+                                                                     (int<mis>:syntax:get/value caller :style style)
+                                                                     (int<mis>:syntax:get/value caller :style syntax/children))))
+           ;; Delete styling so we don't get confused about needing it or not.
            (syntax/children (int<mis>:syntax:delete caller
                                                     :style
                                                     syntax/children))
@@ -200,7 +203,7 @@ CALLER should be calling function's name. It can be one of:
                                                   (cdr child))))
           (push (int<mis>:compile:syntax caller
                                          syntax/child
-                                         styling)
+                                         style/merged)
                 output)))
 
       ;;------------------------------
@@ -210,11 +213,13 @@ CALLER should be calling function's name. It can be one of:
         (int<mis>:error caller
                         "Children should have been compiled to strings, got: %S"
                         output))
-      (apply #'concat (nreverse output)))))
+      (int<mis>:style caller
+                      (nreverse output)
+                      style/merged))))
 ;; (int<mis>:compile:children 'test '((:children (:format (:formatter . string) (:value . "-")))))
 
 
-(int<mis>:register:compiler :children #'int<mis>:compile:children)
+(int<mis>:compiler:register :children #'int<mis>:compile:children)
 
 
 (defun int<mis>:compile (caller syntax &optional style)

@@ -165,39 +165,46 @@ CALLER should be calling function's name. It can be one of:
       (int<mis>:debug caller "<--value:  %S" value))
 
     ;;------------------------------
-    ;; Format output string.
+    ;; Style formatted string & return.
     ;;------------------------------
-    (pcase formatter
-      ('repeat
-       ;; Build & return the repeated string.
-       (int<mis>:format:repeat value
-                               (int<mis>:style:width caller style)))
+    (int<mis>:style caller
+                    (list
+                     ;;------------------------------
+                     ;; Format output string.
+                     ;;------------------------------
+                     (pcase formatter
+                       ('repeat
+                        ;; Build & return the repeated string.
+                        (int<mis>:format:repeat value
+                                                (int<mis>:style:width caller style)))
 
-      ('message
-       (apply #'int<mis>:format:message
-              caller
-              value))
+                       ('message
+                        (apply #'int<mis>:format:message
+                               caller
+                               value))
 
-      ('string
-       (if (stringp value)
-           value
-         (int<mis>:error caller
-                         "`string' formatter expected string but got %S: %S"
-                         (type-of value)
-                         value)))
+                       ('string
+                        (if (stringp value)
+                            value
+                          (int<mis>:error caller
+                                          "`string' formatter expected string but got %S: %S"
+                                          (type-of value)
+                                          value)))
 
-      ('char
-       (if (characterp value)
-           (make-string 1 value)
-         (int<mis>:error caller
-                         "`char' formatter expected character(/integer) but got %S: %S"
-                         (type-of value)
-                         value)))
+                       ('char
+                        (if (characterp value)
+                            (make-string 1 value)
+                          (int<mis>:error caller
+                                          "`char' formatter expected character(/integer) but got %S: %S"
+                                          (type-of value)
+                                          value)))
 
-      (_
-       (int<mis>:error caller
-                       '("Unhandled formatter case `%S'!")
-                       formatter)))))
+                       (_
+                        (int<mis>:error caller
+                                        '("Unhandled formatter case `%S'!")
+                                        formatter))))
+
+                    style)))
 ;; (int<mis>:compile:format 'test '((:format (:formatter . repeat) (:value . "-"))) '((:style (:width . 80))))
 ;; (int<mis>:compile:format 'test (mis:line "-") (mis:style :width 80))
 
