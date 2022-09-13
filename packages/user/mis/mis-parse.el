@@ -133,6 +133,50 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:syntax:get/style 'test :mummy '((:mummy (:test (:width . 10) (:align . :center)))))
 
 
+(defun int<mis>:syntax:merge/style (caller category syntax style/parent)
+  "Merge `:style' in SYNTAX and STYLE/PARENT together.
+
+CATEGORY should be a keyword from `int<mis>:keywords:category/internal'. It is
+the category in SYNTAX that we will look under for styling.
+
+SYNTAX should be nil or a Mis Syntax Tree.
+
+STYLE/PARENT should be nil or a Mis Syntax Tree.
+
+Return nil or a Mis Syntax Tree of only `:style'.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:style:merge caller))
+         (style/child (int<mis>:syntax:get/style caller
+                                                 category
+                                                 syntax)))
+    (if (null style/parent)
+        ;; Nothing to merge; return SYNTAX's style (may be nil).
+        style/child
+
+      ;; Merge parent styling into child styling. Child takes precedence.
+      (let* ((styling/child (int<mis>:syntax:get/value caller :style style/child))
+            ;; Start off with all of parent's values...
+             (styling/output (copy-alist (int<mis>:syntax:get/value caller :style style/parent))))
+
+        ;; Add/overwrite child's values
+        (dolist (assoc/child styling/child)
+          (setf (alist-get (car assoc/child) styling/output) (cdr assoc/child)))
+
+        ;; Turn it into a Mis Syntax Tree and return.
+        (apply #'int<mis>:syntax:create
+               caller
+               :style
+               styling/output)))))
+;; (int<mis>:syntax:merge/style 'test :format (mis:string :width 42 "hi") (mis:style :width 20 :padding "-"))
+;; (int<mis>:syntax:merge/style 'test :format (mis:string :width 42 "hi") nil)
+
+
 (defun int<mis>:syntax:set (caller key syntax)
   "Create a new 1 element Mis Syntax Tree with key KEY and value SYNTAX.
 
