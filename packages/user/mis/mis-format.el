@@ -201,7 +201,8 @@ CALLER should be calling function's name. It can be one of:
                         (int<mis>:error caller
                                         '("Unhandled formatter case `%S'!")
                                         formatter))))
-
+                    :format
+                    syntax
                     style)))
 ;; (int<mis>:compile:format 'test '((:format (:formatter . repeat) (:value . "-"))) '((:style (:width . 80))))
 ;; (int<mis>:compile:format 'test (mis:line "-") (mis:style :width 80))

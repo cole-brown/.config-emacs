@@ -299,43 +299,53 @@ CALLER should be calling function's name. It can be one of:
          (postfix (or (int<mis>:syntax:find caller syntax :comment :postfix) ""))
          ;; Compile our children to get the string that should be commented.
          (comment (or (int<mis>:compile:children caller :comment syntax style) "")))
-    ;; TODO: Indent? Trim? Etc?
 
+    ;; TODO: Styling needs to be smarter for these..?
+    ;; TODO: E.g. centering: Need to center string to width, then carve out space for prefix/postfix, then concat.
     ;;------------------------------
-    ;; Format into a comment.
+    ;; Style the comment.
     ;;------------------------------
-    (cond ((eq type 'quote)
-           ;; Simpler: Just prefix line, the string, and postfix line.
-           (int<mis>:string:lines/join prefix comment postfix))
+    (int<mis>:style caller
+                    ;;------------------------------
+                    ;; Format syntax into a comment.
+                    ;;------------------------------
+                    ;; Need to send `int<mis>:style' a list of strings.
+                    (cond ((eq type 'quote)
+                           ;; Simpler: Just prefix line, the string, and postfix line.
+                           (list (int<mis>:string:lines/join prefix comment postfix)))
 
-          ((eq type 'inline)
-           ;; Each line gets treated the same.
-           (apply #'int<mis>:string:lines/affix
-                  prefix
-                  postfix
-                  (int<mis>:string:lines/split comment)))
+                          ((eq type 'inline)
+                           (int<mis>:string:lines/split
+                            ;; Each line gets treated the same.
+                            (apply #'int<mis>:string:lines/affix
+                                   prefix
+                                   postfix
+                                   (int<mis>:string:lines/split comment))))
 
-          ((eq type 'block)
-           ;; Prefix is just for first line; postfix is just for last line.
-           ;; TODO: a prefix for the rest of the lines?
-           ;; TODO: e.g. C-style:
-           ;; TODO:   /* line 1
-           ;; TODO:    * line 2 */
-           ;; TODO: The 'rest of lines' prefix is " *".
-           (concat prefix comment postfix))
+                          ((eq type 'block)
+                           ;; Prefix is just for first line; postfix is just for last line.
+                           ;; TODO: a prefix for the rest of the lines?
+                           ;; TODO: e.g. C-style:
+                           ;; TODO:   /* line 1
+                           ;; TODO:    * line 2 */
+                           ;; TODO: The 'rest of lines' prefix is " *".
+                           (list (concat prefix comment postfix)))
 
-          ((eq type 'default)
-           ;; Special error cuz it shouldn't be `default' after `int<mis>:comment:type/get'.
-           (int<mis>:error caller
-                           "Comment type (%S) should not still be `default'! %S"
-                           type
-                           syntax))
+                          ((eq type 'default)
+                           ;; Special error cuz it shouldn't be `default' after `int<mis>:comment:type/get'.
+                           (int<mis>:error caller
+                                           "Comment type (%S) should not still be `default'! %S"
+                                           type
+                                           syntax))
 
-          (t
-           (int<mis>:error caller
-                           "Unhandled comment type `%S' in: %S"
-                           type
-                           syntax)))))
+                          (t
+                           (int<mis>:error caller
+                                           "Unhandled comment type `%S' in: %S"
+                                           type
+                                           syntax)))
+                    :comment
+                    syntax
+                    style)))
 ;; (int<mis>:compile:comment 'test (mis:comment "hi") '((:style (:width . 80))))
 
 

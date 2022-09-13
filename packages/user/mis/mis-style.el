@@ -115,12 +115,18 @@ CALLER should be calling function's name. It can be one of:
 (int<mis>:styler:register :padding #'int<mis>:style:styler/no-op)
 
 
-(defun int<mis>:style (caller strings &optional style)
-  "Format/propertize/style list of STRINGS using Mis Syntax Tree STYLE.
+(defun int<mis>:style (caller strings category syntax style/parent)
+  "Style the list of STRINGS with styling from SYNTAX & STYLE/PARENT.
 
 STRINGS should be a list of compiled strings to be styled.
 
-STYLE should be nil or a `:style' syntax tree.
+CATEGORY should be nil or a keyword from `int<mis>:keywords:category/internal'.
+It is the category in SYNTAX that we will look under for styling.
+
+SYNTAX should be nil or a Mis Syntax Tree. It can contain styling of its own,
+which will override any styling in STYLE/PARENT.
+
+STYLE/PARENT should be nil or a `:style' Mis Syntax Tree.
 Example: (mis:style :width 80) -> '((:style (:width . 80)))
 
 CALLER should be calling function's name. It can be one of:
@@ -130,14 +136,13 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let ((caller (list 'int<mis>:style caller)))
-
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
-    (cond ((not (int<mis>:style:exclusive? style))
+    (cond ((not (int<mis>:style:exclusive? style/parent))
            (int<mis>:error caller
-                           "STYLE must be nil or exclusively styling. Got: %S"
-                           style))
+                           "STYLE/PARENT must be nil or exclusively styling. Got: %S"
+                           style/parent))
 
           ((or (not (listp strings))
                ;; NOTE: If a null string is ok, update this.
@@ -150,40 +155,49 @@ CALLER should be calling function's name. It can be one of:
            nil))
 
     (int<mis>:debug caller
-                    "strings:       %S"
+                    "strings:        %S"
                     strings)
     (int<mis>:debug caller
-                    "style:         %S"
-                    style)
+                    "category:       %S"
+                    category)
+    (int<mis>:debug caller
+                    "syntax:         %S"
+                    syntax)
+    (int<mis>:debug caller
+                    "style/parent:   %S"
+                    style/parent)
 
     ;;------------------------------
     ;; Style!
     ;;------------------------------
-    (let ((styling (int<mis>:syntax:find caller style :style))
-          ;; Initial assumption: it's already styled or nothing more to do.
-          (string/styled (apply #'concat strings)))
+    (let* ((style/complete (int<mis>:syntax:merge/style caller
+                                                        category
+                                                        syntax
+                                                        style/parent))
+           ;; Initial assumption: it's already styled or nothing more to do.
+           (string/styled (apply #'concat strings)))
 
       (int<mis>:debug caller
-                      "styling:       %S"
-                      styling)
+                      "style/complete: %S"
+                      style/complete)
 
-      ;; Check each styling keyword in STYLE to see if it wants to mutate the
-      ;; output string any.
-      (dolist (kvp styling)
+      ;; Check each styling keyword in `style/complete' to see if it wants to
+      ;; mutate the output string any.
+      (dolist (kvp (int<mis>:syntax:get/value caller :style style/complete))
         (int<mis>:debug caller
-                        "styling kvp:   %S"
+                        "styling kvp:    %S"
                         kvp)
         (let* ((key    (car kvp))
                (value  (cdr kvp))
                (styler (int<mis>:styler:get key)))
           (int<mis>:debug caller
-                          "styling key:   %S"
+                          "styling key:    %S"
                           key)
           (int<mis>:debug caller
-                          "styling value: %S"
+                          "styling value:  %S"
                           value)
           (int<mis>:debug caller
-                          "styler func:   %S"
+                          "styler func:    %S"
                           styler)
 
           (unless (functionp styler)
@@ -200,19 +214,17 @@ CALLER should be calling function's name. It can be one of:
           (setq string/styled (funcall styler
                                        caller
                                        string/styled
-                                       style
+                                       style/complete
                                        key
                                        value))
 
           (int<mis>:debug caller
-                          "<--string:     %S"
+                          "<--string:      %S"
                           string/styled)))
 
       ;; Done; return the styled string.
       string/styled)))
-;; (int<mis>:style 'test '("hello") (mis:style :width 10))
-;; (int<mis>:style 'test '("hello") (mis:style :width 10 :padding 1))
-;; (int<mis>:style 'test '("hello") (mis:style :width 10 :align 'center))
+;; (int<mis>:style 'test '("hello") :format '((:format (:style (:width . 10) (:align . center)))) nil)
 
 
 ;;------------------------------------------------------------------------------

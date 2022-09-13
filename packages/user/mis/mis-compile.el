@@ -98,11 +98,11 @@ Function must have params: (CALLER SYNTAX STYLE)"
 ;; Compiling
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:compile:syntax (caller syntax &optional style)
-  "Compile SYNTAX into a propertized string for output using STYLE.
+(defun int<mis>:compile:syntax (caller syntax &optional style/parents)
+  "Compile SYNTAX into a propertized string for output using STYLE/PARENTS.
 
 SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
-will override any styling in STYLE.
+will override any styling in STYLE/PARENTS.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -129,7 +129,7 @@ CALLER should be calling function's name. It can be one of:
         (push (funcall compiler
                        caller
                        syntax/branch
-                       style/merged)
+                       style/parents)
               output)))
 
     ;;------------------------------
@@ -142,18 +142,23 @@ CALLER should be calling function's name. It can be one of:
     ;; Concat pieces into final string, and we can finally style it.
     (int<mis>:style caller
                     (nreverse output)
-                    style/merged)))
+                    nil
+                    nil
+                    style/parents)))
 ;; (int<mis>:compile:syntax 'test (mis:string "-"))
 ;; (int<mis>:compile:syntax 'test (mis:line "-"))
 
 
-(defun int<mis>:compile:children (caller parent syntax &optional style/parents)
-  "Compile SYNTAX into a propertized string for output using STYLE/PARENTS.
+(defun int<mis>:compile:children (caller parent syntax &optional style/ancestors)
+  "Compile SYNTAX into a propertized string for output.
 
-PARENT must be a keyword & member of `int<mis>:keywords:category/internal'.
+PARENT must be a keyword & member of `int<mis>:keywords:category/internal'. It
+is the keyword we look under for `:children' in SYNTAX.
 
 SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
-will override any styling in STYLE/PARENTS.
+will override any styling in STYLE/ANCESTORS.
+
+STYLE/ANCESTORS should be nil or a Mis Syntax Tree of only `:style'.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -162,6 +167,12 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:compile:children caller))
+         ;; Update STYLE/ANCESTORS with our parents' styling for cascading into
+         ;; the children.
+         (style/parents (int<mis>:syntax:merge/style caller
+                                                     parent
+                                                     syntax
+                                                     style/ancestors))
          (syntax/children (int<mis>:syntax:find caller
                                                 syntax
                                                 parent
@@ -199,6 +210,8 @@ CALLER should be calling function's name. It can be one of:
                         output))
       (int<mis>:style caller
                       (nreverse output)
+                      nil
+                      nil
                       style/parents))))
 ;; (int<mis>:compile:children 'test :parent '((:parent (:children (:format (:formatter . string) (:value . "-"))))))
 
@@ -206,11 +219,11 @@ CALLER should be calling function's name. It can be one of:
 (int<mis>:compiler:register :children #'int<mis>:compile:children)
 
 
-(defun int<mis>:compile (caller syntax &optional style)
-  "Compile SYNTAX into a propertized string for output using STYLE.
+(defun int<mis>:compile (caller syntax &optional style/parent)
+  "Compile SYNTAX into a propertized string for output using STYLE/PARENT.
 
 SYNTAX should be a Mis Syntax Tree. It can contain styling of its own, which
-will override any styling in STYLE.
+will override any styling in STYLE/PARENT.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -222,7 +235,7 @@ CALLER should be calling function's name. It can be one of:
   ;; this function does, so just tell it to do it.
   (int<mis>:compile:syntax (list 'int<mis>:compile caller)
                            syntax
-                           style))
+                           style/parent))
 ;; (int<mis>:compile 'test '((:format (:formatter . repeat) (:value . "-"))) (mis:style :width 80))
 ;; (int<mis>:compile 'test (mis:comment "hi") (mis:style :width 80))
 ;; (int<mis>:compile 'test (mis:comment (mis:line "-")))
@@ -246,13 +259,18 @@ CALLER should be calling function's name. It can be one of:
     ;; to skim off (e.g. `:buffer').
     (while args
       (let ((arg (pop args)))
-        ;; Is this /only/ styling info? Save it for use on all its siblings.
-        (cond ((int<mis>:style:exclusive? arg)
+        ;; Is this non-nil and /only/ styling info? Then it's global styling for
+        ;; use in all of the things here.
+        (cond ((and arg
+                    (int<mis>:style:exclusive? arg))
                ;; Make sure it's valid...ish.
                (int<mis>:valid:syntax? 'mis 'arg arg)
 
                (if styling
                    ;; There can be only one.
+                   ;;
+                   ;; NOTE: We could allow more than one and merge, but then
+                   ;; we'd have to do collision detection...
                    (int<mis>:error 'mis
                                    '("Only one Mis `:style' allowed per level in ARGS. "
                                      "have: %S, found: %S, args: %S")
