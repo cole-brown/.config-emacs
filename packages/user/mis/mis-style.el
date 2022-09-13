@@ -219,10 +219,78 @@ CALLER should be calling function's name. It can be one of:
 ;; Style Helpers
 ;;------------------------------------------------------------------------------
 
+(defun int<mis>:style:get-or-dne (caller keyword syntax)
+  "Get KEYWORD's value from styling in SYNTAX.
+
+KEYWORD should be a keyword in `int<mis>:keywords:style'.
+
+If KEYWORD does exist, returns its value (even nil).
+If KEYWORD does not exist, returns `:does-not-exist'.
+
+STYLE should be nil or a Mis Syntax Tree of only `:style'.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:style:get-or-dne caller))
+         (style (int<mis>:syntax:get/value caller
+                                           :style
+                                           syntax)))
+    ;; Get from SYNTAX first, then fallback to STYLE/PARENT.
+    (if (int<mis>:syntax:has caller
+                             style
+                             keyword)
+        (int<mis>:syntax:get/value caller
+                                   keyword
+                                   style)
+      :does-not-exist)))
+;; (int<mis>:style:get-or-dne 'test :width (mis:style :width 42))
+;; (int<mis>:style:get-or-dne 'test :width (mis:style :padding "-"))
+
+
+(defun int<mis>:style:get (caller keyword syntax style/parent)
+  "Get KEYWORD's value from styling in SYNTAX (preferred) or STYLE/PARENT.
+
+KEYWORD should be a keyword in `int<mis>:keywords:style'.
+
+SYNTAX should be nil or a Mis Syntax Tree.
+
+STYLE/PARENT should be nil or a Mis Syntax Tree of only `:style' from SYNTAX's
+parent/ancestors.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:style:get caller))
+         (value  (int<mis>:style:get-or-dne caller
+                                            keyword
+                                            syntax)))
+    (if (eq value :does-not-exist)
+        ;; Wasn't in SYNTAX; return from STYLE/PARENT (value or nil).
+        (int<mis>:syntax:find caller
+                              style/parent
+                              :style
+                              keyword)
+      value)))
+;; (int<mis>:style:get 'test :width (mis:style :width 42) (mis:style :padding "-"))
+;; (int<mis>:style:get 'test :width (mis:style :padding "-") (mis:style :width 42))
+;; (int<mis>:style:get 'test :width (mis:style :width 42 :padding "-") (mis:style :width 11))
+
+
 (defun int<mis>:style:exclusive? (syntax)
-  "Return SYNTAX if SYNTAX is _only_ styling; return nil otherwise."
-  ;; Must have valid syntax.
-  (cond ((not (int<mis>:valid:syntax? 'int<mis>:style:exclusive?
+  "Return non-nil if SYNTAX is _only_ styling; return nil otherwise."
+  ;; No styling is valid styling.
+  (cond ((null syntax)
+         t)
+
+        ;; Must have valid syntax.
+        ((not (int<mis>:valid:syntax? 'int<mis>:style:exclusive?
                                       'syntax
                                       syntax
                                       :no-error))
@@ -246,7 +314,7 @@ CALLER should be calling function's name. It can be one of:
          (int<mis>:debug 'int<mis>:style:exclusive?
                          "Ok; style SYNTAX seems valid: %S"
                          syntax)
-         syntax)
+         t)
 
         ;; Fallthrough: not styling so return nil.
         (t
@@ -254,6 +322,7 @@ CALLER should be calling function's name. It can be one of:
                          "Style SYNTAX doesn't seem to be a Mis Styling Syntax Tree? %S"
                          syntax)
          nil)))
+;; (int<mis>:style:exclusive? nil)
 ;; (int<mis>:style:exclusive? (mis:style :width 80))
 ;; (int<mis>:style:exclusive? (mis:style))
 ;; (int<mis>:style:exclusive? '((:style (:align . center)) (:string . "hello")))

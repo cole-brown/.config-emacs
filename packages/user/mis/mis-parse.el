@@ -105,8 +105,32 @@ CALLER should be calling function's name. It can be one of:
   (when-let ((pair (int<mis>:syntax:get/pair (list 'int<mis>:syntax:get/syntax caller)
                                              key
                                              syntax)))
-    (list (assoc key syntax))))
+    (list pair)))
 ;; (int<mis>:syntax:get/syntax 'test :style '((:style (:width . 10) (:align . :center))))
+
+
+(defun int<mis>:syntax:get/style (caller parent syntax)
+  "Get the Mis Style Syntax Tree from PARENT in SYNTAX.
+
+It should be used as the primary source of styling. The parents' / ancestors'
+styling should be used as a fallback/secondary source.
+
+PARENT should be a keyword from `int<mis>:keywords:category/internal`.
+
+SYNTAX should be a Mis Syntax Tree.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (when-let ((style/assoc (int<mis>:syntax:get/pair caller
+                                                  :style
+                                                  (int<mis>:syntax:get/value caller parent syntax))))
+      (list style/assoc)))
+;; (int<mis>:syntax:get/style 'test :mummy '((:mummy (:style (:width . 10) (:align . :center)))))
+;; (int<mis>:syntax:get/style 'test :mummy '((:mummy (:test (:width . 10) (:align . :center)))))
 
 
 (defun int<mis>:syntax:set (caller key syntax)
