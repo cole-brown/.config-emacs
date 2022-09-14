@@ -182,7 +182,7 @@ Return indentation string."
 ;; Indentation Styler
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:style:indent (caller string style &optional _ indentation)
+(defun int<mis>:style:indent (caller string _ style &optional _ indentation)
   "Indent STRING based INDENTATION.
 
 STRING should be the string to be indented.
@@ -206,6 +206,10 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Ignoring:
+  1) Mis Syntax Tree parameter
+  2) `:align' keyword parameter
 
 Return an indented string."
   (declare (pure t) (side-effect-free t))

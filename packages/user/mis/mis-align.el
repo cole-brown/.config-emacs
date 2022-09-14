@@ -62,7 +62,7 @@ If STRING is too long, just return it (as-is/un-truncated)."
             (make-string pad-amt (string-to-char padding)))))
 
 
-(defun int<mis>:style:align (caller string style &optional _ alignment)
+(defun int<mis>:style:align (caller string _ style &optional _ alignment)
   "Align STRING based ALIGNMENT.
 
 STRING should be the string to be aligned.
@@ -85,6 +85,10 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Ignoring:
+  1) Mis Syntax Tree parameter
+  2) `:align' keyword parameter
 
 Return an aligned string. If STRING is too long, returns it as-is
 \(un-aligned, un-truncated)."
@@ -125,8 +129,8 @@ Return an aligned string. If STRING is too long, returns it as-is
            (int<mis>:error caller
                            "Unhandled ALIGNMENT of %S!"
                            alignment)))))
-;; (int<mis>:style:align 'test "hello" (mis:style :width 20) :align 'center)
-;; (int<mis>:style:align 'test "hello" nil :align 'center)
+;; (int<mis>:style:align 'test "hello" nil (mis:style :width 20) :align 'center)
+;; (int<mis>:style:align 'test "hello" nil nil :align 'center)
 
 
 ;; Register our users of the no-op styler:

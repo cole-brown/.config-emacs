@@ -41,10 +41,14 @@
 
 Keyword must be a member of `int<mis>:keywords:style'.
 
-Styler FUNCTION must have params: (CALLER STRING STYLE &optional KEY VALUE)
-Or if function doesn't care about key/value: (CALLER STRING STYLE &rest _)
-Or if function doesn't care about anything: (CALLER STRING &rest _)
+Styler FUNCTION must have params:
+     (CALLER STRING SYNTAX STYLE &optional KEY VALUE)
+Or if function doesn't care about key/value:
+     (CALLER STRING STYLE &rest _)
+Or ignore even more if function doesn't care about them. e.g.:
+     (CALLER STRING &rest _)
   - STRING will be the string to be styled.
+  - SYNTAX should be a Mis Syntax Tree.
   - STYLE will be the current Mis Style Syntax Tree.
   - KEY will be the styling keyword encountered.
     - Allows one func to handle multiple keywords, like `:trim', `:trim:left'...
@@ -214,6 +218,7 @@ CALLER should be calling function's name. It can be one of:
           (setq string/styled (funcall styler
                                        caller
                                        string/styled
+                                       syntax
                                        style/complete
                                        key
                                        value))
@@ -224,7 +229,7 @@ CALLER should be calling function's name. It can be one of:
 
       ;; Done; return the styled string.
       string/styled)))
-;; (int<mis>:style 'test '("hello") :format '((:format (:style (:width . 10) (:align . center)))) nil)
+;; (int<mis>:style 'test '("hello") :format nil '((:format (:style (:width . 10) (:align . center)))) nil)
 
 
 ;;------------------------------------------------------------------------------

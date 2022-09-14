@@ -21,7 +21,7 @@
 ;; Trim Styler
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:style:trim (caller string style &optional type regex)
+(defun int<mis>:style:trim (caller string _ style &optional type regex)
   "Trim REGEX of leading and/or trailing strings from STRING.
 
 TYPE should be one of: `:trim', `:trim:left', or `:trim:right'.
@@ -39,6 +39,9 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+Ignoring:
+  1) Mis Syntax Tree parameter
 
 Return the trimmed string."
   (let ((caller (list 'int<mis>:style:trim caller)))
