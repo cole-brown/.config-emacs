@@ -36,10 +36,60 @@
 ;;
 ;;------------------------------------------------------------------------------
 
+(defun int<mis>:output:get/outputs (caller output)
+  "Return the list-of-alists from Mis OUTPUT Tree.
+
+Return value is a list of alists:
+ '(((:string . \"foo\") (:metadata . [...]))
+   ((:string . \"bar\") (:metadata . [...])))
+Each alist in return value has keys: `:string' and `:metadata'
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (alist-get :output tree))
+;; (int<mis>:output:get/outputs 'test '((:output ((:string . "foo") (:metadata . :foo)) ((:string . "bar") (:metadata . :bar)))))
+
+
+(defun int<mis>:output:get/string (caller output)
+  "Return output string from OUTPUT alist.
+
+OUTPUT should be an alist with key/value conses.
+  - valid keys: `:string', `:metadata'
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (alist-get :string output))
+;; (int<mis>:output:get/string 'test '((:string . "foo") (:metadata . :foo)))
+
+
+(defun int<mis>:output:get/metadata (caller output)
+  "Return output string from OUTPUT alist.
+
+OUTPUT should be an alist with key/value conses.
+  - valid keys: `:string', `:metadata'
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (alist-get :metadata output))
+;; (int<mis>:output:get/metadata 'test '((:string . "foo") (:metadata . :foo)))
+
+
 (defun int<mis>:output:create (caller string &rest metadata)
   "Create a Mis Output Tree from STRING and METADATA(s).
 
-String should be nil or a string.
+STRING should be nil or a string.
 
 Each METADATA should nil or a cons of a keyword and... some value.
 
