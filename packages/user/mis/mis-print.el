@@ -22,6 +22,72 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Output Trees
+;;------------------------------
+;; These trees are formatted as an alist with key/value cons:
+;;   - key: `:output'
+;;   - value:
+;;     - list of alists with key/value conses
+;;     - valid keys: `:string', `:metadata'
+;;
+;; Example
+;; '((:output ((:string . "foo") (:metadata . ...))
+;;            ((:string . "bar") (:metadata . ...))))
+;;
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:output:create (caller string &rest metadata)
+  "Create a Mis Output Tree from STRING and METADATA(s).
+
+String should be nil or a string.
+
+Each METADATA should nil or a cons of a keyword and... some value.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:print:string caller)))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (cond ((and (not (null string))
+                (not (stringp string)))
+           (int<mis>:error caller
+                           "Mis Output String must be a string or nil. Got %S: %S"
+                           (type-of string)
+                           string))
+
+          ((and (not (null metadata))
+                (not (seq-every-p (lambda (m) "Validate METADATA param."
+                                    (and
+                                     ;; Is a cons but is not a list?
+                                     (and (listp m)
+                                          (cdr m)
+                                          (atom (cdr m)))
+                                     ;; Key is a keyword?
+                                     (keywordp (car m))))
+                                  metadata)))
+           (int<mis>:error caller
+                           "Mis Output Metadata must be nil or a cons alist. Got %S: %S"
+                           (type-of metadata)
+                           metadata))
+
+          ;;------------------------------
+          ;; Create the Mis Output Tree
+          ;;------------------------------
+          (t
+           ;; Alist of `:output' to alist...
+           (list (cons :output
+                       ;; Alist with `:string' & `:metadata' keys, validated values.
+                       (list (cons :string string)
+                             (cons :metadata metadata))))))))
+;; (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz))
+
+
+;;------------------------------------------------------------------------------
 ;; Output API
 ;;------------------------------------------------------------------------------
 

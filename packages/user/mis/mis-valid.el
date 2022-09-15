@@ -77,6 +77,12 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
   "Valid line keywords.")
 
 
+(defconst int<mis>:keywords:metadata
+  '(:buffer
+    :align)
+  "Valid metadata keywords.")
+
+
 ;;------------------------------
 ;; Keywords/Symbols for a specific Mis keyword.
 ;;------------------------------

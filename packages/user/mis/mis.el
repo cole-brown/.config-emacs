@@ -44,6 +44,11 @@
 (require 'mis-style)
 
 ;;------------------------------
+;; Output Printing & OUtput API
+;;------------------------------
+(require 'mis-print)
+
+;;------------------------------
 ;; Input APIs, Type Compilers, & Stylers
 ;;------------------------------
 (require 'mis-format)
