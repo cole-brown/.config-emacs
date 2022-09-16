@@ -759,7 +759,7 @@ CALLER should be calling function's name. It can be one of:
 
 
 ;;------------------------------------------------------------------------------
-;; Mis Syntax
+;; Mis Trees
 ;;------------------------------------------------------------------------------
 
 ;; TODO: Do we need to recursively check the syntax tree? Currently only check top level.
@@ -824,9 +824,20 @@ signaling an error."
                              name
                              syntax)))
 
+          ;; And... it should not be a Mis Output Tree, probably?
+          ;; This just checks for first key of `:output'; full check would be `int<mis>:valid:output?'.
+          ((eq :output (caar syntax))
+           (if no-error?
+               nil
+             (int<mis>:error caller
+                             "%S should not be a Mis Output Tree, but found `:output' key. %S"
+                             name
+                             syntax)))
+
           ;; Fallthrough: Failed to find a reason it's invalid so it must be valid?
           (t))))
 ;; (int<mis>:valid:syntax? 'test 'syntax '((:format (:formatter repeat :string "-"))))
+;; (int<mis>:valid:syntax? 'test 'syntax (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz)))
 
 
 (defun int<mis>:valid:output? (caller name output &optional no-error?)
@@ -964,6 +975,37 @@ signaling an error."
 ;; Not Valid:
 ;;   (int<mis>:valid:output? 'test 'output '((:output (:string . "foo") (:metadata . "...actual metadata here"))))
 ;;   (int<mis>:valid:output? 'test 'output '((:format (:formatter repeat :string "-"))))
+
+
+(defun int<mis>:tree:type (caller tree)
+  "Return TREE's type.
+
+Return:
+  - `:syntax' - valid Mis Syntax Tree
+  - `:output' - valid Mis Output Tree
+If not a valid Mis tree, signal an error.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:tree:type caller))
+        (name (int<mis>:error:name 'tree)))
+    (cond ((int<mis>:valid:output? caller name tree :no-error)
+           :output)
+          ((int<mis>:valid:syntax? caller name tree :no-error)
+           :syntax)
+          (t
+           (int<mis>:error caller
+                           "%s is not a Mis Tree of any sort. %s: %S"
+                           name
+                           name
+                           tree)))))
+;; (int<mis>:tree:type 'test (int<mis>:syntax:create 'test :style '(:width . 10) '(:align . :center)))
+;; (int<mis>:tree:type 'test (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz)))
+;; (int<mis>:tree:type 'test nil)
 
 
 ;;------------------------------------------------------------------------------

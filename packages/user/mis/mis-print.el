@@ -34,7 +34,6 @@
 ;;
 ;;------------------------------------------------------------------------------
 
-
 (defun int<mis>:output:get/outputs (caller output)
   "Return the list-of-alists from Mis OUTPUT Tree.
 
@@ -156,7 +155,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller (list 'int<mis>:output:append caller)))
+  (let ((caller (list 'int<mis>:output:append caller)))
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
@@ -202,7 +201,7 @@ CALLER should be calling function's name. It can be one of:
 
 
 (defun int<mis>:output:create-or-append (caller output string &rest metadata)
-  "Create or append to the Mis OUTPUT tree, depending on if it exists currently.
+  "Create or append to the Mis OUTPUT Tree, depending on if it exists currently.
 
 Will call either `int<mis>:output:create' or `int<mis>:output:append'.
 
@@ -232,6 +231,48 @@ CALLER should be calling function's name. It can be one of:
          output
          string
          metadata))
+
+
+(defun int<mis>:output (caller string style/complete)
+  "Create a Mis Output Tree from STRING & style data in SYNTAX and STYLE.
+
+STRING should be a formatted/propertized/etc string for outputting.
+
+STYLE/COMPLETE should be nil or a `:style' Mis Syntax Tree. It should be the
+full & complete styling tree for STRING.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:output caller))
+        metadata) ;; alist
+    (int<mis>:debug caller
+                    "string:         %S"
+                    string)
+    (int<mis>:debug caller
+                    "style/complete: %S"
+                    style/complete)
+
+    ;; Check each styling keyword in `style/complete' to see if it's metadata-worthy.
+    (dolist (kvp (int<mis>:syntax:get/value caller :style style/complete))
+      (int<mis>:debug caller
+                        "metadata kvp:   %S"
+                        kvp)
+      (when (memq (car kvp) int<mis>:keywords:metadata)
+        (int<mis>:debug caller
+                        "metadata kvp:   %S"
+                        kvp)
+        (push kvp metadata)))
+
+    ;; Create the Mis Output Tree.
+    (apply #'int<mis>:output:create
+           caller
+           string
+           metadata)))
+;; (int<mis>:output 'test "hello there" (mis:style :width 42 :align 'center))
 
 
 ;;------------------------------------------------------------------------------
@@ -283,9 +324,9 @@ CALLER should be calling function's name. It can be one of:
           ;;------------------------------
           (t
            ;;------------------------------
-           ;; Finalize String
+           ;; TODO: Finalize String
            ;;------------------------------
-           ;; TODO: string alignment?
+           ;; TODO: string alignment and other finalization? or is that done elsewhere?
 
            ;;------------------------------
            ;; Print String to Buffer
