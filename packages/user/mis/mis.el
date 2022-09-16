@@ -34,6 +34,11 @@
 (require 'mis-string)
 
 ;;------------------------------
+;; Output Printing & Output API
+;;------------------------------
+(require 'mis-print)
+
+;;------------------------------
 ;; Output API & Type Compiler
 ;;------------------------------
 (require 'mis-compile)
@@ -42,11 +47,6 @@
 ;; Input API & Output Styler
 ;;------------------------------
 (require 'mis-style)
-
-;;------------------------------
-;; Output Printing & OUtput API
-;;------------------------------
-(require 'mis-print)
 
 ;;------------------------------
 ;; Input APIs, Type Compilers, & Stylers
@@ -58,6 +58,11 @@
 (require 'mis-art)
 (require 'mis-comment)
 (require 'mis-message)
+
+;;------------------------------
+;; Mis' Top-Level API
+;;------------------------------
+(require 'mis-mis)
 
 
 ;;------------------------------------------------------------------------------
