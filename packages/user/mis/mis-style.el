@@ -174,12 +174,12 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Style!
     ;;------------------------------
-    (let* ((style/complete (int<mis>:syntax:merge/style caller
-                                                        category
-                                                        syntax
-                                                        style/parent))
-           ;; Initial assumption: it's already styled or nothing more to do.
-           (string/styled (apply #'concat strings)))
+    (let ((style/complete (int<mis>:syntax:merge/style caller
+                                                       category
+                                                       syntax
+                                                       style/parent))
+          ;; Initial assumption: it's already styled or nothing more to do.
+          (string/styled (apply #'concat strings)))
 
       (int<mis>:debug caller
                       "style/complete: %S"
@@ -227,9 +227,11 @@ CALLER should be calling function's name. It can be one of:
                           "<--string:      %S"
                           string/styled)))
 
-      ;; Done; return the styled string.
-      string/styled)))
-;; (int<mis>:style 'test '("hello") :format nil '((:format (:style (:width . 10) (:align . center)))) nil)
+      ;; Done; return a Mis Output Tree.
+      (int<mis>:output caller
+                       string/styled
+                       style/complete))))
+;; (int<mis>:style 'test '("hello") :format '((:format (:style (:width . 10) (:align . center)))) nil)
 
 
 ;;------------------------------------------------------------------------------
