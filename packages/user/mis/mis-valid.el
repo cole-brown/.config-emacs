@@ -960,6 +960,7 @@ signaling an error."
                  nil)))))))
 ;; Valid:
 ;;   (int<mis>:valid:output? 'test 'output '((:output ((:string . "foo") (:metadata . :foo)) ((:string . "bar") (:metadata . :bar)))))
+;;   (int<mis>:valid:output? 'test 'output (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz)))
 ;; Not Valid:
 ;;   (int<mis>:valid:output? 'test 'output '((:output (:string . "foo") (:metadata . "...actual metadata here"))))
 ;;   (int<mis>:valid:output? 'test 'output '((:format (:formatter repeat :string "-"))))
