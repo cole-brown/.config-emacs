@@ -17,8 +17,6 @@
 (require 'mis-parse)
 (require 'mis-buffer)
 (require 'mis-string)
-(require 'mis-compile)
-(require 'mis-style)
 
 
 ;;------------------------------------------------------------------------------
@@ -245,6 +243,12 @@ CALLER should be calling function's name. It can be one of:
 
 OUTPUT should be an alist with key/value conses.
   - valid keys: `:string', `:metadata'
+NOTE: OUTPUT should be one of the output alists of a full Mis Output Tree.
+For example, if the full Mis Output Tree is:
+  '((:output ((:string . \"foo\")  (:metadata (:bar . baz)))
+             ((:string . \"zort\") (:metadata (:poit . narf)))))
+Then OUTPUT should be, e.g.:
+  '((:string . \"foo\")  (:metadata (:bar . baz)))
 
 Caller should be in correct position of correct buffer.
 
@@ -286,34 +290,33 @@ CALLER should be calling function's name. It can be one of:
            ;;------------------------------
            ;; Print String to Buffer
            ;;------------------------------
-           (dolist (string strings)
-             ;; Special Shenanigans™ Part 01: *Messages*
-             ;; Set `message-log-max' to nothing and then `message' so normal stuff
-             ;; happens /EXCEPT/ for STRING getting printed to *Messages*.
-             (when (eq (int<mis>:buffer:type caller buffer) :messages)
-               (let ((message-log-max nil))
-                 (message string)))
+           ;; Special Shenanigans™ Part 01: *Messages*
+           ;; Set `message-log-max' to nothing and then `message' so normal stuff
+           ;; happens /EXCEPT/ for STRING getting printed to *Messages*.
+           (when (eq (int<mis>:buffer:type caller buffer) :messages)
+             (let ((message-log-max nil))
+               (message string)))
 
-             (goto-char (point-max))
+           (goto-char (point-max))
 
-             ;; Special Shenanigans™ Part 02: Read-Only Buffers (e.g. *Messages*)
-             ;; Ignore read-only status of buffer while we output to it. Need this to
-             ;; be able to actually print our output to *Messages* with its properties
-             ;; intact.
-             (let ((inhibit-read-only t))
-               ;; TODO: Test this to make sure we don't get extra newlines. It looks correct?
-               (unless (zerop (current-column))
-                 (insert "\n"))
-               (insert string "\n")))))))
+           ;; Special Shenanigans™ Part 02: Read-Only Buffers (e.g. *Messages*)
+           ;; Ignore read-only status of buffer while we output to it. Need this to
+           ;; be able to actually print our output to *Messages* with its properties
+           ;; intact.
+           (let ((inhibit-read-only t))
+             ;; TODO: Test this to make sure we don't get extra newlines. It looks correct?
+             (unless (zerop (current-column))
+               (insert "\n"))
+             (insert string "\n"))))))
 
 
-(defun int<mis>:print (caller tree metadata)
-  "Finalize and print strings in TREE to the output buffer.
+(defun int<mis>:print (caller output metadata)
+  "Finalize and print strings in Mis OUTPUT Tree to the output buffer.
 
-TREE should be a Mis Output Tree.
+OUTPUT should be a Mis Output Tree.
 
-METADATA should be nil or an alist of any top-level metadata (like output buffer
-settings).
+METADATA should be nil or an alist of any top-level metadata (like the output
+buffer settings).
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -327,17 +330,12 @@ CALLER should be calling function's name. It can be one of:
          ;; buffer object
          (buffer (int<mis>:buffer:get-or-create caller buffer)))
 
-    (with-current-buffer (int<mis>:buffer:get-or-create caller buffer)
+    ;; Enter buffer & save mark/excursion once, then print each string.
+    (with-current-buffer buffer
       (save-mark-and-excursion
         ;; Loop on the output strings/metadatas to finalize & print.
         (dolist (output (int<mis>:output:get/outputs caller tree))
-
-          ;; TODO: Finalize string.
-
-          ;; TODO: Print string.
-
-          )
-        ))))
+          (int<mis>:print:string caller output))))))
 
 
 ;;------------------------------------------------------------------------------
