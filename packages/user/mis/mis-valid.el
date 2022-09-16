@@ -769,9 +769,9 @@ CALLER should be calling function's name. It can be one of:
 
 
 (defun int<mis>:valid:syntax? (caller name syntax &optional no-error?)
-  "Error if SYNTAX fails any basic sanity check for Mis abstract syntax trees.
+  "Error if SYNTAX fails any basic sanity check for Mis Syntax Trees.
 
-NAME should be VALUE's symbol name as a symbol or string.
+NAME should be OUTPUT's symbol name as a symbol or string.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -782,7 +782,8 @@ CALLER should be calling function's name. It can be one of:
 
 NO-ERROR? should be nil/non-nil. If non-nil, will return nil instead of
 signaling an error."
-  (let ((caller (list 'int<mis>:valid:syntax? caller)))
+  (let ((caller (list 'int<mis>:valid:syntax? caller))
+        (name (int<mis>:error:name name)))
     ;; NOTE: We do not consider `nil' a valid syntax tree,
     ;; so check for explicit nil first sot we can then check for lists.
     (cond ((null syntax)
@@ -790,7 +791,7 @@ signaling an error."
                nil
              (int<mis>:error caller
                              "%S must be... something. Got: %S"
-                             (int<mis>:error:name name)
+                             name
                              syntax)))
 
           ;; An alist has to be a list.
@@ -798,8 +799,8 @@ signaling an error."
            (if no-error?
                nil
              (int<mis>:error caller
-                             "%S be a list. Got %S: %S"
-                             (int<mis>:error:name name)
+                             "%S must be a list. Got %S: %S"
+                             name
                              (type-of syntax)
                              syntax)))
 
@@ -808,8 +809,8 @@ signaling an error."
            (if no-error?
                nil
              (int<mis>:error caller
-                             "%S be a list of lists. Got: %S"
-                             (int<mis>:error:name name)
+                             "%S must be a list of lists. Got: %S"
+                             name
                              syntax)))
 
           ;; And we require all of them to have keywords as keys.
@@ -819,13 +820,128 @@ signaling an error."
            (if no-error?
                nil
              (int<mis>:error caller
-                             "%S be an alist with keyword keys. Got: %S"
-                             (int<mis>:error:name name)
+                             "%S must be an alist with keyword keys. Got: %S"
+                             name
                              syntax)))
 
           ;; Fallthrough: Failed to find a reason it's invalid so it must be valid?
           (t))))
 ;; (int<mis>:valid:syntax? 'test 'syntax '((:format (:formatter repeat :string "-"))))
+
+
+(defun int<mis>:valid:output? (caller name output &optional no-error?)
+  "Error if OUTPUT fails any basic sanity check for Mis Output Trees.
+
+NAME should be OUTPUT's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+NO-ERROR? should be nil/non-nil. If non-nil, will return nil instead of
+signaling an error."
+  (let ((caller (list 'int<mis>:valid:output? caller))
+        (name (int<mis>:error:name name)))
+    ;; NOTE: We do not consider `nil' a valid output tree,
+    ;; so check for explicit nil first sot we can then check for lists.
+    (cond ((null output)
+           (if no-error?
+               nil
+             (int<mis>:error caller
+                             "%S must be... something. Got: %S"
+                             name
+                             output)))
+
+          ;; NOTE: These trees are formatted as an alist with key/value cons:
+          ;;   - key: `:output'
+          ;;   - value:
+          ;;     - list of alists with key/value conses
+          ;;     - valid keys: `:string', `:metadata'
+
+          ;; An alist has to be a list.
+          ((not (listp output))
+           (if no-error?
+               nil
+             (int<mis>:error caller
+                             "%S must be a list. Got %S: %S"
+                             name
+                             (type-of output)
+                             output)))
+
+          ;; An alist has to have only lists (or cons, which are lists).
+          ((not (seq-every-p #'listp output))
+           (if no-error?
+               nil
+             (int<mis>:error caller
+                             "%S must be a list of lists. Got: %S"
+                             name
+                             output)))
+
+          ;; And we require all of them to have keywords as keys.
+          ((not (seq-every-p (lambda (output/assoc) "Ensure alist keys are keywords."
+                               (keywordp (car output/assoc)))
+                             output))
+           (if no-error?
+               nil
+             (int<mis>:error caller
+                             "%S must be an alist with keyword keys. Got: %S"
+                             name
+                             output)))
+
+          ;; Currently, the output list only has the `:output' key.
+          ((or (not (eq 1 (length output)))
+               (not (eq :output (caar output))))
+           (if no-error?
+               nil
+             (int<mis>:error caller
+                             "%S must be an alist with only `:output' key. Got: %S"
+                             name
+                             output)))
+
+          ;; Fallthrough: Failed to find a reason it's invalid so far...
+          (t
+           ;; Now... Check down inside the output list...
+           (let ((output/value (alist-get :output output))
+                 (output/value/name (int<mis>:error:name :output)))
+             ;; Should be an alist with only keys: `:string' and `:metadata'
+             ;; So... should be list of length 2.
+             (cond ((not (listp output/value))
+                    (if no-error?
+                        nil
+                      (int<mis>:error caller
+                                      "%S must be a list. Got %S: %S"
+                                      output/value/name
+                                      (type-of output/value)
+                                      output/value)))
+
+                   ;; An alist has to have only lists (or cons, which are lists).
+                   ((not (seq-every-p #'listp output/value))
+                    (if no-error?
+                        nil
+                      (int<mis>:error caller
+                                      "%S must be a list of lists. Got: %S"
+                                      output/value/name
+                                      output/value)))
+
+                   ;; And this alist should only have the 2 keys: `:string' and `:metadata'
+                   ((or (not (eq 2 (length output/value)))
+                        ;; Use `assoc' in order to allow null values.
+                        (not (assoc :string output/value))
+                        (not (assoc :string output/value)))
+                    (if no-error?
+                        nil
+                      (int<mis>:error caller
+                                      "%S must be an alist with only `:string' and `:metadata' key. Got: %S"
+                                      name
+                                      output/value)))
+
+                   ;; Fallthrough: Failed to find a reason it's invalid so it must be valid?
+                   (t)))))))
+;; (int<mis>:valid:output? 'test 'output '((:output (:string . "foo") (:metadata . "...actual metadata here"))))
+;; (int<mis>:valid:output? 'test 'syntax '((:format (:formatter repeat :string "-"))))
 
 
 ;;------------------------------------------------------------------------------
