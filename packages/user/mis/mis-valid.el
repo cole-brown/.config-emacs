@@ -904,44 +904,65 @@ signaling an error."
           ;; Fallthrough: Failed to find a reason it's invalid so far...
           (t
            ;; Now... Check down inside the output list...
-           (let ((output/value (alist-get :output output))
-                 (output/value/name (int<mis>:error:name :output)))
-             ;; Should be an alist with only keys: `:string' and `:metadata'
-             ;; So... should be list of length 2.
-             (cond ((not (listp output/value))
-                    (if no-error?
-                        nil
-                      (int<mis>:error caller
-                                      "%S must be a list. Got %S: %S"
-                                      output/value/name
-                                      (type-of output/value)
-                                      output/value)))
+           (let* ((output/value (alist-get :output output))
+                  (output/value/name (int<mis>:error:name :output))
+                  (output/value/alist/name (concat output/value/name " alist"))
+                  (valid t))
+             ;; Should be a list of alists.
+             (if (not (listp output/value))
+                 (if no-error?
+                     (setq valid nil)
+                   (int<mis>:error caller
+                                   "%S must be a list. Got %S: %S"
+                                   output/value/name
+                                   (type-of output/value)
+                                   output/value))
+               ;; Check each alist in list.
+               (dolist (output/value/alist output/value)
+                 ;; Should be an alist with only keys: `:string' and `:metadata'
+                 ;; So... should be list of length 2.
+                 (cond ((not (listp output/value/alist))
+                        (if no-error?
+                            (setq valid nil)
+                          (int<mis>:error caller
+                                          "%S must be a list. Got %S: %S"
+                                          output/value/alist/name
+                                          (type-of output/value/alist)
+                                          output/value/alist)))
 
-                   ;; An alist has to have only lists (or cons, which are lists).
-                   ((not (seq-every-p #'listp output/value))
-                    (if no-error?
-                        nil
-                      (int<mis>:error caller
-                                      "%S must be a list of lists. Got: %S"
-                                      output/value/name
-                                      output/value)))
+                       ;; An alist has to have only lists (or cons, which are lists).
+                       ((not (seq-every-p #'listp output/value/alist))
+                        (if no-error?
+                            (setq valid nil)
+                          (int<mis>:error caller
+                                          "%S must be a list of lists. Got: %S"
+                                          output/value/alist/name
+                                          output/value/alist)))
 
-                   ;; And this alist should only have the 2 keys: `:string' and `:metadata'
-                   ((or (not (eq 2 (length output/value)))
-                        ;; Use `assoc' in order to allow null values.
-                        (not (assoc :string output/value))
-                        (not (assoc :string output/value)))
-                    (if no-error?
-                        nil
-                      (int<mis>:error caller
-                                      "%S must be an alist with only `:string' and `:metadata' key. Got: %S"
-                                      name
-                                      output/value)))
+                       ;; And this alist should only have the 2 keys: `:string' and `:metadata'
+                       ((or (not (eq 2 (length output/value/alist)))
+                            ;; Use `assoc' in order to allow null values.
+                            (not (assoc :string output/value/alist))
+                            (not (assoc :string output/value/alist)))
+                        (if no-error?
+                            (setq valid nil)
+                            nil
+                          (int<mis>:error caller
+                                          "%S must be an alist with only `:string' and `:metadata' key. Got: %S"
+                                          name
+                                          output/value/alist)))
 
-                   ;; Fallthrough: Failed to find a reason it's invalid so it must be valid?
-                   (t)))))))
-;; (int<mis>:valid:output? 'test 'output '((:output (:string . "foo") (:metadata . "...actual metadata here"))))
-;; (int<mis>:valid:output? 'test 'syntax '((:format (:formatter repeat :string "-"))))
+                       ;; Fallthrough: Failed to find a reason it's invalid so it must be valid?
+                       (t)))
+               ;; Return the valid tree, or the "not valid and not erroring" return value of nil.
+               (if valid
+                   output
+                 nil)))))))
+;; Valid:
+;;   (int<mis>:valid:output? 'test 'output '((:output ((:string . "foo") (:metadata . :foo)) ((:string . "bar") (:metadata . :bar)))))
+;; Not Valid:
+;;   (int<mis>:valid:output? 'test 'output '((:output (:string . "foo") (:metadata . "...actual metadata here"))))
+;;   (int<mis>:valid:output? 'test 'output '((:format (:formatter repeat :string "-"))))
 
 
 ;;------------------------------------------------------------------------------
