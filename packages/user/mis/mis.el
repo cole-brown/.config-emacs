@@ -34,14 +34,14 @@
 (require 'mis-string)
 
 ;;------------------------------
-;; Output Printing & Output API
-;;------------------------------
-(require 'mis-print)
-
-;;------------------------------
 ;; Output API & Type Compiler
 ;;------------------------------
 (require 'mis-compile)
+
+;;------------------------------
+;; Output Printing & Output API
+;;------------------------------
+(require 'mis-print)
 
 ;;------------------------------
 ;; Input API & Output Styler
