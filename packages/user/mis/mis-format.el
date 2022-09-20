@@ -130,7 +130,9 @@ CALLER should be calling function's name. It can be one of:
          (value (int<mis>:syntax:find caller
                                       syntax
                                       :format :value))
-         output/string)
+         output/string
+         output
+         output/styled)
     (int<mis>:debug caller "syntax:    %S" syntax)
     (int<mis>:debug caller "style:     %S" style)
     (int<mis>:debug caller "formatter: %S" formatter)
@@ -198,21 +200,26 @@ CALLER should be calling function's name. It can be one of:
              (int<mis>:error caller
                              '("Unhandled formatter case `%S'!")
                              formatter))))
+    (int<mis>:debug caller "formatted string: %S" output/string)
 
     ;;------------------------------
     ;; Style formatted string & return.
     ;;------------------------------
+    (setq output (int<mis>:output caller
+                                  output/string
+                                  (int<mis>:syntax:merge/style caller
+                                                               :format
+                                                               syntax
+                                                               style)))
+    (int<mis>:debug caller "output:           %S" output)
 
-    (int<mis>:style caller
-                    (int<mis>:output caller
-                                     output/string
-                                     (int<mis>:syntax:merge/style caller
-                                                                  :format
-                                                                  syntax
-                                                                  style))
-                    :format
-                    syntax
-                    style)))
+    (setq output/styled (int<mis>:style caller
+                                        output
+                                        :format
+                                        syntax
+                                        style))
+    (int<mis>:debug caller "<--output/styled: %S" output/styled)
+    output/styled))
 ;; (int<mis>:compile:format 'test '((:format (:formatter . repeat) (:value . "-"))) '((:style (:width . 80))))
 ;; (int<mis>:compile:format 'test (mis:line "-") (mis:style :width 80))
 

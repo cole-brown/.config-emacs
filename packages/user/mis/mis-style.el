@@ -272,7 +272,8 @@ CALLER should be calling function's name. It can be one of:
                                                        category
                                                        syntax
                                                        style/parent))
-          outputs/styled)
+          outputs/styled
+          output/return)
 
       (int<mis>:debug caller
                       "style/complete: %S"
@@ -295,12 +296,15 @@ CALLER should be calling function's name. It can be one of:
             (push (car outputs/new) outputs/styled))))
 
       (int<mis>:debug caller
-                      "<--outputs:     %S"
+                      "outputs:        %S"
                       outputs/styled)
 
       ;; Done; return a Mis Output Tree from our styled outputs.
-      (int<mis>:output:from-entries caller
-                                    (nreverse outputs/styled)))))
+      (setq output/return (int<mis>:output:from-entries caller (nreverse outputs/styled)))
+      (int<mis>:debug caller
+                      "<--output:      %S"
+                      output/return)
+      output/return)))
 ;; (int<mis>:style 'test '((:output ((:string . "hi") (:metadata)))) :format '((:format (:style (:width . 10) (:align . center)))) nil)
 
 

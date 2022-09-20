@@ -134,10 +134,10 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:valid:output? 'test 'output (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz)))
 
 
-(defun int<mis>:output:from-entries (caller &rest entry)
-  "Create a Mis Output Tree from Mis Output Tree ENTRY.
+(defun int<mis>:output:from-entries (caller entries)
+  "Create a Mis Output Tree from Mis Output Tree ENTRIES.
 
-Each ENTRY should be an alist with `:string' and `:metadata' keys:
+Each entry in ENTRIES should be an alist with `:string' and `:metadata' keys:
   ((:string . \"foo\") (:metadata . [...]))
 
 CALLER should be calling function's name. It can be one of:
@@ -148,10 +148,10 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let ((caller (list 'int<mis>:output:from-entries caller)))
     (list (cons :output
-                entry))))
+                entries))))
 ;; (int<mis>:output:from-entries 'test
-;;                               '((:string . \"foo\")  (:metadata (:bar . baz)))
-;;                               '((:string . \"zort\") (:metadata (:poit . narf))))
+;;                               '(((:string . \"foo\")  (:metadata (:bar . baz)))
+;;                                 ((:string . \"zort\") (:metadata (:poit . narf)))))
 
 
 (defun int<mis>:output (caller string style/complete &optional metadata)
