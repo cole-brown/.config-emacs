@@ -129,7 +129,8 @@ CALLER should be calling function's name. It can be one of:
                                           :format :formatter))
          (value (int<mis>:syntax:find caller
                                       syntax
-                                      :format :value)))
+                                      :format :value))
+         output/string)
     (int<mis>:debug caller "syntax:    %S" syntax)
     (int<mis>:debug caller "style:     %S" style)
     (int<mis>:debug caller "formatter: %S" formatter)
@@ -163,44 +164,52 @@ CALLER should be calling function's name. It can be one of:
       (int<mis>:debug caller "<--value:  %S" value))
 
     ;;------------------------------
+    ;; Format output string.
+    ;;------------------------------
+    (setq output/string
+          (pcase formatter
+            ('repeat
+             ;; Build & return the repeated string.
+             (int<mis>:format:repeat value
+                                     (int<mis>:style:width caller style)))
+
+            ('message
+             (apply #'int<mis>:format:message
+                    caller
+                    value))
+
+            ('string
+             (if (stringp value)
+                 value
+               (int<mis>:error caller
+                               "`string' formatter expected string but got %S: %S"
+                               (type-of value)
+                               value)))
+
+            ('char
+             (if (characterp value)
+                 (make-string 1 value)
+               (int<mis>:error caller
+                               "`char' formatter expected character(/integer) but got %S: %S"
+                               (type-of value)
+                               value)))
+
+            (_
+             (int<mis>:error caller
+                             '("Unhandled formatter case `%S'!")
+                             formatter))))
+
+    ;;------------------------------
     ;; Style formatted string & return.
     ;;------------------------------
+
     (int<mis>:style caller
-                    (list
-                     ;;------------------------------
-                     ;; Format output string.
-                     ;;------------------------------
-                     (pcase formatter
-                       ('repeat
-                        ;; Build & return the repeated string.
-                        (int<mis>:format:repeat value
-                                                (int<mis>:style:width caller style)))
-
-                       ('message
-                        (apply #'int<mis>:format:message
-                               caller
-                               value))
-
-                       ('string
-                        (if (stringp value)
-                            value
-                          (int<mis>:error caller
-                                          "`string' formatter expected string but got %S: %S"
-                                          (type-of value)
-                                          value)))
-
-                       ('char
-                        (if (characterp value)
-                            (make-string 1 value)
-                          (int<mis>:error caller
-                                          "`char' formatter expected character(/integer) but got %S: %S"
-                                          (type-of value)
-                                          value)))
-
-                       (_
-                        (int<mis>:error caller
-                                        '("Unhandled formatter case `%S'!")
-                                        formatter))))
+                    (int<mis>:output caller
+                                     output/string
+                                     (int<mis>:syntax:merge/style caller
+                                                                  :format
+                                                                  syntax
+                                                                  style))
                     :format
                     syntax
                     style)))
