@@ -17,7 +17,7 @@
 (require 'mis-parse)
 (require 'mis-buffer)
 (require 'mis-string)
-
+(require 'mis-compile)
 
 ;;------------------------------------------------------------------------------
 ;; Output Trees
@@ -134,20 +134,11 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:valid:output? 'test 'output (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz)))
 
 
-(defun int<mis>:output:append (caller output string &rest metadata)
-  "Append STRING & METADATA to Mis OUTPUT Tree.
+(defun int<mis>:output:from-entries (caller &rest entry)
+  "Create a Mis Output Tree from Mis Output Tree ENTRY.
 
-STRING should be nil or a string.
-
-Each METADATA should nil or a cons of a keyword and... some value.
-
-OUTPUT should be a Mis Output Tree (can be nil). It will be updated and
-the updated value returned. Caller should set the return value back to the input
-arg as the update is not guaranteed to be in-place.
-Example:
-  (setq output (int<mis>:output:append 'test
-                                       output
-                                       \"New output string!\"))
+Each ENTRY should be an alist with `:string' and `:metadata' keys:
+  ((:string . \"foo\") (:metadata . [...]))
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -155,85 +146,15 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let ((caller (list 'int<mis>:output:append caller)))
-    ;;------------------------------
-    ;; Error Checks
-    ;;------------------------------
-    (int<mis>:valid:output? caller
-                            'output
-                            output)
-    (int<mis>:valid:string-or-nil? caller
-                                   'string
-                                   string)
-
-    (when (and (not (null metadata))
-               (not (seq-every-p (lambda (m) "Validate METADATA param."
-                                   (and
-                                    ;; Is a cons but is not a list?
-                                    (and (listp m)
-                                         (cdr m)
-                                         (atom (cdr m)))
-                                    ;; Key is a keyword?
-                                    (keywordp (car m))))
-                                 metadata)))
-      (int<mis>:error caller
-                      "Mis Output Metadata must be nil or a cons alist. Got %S: %S"
-                      (type-of metadata)
-                      metadata))
-
-    ;;------------------------------
-    ;; Append to OUTPUT
-    ;;------------------------------
-    (let ((outputs (int<mis>:output:get/outputs :output output))) ;; list of alists
-      ;; Update OUTPUT.
-      (setf (alist-get :output output)
-            ;; Add to the end of the list of alists.
-            (append outputs
-                    (list ;; list of...
-                     (list (cons :string string) ;; alist of string & metadata
-                           (cons :metadata metadata)))))
-      ;; And return updated OUTPUT.
-      output)))
-;; (int<mis>:output:append 'test
-;;                         (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz))
-;;                         "zort"
-;;                         (cons :poit 'narf))
+  (let ((caller (list 'int<mis>:output:from-entries caller)))
+    (list (cons :output
+                entry))))
+;; (int<mis>:output:from-entries 'test
+;;                               '((:string . \"foo\")  (:metadata (:bar . baz)))
+;;                               '((:string . \"zort\") (:metadata (:poit . narf))))
 
 
-(defun int<mis>:output:create-or-append (caller output string &rest metadata)
-  "Create or append to the Mis OUTPUT Tree, depending on if it exists currently.
-
-Will call either `int<mis>:output:create' or `int<mis>:output:append'.
-
-STRING should be nil or a string.
-
-Each METADATA should nil or a cons of a keyword and... some value.
-
-OUTPUT should be a Mis Output Tree (can be nil). It will be updated and
-the updated value returned. Caller should set the return value back to the input
-arg as the update is not guaranteed to be in-place.
-Example:
-  (setq output (int<mis>:output:create-or-append 'test
-                                                 output
-                                                 \"hello there\"
-                                                 '(:align . :center)))
-
-CALLER should be calling function's name. It can be one of:
-  - a string
-  - a quoted symbol
-  - a function-quoted symbol
-  - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (apply (if output
-             #'int<mis>:output:update
-           #'int<mis>:output:create)
-         (list 'int<mis>:output:create-or-append caller)
-         output
-         string
-         metadata))
-
-
-(defun int<mis>:output (caller string style/complete)
+(defun int<mis>:output (caller string style/complete &optional metadata)
   "Create a Mis Output Tree from STRING & style data in SYNTAX and STYLE.
 
 STRING should be a formatted/propertized/etc string for outputting.
@@ -241,31 +162,41 @@ STRING should be a formatted/propertized/etc string for outputting.
 STYLE/COMPLETE should be nil or a `:style' Mis Syntax Tree. It should be the
 full & complete styling tree for STRING.
 
+METADATA should be nil or a Mis Output Tree node's metadata alist.
+
 CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let ((caller (list 'int<mis>:output caller))
-        metadata) ;; alist
+  (let ((caller (list 'int<mis>:output caller)))
     (int<mis>:debug caller
                     "string:         %S"
                     string)
     (int<mis>:debug caller
                     "style/complete: %S"
                     style/complete)
+    (int<mis>:debug caller
+                    "metadata:       %S"
+                    metadata)
 
     ;; Check each styling keyword in `style/complete' to see if it's metadata-worthy.
+    ;; If so, (over)write to METADATA alist.
     (dolist (kvp (int<mis>:syntax:get/value caller :style style/complete))
       (int<mis>:debug caller
                         "metadata kvp:   %S"
                         kvp)
-      (when (memq (car kvp) int<mis>:keywords:metadata)
+      (let ((key   (car kvp))
+            (value (cdr kvp)))
         (int<mis>:debug caller
-                        "metadata kvp:   %S"
-                        kvp)
-        (push kvp metadata)))
+                        "metadata key:   %S"
+                        key)
+        (int<mis>:debug caller
+                        "metadata value: %S"
+                        value)
+        (when (memq key int<mis>:keywords:metadata)
+          (setf (alist-get key metadata) value))))
 
     ;; Create the Mis Output Tree.
     (apply #'int<mis>:output:create
@@ -273,6 +204,7 @@ CALLER should be calling function's name. It can be one of:
            string
            metadata)))
 ;; (int<mis>:output 'test "hello there" (mis:style :width 42 :align 'center))
+;; (int<mis>:output 'test "hello there" (mis:style :width 42 :align 'center) '((:width . 11) (:align . left)))
 
 
 ;;------------------------------------------------------------------------------

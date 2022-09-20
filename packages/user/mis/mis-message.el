@@ -70,7 +70,7 @@ ARGS should be the `format' ARGS for MESSAGE."
 
 BUFFER should be a buffer or string.
 
-MESSAGES should be a list of strings.
+STRINGS should be a list of strings.
 
 CALLER should be calling function's name. It can be one of:
   - a string

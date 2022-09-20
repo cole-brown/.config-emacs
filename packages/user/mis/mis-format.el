@@ -103,7 +103,7 @@ LENGTH should be an integer greater than zero."
 
 
 ;;------------------------------------------------------------------------------
-;; Output Builder
+;; Compiler
 ;;------------------------------------------------------------------------------
 
 (defun int<mis>:compile:format (caller syntax style)

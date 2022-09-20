@@ -119,10 +119,106 @@ CALLER should be calling function's name. It can be one of:
 (int<mis>:styler:register :padding #'int<mis>:style:styler/no-op)
 
 
-(defun int<mis>:style (caller strings category syntax style/parent)
-  "Style the list of STRINGS with styling from SYNTAX & STYLE/PARENT.
+(defun int<mis>:style/output-entry (caller entry syntax style/complete)
+  "`int<mis>:style' helper: Style a single ENTRY from a Mis Output Tree.
+For example, assuming Mis Output Tree is:
+  '((:output ((:string . \"foo\")  (:metadata (:bar . baz)))
+             ((:string . \"zort\") (:metadata (:poit . narf))))
+OUTPUT should be:
+  1. '((:string . \"foo\")  (:metadata (:bar . baz)))
+or:
+  2. '((:string . \"zort\") (:metadata (:poit . narf)))
 
-STRINGS should be a list of compiled strings to be styled.
+SYNTAX should be nil or a Mis Syntax Tree. Its styling is ignored; only
+STYLE/COMPLETE is used.
+
+STYLE/COMPLETE should be nil or a `:style' Mis Syntax Tree.
+Example: (mis:style :width 80) -> '((:style (:width . 80)))
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller        (list 'int<mis>:style/string caller))
+         (string/styled (int<mis>:output:get/string caller entry)) ; Initial assumption: it's already styled or nothing more to do.
+         (metadata      (int<mis>:output:get/metadata caller entry)))
+    (int<mis>:debug caller
+                    "entry:         %S"
+                    entry)
+    (int<mis>:debug caller
+                    "string:         %S"
+                    string/styled)
+    (int<mis>:debug caller
+                    "metadata:       %S"
+                    metadata)
+    (int<mis>:debug caller
+                    "style/complete: %S"
+                    style/complete)
+
+    ;; No error checks; expect parent to provide valid params.
+
+    ;;------------------------------
+    ;; Style!
+    ;;------------------------------
+    ;; Check each styling keyword in `style/complete' to see if it wants to
+    ;; mutate the output string any.
+    (dolist (kvp (int<mis>:syntax:get/value caller :style style/complete))
+      (int<mis>:debug caller
+                      "styling kvp:    %S"
+                      kvp)
+      (let* ((key    (car kvp))
+             (value  (cdr kvp))
+             (styler (int<mis>:styler:get key)))
+        (int<mis>:debug caller
+                        "styling key:    %S"
+                        key)
+        (int<mis>:debug caller
+                        "styling value:  %S"
+                        value)
+        (int<mis>:debug caller
+                        "styler func:    %S"
+                        styler)
+
+        (unless (functionp styler)
+          (int<mis>:error caller
+                          '("No valid styler found! "
+                            "keyword: %S, "
+                            "value: %S, "
+                            "styler: %S")
+                          key
+                          value
+                          styler))
+        ;; `key' & `value' should have already been validated during parsing, so
+        ;; just use 'em as-is.
+        (setq string/styled (funcall styler
+                                     caller
+                                     string/styled
+                                     syntax
+                                     style/complete
+                                     key
+                                     value))
+
+        (int<mis>:debug caller
+                        "<--string:      %S"
+                        string/styled)))
+
+    ;; Done; return a new Mis Output Tree (with pre-existing metadata).
+    (int<mis>:output caller
+                     string/styled
+                     style/complete
+                     metadata)))
+;; (int<mis>:style/output-entry 'test
+;;                              '((:string . "hello there") (:metadata (:foo . "bar")))
+;;                              nil
+;;                              '((:style (:width . 20) (:align . center))))
+
+
+(defun int<mis>:style (caller output category syntax style/parent)
+  "Style the Mis OUTPUT Tree with styling from SYNTAX & STYLE/PARENT.
+
+OUTPUT should be a Mis OUTPUT Tree to be styled.
 
 CATEGORY should be nil or a keyword from `int<mis>:keywords:category/internal'.
 It is the category in SYNTAX that we will look under for styling.
@@ -140,27 +236,9 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let ((caller (list 'int<mis>:style caller)))
-    ;;------------------------------
-    ;; Error Checks
-    ;;------------------------------
-    (cond ((not (int<mis>:style:exclusive? style/parent))
-           (int<mis>:error caller
-                           "STYLE/PARENT must be nil or exclusively styling. Got: %S"
-                           style/parent))
-
-          ((or (not (listp strings))
-               ;; NOTE: If a null string is ok, update this.
-               (not (seq-every-p #'stringp strings)))
-           (int<mis>:error caller
-                           "STRINGS must be a list of strings. Got: %S"
-                           strings))
-
-          (t
-           nil))
-
     (int<mis>:debug caller
-                    "strings:        %S"
-                    strings)
+                    "output:         %S"
+                    output)
     (int<mis>:debug caller
                     "category:       %S"
                     category)
@@ -172,66 +250,58 @@ CALLER should be calling function's name. It can be one of:
                     style/parent)
 
     ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (cond ((not (int<mis>:style:exclusive? style/parent))
+           (int<mis>:error caller
+                           "STYLE/PARENT must be nil or exclusively styling. Got: %S"
+                           style/parent))
+
+          ((not (int<mis>:valid:output? caller 'output output))
+           (int<mis>:error caller
+                           "OUTPUT must be a Mis OUTPUT Tree. Got: %S"
+                           output))
+
+          (t
+           nil))
+
+    ;;------------------------------
     ;; Style!
     ;;------------------------------
     (let ((style/complete (int<mis>:syntax:merge/style caller
                                                        category
                                                        syntax
                                                        style/parent))
-          ;; Initial assumption: it's already styled or nothing more to do.
-          (string/styled (apply #'concat strings)))
+          outputs/styled)
 
       (int<mis>:debug caller
                       "style/complete: %S"
                       style/complete)
 
-      ;; Check each styling keyword in `style/complete' to see if it wants to
-      ;; mutate the output string any.
-      (dolist (kvp (int<mis>:syntax:get/value caller :style style/complete))
-        (int<mis>:debug caller
-                        "styling kvp:    %S"
-                        kvp)
-        (let* ((key    (car kvp))
-               (value  (cdr kvp))
-               (styler (int<mis>:styler:get key)))
-          (int<mis>:debug caller
-                          "styling key:    %S"
-                          key)
-          (int<mis>:debug caller
-                          "styling value:  %S"
-                          value)
-          (int<mis>:debug caller
-                          "styler func:    %S"
-                          styler)
+      ;; Style each entry in OUTPUT.
+      (dolist (entry (int<mis>:output:get/outputs caller output))
+        (let ((outputs/new (int<mis>:output:get/outputs
+                            caller
+                            (int<mis>:style/output-entry caller
+                                                         entry
+                                                         syntax
+                                                         style/complete))))
+          (if (> (length outputs/new) 1)
+              (int<mis>:error caller
+                              '("Expecting only one styled result from only one entry. "
+                                "entry: %S, outputs/new: %S")
+                              entry
+                              outputs/new)
+            (push (car outputs/new) outputs/styled))))
 
-          (unless (functionp styler)
-            (int<mis>:error caller
-                            '("No valid styler found! "
-                              "keyword: %S, "
-                              "value: %S, "
-                              "styler: %S")
-                            key
-                            value
-                            styler))
-          ;; `key' & `value' should have already been validated during parsing, so
-          ;; just use 'em as-is.
-          (setq string/styled (funcall styler
-                                       caller
-                                       string/styled
-                                       syntax
-                                       style/complete
-                                       key
-                                       value))
+      (int<mis>:debug caller
+                      "<--outputs:     %S"
+                      outputs/styled)
 
-          (int<mis>:debug caller
-                          "<--string:      %S"
-                          string/styled)))
-
-      ;; Done; return a Mis Output Tree.
-      (int<mis>:output caller
-                       string/styled
-                       style/complete))))
-;; (int<mis>:style 'test '("hello") :format '((:format (:style (:width . 10) (:align . center)))) nil)
+      ;; Done; return a Mis Output Tree from our styled outputs.
+      (int<mis>:output:from-entries caller
+                                    (nreverse outputs/styled)))))
+;; (int<mis>:style 'test '((:output ((:string . "hi") (:metadata)))) :format '((:format (:style (:width . 10) (:align . center)))) nil)
 
 
 ;;------------------------------------------------------------------------------

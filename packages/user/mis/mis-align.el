@@ -98,6 +98,23 @@ Return an aligned string. If STRING is too long, returns it as-is
          (width   (int<mis>:style:width caller style))
          (padding (int<mis>:style:padding caller style " ")))
 
+
+    (int<mis>:debug caller
+                    "alignment: %S"
+                    alignment)
+    (int<mis>:debug caller
+                    "string:    %S"
+                    string)
+    (int<mis>:debug caller
+                    "style:    %S"
+                    style)
+    (int<mis>:debug caller
+                    "width:    %S"
+                    width)
+    (int<mis>:debug caller
+                    "padding:    %S"
+                    padding)
+
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
