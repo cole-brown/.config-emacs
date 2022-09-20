@@ -134,11 +134,17 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Finalize
     ;;------------------------------
-    (when (not (seq-every-p #'stringp output))
+    ;; Should have only Mis Output Trees after compiling.
+    (when (not (seq-every-p (lambda (each) "Verify each in output is Mis Output Tree."
+                              (int<mis>:valid:output? caller
+                                                      'output/each
+                                                      each
+                                                      :no-error))
+                            output))
       (int<mis>:error caller
-                      "Syntax should have been compiled to strings, got: %S"
+                      "Syntax should have been compiled to Mis Output Trees; got: %S"
                       output))
-    ;; Concat pieces into final string, and we can finally style it.
+    ;; Concat MOT strings into final string with final styling.
     (int<mis>:style caller
                     (nreverse output)
                     nil
@@ -236,7 +242,7 @@ CALLER should be calling function's name. It can be one of:
                            syntax
                            style/parent))
 ;; (int<mis>:compile 'test '((:format (:formatter . repeat) (:value . "-"))) (mis:style :width 80))
-;; (int<mis>:compile 'test (mis:comment "hi") (mis:style :width 80))
+;; (int<mis>:compile 'test (mis:string "hi") (mis:style :width 80))
 ;; (int<mis>:compile 'test (mis:comment (mis:line "-")))
 
 
