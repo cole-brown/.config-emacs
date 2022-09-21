@@ -110,7 +110,8 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:compile:syntax caller))
-         output)
+         output
+         output/styled)
 
     ;;------------------------------
     ;; Compile!
@@ -134,7 +135,7 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Finalize
     ;;------------------------------
-    ;; Should have only Mis Output Trees after compiling.
+    ;; Should have a list of Mis Output Trees after compiling.
     (when (not (seq-every-p (lambda (each) "Verify each in output is Mis Output Tree."
                               (int<mis>:valid:output? caller
                                                       'output/each
@@ -144,12 +145,29 @@ CALLER should be calling function's name. It can be one of:
       (int<mis>:error caller
                       "Syntax should have been compiled to Mis Output Trees; got: %S"
                       output))
-    ;; Concat MOT strings into final string with final styling.
-    (int<mis>:style caller
-                    (nreverse output)
-                    nil
-                    nil
-                    style/parents)))
+
+    ;; Style each of the MOT strings.
+    (setq output (nreverse output))
+    (int<mis>:debug caller
+                    "outputs to style:  %S"
+                    output)
+    (dolist (each output)
+      (let ((styled (int<mis>:style caller
+                                    each
+                                    nil
+                                    nil
+                                    style/parents)))
+        (int<mis>:debug caller
+                        "styled output:     %S"
+                        styled)
+        (push styled output/styled)))
+
+    ;; Fix ordering of the list of Mis Output Trees for returning.
+    (setq output/styled (nreverse output/styled))
+    (int<mis>:debug caller
+                    "<--styled outputs: %S"
+                    output/styled)
+    output/styled))
 ;; (int<mis>:compile:syntax 'test (mis:string "-"))
 ;; (int<mis>:compile:syntax 'test (mis:line "-"))
 
