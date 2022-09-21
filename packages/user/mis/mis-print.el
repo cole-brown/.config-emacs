@@ -134,6 +134,56 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:valid:output? 'test 'output (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz)))
 
 
+(defun int<mis>:output:append (caller existing new)
+  "Append Mis Output Tree NEW onto Mis Output Tree EXISTING.
+
+EXISTING and NEW should both be either nil or a Mis Output Tree.
+
+Return updated EXISTING Mis Output Tree. Caller should set the return value back
+to the input arg as the update is not guaranteed to be in-place.
+Example:
+  (setq output/existing (int<mis>:output:append 'example
+                                                output/existing
+                                                output/new))
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:output:append caller))
+         ;; Make 'em backwards so we can append and un-backwards at the end.
+         (existing/entries (nreverse (int<mis>:output:get/outputs caller existing))))
+    (int<mis>:debug caller "existing: %S" existing)
+    (int<mis>:debug caller "new:      %S" new)
+
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (int<mis>:valid:output? caller 'existing existing)
+    (int<mis>:valid:output? caller 'new      new)
+
+    ;;------------------------------
+    ;; Append & Return
+    ;;------------------------------
+    ;; Append the new MOT's outputs to the existing one's.
+    (dolist (entry/new (int<mis>:output:get/outputs caller new))
+      (push entry/new existing/entries))
+
+    ;; Recombobulate return value.
+    (int<mis>:output:from-entries caller
+                                  (nreverse existing/entries))))
+;; (int<mis>:output:append 'test
+;;                         '((:output
+;;                            ((:string . \"foo-0\" ) (:metadata (:bar:0  . baz0 )))
+;;                            ((:string . \"foo-1\" ) (:metadata (:bar:1  . baz1 )))
+;;                            ((:string . \"foo-2\" ) (:metadata (:bar:2  . baz2 )))))
+;;                         '((:output
+;;                            ((:string . \"narf\") (:metadata (:zort . poit)))
+;;                            ((:string . \"egad\") (:metadata (:troz . fiddely-posh))))))
+
+
 (defun int<mis>:output:from-entries (caller entries)
   "Create a Mis Output Tree from Mis Output Tree ENTRIES.
 
