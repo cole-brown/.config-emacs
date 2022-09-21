@@ -110,6 +110,7 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:compile:syntax caller))
+         output/trees
          output
          output/styled)
 
@@ -130,42 +131,42 @@ CALLER should be calling function's name. It can be one of:
                        caller
                        syntax/branch
                        style/parents)
-              output)))
+              output/trees)))
+    (int<mis>:debug caller
+                    "compiled outputs: %S"
+                    output)
 
+    ;;------------------------------
+    ;; Validate
+    ;;------------------------------
+    ;; Should have a list of Mis Output Trees after compiling.
+    ;; Combine into one Mis Output Tree while checking that.
+    (dolist (tree (nreverse output/trees))
+      (unless (int<mis>:valid:output? caller
+                                      'tree
+                                      tree
+                                      :no-error)
+        (int<mis>:error caller
+                        "Invalid Mis Output Tree in compiled result: tree: %S, from: %S"
+                        tree
+                        output/trees))
+      (setq output (int<mis>:output:append caller
+                                           output
+                                           tree)))
     ;;------------------------------
     ;; Finalize
     ;;------------------------------
-    ;; Should have a list of Mis Output Trees after compiling.
-    (when (not (seq-every-p (lambda (each) "Verify each in output is Mis Output Tree."
-                              (int<mis>:valid:output? caller
-                                                      'output/each
-                                                      each
-                                                      :no-error))
-                            output))
-      (int<mis>:error caller
-                      "Syntax should have been compiled to Mis Output Trees; got: %S"
-                      output))
-
-    ;; Style each of the MOT strings.
-    (setq output (nreverse output))
+    ;; Style all of the MOT strings.
     (int<mis>:debug caller
-                    "outputs to style:  %S"
+                    "output to style:  %S"
                     output)
-    (dolist (each output)
-      (let ((styled (int<mis>:style caller
-                                    each
-                                    nil
-                                    nil
-                                    style/parents)))
-        (int<mis>:debug caller
-                        "styled output:     %S"
-                        styled)
-        (push styled output/styled)))
-
-    ;; Fix ordering of the list of Mis Output Trees for returning.
-    (setq output/styled (nreverse output/styled))
+    (setq output/styled (int<mis>:style caller
+                                        output
+                                        nil
+                                        nil
+                                        style/parents))
     (int<mis>:debug caller
-                    "<--styled outputs: %S"
+                    "<--styled output: %S"
                     output/styled)
     output/styled))
 ;; (int<mis>:compile:syntax 'test (mis:string "-"))
