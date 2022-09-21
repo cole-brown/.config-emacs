@@ -159,21 +159,34 @@ CALLER should be calling function's name. It can be one of:
     (int<mis>:debug caller "new:      %S" new)
 
     ;;------------------------------
-    ;; Error Checks
+    ;; Null Checks
     ;;------------------------------
-    (int<mis>:valid:output? caller 'existing existing)
-    (int<mis>:valid:output? caller 'new      new)
+    (cond ((null existing)
+           new)
 
-    ;;------------------------------
-    ;; Append & Return
-    ;;------------------------------
-    ;; Append the new MOT's outputs to the existing one's.
-    (dolist (entry/new (int<mis>:output:get/outputs caller new))
-      (push entry/new existing/entries))
+          ((null new)
+           existing)
 
-    ;; Recombobulate return value.
-    (int<mis>:output:from-entries caller
-                                  (nreverse existing/entries))))
+          ;; Both exist so actually append them.
+          (t
+           ;;------------------------------
+           ;; Error Checks
+           ;;------------------------------
+           (int<mis>:valid:output? caller 'existing existing)
+           (int<mis>:valid:output? caller 'new      new)
+
+           ;;------------------------------
+           ;; Append & Return
+           ;;------------------------------
+           ;; Append the new MOT's outputs to the existing one's.
+           (dolist (entry/new (int<mis>:output:get/outputs caller new))
+             (push entry/new existing/entries))
+
+           ;; Recombobulate return value.
+           (int<mis>:output:from-entries caller
+                                         (nreverse existing/entries))))))
+;; (int<mis>:output:append 'test nil '((:output ((:string . \"foo-0\" ) (:metadata (:bar:0  . baz0 ))))))
+;; (int<mis>:output:append 'test '((:output ((:string . \"foo-0\" ) (:metadata (:bar:0  . baz0 ))))) nil)
 ;; (int<mis>:output:append 'test
 ;;                         '((:output
 ;;                            ((:string . \"foo-0\" ) (:metadata (:bar:0  . baz0 )))
