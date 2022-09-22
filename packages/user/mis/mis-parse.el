@@ -264,7 +264,11 @@ example: '(:width . 10)
 SYNTAX should be a Mis abstract syntax tree. It will be updated with KVPs and
 the updated value returned. Caller should set the return value back to the input
 arg as the update is not guaranteed to be in-place.
-Example: (setq syntax (int<mis>:syntax:update 'test :style syntax '(:align . :center)))
+Example:
+  (setq syntax (int<mis>:syntax:update 'example
+                                       :style
+                                       syntax
+                                       '(:align . :center)))
 
 CALLER should be calling function's name. It can be one of:
   - a string

@@ -212,7 +212,9 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Compile
     ;;------------------------------
-    (let* (output)
+    (let* (output/trees
+           output
+           output/styled)
 
       ;; And now we can just loop into the core compiling function.
       (dolist (child syntax/children)
@@ -223,20 +225,42 @@ CALLER should be calling function's name. It can be one of:
           (push (int<mis>:compile:syntax caller
                                          syntax/child   ;; Childrens' styling will come from their syntax.
                                          style/parents) ;; Parents' styling cascades into children.
-                output)))
+                output/trees)))
 
-      ;;------------------------------
-      ;; Finalize
-      ;;------------------------------
-      (when (not (seq-every-p #'stringp output))
+    ;;------------------------------
+    ;; Validate
+    ;;------------------------------
+    ;; Should have a list of Mis Output Trees after compiling.
+    ;; Combine into one Mis Output Tree while checking that.
+    (dolist (tree (nreverse output/trees))
+      (unless (int<mis>:valid:output? caller
+                                      'tree
+                                      tree
+                                      :no-error)
         (int<mis>:error caller
-                        "Children should have been compiled to strings, got: %S"
-                        output))
-      (int<mis>:style caller
-                      (nreverse output)
-                      nil
-                      nil
-                      style/parents))))
+                        "Invalid Mis Output Tree in compiled result: tree: %S, from: %S"
+                        tree
+                        output/trees))
+      (setq output (int<mis>:output:append caller
+                                           output
+                                           tree)))
+
+    ;;------------------------------
+    ;; Finalize
+    ;;------------------------------
+    ;; Style all of the MOT strings.
+    (int<mis>:debug caller
+                    "output to style:  %S"
+                    output)
+    (setq output/styled (int<mis>:style caller
+                                        output
+                                        nil
+                                        nil
+                                        style/parents))
+    (int<mis>:debug caller
+                    "<--styled output: %S"
+                    output/styled)
+    output/styled)))
 ;; (int<mis>:compile:children 'test :parent '((:parent (:children (:format (:formatter . string) (:value . "-"))))))
 
 
