@@ -341,7 +341,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller (list 'int<mis>:compile:output caller))
+  (let* ((caller (list 'int<mis>:output:reduce caller))
          string/reduced
          metadata/reduced
          output/reduced)
@@ -377,7 +377,7 @@ CALLER should be calling function's name. It can be one of:
                                                            (apply #'int<mis>:output:create
                                                                   caller
                                                                   string/reduced
-                                                                  (nreverse metadata/reduced)))
+                                                                  metadata/reduced))
                     string/reduced   nil
                     metadata/reduced nil)
               (int<mis>:debug caller
@@ -413,7 +413,7 @@ CALLER should be calling function's name. It can be one of:
                                                        (apply #'int<mis>:output:create
                                                               caller
                                                               string/reduced
-                                                              (nreverse metadata/reduced)))
+                                                              metadata/reduced))
                 string/reduced   nil
                 metadata/reduced nil)
           (int<mis>:debug caller
@@ -428,7 +428,7 @@ CALLER should be calling function's name. It can be one of:
                                                  (apply #'int<mis>:output:create
                                                         caller
                                                         string/reduced
-                                                        (nreverse metadata/reduced))))
+                                                        metadata/reduced)))
     (int<mis>:debug caller
                     "<--output:      %S"
                     output/reduced)
@@ -448,6 +448,76 @@ CALLER should be calling function's name. It can be one of:
 ;;                            ((:string . "\nfoo-2") (:metadata (:bar:2 . baz2)))
 ;;                            ((:string . "narf") (:metadata (:zort . poit)))
 ;;                            ((:string . "egad") (:metadata (:troz . fiddely-posh))))))
+
+
+(defun int<mis>:output:finalize (caller output)
+  "Reduce the Mis OUTPUT Tree into a single string/metadata MOT.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:output:finalize caller))
+         string/finalized
+         metadata/finalized
+         output/finalized)
+    (int<mis>:debug caller
+                    "output:         %S"
+                    output)
+
+    ;;------------------------------
+    ;; Finalize Outputs
+    ;;------------------------------
+    (dolist (entry (int<mis>:output:get/outputs caller output))
+      (int<mis>:debug caller
+                      "entry:          %S"
+                      entry)
+      (let* ((string/entry   (int<mis>:output:get/string caller entry))
+             (metadata/entry (int<mis>:output:get/metadata caller entry)))
+        (int<mis>:debug caller
+                        "string/entry:   %S"
+                        string/entry)
+        (int<mis>:debug caller
+                        "meta/entry:     %S"
+                        metadata/entry)
+
+        ;; Combine strings.
+        (unless (or (null string/entry)
+                    (string-empty-p string/entry))
+          (setq string/finalized
+                (if (null string/finalized)
+                    string/entry
+                  (concat string/finalized string/entry)))
+          (int<mis>:debug caller
+                          "concat:         %S"
+                          string/finalized))
+        ;; Combine metadatas.
+        (setq metadata/finalized
+              (int<mis>:output:update/metadata caller metadata/finalized metadata/entry))
+        (int<mis>:debug caller
+                        "meta:          %S"
+                        metadata/finalized)))
+
+    ;;------------------------------
+    ;; Return finalized as a MOT
+    ;;------------------------------
+    (setq output/finalized (apply #'int<mis>:output:create
+                                  caller
+                                  string/finalized
+                                  metadata/finalized))
+    (int<mis>:debug caller
+                    "<--output:      %S"
+                    output/finalized)
+    output/finalized))
+;; (int<mis>:output:finalize 'test
+;;                           '((:output
+;;                              ((:string . "\nfoo-0") (:metadata (:bar:0 . baz0)))
+;;                              ((:string . "foo-1\n") (:metadata (:bar:1 . baz1)))
+;;                              ((:string . "\nfoo-2") (:metadata (:bar:2 . baz2)))
+;;                              ((:string . "narf") (:metadata (:zort . poit)))
+;;                              ((:string . "egad") (:metadata (:troz . fiddely-posh))))))
 
 
 
