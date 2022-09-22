@@ -365,46 +365,52 @@ CALLER should be calling function's name. It can be one of:
                         "meta/entry:     %S"
                         metadata/entry)
 
-        ;; Should we start a new entry? Part 1: Prefix?
-        ;;  - Yes if the new string starts with a newline and we are not just starting off.
-        (if (and (string-prefix-p "\n" string/entry)
-                 (or string/reduced
-                     metadata/reduced))
-            ;; Yes; add this entry into our output and start anew.
-            (progn
-              (setq output/reduced (int<mis>:output:append caller
-                                                           output/reduced
-                                                           (apply #'int<mis>:output:create
-                                                                  caller
-                                                                  string/reduced
-                                                                  metadata/reduced))
-                    string/reduced   nil
-                    metadata/reduced nil)
-              (int<mis>:debug caller
-                              "output/reduced: %S"
-                              output/reduced))
-
-          ;; No; keep going with the current...
-
-          ;; Combine strings.
-          (unless (or (null string/entry)
-                      (string-empty-p string/entry))
-            (setq string/reduced
-                  (if (null string/reduced)
-                      string/entry
-                    (concat string/reduced string/entry)))
-            (int<mis>:debug caller
-                            "concat:         %S"
-                            string/reduced))
-          ;; Combine metadatas.
-          (setq metadata/reduced
-                (int<mis>:output:update/metadata caller metadata/reduced metadata/entry))
+        ;;---
+        ;; Should we start a new entry?
+        ;;   - Part 1: Prefix?
+        ;;---
+        ;; Yes if the new string starts with a newline and we are not just starting off.
+        (when (and (string-prefix-p "\n" string/entry)
+                   (or string/reduced
+                       metadata/reduced))
+          ;; Yes; add this entry into our output and start anew.
+          (setq output/reduced (int<mis>:output:append caller
+                                                       output/reduced
+                                                       (apply #'int<mis>:output:create
+                                                              caller
+                                                              string/reduced
+                                                              metadata/reduced))
+                string/reduced   nil
+                metadata/reduced nil)
           (int<mis>:debug caller
-                          "meta:          %S"
-                          metadata/reduced))
+                          "output/reduced: %S"
+                          output/reduced))
 
-        ;; Should we start a new entry? Part 2: Postfix?
-        ;;  - Yes if the built string ends with a newline.
+        ;;---
+        ;; Process this string/metadata...
+        ;;---
+        ;; Combine strings.
+        (unless (or (null string/entry)
+                    (string-empty-p string/entry))
+          (setq string/reduced
+                (if (null string/reduced)
+                    string/entry
+                  (concat string/reduced string/entry)))
+          (int<mis>:debug caller
+                          "concat:         %S"
+                          string/reduced))
+        ;; Combine metadatas.
+        (setq metadata/reduced
+              (int<mis>:output:update/metadata caller metadata/reduced metadata/entry))
+        (int<mis>:debug caller
+                        "meta:          %S"
+                        metadata/reduced)
+
+        ;;---
+        ;; Should we start a new entry?
+        ;;   - Part 2: Postfix?
+        ;;---
+        ;; Yes if the built string ends with a newline.
         (when (and string/reduced
                    (string-suffix-p "\n" string/reduced))
           ;; Yes; add this entry into our output and start anew.
@@ -441,13 +447,13 @@ CALLER should be calling function's name. It can be one of:
 ;;                            ((:string . "narf") (:metadata (:zort . poit)))
 ;;                            ((:string . "egad") (:metadata (:troz . fiddely-posh))))))
 ;;
-;; (int<mis>:output:reduce 'test
-;;                         '((:output
-;;                            ((:string . "\nfoo-0") (:metadata (:bar:0 . baz0)))
-;;                            ((:string . "foo-1\n") (:metadata (:bar:1 . baz1)))
-;;                            ((:string . "\nfoo-2") (:metadata (:bar:2 . baz2)))
-;;                            ((:string . "narf") (:metadata (:zort . poit)))
-;;                            ((:string . "egad") (:metadata (:troz . fiddely-posh))))))
+(int<mis>:output:reduce 'test
+                        '((:output
+                           ((:string . "\nfoo-0") (:metadata (:bar:0 . baz0)))
+                           ((:string . "foo-1\n") (:metadata (:bar:1 . baz1)))
+                           ((:string . "\nfoo-2") (:metadata (:bar:2 . baz2)))
+                           ((:string . "\nnarf") (:metadata (:zort . poit)))
+                           ((:string . "zort\ntroz") (:metadata (:egad . fiddely-posh))))))
 
 
 (defun int<mis>:output:finalize (caller output)
