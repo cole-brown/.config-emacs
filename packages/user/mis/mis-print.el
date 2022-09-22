@@ -69,7 +69,7 @@ CALLER should be calling function's name. It can be one of:
 
 
 (defun int<mis>:output:get/metadata (caller output)
-  "Return output string from OUTPUT alist.
+  "Return output metadata from OUTPUT alist.
 
 OUTPUT should be an alist with key/value conses.
   - valid keys: `:string', `:metadata'
@@ -82,6 +82,46 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (alist-get :metadata output))
 ;; (int<mis>:output:get/metadata 'test '((:string . "foo") (:metadata . :foo)))
+;; (int<mis>:output:get/metadata
+;;  'test
+;;  (nth 0 (int<mis>:output:get/outputs 'test
+;;                                      (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
+
+
+(defun int<mis>:output:update/metadata (caller existing new)
+  "Update/overwrite EXISTING metadata with NEW metatada.
+
+Return updated EXISTING Mis Output Tree. Caller should save the return value as
+the update is not guaranteed to be in-place.
+Example:
+  (setq metadata/existing (int<mis>:output:update/metadata 'example
+                                                            metadata/existing
+                                                            metadata/new))
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:output:update/metadata)))
+    (dolist (each/new new)
+      (let ((key (car each/new))
+            (value (cdr each/new)))
+        ;; Add/overwrite NEW's key/value to EXISTING.
+        (setf (alist-get key existing) value)))
+
+    existing))
+;; (int<mis>:output:update/metadata
+;;  'test
+;;  (int<mis>:output:get/metadata
+;;   'test
+;;   (nth 0 (int<mis>:output:get/outputs 'test
+;;                                       (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
+;;  (int<mis>:output:get/metadata
+;;   'test
+;;   (nth 0 (int<mis>:output:get/outputs 'test
+;;                                       (int<mis>:output:create 'test "also this" '(:align . center))))))
 
 
 (defun int<mis>:output:create (caller string &rest metadata)
