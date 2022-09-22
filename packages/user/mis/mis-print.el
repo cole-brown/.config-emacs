@@ -91,6 +91,8 @@ CALLER should be calling function's name. It can be one of:
 (defun int<mis>:output:update/metadata (caller existing new)
   "Update/overwrite EXISTING metadata with NEW metatada.
 
+EXISTING and NEW should be nil or a Mis Output Tree.
+
 Return updated EXISTING Mis Output Tree. Caller should save the return value as
 the update is not guaranteed to be in-place.
 Example:
@@ -118,6 +120,22 @@ CALLER should be calling function's name. It can be one of:
 ;;   'test
 ;;   (nth 0 (int<mis>:output:get/outputs 'test
 ;;                                       (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
+;;  (int<mis>:output:get/metadata
+;;   'test
+;;   (nth 0 (int<mis>:output:get/outputs 'test
+;;                                       (int<mis>:output:create 'test "also this" '(:align . center))))))
+;;
+;; (int<mis>:output:update/metadata
+;;  'test
+;;  (int<mis>:output:get/metadata
+;;   'test
+;;   (nth 0 (int<mis>:output:get/outputs 'test
+;;                                       (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
+;;  nil)
+;;
+;; (int<mis>:output:update/metadata
+;;  'test
+;;  nil
 ;;  (int<mis>:output:get/metadata
 ;;   'test
 ;;   (nth 0 (int<mis>:output:get/outputs 'test
@@ -308,6 +326,79 @@ CALLER should be calling function's name. It can be one of:
            metadata)))
 ;; (int<mis>:output 'test "hello there" (mis:style :width 42 :align 'center))
 ;; (int<mis>:output 'test "hello there" (mis:style :width 42 :align 'center) '((:width . 11) (:align . left)))
+
+
+;;------------------------------------------------------------------------------
+;; Finalize / Reduce
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:output:reduce (caller output)
+  "Reduce the Mis OUTPUT Tree into a single string/metadata MOT.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:compile:output caller))
+         entry/reduced
+         string/reduced
+         metadata/reduced)
+    (int<mis>:debug caller
+                    "output:       %S"
+                    output)
+
+    ;;------------------------------
+    ;; Reduce Outputs
+    ;;------------------------------
+    (dolist (entry (int<mis>:output:get/outputs caller output))
+      (int<mis>:debug caller
+                      "entry:        %S"
+                      entry)
+      (let ((string/entry   (int<mis>:output:get/string caller entry))
+            (metadata/entry (int<mis>:output:get/metadata caller entry)))
+        (int<mis>:debug caller
+                        "string/entry: %S"
+                        string/entry)
+        (int<mis>:debug caller
+                        "meta/entry:   %S"
+                        metadata/entry)
+        ;; Combine strings.
+        (unless (or (null string/entry)
+                    (string-empty-p string/entry))
+          (setq string/reduced
+                (if (null string/reduced)
+                    string/entry
+                  (concat string/reduced string/entry)))
+          (int<mis>:debug caller
+                          "concat:       %S"
+                          string/reduced))
+        ;; Combine metadatas.
+        (setq metadata/reduced
+              (int<mis>:output:update/metadata caller metadata/reduced metadata/entry))
+        (int<mis>:debug caller
+                        "meta:        %S"
+                        metadata/reduced)))
+
+    ;;------------------------------
+    ;; Return reduced as a MOT
+    ;;------------------------------
+    (let ((output/reduced (apply #'int<mis>:output:create
+                                 caller
+                                 string/reduced
+                                 (nreverse metadata/reduced))))
+      (int<mis>:debug caller
+                      "<--output:    %S"
+                      output/reduced)
+      output/reduced)))
+;; (int<mis>:output:reduce 'test
+;;                         '((:output
+;;                            ((:string . "foo-0") (:metadata (:bar:0 . baz0)))
+;;                            ((:string . "foo-1") (:metadata (:bar:1 . baz1)))
+;;                            ((:string . "foo-2") (:metadata (:bar:2 . baz2)))
+;;                            ((:string . "narf") (:metadata (:zort . poit)))
+;;                            ((:string . "egad") (:metadata (:troz . fiddely-posh))))))
 
 
 ;;------------------------------------------------------------------------------
