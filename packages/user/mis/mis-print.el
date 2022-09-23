@@ -329,11 +329,14 @@ CALLER should be calling function's name. It can be one of:
 
 
 ;;------------------------------------------------------------------------------
-;; Finalize / Reduce
+;; Finalize
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:output:reduce (caller output)
+(defun int<mis>:output:finalize/lines (caller output)
   "Reduce the Mis OUTPUT Tree into a single string/metadata MOT per line.
+
+Will split any strings with newlines up so that return value has only one line
+per MOT entry string.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -341,122 +344,186 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller (list 'int<mis>:output:reduce caller))
-         string/reduced
-         metadata/reduced
-         output/reduced)
+  (let* ((caller (list 'int<mis>:output:finalize/lines caller))
+         string/line
+         metadata/line
+         output/line)
     (int<mis>:debug caller
-                    "output:         %S"
+                    "output:            %S"
                     output)
 
     ;;------------------------------
-    ;; Reduce Outputs
+    ;; Finalize Outputs
     ;;------------------------------
     (dolist (entry (int<mis>:output:get/outputs caller output))
       (int<mis>:debug caller
-                      "entry:          %S"
+                      '("\n========="
+                        "\n==ENTRY=="))
+      (int<mis>:debug caller
+                      "entry:             %S"
                       entry)
-      (let* ((string/entry   (int<mis>:output:get/string caller entry))
-             (metadata/entry (int<mis>:output:get/metadata caller entry)))
+      (let* ((string/entry       (int<mis>:output:get/string caller entry))
+             (metadata/entry     (int<mis>:output:get/metadata caller entry))
+             (string/entry/lines (int<mis>:string:lines/split string/entry))
+             (length             (length string/entry/lines)))
         (int<mis>:debug caller
-                        "string/entry:   %S"
+                        "string/entry:      %S"
                         string/entry)
         (int<mis>:debug caller
-                        "meta/entry:     %S"
+                        "meta/entry:        %S"
                         metadata/entry)
 
-        ;;---
-        ;; Should we start a new entry?
-        ;;   - Part 1: Prefix?
-        ;;---
-        ;; Yes if the new string starts with a newline and we are not just starting off.
-        (when (and (string-prefix-p "\n" string/entry)
-                   (or string/reduced
-                       metadata/reduced))
-          ;; Yes; add this entry into our output and start anew.
-          (setq output/reduced (int<mis>:output:append caller
-                                                       output/reduced
-                                                       (apply #'int<mis>:output:create
-                                                              caller
-                                                              string/reduced
-                                                              metadata/reduced))
-                string/reduced   nil
-                metadata/reduced nil)
-          (int<mis>:debug caller
-                          "output/reduced: %S"
-                          output/reduced))
+        ;;------------------------------
+        ;; Explode each entry into its lines.
+        ;;------------------------------
+        (dotimes (i length)
+          (let ((string/entry/line   (nth i string/entry/lines))
+                (metadata/entry/line metadata/entry)     ; Alias so the code is easier to read.
+                (newline?            (< i (1- length)))  ; Is this the end of a line?
+                ;; Merge last entry's metadata with this entry's?
+                (metadata/merge?     ))
+            (int<mis>:debug caller
+                            '("\n-------"
+                              "\n--#%02d--")
+                            i)
+            (int<mis>:debug caller
+                            "string/entry/line: %S"
+                            string/entry/line)
+            (int<mis>:debug caller
+                            "newline?:          %S"
+                            newline?)
+            (int<mis>:debug caller
+                            "metadata/merge?:   %S"
+                            metadata/merge?)
 
-        ;;---
-        ;; Process this string/metadata...
-        ;;---
-        ;; Combine strings.
-        (unless (or (null string/entry)
-                    (string-empty-p string/entry))
-          (setq string/reduced
-                (if (null string/reduced)
-                    string/entry
-                  (concat string/reduced string/entry)))
-          (int<mis>:debug caller
-                          "concat:         %S"
-                          string/reduced))
-        ;; Combine metadatas.
-        (setq metadata/reduced
-              (int<mis>:output:update/metadata caller metadata/reduced metadata/entry))
-        (int<mis>:debug caller
-                        "meta:          %S"
-                        metadata/reduced)
+            (int<mis>:debug caller
+                            "  - 1? %S"
+                            (= i 0))
+            (int<mis>:debug caller
+                            "  - 2? %S"
+                            (not (null string/line)))
+            (int<mis>:debug caller
+                            "  - 3? %S"
+                            (when (not (null string/line))
+                              (not (string-match-p (rx string-start
+                                                       (one-or-more not-newline)
+                                                       (zero-or-more "\n")
+                                                       string-end)
+                                                   string/line))))
 
-        ;;---
-        ;; Should we start a new entry?
-        ;;   - Part 2: Postfix?
-        ;;---
-        ;; Yes if the built string ends with a newline.
-        (when (and string/reduced
-                   (string-suffix-p "\n" string/reduced))
-          ;; Yes; add this entry into our output and start anew.
-          (setq output/reduced (int<mis>:output:append caller
-                                                       output/reduced
-                                                       (apply #'int<mis>:output:create
-                                                              caller
-                                                              string/reduced
-                                                              metadata/reduced))
-                string/reduced   nil
-                metadata/reduced nil)
-          (int<mis>:debug caller
-                          "output/reduced: %S"
-                          output/reduced))))
+            ;;---
+            ;; Process metadata...
+            ;;---
+            ;; NOTE: Process before string so we can do string checks before it's mutated.
+            (setq metadata/line
+                  ;; Not the very first thing we process and this string is just a newline?
+                  (cond ((and (not (null metadata/line))
+                              (string-match-p (rx string-start
+                                                  (zero-or-more "\n")
+                                                  string-end)
+                                              string/entry/line))
+                         ;; Use most appropriate metadata. If the line
+                         ;; accumulator string is something, use its metadata,
+                         ;; otherwise use the current empty line's metadata.
+                         (if (and (not (null string/line))
+                                  (string-match-p (rx string-start
+                                                      (one-or-more not-newline)
+                                                      (zero-or-more "\n")
+                                                      string-end)
+                                                  string/line))
+                             metadata/line
+                           metadata/entry/line))
+
+                        ;; Merge metadata together because merging strings together.
+                        ((and (= i 0)
+                              ;; Existing string must be something other than just empty/newline.
+                              (not (null string/line))
+                              (string-match-p (rx string-start
+                                                  (one-or-more not-newline)
+                                                  (zero-or-more "\n")
+                                                  string-end)
+                                              string/line))
+                         (int<mis>:output:update/metadata caller metadata/line metadata/entry/line))
+
+                        ;; Otherwise, use only the new metadata.
+                        (t
+                         metadata/entry/line)))
+            (int<mis>:debug caller
+                            "meta/line:         %S"
+                            metadata/line)
+
+            ;;---
+            ;; Process this string...
+            ;;---
+            ;; Add back in the newline char that `int<mis>:string:lines/split` removed?
+            (when newline?
+              (setq string/entry/line (concat string/entry/line "\n")))
+
+            ;; Combine strings?
+            (setq string/line (if (null string/line)
+                                  string/entry/line
+                                (concat string/line string/entry/line)))
+            (int<mis>:debug caller
+                            "string/line:       %S"
+                            string/line)
+
+            ;;---
+            ;; Should we start a new entry?
+            ;;---
+            ;; Yes if this line isn't the last (aka when it ends with a newline).
+            ;; E.g. splitting:
+            ;;   -  ""    -> '("")
+            ;;   - "1\n"  -> '("1" "")
+            ;;   - "\n2"  -> '("" "2")
+            ;;   - "1\n2" -> '("1" "2")
+            (when (and newline?
+                       (not (string-empty-p string/line))) ; Ignore if it's just... nothing.
+              ;; Add this line into our output and start anew.
+              (setq output/line (int<mis>:output:append caller
+                                                        output/line
+                                                        (apply #'int<mis>:output:create
+                                                               caller
+                                                               string/line
+                                                               metadata/line))
+                    string/line   nil
+                    metadata/line nil)
+              (int<mis>:debug caller
+                              "output/line: %S"
+                              output/line))))))
 
     ;;------------------------------
-    ;; Return reduced as a MOT
+    ;; Return lines as a MOT
     ;;------------------------------
-    (setq output/reduced (int<mis>:output:append caller
-                                                 output/reduced
-                                                 (apply #'int<mis>:output:create
-                                                        caller
-                                                        string/reduced
-                                                        metadata/reduced)))
+    ;; Need to add the final output entry (if it's not nothing).
+    (when (not (string-empty-p string/line))
+      (setq output/line (int<mis>:output:append caller
+                                                output/line
+                                                (apply #'int<mis>:output:create
+                                                       caller
+                                                       string/line
+                                                       metadata/line))))
     (int<mis>:debug caller
                     "<--output:      %S"
-                    output/reduced)
-    output/reduced))
-;; (int<mis>:output:reduce 'test
-;;                         '((:output
-;;                            ((:string . "foo-0") (:metadata (:bar:0 . baz0)))
-;;                            ((:string . "foo-1") (:metadata (:bar:1 . baz1)))
-;;                            ((:string . "foo-2") (:metadata (:bar:2 . baz2)))
-;;                            ((:string . "narf") (:metadata (:zort . poit)))
-;;                            ((:string . "egad") (:metadata (:troz . fiddely-posh))))))
+                    output/line)
+    output/line))
+;; (int<mis>:output:finalize/lines 'test
+;;                                 '((:output
+;;                                    ((:string . "foo-0") (:metadata (:bar:0 . baz0)))
+;;                                    ((:string . "foo-1") (:metadata (:bar:1 . baz1)))
+;;                                    ((:string . "foo-2") (:metadata (:bar:2 . baz2)))
+;;                                    ((:string . "narf") (:metadata (:zort . poit)))
+;;                                    ((:string . "egad") (:metadata (:troz . fiddely-posh))))))
 ;;
-(int<mis>:output:reduce 'test
-                        '((:output
-                           ((:string . "\nfoo-0") (:metadata (:bar:0 . baz0)))
-                           ((:string . "foo-1\n") (:metadata (:bar:1 . baz1)))
-                           ((:string . "\nfoo-2") (:metadata (:bar:2 . baz2)))
-                           ((:string . "\nnarf") (:metadata (:zort . poit)))
-                           ((:string . "zort\ntroz") (:metadata (:egad . fiddely-posh))))))
+;; (int<mis>:output:finalize/lines 'test
+;;                                 '((:output
+;;                                    ((:string . "\nfoo-0") (:metadata (:bar:0 . baz0)))
+;;                                    ((:string . "foo-1\n") (:metadata (:bar:1 . baz1)))
+;;                                    ((:string . "\nfoo-2") (:metadata (:bar:2 . baz2)))
+;;                                    ((:string . "\nnarf") (:metadata (:zort . poit)))
+;;                                    ((:string . "zort\ntroz") (:metadata (:egad . fiddely-posh))))))
 
 
-(defun int<mis>:output:finalize (caller output)
+(defun int<mis>:output:finalize/block (caller output)
   "Reduce the Mis OUTPUT Tree into a single string/metadata MOT.
 
 CALLER should be calling function's name. It can be one of:
@@ -517,13 +584,13 @@ CALLER should be calling function's name. It can be one of:
                     "<--output:      %S"
                     output/finalized)
     output/finalized))
-;; (int<mis>:output:finalize 'test
-;;                           '((:output
-;;                              ((:string . "\nfoo-0") (:metadata (:bar:0 . baz0)))
-;;                              ((:string . "foo-1\n") (:metadata (:bar:1 . baz1)))
-;;                              ((:string . "\nfoo-2") (:metadata (:bar:2 . baz2)))
-;;                              ((:string . "narf") (:metadata (:zort . poit)))
-;;                              ((:string . "egad") (:metadata (:troz . fiddely-posh))))))
+;; (int<mis>:output:finalize/block 'test
+;;                                 '((:output
+;;                                    ((:string . "\nfoo-0") (:metadata (:bar:0 . baz0)))
+;;                                    ((:string . "foo-1\n") (:metadata (:bar:1 . baz1)))
+;;                                    ((:string . "\nfoo-2") (:metadata (:bar:2 . baz2)))
+;;                                    ((:string . "narf") (:metadata (:zort . poit)))
+;;                                    ((:string . "egad") (:metadata (:troz . fiddely-posh))))))
 
 
 

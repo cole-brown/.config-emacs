@@ -25,7 +25,10 @@
 
 (defun int<mis>:string:lines/split (string)
   "Split STRING on newline character into a list on strings."
-  (split-string string "\n"))
+  (split-string string
+                "\n"
+                nil)) ;; Must not OMIT-NULLs here as we want to preserve empty lines.
+;; (int<mis>:string:lines/split "\nhello\nthere\n")
 
 
 (defun int<mis>:string:lines/join (&rest string)
