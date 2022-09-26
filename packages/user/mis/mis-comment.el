@@ -272,10 +272,9 @@ LANGUAGE should be nil or string:
 
 
 ;;------------------------------------------------------------------------------
-;; Output Builders
+;; Compiler
 ;;------------------------------------------------------------------------------
 
-;; TODO: Handle style!
 (defun int<mis>:compile:comment (caller syntax style)
   "Compile `:comment' SYNTAX using STYLE; return string.
 
@@ -292,61 +291,142 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
+
   (let* ((caller  (list 'int<mis>:compile:comment caller))
          (type    (int<mis>:comment:type/get
-                   (int<mis>:syntax:find caller syntax :comment :type)))
-         (prefix  (or (int<mis>:syntax:find caller syntax :comment :prefix) ""))
-         (postfix (or (int<mis>:syntax:find caller syntax :comment :postfix) ""))
-         ;; Compile our children to get the string that should be commented.
-         (comment (or (int<mis>:compile:children caller :comment syntax style) "")))
+                   (int<mis>:syntax:find    caller syntax :comment :type)))
+         (prefix/major  (or (int<mis>:syntax:find caller syntax :comment :prefix:major) ""))
+         (postfix/major (or (int<mis>:syntax:find caller syntax :comment :postfix:major) ""))
+         ;; Compile our children to get the Mis Output Tree that should be
+         ;; commented.
+         (mot/comment (int<mis>:compile:children caller :comment syntax style))
+         output)
 
-    ;; TODO: Styling needs to be smarter for these..?
-    ;; TODO: E.g. centering: Need to center string to width, then carve out space for prefix/postfix, then concat.
+    (int<mis>:debug caller "syntax:        %S" syntax)
+    (int<mis>:debug caller "style:         %S" style)
+    (int<mis>:debug caller "type:          %S" type)
+    (int<mis>:debug caller "prefix/major:  %S" prefix/major)
+    (int<mis>:debug caller "postfix/major: %S" postfix/major)
+    (int<mis>:debug caller "comment:       %S" mot/comment)
+
+    ;; TODO-mot: Styling needs to be smarter for these..?
+    ;; TODO-mot: E.g. centering: Need to center string to width, then carve out space for prefix/postfix, then concat.
+
+    ;;------------------------------
+    ;; Format SYNTAX into a comment.
+    ;;------------------------------
+    (setq output
+          (cond ((eq type 'quote)
+                 ;; We want to block quote this comment for e.g. `org-mode', so
+                 ;; we need final full text string.
+                 (let* ((mot/final      (int<mis>:output:finalize/block caller mot/comment))
+                        (entries/final  (int<mis>:output:get/outputs    caller mot/final))
+                        (string/final   (int<mis>:output:get/string     caller (nth 0 entries/final)))
+                        (metadata/final (int<mis>:output:get/metadata   caller (nth 0 entries/final))))
+
+                   ;; Now it's simple: prefix line, the comment text, and postfix line.
+                   ;; And wrap it up in a MOT for outputting.
+                   (int<mis>:output:create caller
+                                           (int<mis>:string:affix prefix/major
+                                                                  postfix/major
+                                                                  string/final)
+                                           metadata/final)))
+
+                ((eq type 'inline)
+                 ;; Each line gets treated the same, so reduced the comment MOT
+                 ;; down as much as possible before commenting. This will give
+                 ;; us a MOT with string/metadata per newline.
+                 (let ((mot/lines (int<mis>:output:finalize/lines caller mot/comment))
+                       mot/return)
+                   (dolist (entry/line     (int<mis>:output:get/outputs  caller mot/lines))
+                     (let* ((string/line   (int<mis>:output:get/string   caller entry/line))
+                            (metadata/line (int<mis>:output:get/metadata caller entry/line)))
+                       ;; Convert text into a comment.
+                       (setq mot/return (int<mis>:output:append
+                                         caller
+                                         mot/return
+                                         (apply #'int<mis>:output:create
+                                                caller
+                                                (int<mis>:string:lines/affix prefix/major
+                                                                             postfix/major
+                                                                             string/line)
+                                                metadata/line)))))
+                   ;; Done.
+                   mot/return))
+
+                ((eq type 'block)
+                 ;; `prefix/major' is just for first line; `postfix/major' is
+                 ;; just for last line. We must get `prefix/minor' and
+                 ;; `prefix/minor' for all the other lines in order to make this
+                 ;; block comment correctly.
+                 ;; E.g. C-style comments are often:
+                 ;;     /* line 1
+                 ;;      * line 2 */
+                 ;; So in that case would be:
+                 ;;   - `prefix/minor'  == " *"
+                 ;;   - `postfix/minor' == "" or nil
+                 (let* ((prefix/minor   (or (int<mis>:syntax:find caller syntax :comment :prefix:minor) ""))
+                        (postfix/minor  (or (int<mis>:syntax:find caller syntax :comment :postfix:minor) ""))
+                        (mot/lines      (int<mis>:output:finalize/lines caller mot/comment))
+                        (outputs/line   (int<mis>:output:get/outputs    caller mot/lines))
+                        (outputs/length (length outputs/line))
+                        mot/return)
+                   (dotimes (i outputs/length)
+                     (let* ((entry/line    (nth i outputs/line))
+                            (string/line   (int<mis>:output:get/string   caller entry/line))
+                            (metadata/line (int<mis>:output:get/metadata caller entry/line))
+                            (line/first? (= i 0))
+                            (line/last?  (= i (1- outputs/length))))
+                       ;; `int<mis>:output:finalize/lines' has combined/split
+                       ;; the output strings so that each entry is a separate
+                       ;; line. We just need to decide on the correct
+                       ;; combinatior of prefix and postfix (major vs minor).
+                       (setq mot/return (int<mis>:output:append
+                                         caller
+                                         mot/return
+                                         (apply #'int<mis>:output:create
+                                                caller
+                                                (int<mis>:string:lines/affix (if line/first?
+                                                                                 prefix/major
+                                                                               prefix/minor)
+                                                                             (if line/last?
+                                                                                 postfix/major
+                                                                               postfix/minor)
+                                                                             string/line)
+                                                metadata/line)))))
+                   ;; Done.
+                   mot/return))
+
+                ;;------------------------------
+                ;; Errors
+                ;;------------------------------
+                ((eq type 'default)
+                 ;; Special error cuz it shouldn't be `default' after `int<mis>:comment:type/get'.
+                 (int<mis>:error caller
+                                 "Comment type (%S) should not still be `default'! %S"
+                                 type
+                                 syntax))
+
+                (t
+                 (int<mis>:error caller
+                                 "Unhandled comment type `%S' in: %S"
+                                 type
+                                 syntax))))
+
+    (int<mis>:debug caller "output:        %S" mot/comment)
+
     ;;------------------------------
     ;; Style the comment.
     ;;------------------------------
-    (int<mis>:style caller
-                    ;;------------------------------
-                    ;; Format syntax into a comment.
-                    ;;------------------------------
-                    ;; Need to send `int<mis>:style' a list of strings.
-                    (cond ((eq type 'quote)
-                           ;; Simpler: Just prefix line, the string, and postfix line.
-                           (list (int<mis>:string:lines/join prefix comment postfix)))
-
-                          ((eq type 'inline)
-                           (int<mis>:string:lines/split
-                            ;; Each line gets treated the same.
-                            (apply #'int<mis>:string:lines/affix
-                                   prefix
-                                   postfix
-                                   (int<mis>:string:lines/split comment))))
-
-                          ((eq type 'block)
-                           ;; Prefix is just for first line; postfix is just for last line.
-                           ;; TODO: a prefix for the rest of the lines?
-                           ;; TODO: e.g. C-style:
-                           ;; TODO:   /* line 1
-                           ;; TODO:    * line 2 */
-                           ;; TODO: The 'rest of lines' prefix is " *".
-                           (list (concat prefix comment postfix)))
-
-                          ((eq type 'default)
-                           ;; Special error cuz it shouldn't be `default' after `int<mis>:comment:type/get'.
-                           (int<mis>:error caller
-                                           "Comment type (%S) should not still be `default'! %S"
-                                           type
-                                           syntax))
-
-                          (t
-                           (int<mis>:error caller
-                                           "Unhandled comment type `%S' in: %S"
-                                           type
-                                           syntax)))
-                    :comment
-                    syntax
-                    style)))
+    (let ((styled (int<mis>:style caller
+                                  output
+                                  :comment
+                                  syntax
+                                  style)))
+      (int<mis>:debug caller "styled:        %S" styled)
+      styled)))
 ;; (int<mis>:compile:comment 'test (mis:comment "hi") '((:style (:width . 80))))
+;; (int<mis>:compile:comment 'test (mis:comment :type 'block "hi") '((:style (:width . 80))))
 
 
 (int<mis>:compiler:register :comment #'int<mis>:compile:comment)
@@ -393,10 +473,12 @@ NOTE: Comment keyword args must always have both a keyword and a value."
                             :comment
                             syntax
                             (when language
-                              (cons :language language))
-                            (cons :type    type)
-                            (cons :postfix (int<mis>:comment:end type language))
-                            (cons :prefix  (int<mis>:comment:start type language)))))
+                              (cons :language      language))
+                            (cons   :type          type)
+                            ;; TODO: `when' for `:postfix:minor'
+                            ;; TODO: `when' for `:prefix:minor'
+                            (cons   :postfix:major (int<mis>:comment:end type language))
+                            (cons   :prefix:major  (int<mis>:comment:start type language)))))
 ;; (mis:comment :align 'center "hello")
 ;; (mis:comment :type 'inline "hello")
 ;; (mis:comment :type 'block :align 'center "hello %s" "world")

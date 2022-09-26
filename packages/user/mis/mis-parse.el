@@ -252,7 +252,7 @@ CALLER should be calling function's name. It can be one of:
       (push syntax/assoc existing))
     existing))
 ;; (int<mis>:syntax:append 'test nil '((:style (:width . 10) (:align . :center))))
-;; (int<mis>:syntax:append 'test '((:comment (:prefix . ";; ") (:postfix . "") (:type . default))) '((:style (:width . 10) (:align . :center))))
+;; (int<mis>:syntax:append 'test '((:comment (:prefix:major . ";; ") (:postfix:major . "") (:type . default))) '((:style (:width . 10) (:align . :center))))
 
 
 (defun int<mis>:syntax:update (caller key syntax &rest kvp)
