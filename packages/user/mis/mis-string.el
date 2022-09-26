@@ -37,15 +37,24 @@
              string
              "\n"))
 
-(defun int<mis>:string:lines/affix (prefix postfix &rest line)
-  "Attach PREFIX and POSTFIX to each LINE, then join with newlines into a string.
+(defun int<mis>:string:affix (prefix postfix string)
+  "Attach PREFIX and POSTFIX to STRING."
+  (concat (or prefix "") string (or postfix "")))
+;; (int<mis>:string:affix ";; " nil "foo")
+
+
+(defun int<mis>:string:lines/affix (prefix postfix &rest string)
+  "Attach PREFIX and POSTFIX to each line in each STRING.
 
 Does not split LINE; caller should split before calling."
-  (mapconcat (lambda (str) "Combine PREFIX, STR, and POSTFIX."
-               (concat (or prefix "") str (or postfix "")))
-             line
+  (mapconcat (lambda (each) "Split EACH into lines, do prefix/postfix."
+               (mapconcat (lambda (line) "Combine LINE with prefix & postfix."
+                            (int<mis>:string:affix prefix postfix line))
+                          (int<mis>:string:lines/split each)
+                          "\n"))
+             string
              "\n"))
-;; (int<mis>:string:lines/affix ";; " "" "foo" "bar" "baz")
+;; (int<mis>:string:lines/affix ";; " "" "foo" "bar" "baz\nqux")
 
 
 ;;------------------------------------------------------------------------------
