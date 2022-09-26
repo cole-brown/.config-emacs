@@ -15,14 +15,9 @@
 (require 'mis-error)
 (require 'mis-valid)
 (require 'mis-buffer)
-(require 'mis-format)
+(require 'mis-tree-syntax)
+(require 'mis-tree-output)
 (require 'mis-parse)
-
-(require 'mis-align)
-(require 'mis-style)
-(require 'mis-art)
-
-(require 'mis-comment)
 
 
 ;;------------------------------------------------------------------------------

@@ -15,8 +15,7 @@
 (require 'mis-error)
 (require 'mis-valid)
 (require 'mis-tree-output)
-;; TODO: (require 'mis-tree-syntax)
-;; (require 'mis-parse)
+(require 'mis-tree-syntax)
 (require 'mis-buffer)
 ;; (require 'mis-string)
 
