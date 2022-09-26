@@ -320,7 +320,7 @@ CALLER should be calling function's name. It can be one of:
                  ;; We want to block quote this comment for e.g. `org-mode', so
                  ;; we need final full text string.
                  (let* ((mot/final      (int<mis>:output:finalize/block caller mot/comment))
-                        (entries/final  (int<mis>:output:get/outputs    caller mot/final))
+                        (entries/final  (int<mis>:output:get/entries    caller mot/final))
                         (string/final   (int<mis>:output:get/string     caller (nth 0 entries/final)))
                         (metadata/final (int<mis>:output:get/metadata   caller (nth 0 entries/final))))
 
@@ -338,7 +338,7 @@ CALLER should be calling function's name. It can be one of:
                  ;; us a MOT with string/metadata per newline.
                  (let ((mot/lines (int<mis>:output:finalize/lines caller mot/comment))
                        mot/return)
-                   (dolist (entry/line     (int<mis>:output:get/outputs  caller mot/lines))
+                   (dolist (entry/line     (int<mis>:output:get/entries  caller mot/lines))
                      (let* ((string/line   (int<mis>:output:get/string   caller entry/line))
                             (metadata/line (int<mis>:output:get/metadata caller entry/line)))
                        ;; Convert text into a comment.
@@ -368,7 +368,7 @@ CALLER should be calling function's name. It can be one of:
                  (let* ((prefix/minor   (or (int<mis>:syntax:find caller syntax :comment :prefix:minor) ""))
                         (postfix/minor  (or (int<mis>:syntax:find caller syntax :comment :postfix:minor) ""))
                         (mot/lines      (int<mis>:output:finalize/lines caller mot/comment))
-                        (outputs/line   (int<mis>:output:get/outputs    caller mot/lines))
+                        (outputs/line   (int<mis>:output:get/entries    caller mot/lines))
                         (outputs/length (length outputs/line))
                         mot/return)
                    (dotimes (i outputs/length)

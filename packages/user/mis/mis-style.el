@@ -280,8 +280,8 @@ CALLER should be calling function's name. It can be one of:
                       style/complete)
 
       ;; Style each entry in OUTPUT.
-      (dolist (entry (int<mis>:output:get/outputs caller output))
-        (let ((outputs/new (int<mis>:output:get/outputs
+      (dolist (entry (int<mis>:output:get/entries caller output))
+        (let ((outputs/new (int<mis>:output:get/entries
                             caller
                             (int<mis>:style/output-entry caller
                                                          entry

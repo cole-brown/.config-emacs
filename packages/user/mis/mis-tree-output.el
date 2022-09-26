@@ -31,7 +31,7 @@
 ;;------------------------------------------------------------------------------
 
 ;; TODO: rename `...get/entries' or something?
-(defun int<mis>:output:get/outputs (caller output)
+(defun int<mis>:output:get/entries (caller output)
   "Return the list-of-alists from Mis OUTPUT Tree.
 
 Return value is a list of alists:
@@ -46,7 +46,7 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (alist-get :output output))
-;; (int<mis>:output:get/outputs 'test '((:output ((:string . "foo") (:metadata . :foo)) ((:string . "bar") (:metadata . :bar)))))
+;; (int<mis>:output:get/entries 'test '((:output ((:string . "foo") (:metadata . :foo)) ((:string . "bar") (:metadata . :bar)))))
 
 
 (defun int<mis>:output:get/string (caller output)
@@ -81,7 +81,7 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:output:get/metadata 'test '((:string . "foo") (:metadata . :foo)))
 ;; (int<mis>:output:get/metadata
 ;;  'test
-;;  (nth 0 (int<mis>:output:get/outputs 'test
+;;  (nth 0 (int<mis>:output:get/entries 'test
 ;;                                      (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
 
 
@@ -115,18 +115,18 @@ CALLER should be calling function's name. It can be one of:
 ;;  'test
 ;;  (int<mis>:output:get/metadata
 ;;   'test
-;;   (nth 0 (int<mis>:output:get/outputs 'test
+;;   (nth 0 (int<mis>:output:get/entries 'test
 ;;                                       (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
 ;;  (int<mis>:output:get/metadata
 ;;   'test
-;;   (nth 0 (int<mis>:output:get/outputs 'test
+;;   (nth 0 (int<mis>:output:get/entries 'test
 ;;                                       (int<mis>:output:create 'test "also this" '(:align . center))))))
 ;;
 ;; (int<mis>:output:update/metadata
 ;;  'test
 ;;  (int<mis>:output:get/metadata
 ;;   'test
-;;   (nth 0 (int<mis>:output:get/outputs 'test
+;;   (nth 0 (int<mis>:output:get/entries 'test
 ;;                                       (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
 ;;  nil)
 ;;
@@ -135,7 +135,7 @@ CALLER should be calling function's name. It can be one of:
 ;;  nil
 ;;  (int<mis>:output:get/metadata
 ;;   'test
-;;   (nth 0 (int<mis>:output:get/outputs 'test
+;;   (nth 0 (int<mis>:output:get/entries 'test
 ;;                                       (int<mis>:output:create 'test "also this" '(:align . center))))))
 
 
@@ -209,7 +209,7 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:output:append caller))
          ;; Make 'em backwards so we can append and un-backwards at the end.
-         (existing/entries (nreverse (int<mis>:output:get/outputs caller existing))))
+         (existing/entries (nreverse (int<mis>:output:get/entries caller existing))))
     (int<mis>:debug caller "existing: %S" existing)
     (int<mis>:debug caller "new:      %S" new)
 
@@ -234,7 +234,7 @@ CALLER should be calling function's name. It can be one of:
            ;; Append & Return
            ;;------------------------------
            ;; Append the new MOT's outputs to the existing one's.
-           (dolist (entry/new (int<mis>:output:get/outputs caller new))
+           (dolist (entry/new (int<mis>:output:get/entries caller new))
              (push entry/new existing/entries))
 
            ;; Recombobulate return value.
@@ -303,8 +303,8 @@ CALLER should be calling function's name. It can be one of:
     ;; If so, (over)write to METADATA alist.
     (dolist (kvp (int<mis>:syntax:get/value caller :style style/complete))
       (int<mis>:debug caller
-                        "metadata kvp:   %S"
-                        kvp)
+                      "metadata kvp:   %S"
+                      kvp)
       (let ((key   (car kvp))
             (value (cdr kvp)))
         (int<mis>:debug caller
@@ -352,7 +352,7 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Finalize Outputs
     ;;------------------------------
-    (dolist (entry (int<mis>:output:get/outputs caller output))
+    (dolist (entry (int<mis>:output:get/entries caller output))
       (int<mis>:debug caller
                       '("\n========="
                         "\n==ENTRY=="))
@@ -540,7 +540,7 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Finalize Outputs
     ;;------------------------------
-    (dolist (entry (int<mis>:output:get/outputs caller output))
+    (dolist (entry (int<mis>:output:get/entries caller output))
       (int<mis>:debug caller
                       "entry:          %S"
                       entry)

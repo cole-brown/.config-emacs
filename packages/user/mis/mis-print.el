@@ -121,7 +121,7 @@ CALLER should be calling function's name. It can be one of:
     (with-current-buffer buffer
       (save-mark-and-excursion
         ;; Loop on the output strings/metadatas to finalize & print.
-        (dolist (output (int<mis>:output:get/outputs caller tree))
+        (dolist (output (int<mis>:output:get/entries caller tree))
           (int<mis>:print:string caller output))))))
 
 
