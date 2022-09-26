@@ -68,7 +68,11 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
 
 (defconst int<mis>:keywords:comment
   '(:type
-    :language)
+    :language
+    :prefix:major   ; start of first line of comment
+    :prefix:minor   ; start of rest of the comment lines
+    :postfix:minor  ; end of rest of the comment lines
+    :postfix:major) ; end of final line of comment
   "Valid comment keywords.")
 
 
