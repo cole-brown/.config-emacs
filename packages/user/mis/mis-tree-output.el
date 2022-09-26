@@ -14,6 +14,8 @@
 
 (require 'mis-error)
 (require 'mis-valid)
+(require 'mis-tree-syntax)
+
 
 ;;------------------------------------------------------------------------------
 ;; Output Trees
@@ -30,7 +32,6 @@
 ;;
 ;;------------------------------------------------------------------------------
 
-;; TODO: rename `...get/entries' or something?
 (defun int<mis>:output:get/entries (caller output)
   "Return the list-of-alists from Mis OUTPUT Tree.
 
