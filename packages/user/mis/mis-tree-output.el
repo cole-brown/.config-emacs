@@ -90,7 +90,8 @@ CALLER should be calling function's name. It can be one of:
 (defun int<mis>:output:update/metadata (caller existing new)
   "Update/overwrite EXISTING metadata with NEW metatada.
 
-EXISTING and NEW should be nil or a Mis Output Tree.
+EXISTING and NEW should be nil or a Mis Output Tree's Entry's metadata (e.g. a
+return value from `int<mis>:output:get/metadata'.
 
 Return updated EXISTING Mis Output Tree. Caller should save the return value as
 the update is not guaranteed to be in-place.
@@ -163,14 +164,7 @@ CALLER should be calling function's name. It can be one of:
                                    string)
 
     (when (and (not (null metadata))
-               (not (seq-every-p (lambda (m) "Validate METADATA param."
-                                   (and
-                                    ;; Is a cons but is not a list?
-                                    (and (listp m)
-                                         (cdr m)
-                                         (atom (cdr m)))
-                                    ;; Key is a keyword?
-                                    (keywordp (car m))))
+               (not (seq-every-p #'consp
                                  metadata)))
       (int<mis>:error caller
                       "Mis Output Metadata must be nil or a cons alist. Got %S: %S"
@@ -183,7 +177,8 @@ CALLER should be calling function's name. It can be one of:
     ;; Alist with `:string' & `:metadata' keys, validated values.
     (list (cons :string string)
           (cons :metadata metadata))))
-;; (int<mis>:output:create/entry 'test "foo" '(:buffer . "bar") '(:align . baz) '(:width . 11))
+;; (int<mis>:output:create/entry 'test "foo" '(:buffer . "bar") '(:align . center) '(:width . 11))
+;; (int<mis>:output:create/entry 'test "foo" '(:buffer . "bar") '(:align . (affix center)) '(:width . 11))
 
 
 (defun int<mis>:output:create (caller string &rest metadata)
@@ -208,14 +203,7 @@ CALLER should be calling function's name. It can be one of:
                                    string)
 
     (when (and (not (null metadata))
-               (not (seq-every-p (lambda (m) "Validate METADATA param."
-                                   (and
-                                    ;; Is a cons but is not a list?
-                                    (and (listp m)
-                                         (cdr m)
-                                         (atom (cdr m)))
-                                    ;; Key is a keyword?
-                                    (keywordp (car m))))
+               (not (seq-every-p #'consp
                                  metadata)))
       (int<mis>:error caller
                       "Mis Output Metadata must be nil or a cons alist. Got %S: %S"
@@ -399,7 +387,17 @@ CALLER should be calling function's name. It can be one of:
          (string   (int<mis>:output:get/string caller entry))
          (metadata (int<mis>:output:get/metadata caller entry))
          (align    (alist-get :align metadata))
-         (width    (alist-get :width metadata)))
+         (width    (alist-get :width metadata))
+         ;; Update the alignment metadata so anyone else can know that shenanigans
+         ;; have happened.
+         ;; e.g.
+         ;;   From:
+         ;;     '(:align . center)
+         ;;   To:
+         ;;     '(:align . (affix center))
+         (metadata/affix (int<mis>:output:update/metadata caller
+                                                          (copy-alist metadata)
+                                                          (list (cons :align (list 'affix align))))))
 
     ;;------------------------------
     ;; Error Checks
@@ -427,6 +425,7 @@ CALLER should be calling function's name. It can be one of:
       (apply #'int<mis>:output:create
              caller
              (int<mis>:string:affix prefix postfix string)
+             ;; Leave old metadata, since we didn't change alignment really.
              metadata))
 
      ;;---
@@ -446,14 +445,14 @@ CALLER should be calling function's name. It can be one of:
                    (int<mis>:string:affix prefix
                                           postfix
                                           (substring string 0 (- width prefix/length postfix/length)))
-                   metadata)
+                   metadata/affix)
           ;; No trim necessary; have the space to just affix.
           (apply #'int<mis>:output:create
                  caller
                  (int<mis>:string:affix prefix
                                         postfix
                                         string)
-                 metadata))))
+                 metadata/affix))))
 
      ((eq align 'center)
       (let* ((prefix/length  (length prefix))
@@ -466,7 +465,7 @@ CALLER should be calling function's name. It can be one of:
                                       (substring string
                                                  prefix/length
                                                  (- width postfix/length)))
-               metadata)))
+               metadata/affix)))
 
      ((eq align 'right)
       (let* ((prefix/length  (length prefix))
@@ -482,14 +481,14 @@ CALLER should be calling function's name. It can be one of:
                                           (substring string
                                                      (+ prefix/length postfix/length)
                                                      width))
-                   metadata)
+                   metadata/affix)
           ;; No trim necessary; have the space to just affix.
           (apply #'int<mis>:output:create
                  caller
                  (int<mis>:string:affix prefix
                                         postfix
                                         string)
-                 metadata))))
+                 metadata/affix))))
 
      ;;---
      ;; No alignment: Nothing special to do.
@@ -498,6 +497,7 @@ CALLER should be calling function's name. It can be one of:
       (apply #'int<mis>:output:create
              caller
              (int<mis>:string:affix prefix postfix string)
+             ;; Leave old metadata, since we didn't change alignment really.
              metadata)))))
 ;; (int<mis>:output/string:affix 'test
 ;;                               ";; " ""
