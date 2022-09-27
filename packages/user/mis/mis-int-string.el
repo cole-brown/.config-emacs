@@ -1,4 +1,4 @@
-;;; mis-tree-string.el --- String Manipulation Functions -*- lexical-binding: t; -*-
+;;; mis-int-string.el --- String Manipulation Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -14,7 +14,7 @@
 
 (require 'mis-error)
 (require 'mis-valid)
-(require 'mis-tree-syntax)
+(require 'mis-int-syntax)
 
 
 ;;------------------------------------------------------------------------------
@@ -58,5 +58,5 @@ Does not split LINE; caller should split before calling."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(provide 'mis-tree-string)
-;;; mis-tree-string.el ends here
+(provide 'mis-int-string)
+;;; mis-int-string.el ends here

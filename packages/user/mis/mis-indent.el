@@ -25,7 +25,7 @@
 
 (require 'mis-error)
 (require 'mis-valid)
-(require 'mis-tree-string)
+(require 'mis-int-string)
 (require 'mis-tree-syntax)
 (require 'mis-tree-output)
 (require 'mis-style)
