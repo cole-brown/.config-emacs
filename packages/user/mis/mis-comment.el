@@ -312,50 +312,33 @@ CALLER should be calling function's name. It can be one of:
     (int<mis>:debug caller "postfix/major: %S" postfix/major)
     (int<mis>:debug caller "comment:       %S" mot/comment)
 
-    ;; TODO-mot: Styling needs to be smarter for these..?
-    ;; TODO-mot: E.g. centering: Need to center string to width, then carve out space for prefix/postfix, then concat.
-
     ;;------------------------------
     ;; Format SYNTAX into a comment.
     ;;------------------------------
     (setq output
           (cond ((eq type 'quote)
-                 ;; We want to block quote this comment for e.g. `org-mode', so
-                 ;; we need final full text string.
-                 (let* ((mot/final      (int<mis>:output:finalize/block caller mot/comment))
-                        (entries/final  (int<mis>:output:get/entries    caller mot/final))
-                        (string/final   (int<mis>:output:get/string     caller (nth 0 entries/final)))
-                        (metadata/final (int<mis>:output:get/metadata   caller (nth 0 entries/final))))
-
-                   ;; Now it's simple: prefix line, the comment text, and postfix line.
-                   ;; And wrap it up in a MOT for outputting.
-                   (int<mis>:output:create caller
-                                           (int<mis>:string:affix prefix/major
-                                                                  postfix/major
-                                                                  string/final)
-                                           metadata/final)))
+                 ;; Now it's simple: prefix line, the comment text, and postfix line.
+                 (apply #'int<mis>:output/string:affix
+                        caller
+                        prefix/major
+                        postfix/major
+                        (int<mis>:output:get/entries caller
+                                                     ;; We want to block quote this comment for e.g. `org-mode', so
+                                                     ;; we need final full text string.
+                                                     (int<mis>:output:finalize/block caller
+                                                                                     mot/comment))))
 
                 ((eq type 'inline)
                  ;; Each line gets treated the same, so reduced the comment MOT
                  ;; down as much as possible before commenting. This will give
                  ;; us a MOT with string/metadata per newline.
-                 (let ((mot/lines (int<mis>:output:finalize/lines caller mot/comment))
-                       mot/return)
-                   (dolist (entry/line     (int<mis>:output:get/entries  caller mot/lines))
-                     (let* ((string/line   (int<mis>:output:get/string   caller entry/line))
-                            (metadata/line (int<mis>:output:get/metadata caller entry/line)))
-                       ;; Convert text into a comment.
-                       (setq mot/return (int<mis>:output:append
-                                         caller
-                                         mot/return
-                                         (apply #'int<mis>:output:create
-                                                caller
-                                                (int<mis>:string:lines/affix prefix/major
-                                                                             postfix/major
-                                                                             string/line)
-                                                metadata/line)))))
-                   ;; Done.
-                   mot/return))
+                 (apply #'int<mis>:output/string:affix
+                        caller
+                        prefix/major
+                        postfix/major
+                        (int<mis>:output:get/entries caller
+                                                     (int<mis>:output:finalize/lines caller
+                                                                                     mot/comment))))
 
                 ((eq type 'block)
                  ;; `prefix/major' is just for first line; `postfix/major' is
@@ -384,19 +367,18 @@ CALLER should be calling function's name. It can be one of:
                        ;; the output strings so that each entry is a separate
                        ;; line. We just need to decide on the correct
                        ;; combinatior of prefix and postfix (major vs minor).
-                       (setq mot/return (int<mis>:output:append
-                                         caller
-                                         mot/return
-                                         (apply #'int<mis>:output:create
-                                                caller
-                                                (int<mis>:string:lines/affix (if line/first?
-                                                                                 prefix/major
-                                                                               prefix/minor)
-                                                                             (if line/last?
-                                                                                 postfix/major
-                                                                               postfix/minor)
-                                                                             string/line)
-                                                metadata/line)))))
+                       (setq mot/return
+                             (int<mis>:output:append
+                              caller
+                              mot/return
+                              (int<mis>:output/string:affix caller
+                                                             (if line/first?
+                                                                 prefix/major
+                                                               prefix/minor)
+                                                             (if line/last?
+                                                                 postfix/major
+                                                               postfix/minor)
+                                                             entry/line)))))
                    ;; Done.
                    mot/return))
 
@@ -430,6 +412,11 @@ CALLER should be calling function's name. It can be one of:
       styled)))
 ;; (int<mis>:compile:comment 'test (mis:comment "hi") '((:style (:width . 80))))
 ;; (int<mis>:compile:comment 'test (mis:comment :type 'block "hi") '((:style (:width . 80))))
+;;
+;; alignment-aware commenting:
+;;   (int<mis>:compile:comment 'test (mis:comment :align 'center :width 80 "hello there") '((:style (:width . 80))))
+;; vs normal centered string:
+;;   (int<mis>:compile 'test (mis:string :align 'center :width 80 "hello there") nil)
 
 
 (int<mis>:compiler:register :comment #'int<mis>:compile:comment)

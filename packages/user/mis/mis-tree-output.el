@@ -387,6 +387,8 @@ ENTRY should be a Mis Output Tree Entry, which is an alist with keys:
   - `:string'
   - `:metadata'
 
+Return a Mis Output Tree with affixed string(s).
+
 CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
