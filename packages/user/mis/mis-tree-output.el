@@ -141,6 +141,51 @@ CALLER should be calling function's name. It can be one of:
 ;;                                       (int<mis>:output:create 'test "also this" '(:align . center))))))
 
 
+(defun int<mis>:output:create/entry (caller string &rest metadata)
+  "Create a Mis Output Tree Entry from STRING and METADATA(s).
+
+STRING should be nil or a string.
+
+Each METADATA should nil or a cons of a keyword and... some value.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:output:create/entry caller)))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (int<mis>:valid:string-or-nil? caller
+                                   'string
+                                   string)
+
+    (when (and (not (null metadata))
+               (not (seq-every-p (lambda (m) "Validate METADATA param."
+                                   (and
+                                    ;; Is a cons but is not a list?
+                                    (and (listp m)
+                                         (cdr m)
+                                         (atom (cdr m)))
+                                    ;; Key is a keyword?
+                                    (keywordp (car m))))
+                                 metadata)))
+      (int<mis>:error caller
+                      "Mis Output Metadata must be nil or a cons alist. Got %S: %S"
+                      (type-of metadata)
+                      metadata))
+
+    ;;------------------------------
+    ;; Create the MOT entry.
+    ;;------------------------------
+    ;; Alist with `:string' & `:metadata' keys, validated values.
+    (list (cons :string string)
+          (cons :metadata metadata))))
+;; (int<mis>:output:create/entry 'test "foo" '(:buffer . "bar") '(:align . baz) '(:width . 11))
+
+
 (defun int<mis>:output:create (caller string &rest metadata)
   "Create a Mis Output Tree from STRING and METADATA(s).
 
@@ -185,8 +230,10 @@ CALLER should be calling function's name. It can be one of:
                 ;; List of alists...
                 (list
                  ;; Alist with `:string' & `:metadata' keys, validated values.
-                 (list (cons :string string)
-                       (cons :metadata metadata)))))))
+                 (apply #'int<mis>:output:create/entry
+                        caller
+                        string
+                        metadata))))))
 ;; (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz))
 ;; (int<mis>:valid:output? 'test 'output (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz)))
 
@@ -325,6 +372,136 @@ CALLER should be calling function's name. It can be one of:
            metadata)))
 ;; (int<mis>:output 'test "hello there" (mis:style :width 42 :align 'center))
 ;; (int<mis>:output 'test "hello there" (mis:style :width 42 :align 'center) '((:width . 11) (:align . left)))
+
+
+;;------------------------------------------------------------------------------
+;; Mis Output Tree String Functions
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:output/string:affix (caller prefix postfix entry)
+  "Attach PREFIX and POSTFIX to Mis Output Tree ENTRY's string.
+
+PREFIX and POSTFIX should be strings.
+
+ENTRY should be a Mis Output Tree Entry, which is an alist with keys:
+  - `:string'
+  - `:metadata'
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller   (list 'int<mis>:output/string:affix caller))
+         (string   (int<mis>:output:get/string caller entry))
+         (metadata (int<mis>:output:get/metadata caller entry))
+         (align    (alist-get :align metadata))
+         (width    (alist-get :width metadata)))
+
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    ;; We refuse to mess with nil, etc.
+    (int<mis>:valid:string? caller :string  string)
+    (int<mis>:valid:string? caller 'prefix  prefix)
+    (int<mis>:valid:string? caller 'postfix postfix)
+
+    ;; If they are aligned, they've need to have been given a width.
+    (when align
+      (int<mis>:valid:positive-integer? caller :width width))
+
+    ;;------------------------------
+    ;; Alignment-Aware Prefix & Postfix
+    ;;------------------------------
+    ;; Deal with string according to metadata, then return a new MOT entry.
+    (cond
+     ;;---
+     ;; Special Cases:
+     ;;---
+
+     ;; Empty String: Who cares what the metadata says?
+     ((string-empty-p string)
+      (apply #'int<mis>:output:create
+             caller
+             (int<mis>:string:affix prefix postfix string)
+             metadata))
+
+     ;;---
+     ;; Left/Center/Right Cases:
+     ;;---
+     ;; Carve out space for prefix/postfix in the string based on the alignment.
+
+     ((eq align 'left)
+      (let* ((prefix/length  (length prefix))
+             (postfix/length (length postfix))
+             (string/length  (length string))
+             (total/length   (+ prefix/length string/length postfix/length)))
+        ;; No room on left; if we need to trim down, do it all from the end of the string.
+        (if (> total/length width)
+            (apply #'int<mis>:output:create
+                   caller
+                   (int<mis>:string:affix prefix
+                                          postfix
+                                          (substring string 0 (- width prefix/length postfix/length)))
+                   metadata)
+          ;; No trim necessary; have the space to just affix.
+          (apply #'int<mis>:output:create
+                 caller
+                 (int<mis>:string:affix prefix
+                                        postfix
+                                        string)
+                 metadata))))
+
+     ((eq align 'center)
+      (let* ((prefix/length  (length prefix))
+             (postfix/length (length postfix)))
+        ;; Trim down each side by the length of the string being affixed there.
+        (apply #'int<mis>:output:create
+               caller
+               (int<mis>:string:affix prefix
+                                      postfix
+                                      (substring string
+                                                 prefix/length
+                                                 (- width postfix/length)))
+               metadata)))
+
+     ((eq align 'right)
+      (let* ((prefix/length  (length prefix))
+             (postfix/length (length postfix))
+             (string/length  (length string))
+             (total/length   (+ prefix/length string/length postfix/length)))
+        ;; No room on right; if we need to trim down, do it all from the beginning of the string.
+        (if (> total/length width)
+            (apply #'int<mis>:output:create
+                   caller
+                   (int<mis>:string:affix prefix
+                                          postfix
+                                          (substring string
+                                                     (+ prefix/length postfix/length)
+                                                     width))
+                   metadata)
+          ;; No trim necessary; have the space to just affix.
+          (apply #'int<mis>:output:create
+                 caller
+                 (int<mis>:string:affix prefix
+                                        postfix
+                                        string)
+                 metadata))))
+
+     ;;---
+     ;; No alignment: Nothing special to do.
+     ;;---
+     (t
+      (apply #'int<mis>:output:create
+             caller
+             (int<mis>:string:affix prefix postfix string)
+             metadata)))))
+;; (int<mis>:output/string:affix 'test
+;;                               ";; " ""
+;;                               '((:string . "    hello there     ") (:metadata (:align . center) (:width . 20))))
+;; from: '((:output ((:string . "    hello there     ") (:metadata (:align . center) (:width . 20)))))
+;; to:   '((:output ((:string . ";;  hello there     ") (:metadata (:align . center) (:width . 20)))))
 
 
 ;;------------------------------------------------------------------------------

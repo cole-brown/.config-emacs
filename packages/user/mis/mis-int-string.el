@@ -14,7 +14,6 @@
 
 (require 'mis-error)
 (require 'mis-valid)
-(require 'mis-int-syntax)
 
 
 ;;------------------------------------------------------------------------------
@@ -44,7 +43,7 @@
 (defun int<mis>:string:lines/affix (prefix postfix &rest string)
   "Attach PREFIX and POSTFIX to each line in each STRING.
 
-Does not split LINE; caller should split before calling."
+Splits each STRING into lines."
   (mapconcat (lambda (each) "Split EACH into lines, do prefix/postfix."
                (mapconcat (lambda (line) "Combine LINE with prefix & postfix."
                             (int<mis>:string:affix prefix postfix line))

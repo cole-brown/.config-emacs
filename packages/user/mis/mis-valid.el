@@ -83,7 +83,8 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
 
 (defconst int<mis>:keywords:metadata
   '(:buffer
-    :align)
+    :align
+    :width)
   "Valid metadata keywords.")
 
 
