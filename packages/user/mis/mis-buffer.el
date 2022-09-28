@@ -116,7 +116,7 @@ CALLER should be calling function's name. It can be one of:
       ((or :mis 'mis)
        mis:buffer:name)
       ((pred bufferp)
-       name)
+       (buffer-name name))
       ((pred stringp)
        name)
       (_
