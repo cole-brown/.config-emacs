@@ -132,14 +132,6 @@ CALLER should be calling function's name. It can be one of:
 ;;   (nth 0 (int<mis>:output:get/entries 'test
 ;;                                       (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
 ;;  nil)
-;;
-;; (int<mis>:output:update/metadata
-;;  'test
-;;  nil
-;;  (int<mis>:output:get/metadata
-;;   'test
-;;   (nth 0 (int<mis>:output:get/entries 'test
-;;                                       (int<mis>:output:create 'test "also this" '(:align . center))))))
 
 
 (defun int<mis>:output:create/entry (caller string &rest metadata)

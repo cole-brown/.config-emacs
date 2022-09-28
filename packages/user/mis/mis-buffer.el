@@ -17,6 +17,7 @@
 
 
 (require 'mis-error)
+(require 'mis-tree-output)
 
 
 ;;------------------------------------------------------------------------------
@@ -167,6 +168,42 @@ CALLER should be calling function's name. It can be one of:
                                caller)
                          name)))
 ;; (int<mis>:buffer:get 'test :messages)
+
+
+(defun int<mis>:buffer:metadata (caller buffer output)
+  "Given BUFFER name or object, put name /and/ object in Mis OUTPUT Tree.
+
+Gets or creates the buffer object.
+
+BUFFER should be something that `int<mis>:buffer:name' understands.
+
+Return OUTPUT with updated metadata:
+  - buffer name under `:buffer:name' key
+  - buffer object under `:buffer:object' key
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:buffer:metadata caller)))
+    (apply #'int<mis>:output:create
+           caller
+           nil
+           (int<mis>:output:update/metadata
+            caller
+            (int<mis>:output:get/metadata caller output)
+            (int<mis>:output:get/metadata caller
+                                          (int<mis>:output:create/entry
+                                           caller
+                                           nil
+                                           (cons :buffer:object (int<mis>:buffer:get-or-create caller buffer))
+                                           (cons :buffer:name   (int<mis>:buffer:name          caller buffer))))))))
+;; (int<mis>:buffer:metadata 'test nil nil)
+;; (int<mis>:output/metadata:find 'test
+;;                                :buffer:name
+;;                                (int<mis>:buffer:metadata 'test nil nil))
 
 
 ;;------------------------------------------------------------------------------
