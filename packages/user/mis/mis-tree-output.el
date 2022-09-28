@@ -167,10 +167,67 @@ CALLER should be calling function's name. It can be one of:
     ;; Create the MOT entry.
     ;;------------------------------
     ;; Alist with `:string' & `:metadata' keys, validated values.
-    (list (cons :string string)
-          (cons :metadata metadata))))
+    (list (int<mis>:output:create/string caller string)
+          (apply #'int<mis>:output:create/metadata caller metadata))))
 ;; (int<mis>:output:create/entry 'test "foo" '(:buffer . "bar") '(:align . center) '(:width . 11))
 ;; (int<mis>:output:create/entry 'test "foo" '(:buffer . "bar") '(:align . (affix center)) '(:width . 11))
+
+
+(defun int<mis>:output:create/string (caller string)
+  "Create a Mis Output Tree Entry from STRING.
+
+STRING should be nil or a string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:output:create/entry caller)))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (int<mis>:valid:string-or-nil? caller
+                                   'string
+                                   string)
+
+    ;;------------------------------
+    ;; Create the string.
+    ;;------------------------------
+    (cons :string string)))
+;; (int<mis>:output:create/string 'test "foo")
+
+
+(defun int<mis>:output:create/metadata (caller &rest metadata)
+  "Create a Mis Output Tree Entry's metadata from METADATA(s).
+
+Each METADATA should nil or a cons of a keyword and... some value.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:output:create/entry caller)))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (when (and (not (null metadata))
+               (not (seq-every-p #'consp
+                                 metadata)))
+      (int<mis>:error caller
+                      "Mis Output Metadata must be nil or a cons alist. Got %S: %S"
+                      (type-of metadata)
+                      metadata))
+
+    ;;------------------------------
+    ;; Create the metadata.
+    ;;------------------------------
+    (cons :metadata metadata)))
+;; (int<mis>:output:create/metadata 'test '(:buffer . "bar") '(:align . center) '(:width . 11))
+;; (int<mis>:output:create/metadata 'test '(:buffer . "bar") '(:align . (affix center)) '(:width . 11))
 
 
 (defun int<mis>:output:create (caller string &rest metadata)
@@ -496,6 +553,55 @@ CALLER should be calling function's name. It can be one of:
 ;;                               '((:string . "    hello there     ") (:metadata (:align . center) (:width . 20))))
 ;; from: '((:output ((:string . "    hello there     ") (:metadata (:align . center) (:width . 20)))))
 ;; to:   '((:output ((:string . ";;  hello there     ") (:metadata (:align . center) (:width . 20)))))
+
+
+;;------------------------------------------------------------------------------
+;; Mis Output Tree String Functions
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:output/metadata:find (caller key output &optional default)
+  "Find KEY in metadata alists in Mis OUTPUT Tree.
+
+Return value of first KEY found or DEFAULT if none found.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:output/metadata:find caller))
+         (entries (int<mis>:output:get/entries caller output))
+         ;; Use `:does-not-exist' so we know if we found something or not.
+         ;; Translate to DEFAULT later.
+         (value :does-not-exist)
+         found)
+    ;; Wander around the alist looking for this KEY...
+    (while (and (not found)
+                entries)
+      (let ((value/entry (alist-get key
+                                    (int<mis>:output:get/metadata caller (pop entries))
+                                    :does-not-exist)))
+        (unless (eq value/entry :does-not-exist)
+          (setq value value/entry
+                found t))))
+
+    ;; Did we actually find anything?
+    (when (eq value :does-not-exist)
+      ;; No; translate `:does-not-exist' back to DEFAULT.
+      (setq value default))
+
+    value))
+;; (int<mis>:output/metadata:find 'test
+;;                                :width
+;;                                '((:output ((:string . "    hello there     ") (:metadata (:align . center) (:width . 20))))))
+;; (int<mis>:output/metadata:find 'test
+;;                                :jeff
+;;                                '((:output ((:string . "    hello there     ") (:metadata (:align . center) (:width . 20))))))
+;; (int<mis>:output/metadata:find 'test
+;;                                :jeff
+;;                                '((:output ((:string . "    hello there     ") (:metadata (:align . center) (:width . 20)))))
+;;                                :dne)
 
 
 ;;------------------------------------------------------------------------------

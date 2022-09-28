@@ -96,13 +96,13 @@ CALLER should be calling function's name. It can be one of:
              (insert string "\n"))))))
 
 
-(defun int<mis>:print (caller output metadata)
+(defun int<mis>:print (caller metadata output)
   "Finalize and print strings in Mis OUTPUT Tree to the output buffer.
 
 OUTPUT should be a Mis Output Tree.
 
-METADATA should be nil or an alist of any top-level metadata (like the output
-buffer settings).
+METADATA should be nil or a Mis Output Tree of any top-level metadata (like the
+output buffer settings).
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -111,9 +111,11 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller  (list 'int<mis>:print caller))
-         ;; buffer name string or buffer object or nil
-         (buffer/meta (int<mis>:metadata:get/value caller :buffer metadata))
-         ;; buffer object
+         ;; buffer name string, buffer object, or nil
+         (buffer/meta (int<mis>:output/metadata:find caller
+                                                     :buffer
+                                                     metadata))
+         ;; buffer object for sure
          (buffer (int<mis>:buffer:get-or-create caller buffer)))
 
     ;; Enter buffer & save mark/excursion once, then print each string.

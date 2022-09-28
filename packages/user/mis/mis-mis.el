@@ -32,7 +32,8 @@
   (let (styling
         content
         output
-        buffer)
+        buffer
+        metadata-mot) ;; Mis Output Tree of just (top-level) metadata.
 
     ;;------------------------------
     ;; Parsing & Validation
@@ -72,7 +73,7 @@
               ((keywordp arg)
                (let ((key arg)
                      (value (pop arg)))
-                 ;; Validate top-level Mis arg.
+                 ;; Put top-level Mis arg into top-level metadata.
                  (pcase key
                    (:buffer
                     (if buffer
@@ -82,9 +83,11 @@
                                         buffer
                                         value
                                         args)
-                      ;; Validate value later (when used)?
+                      ;; Validate value later (when used).
                       (setq buffer value)))
+
                    ;; TODO: Other top-level keywords?
+
                    (_
                     (int<mis>:error 'mis
                                     '("Unknown/unhandled args keyword/value pair!"
@@ -102,31 +105,56 @@
                                args)))))
 
     ;;------------------------------
-    ;; Compile Mis syntax into strings.
+    ;; Context of Target Buffer
     ;;------------------------------
-    ;; Compile each piece of `content' in current (reverse) order & push to
-    ;; `output' list. Final step will then have `output' in forwards order.
-    (while content
+    ;;
+    ;; First, get the buffer name & object from... whichever we do or do not
+    ;; have right now.
+    (setq metadata-mot (int<mis>:output:update/metadata
+                        caller
+                        metadata-mot
+                        (int<mis>:buffer:metadata caller
+                                                  buffer
+                                                  metadata-mot))
+          ;; Now change `buffer' from "dunno... name, object, nil maybe?" to "def. object".
+          buffer (int<mis>:output/metadata:find caller
+                                                :buffer:object
+                                                metadata-mot))
+
+    ;; We need to be in the context of the target buffer while parsing,
+    ;; compiling, etc... So now that we know what the target buffer is, switch
+    ;; to be in it.
+    (with-current-buffer buffer
+
+      ;;------------------------------
+      ;; Compile Mis syntax into strings.
+      ;;------------------------------
+      ;; Compile each piece of `content' in current (reverse) order & push to
+      ;; `output' list. Final step will then have `output' in forwards order.
+      (while content
+        (int<mis>:debug 'mis
+                        "compile: %S"
+                        (nth 0 content))
+        ;; Get a syntax tree; turn into a string.
+        (push (int<mis>:compile 'mis
+                                (pop content)
+                                styling)
+              output))
+
       (int<mis>:debug 'mis
-                      "compile: %S"
-                      (nth 0 content))
-      ;; Get a syntax tree; turn into a string.
-      (push (int<mis>:compile 'mis
-                              (pop content)
-                              styling)
-            output))
+                      "compiled output: %S"
+                      output)
 
-    (int<mis>:debug 'mis
-                    "compiled output: %S"
-                    output)
-
-    ;;------------------------------
-    ;; Print Output
-    ;;------------------------------
-    ;; Now that we only have output left, switch to output buffer and print.
-    (mis:print:strings 'mis
-                       buffer
-                       output)))
+      ;;------------------------------
+      ;; Print Output
+      ;;------------------------------
+      ;; Now we should only have outputs left; print 'em.
+      (int<mis>:print 'mis
+                      ;; Our top-level metadata like `:buffer'.
+                      (int<mis>:output:create caller
+                                              nil
+                                              metadata)
+                      output))))
 ;; (mis
 ;;  (mis:style :width 80)
 ;;  (mis:line "-"))
