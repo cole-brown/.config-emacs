@@ -31,14 +31,6 @@
 (require 'mis-parse)
 (require 'mis-buffer)
 
-;;------------------------------
-;; Might should split into internal & API?
-;;------------------------------
-(require 'mis-string)
-
-;;------------------------------
-;; Output API & Type Compiler
-;;------------------------------
 (require 'mis-compile)
 
 ;;------------------------------
@@ -54,13 +46,13 @@
 ;;------------------------------
 ;; Input APIs, Type Compilers, & Stylers
 ;;------------------------------
+(require 'mis-string)
 (require 'mis-format)
 (require 'mis-trim)
 (require 'mis-indent)
 (require 'mis-align)
 (require 'mis-art)
 (require 'mis-comment)
-(require 'mis-message)
 
 ;;------------------------------
 ;; Mis' Top-Level API
