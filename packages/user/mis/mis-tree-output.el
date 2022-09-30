@@ -51,10 +51,10 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:output:get/entries 'test '((:output ((:string . "foo") (:metadata . :foo)) ((:string . "bar") (:metadata . :bar)))))
 
 
-(defun int<mis>:output:get/string (caller output)
-  "Return output string from OUTPUT alist.
+(defun int<mis>:output:get/string (caller entry)
+  "Return MOT string from Mis Output Tree ENTRY alist.
 
-OUTPUT should be an alist with key/value conses.
+ENTRY should be an alist with key/value conses.
   - valid keys: `:string', `:metadata'
 
 CALLER should be calling function's name. It can be one of:
@@ -63,14 +63,14 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (alist-get :string output))
+  (alist-get :string entry))
 ;; (int<mis>:output:get/string 'test '((:string . "foo") (:metadata . :foo)))
 
 
-(defun int<mis>:output:get/metadata (caller output)
-  "Return output metadata from OUTPUT alist.
+(defun int<mis>:output:get/metadata (caller entry)
+  "Return MOT metadata from ENTRY alist.
 
-OUTPUT should be an alist with key/value conses.
+ENTRY should be an alist with key/value conses.
   - valid keys: `:string', `:metadata'
 
 CALLER should be calling function's name. It can be one of:
@@ -79,7 +79,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (alist-get :metadata output))
+  (alist-get :metadata entry))
 ;; (int<mis>:output:get/metadata 'test '((:string . "foo") (:metadata . :foo)))
 ;; (int<mis>:output:get/metadata
 ;;  'test

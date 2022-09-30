@@ -109,7 +109,7 @@ LENGTH should be an integer greater than zero."
 ;;------------------------------------------------------------------------------
 
 (defun int<mis>:compile:format (caller syntax style)
-  "Format Mis SYNTAX Tree using STYLE; return string.
+  "Format Mis SYNTAX Tree using STYLE; return a Mis Output Tree.
 
 SYNTAX should be `:format' syntax tree.
 Example: '((:format (:formatter . repeat) (:string . \"-\")))
@@ -132,9 +132,8 @@ CALLER should be calling function's name. It can be one of:
          (value (int<mis>:syntax:find caller
                                       syntax
                                       :format :value))
-         output/string
-         output
-         output/styled)
+         value/metadata
+         output/string)
     (int<mis>:debug caller "syntax:    %S" syntax)
     (int<mis>:debug caller "style:     %S" style)
     (int<mis>:debug caller "formatter: %S" formatter)
@@ -143,18 +142,15 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Sanity Checks
     ;;------------------------------
-    (cond ((null formatter)
-           (int<mis>:error caller
-                           '("SYNTAX should have some sort of `:formatter'? "
-                             "Got %S from %S")
-                           formatter
-                           syntax))
-
-          (t
-           nil))
+    (unless formatter
+      (int<mis>:error caller
+                      '("SYNTAX should have some sort of `:formatter'? "
+                        "Got %S from %S")
+                      formatter
+                      syntax))
 
     ;;------------------------------
-    ;; Do we have the output string?
+    ;; Process syntax enough to get an output string from it.
     ;;------------------------------
     ;; If the value is `child', we first have to go get a string from our children.
     (when (eq value 'child)
@@ -166,6 +162,20 @@ CALLER should be calling function's name. It can be one of:
                                             :format :children))
       (setq value (int<mis>:compile:children caller :format syntax style))
       (int<mis>:debug caller "<--value:  %S" value))
+
+    ;; If value is a Mis Output Tree, need to finalize it down to a single string.
+    (when (int<mis>:valid:output? caller 'value value :no-error)
+      (let* ((mot (int<mis>:output:finalize/block caller value))
+             (mot/entries (int<mis>:output:get/entries caller mot))
+             (mot/entry/0 (nth 0 mot/entries)))
+        ;; Sanity checks & extract string.
+        (when (> (length mot/entries) 1)
+          (int<mis>:error caller
+                          '("Finalized Mis Output Tree has more than one entry?! "
+                            "mot: %S")
+                          mot))
+        (setq value          (int<mis>:output:get/string   caller mot/entry/0)
+              value/metadata (int<mis>:output:get/metadata caller mot/entry/0))))
 
     ;;------------------------------
     ;; Format output string.
@@ -207,23 +217,25 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Style formatted string & return.
     ;;------------------------------
-    (setq output (int<mis>:output caller
-                                  output/string
-                                  (int<mis>:syntax:merge/style caller
-                                                               :format
-                                                               syntax
-                                                               style)))
-    (int<mis>:debug caller "output:           %S" output)
-
-    (setq output/styled (int<mis>:style caller
-                                        output
-                                        :format
-                                        syntax
-                                        style))
-    (int<mis>:debug caller "<--output/styled: %S" output/styled)
-    output/styled))
+    (let ((output/unstyled (int<mis>:output caller
+                                            output/string
+                                            (int<mis>:syntax:merge/style caller
+                                                                         :format
+                                                                         syntax
+                                                                         style)
+                                            value/metadata))
+          output/styled)
+      (int<mis>:debug caller "output/unstyled:  %S" output/unstyled)
+      (setq output/styled (int<mis>:style caller
+                                          output/unstyled
+                                          :format
+                                          syntax
+                                          style))
+      (int<mis>:debug caller "<--output/styled: %S" output/styled)
+      output/styled)))
 ;; (int<mis>:compile:format 'test '((:format (:formatter . repeat) (:value . "-"))) '((:style (:width . 80))))
 ;; (int<mis>:compile:format 'test (mis:line "-") (mis:style :width 80))
+
 
 (int<mis>:compiler:register :format #'int<mis>:compile:format)
 
