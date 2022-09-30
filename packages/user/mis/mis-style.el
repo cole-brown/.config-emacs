@@ -88,7 +88,7 @@ Or if function doesn't care about anything: (CALLER STRING &rest _)
     - Allows one func to handle multiple keywords, like `:trim', `:trim:left'...
   - VALUE will be whatever the KEY's value is."
   (or (alist-get style int<mis>:stylers)
-      (int<mis>:error 'int<mis>:style:get
+      (int<mis>:error 'int<mis>:styler:get
                       "No styler found for `%S'!"
                       style)))
 ;; (int<mis>:styler:get :align)
@@ -314,6 +314,7 @@ CALLER should be calling function's name. It can be one of:
 ;; Style Helpers
 ;;------------------------------------------------------------------------------
 
+;; TODO: syntax and/or output tree? Some styles can be in the output trees now (e.g. `:width').
 (defun int<mis>:style:get-or-dne (caller keyword syntax)
   "Get KEYWORD's value from styling in SYNTAX.
 
@@ -346,6 +347,8 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:style:get-or-dne 'test :width (mis:style :padding "-"))
 
 
+
+;; TODO: syntax and/or output tree? Some styles can be in the output trees now (e.g. `:width').
 (defun int<mis>:style:get (caller keyword syntax style/parent)
   "Get KEYWORD's value from styling in SYNTAX (preferred) or STYLE/PARENT.
 
@@ -404,8 +407,8 @@ CALLER should be calling function's name. It can be one of:
 
         ;; Key should be `:style'.
         ((int<mis>:syntax:has 'int<mis>:style:exclusive?
-                               syntax
-                               :style)
+                              syntax
+                              :style)
          (int<mis>:debug 'int<mis>:style:exclusive?
                          "Ok; style SYNTAX seems valid: %S"
                          syntax)
@@ -423,15 +426,23 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:style:exclusive? '((:style (:align . center)) (:string . "hello")))
 
 
-(defun int<mis>:style:width (caller style &optional default)
-  "Return `:width' from STYLE, or default.
+(defun int<mis>:style:width (caller &optional syntax output default)
+  "Return `:width' from SYNTAX, OUTPUT, or DEFAULT.
 
-STYLE should be a Mis Syntax Tree of styling.
+SYNTAX should be nil or a Mis Syntax Tree of styling.
   - Optional:
     - `:width'
       - Must be a positive integer.
-      - If it is not provided, will try to use DEFAULT.
-        - If DEFAULT is not provided, will use buffer's `fill-column'.
+
+OUTPUT should be nil a Mis Output Tree.
+  - Optional:
+    - `:width'
+      - Must be a positive integer.
+
+DEFAULT should be nil or a positive integer. If DEFAULT is not provided, will
+use buffer's `fill-column'.
+
+Prefers SYNTAX, then OUTPUT, then DEFAULT/`fill-column.
 
 Must be called in the context of the targeted output buffer so that
 `fill-column' can be correct.
@@ -445,15 +456,22 @@ CALLER should be calling function's name. It can be one of:
   ;;------------------------------
   ;; Get Width
   ;;------------------------------
-  (let ((width (or (int<mis>:syntax:find caller
-                                         style
-                                         :style :width)
-                   ;; Fallback to default if it's an integer > 0.
-                   (and (integerp default)
-                        (> default 0)
-                        default)
-                   ;; Fallback to buffer's `fill-column'.
-                   fill-column)))
+  (let* ((caller (list 'int<mis>:style:width caller))
+         ;; Prefer: SYNTAX first...
+         (width (or (int<mis>:syntax:find caller
+                                          syntax
+                                          :style :width)
+                    ;; OUTPUT second...
+                    (int<mis>:output/metadata:find caller
+                                                   :width
+                                                   output)
+
+                    ;; DEFAULT third...
+                    (and (integerp default)
+                         (> default 0)
+                         default)
+                    ;; Or, finally, current buffer's `fill-column'.
+                    fill-column)))
     ;;------------------------------
     ;; Error Check
     ;;------------------------------
@@ -469,15 +487,21 @@ CALLER should be calling function's name. It can be one of:
     width))
 
 
-(defun int<mis>:style:padding (caller style &optional default)
-  "Return `:padding' from STYLE, or DEFAULT.
+(defun int<mis>:style:padding (caller &optional syntax output default)
+  "Return `:padding' from SYNTAX, or DEFAULT.
 
-STYLE should be a Mis Syntax Tree of styling.
+SYNTAX should be nil or a Mis Syntax Tree of styling.
   - Optional:
     - `:padding'
       - Must be a character or a string of length 1.
-      - If not supplied, it will default to DEFAULT.
-        - If not supplied, it will default to a space (\" \").
+
+OUTPUT should be nil a Mis Output Tree.
+  - Optional:
+    - `:padding'
+      - Must be a character or a string of length 1.
+
+DEFAULT should be nil or a character or a string of length 1. If DEFAULT is not
+provided, it will default to a space (\" \").
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -488,87 +512,57 @@ CALLER should be calling function's name. It can be one of:
 
 Return padding as a string."
   ;;------------------------------
-  ;; Get Padding
+  ;; Error Checks
   ;;------------------------------
-  (let ((padding (int<mis>:syntax:find caller
-                                       style
-                                       :style :padding)))
+  (let* ((caller (list 'int<mis>:style:padding caller))
+         (syntax/padding (int<mis>:valid:string1-char-nil?
+                          caller
+                          "syntax padding"
+                          (int<mis>:syntax:find caller
+                                                syntax
+                                                :style :padding)
+                          :invalid))
+         (output/padding (int<mis>:valid:string1-char-nil?
+                          caller
+                          "output padding"
+                          (int<mis>:output/metadata:find caller
+                                                         :padding
+                                                         output)
+                          :invalid))
+         (default (int<mis>:valid:string1-char-nil?
+                   caller
+                   'default
+                   default
+                   :invalid))
+         (invalids '(:invalid nil))
+         padding)
 
     ;;------------------------------
-    ;; Error Checks & Fallbacks
+    ;; Determine padding from inputs/fallback.
     ;;------------------------------
-    (cond ((and (not (null padding))
-                (not (stringp padding))
-                (not (characterp padding)))
-           (int<mis>:error 'int<mis>:align
-                           "PADDING must be nil, a character, or a string of length 1. Got a %S: %S"
-                           (type-of padding)
-                           padding))
-
-          ((and (stringp padding)
-                (not (= (length padding) 1)))
-           (int<mis>:error 'int<mis>:align
-                           '("PADDING must be nil, a character, or a string of length 1. "
-                             "Got a string of length %S: %S")
-                           (length padding)
-                           padding))
-
-          ;;---
-          ;; Initial Fallback: DEFAULT
-          ;;---
-          ((and (null padding)
-                (not (null default)))
-           ;; Fallback to DEFAULT, and do the same error checks on it.
-           (setq padding default)
-           (cond ((and (not (null padding))
-                       (not (stringp padding))
-                       (not (characterp padding)))
-                  (int<mis>:error 'int<mis>:align
-                                  "PADDING must be nil, a character, or a string of length 1. Got a %S: %S"
-                                  (type-of padding)
-                                  padding))
-
-                 ((and (stringp padding)
-                       (not (= (length padding) 1)))
-                  (int<mis>:error 'int<mis>:align
-                                  '("PADDING must be nil, a character, or a string of length 1. "
-                                    "Got a string of length %S: %S")
-                                  (length padding)
-                                  padding))
-
-                 ;;---
-                 ;; Valid `default'.
-                 ;;---
-                 (t
-                  nil)))
-
-          ;;---
-          ;; Final Fallback: A Space.
-          ;;---
-          ((and (null padding)
-                (null default))
-           (setq padding " "))
-
-          ;;---
-          ;; Valid `padding'.
-          ;;---
-          (t
-           nil))
+    (setq padding (cond ((not (memq syntax/padding invalids))
+                         syntax/padding)
+                        ((not (memq output/padding invalids))
+                         output/padding)
+                        ((not (memq default invalids))
+                         default)
+                        (t
+                         " ")))
 
     ;;------------------------------
     ;; Normalize & Return
     ;;------------------------------
-    ;; `padding' is set to something valid: char or string.
+    ;; `padding' is set to nil or something valid: char or string.
     ;; Let's make that a string or a string.
     (if (characterp padding)
         (make-string 1 padding)
       padding)))
 ;; (int<mis>:style:padding 'test (mis:style :padding "?"))
 ;; (int<mis>:style:padding 'test nil)
-;; (int<mis>:style:padding 'test nil "!")
-;; (int<mis>:style:padding 'test nil ?!)
-;; (int<mis>:style:padding 'test (mis:style :padding "?") "!")
-;; (int<mis>:style:padding 'test (mis:style :width 10) "!")
+;; (int<mis>:style:padding 'test nil nil "!")
+;; (int<mis>:style:padding 'test nil nil ?!)
+;; (int<mis>:style:padding 'test (mis:style :padding "?") nil "!")
+;; (int<mis>:style:padding 'test (mis:style :width 10) nil "!")
 
 
 ;;------------------------------------------------------------------------------

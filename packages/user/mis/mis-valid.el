@@ -548,6 +548,8 @@ Signal an error if invalid; return normalized value if valid."
 ;;------------------------------------------------------------------------------
 ;; Signal an error on invalid input, instead of just returning nil.
 
+;; TODO: For all the predicates: Remove `&rest _`, replace with nothing or `&optional no-error?`.
+
 (defun int<mis>:valid:normalize->symbol (name keyword-or-symbol)
   "Normalizes a keyword or a symbol to a symbol.
 That is, removes ':' from the symbol name if present.
@@ -695,6 +697,47 @@ CALLER should be calling function's name. It can be one of:
                     (int<mis>:error:name name)
                     (type-of value)
                     value)))
+
+
+(defun int<mis>:valid:string1-char-nil? (caller name value &optional no-error?)
+  "Assert VALUE is a string of length 1, a character, or nil.
+
+Return VALUE or signal an error. If NO-ERROR? is non-nil, return NO-ERROR?
+instead of signaling an error.
+
+NAME should be VALUE's symbol name as a symbol, keyword, or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (cond ((and (not (null value))
+              (not (stringp value))
+              (not (characterp value)))
+         (if no-error?
+             no-error?
+           (int<mis>:error caller
+                           "%s must be of type string, character, or nil. Got %S: %S"
+                           (int<mis>:error:name name)
+                           (type-of value)
+                           value)))
+
+        ((and (stringp value)
+              (not (= (length value) 1)))
+         (if no-error?
+             no-error?
+           (int<mis>:error caller
+                           '("%s must be nil, a character, or a string of length 1. "
+                             "Got a string of length %S: %S")
+                           (int<mis>:error:name name)
+                           (length value)
+                           value)))
+
+        (t
+         ;; Not invalid; return it.
+         value)))
 
 
 (defun int<mis>:valid:member? (caller name value valids &rest _)
