@@ -602,6 +602,9 @@ CALLER should be calling function's name. It can be one of:
 ;;                                :jeff
 ;;                                '((:output ((:string . "    hello there     ") (:metadata (:align . center) (:width . 20)))))
 ;;                                :dne)
+;; (int<mis>:output/metadata:find 'test
+;;                                    :buffer:name
+;;                                    '((:output ((:string) (:metadata (:buffer:name . "*scratch*") (:buffer:object . 'fake-*scratch*-object))))))
 
 
 ;;------------------------------------------------------------------------------

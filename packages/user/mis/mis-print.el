@@ -24,16 +24,18 @@
 ;; Printing
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:print:string (caller output)
-  "Print OUTPUT to current buffer.
+(defun int<mis>:print:output/entry (caller buffer/type entry)
+  "Print Mis Output Tree ENTRY string to current buffer.
 
-OUTPUT should be an alist with key/value conses.
+BUFFER/TYPE should be a value from `int<mis>:buffer:type'.
+
+ENTRY should be an alist with key/value conses.
   - valid keys: `:string', `:metadata'
-NOTE: OUTPUT should be one of the output alists of a full Mis Output Tree.
+NOTE: ENTRY should be one of the output alists of a full Mis Output Tree.
 For example, if the full Mis Output Tree is:
   '((:output ((:string . \"foo\")  (:metadata (:bar . baz)))
              ((:string . \"zort\") (:metadata (:poit . narf)))))
-Then OUTPUT should be, e.g.:
+Then ENTRY should be, e.g.:
   '((:string . \"foo\")  (:metadata (:bar . baz)))
 
 Caller should be in correct position of correct buffer.
@@ -44,14 +46,24 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller (list 'int<mis>:print:string caller))
-         (string (int<mis>:output:get/string caller output))
-         (metadata (int<mis>:output:get/metadata caller output)))
+  (let* ((caller   (list 'int<mis>:print:output/entry caller))
+         (string   (int<mis>:output:get/string caller entry))
+         (metadata (int<mis>:output:get/metadata caller entry)))
+    (int<mis>:debug caller
+                    "print string: %S"
+                    string)
+    (int<mis>:debug caller
+                    "print metadata: %S"
+                    metadata)
+
     ;;------------------------------
     ;; No-Ops
     ;;------------------------------
     ;; Null string is ok; we do nothing.
     (cond ((null string)
+           (int<mis>:debug caller
+                           "print nothing == do nothing. string: %S"
+                           string)
            nil)
 
           ;;------------------------------
@@ -62,41 +74,64 @@ CALLER should be calling function's name. It can be one of:
            (int<mis>:error caller
                            "Output string must be a string or nil. Got %S from %S"
                            string
-                           output))
+                           entry))
 
           ;;------------------------------
-          ;; Print!
+          ;; Print String to Buffer
           ;;------------------------------
           (t
-           ;;------------------------------
-           ;; TODO: Finalize String
-           ;;------------------------------
-           ;; TODO: string alignment and other finalization? or is that done elsewhere?
+           (int<mis>:debug caller
+                           "buffer/type: %S"
+                           buffer/type)
 
-           ;;------------------------------
-           ;; Print String to Buffer
-           ;;------------------------------
-           ;; Special Shenanigans™ Part 01: *Messages*
+           ;;---
+           ;; Special Shenanigans™ Part 01: '*Messages*' Side-Effects
+           ;;---
            ;; Set `message-log-max' to nothing and then `message' so normal stuff
-           ;; happens /EXCEPT/ for STRING getting printed to *Messages*.
-           (when (eq (int<mis>:buffer:type caller buffer) :messages)
+           ;; happens /EXCEPT/ for STRING getting printed to '*Messages*'.
+           (when (eq buffer/type :messages)
+             (int<mis>:debug caller
+                             "`:messages' shenanigans part 01: `message' for side-effects"
+                             buffer/type)
              (let ((message-log-max nil))
-               (message string)))
+               (message string))
 
-           (goto-char (point-max))
+             ;;---
+             ;; Special Shenanigans™ Part 02: Append-Only Buffers (e.g. '*Messages*')
+             ;;---
+             ;; Only ever append to the *Messages* buffer.
+             ;; TODO: An `:append' metadata or something to generalize this?
+             (int<mis>:debug caller
+                             "`:messages' shenanigans part 02: Go to end of '*Messages*' buffer")
+             (goto-char (point-max)))
 
-           ;; Special Shenanigans™ Part 02: Read-Only Buffers (e.g. *Messages*)
+           ;;---
+           ;; Special Shenanigans™ Part 03: Read-Only Buffers (e.g. '*Messages*')
+           ;;---
            ;; Ignore read-only status of buffer while we output to it. Need this to
            ;; be able to actually print our output to *Messages* with its properties
            ;; intact.
-           (let ((inhibit-read-only t))
-             ;; TODO: Test this to make sure we don't get extra newlines. It looks correct?
+           ;; TODO: "ignore/inhibit read only" metadata prop?
+           (int<mis>:debug caller
+                           "`:messages' shenanigans part 03: force inhibit read-only? %S & %S == %S"
+                           (eq buffer/type :messages)
+                           buffer-read-only
+                           (and (eq buffer/type :messages)
+                                buffer-read-only))
+           (let ((inhibit-read-only (if (and (eq buffer/type :messages)
+                                             buffer-read-only)
+                                        t
+                                      inhibit-read-only)))
+             (int<mis>:debug caller
+                             "insert string...")
              (unless (zerop (current-column))
                (insert "\n"))
-             (insert string "\n"))))))
+             ;; TODO: Test this to make sure we don't get extra newlines. It looks correct?
+             ;; (insert string "\n")
+             (insert string))))))
 
 
-(defun int<mis>:print (caller metadata output)
+(defun int<mis>:print:output (caller metadata output)
   "Finalize and print strings in Mis OUTPUT Tree to the output buffer.
 
 OUTPUT should be a Mis Output Tree.
@@ -110,26 +145,94 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller  (list 'int<mis>:print caller))
-         ;; buffer name string, buffer object, or nil
-         (buffer/meta (int<mis>:output/metadata:find caller
-                                                     :buffer
-                                                     metadata))
-         ;; buffer object for sure
-         (buffer (int<mis>:buffer:get-or-create caller buffer)))
+  (let* ((caller  (list 'int<mis>:print:output caller))
+         (buffer/object (int<mis>:output/metadata:find caller :buffer:object metadata))
+         (buffer/name   (int<mis>:output/metadata:find caller :buffer:name   metadata))
+         (buffer/type   (int<mis>:buffer:type          caller buffer/name)))
+
+    (int<mis>:debug caller
+                    "current-buffer (before): %S"
+                    (current-buffer))
+    (int<mis>:debug caller
+                    '("print to:\n"
+                      "  buffer/name:   %S\n"
+                      "  buffer/type:   %S\n"
+                      "  buffer/object: %S")
+                    buffer/name
+                    buffer/type
+                    buffer/object)
 
     ;; Enter buffer & save mark/excursion once, then print each string.
-    (with-current-buffer buffer
+    (with-current-buffer buffer/object
       (save-mark-and-excursion
+        (int<mis>:debug caller
+                        "current-buffer (printing): %S"
+                        (current-buffer))
         ;; Loop on the output strings/metadatas to finalize & print.
-        (dolist (output (int<mis>:output:get/entries caller tree))
-          (int<mis>:print:string caller output))))))
+        (dolist (entry (int<mis>:output:get/entries caller output))
+          (int<mis>:print:output/entry caller
+                                       buffer/type
+                                       entry))))))
+
+
+(defun int<mis>:print (caller metadata list/output)
+  "Finalize and print strings in list of Mis Output Trees LIST/OUTPUT.
+
+LIST/OUTPUT should be nil or a list of Mis Output Trees.
+
+METADATA should be nil or a Mis Output Tree of any top-level metadata (like the
+output buffer settings).
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller        (list 'int<mis>:print caller))
+         (buffer/object (int<mis>:output/metadata:find caller :buffer:object metadata))
+         (buffer/name   (int<mis>:output/metadata:find caller :buffer:name   metadata))
+         (buffer/type   (int<mis>:buffer:type          caller buffer/name)))
+
+    (int<mis>:debug caller
+                    "metadata:    %S"
+                    metadata)
+    (int<mis>:debug caller
+                    "list/output: %S"
+                    list/output)
+
+    (int<mis>:debug caller
+                    "current-buffer (before): %S"
+                    (current-buffer))
+    (int<mis>:debug caller
+                    '("print to:\n"
+                      "  buffer/name:   %S\n"
+                      "  buffer/type:   %S\n"
+                      "  buffer/object: %S")
+                    buffer/name
+                    buffer/type
+                    buffer/object)
+
+    ;; Enter buffer & save mark/excursion once, then print each string.
+    (with-current-buffer buffer/object
+      (save-mark-and-excursion
+        (int<mis>:debug caller
+                        "current-buffer (printing): %S"
+                        (current-buffer))
+        ;; Loop on the list of output trees.
+        (dolist (output list/output)
+          ;; Loop on this output tree's entries of strings/metadatas to finalize & print.
+          (dolist (entry (int<mis>:output:get/entries caller output))
+            (int<mis>:print:output/entry caller
+                                         buffer/type
+                                         entry)))))))
 
 
 ;;------------------------------------------------------------------------------
 ;; Printing APIs
 ;;------------------------------------------------------------------------------
 
+;; TODO: Use `int<mis>:print'?
 (defun mis:print:message (buffer message &rest args)
   "Output formatted/propertized MESSAGE & ARGS to BUFFER.
 
@@ -166,6 +269,7 @@ ARGS should be the `format' ARGS for MESSAGE."
           (insert output "\n"))))))
 
 
+;; TODO: Use `int<mis>:print'?
 (defun mis:print:strings (caller buffer strings)
   "Output formatted/propertized MESSAGES to current buffer.
 
