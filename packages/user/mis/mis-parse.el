@@ -21,7 +21,7 @@
 ;;
 ;; So Mis functions like `mis:comment' must:
 ;;   - Evaluate their arguments.
-;;   - Return an Abstract Syntax Tree of themselves, basically.
+;;   - Return a Mis Syntax Tree of themselves, basically.
 ;; E.g.
 ;;   (mis:comment :align 'center (get-greeted))
 ;;    -> '((:comment
@@ -52,7 +52,7 @@
 ;;------------------------------------------------------------------------------
 
 (defun int<mis>:parse (caller category valid &rest args)
-  "Parse ARGS into a Mis Abstract Syntax Tree.
+  "Parse ARGS into a Mis Syntax Tree.
 
 CALLER should be calling function's name. It can be one of:
   - a string

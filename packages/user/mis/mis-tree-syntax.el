@@ -233,7 +233,7 @@ CALLER should be calling function's name. It can be one of:
 KVP should (each) be a cons of a KEY keyword and its value.
 example: '(:width . 10)
 
-SYNTAX should be a Mis abstract syntax tree. It will be updated with KVPs and
+SYNTAX should be a Mis Syntax Tree. It will be updated with KVPs and
 the updated value returned. Caller should set the return value back to the input
 arg as the update is not guaranteed to be in-place.
 Example:
@@ -269,7 +269,7 @@ Will call either `int<mis>:syntax:create' or `int<mis>:syntax:update'.
 KVP should (each) be a cons of a KEY keyword and its value.
 example: '(:width . 10)
 
-SYNTAX should be a Mis abstract syntax tree. It will be updated with KVPs and
+SYNTAX should be a Mis Syntax Tree. It will be updated with KVPs and
 the updated value returned. Caller should set the return value back to the input
 arg as the update is not guaranteed to be in-place.
 Example:
@@ -298,7 +298,7 @@ CALLER should be calling function's name. It can be one of:
 
 KEY should be a keyword.
 
-SYNTAX should be a Mis abstract syntax tree. Caller should set the return value
+SYNTAX should be a Mis Syntax Tree. Caller should set the return value
 back to the input arg as the delete is not guaranteed to be in-place.
 Example: (setq syntax (int<mis>:syntax:delete 'test :style syntax))
 
@@ -370,7 +370,7 @@ CALLER should be calling function's name. It can be one of:
 (defun int<mis>:syntax:merge (caller syntax/to syntax/from &rest ignore/from)
   "Merge two Mis Syntax Trees, ignoring IGNORE/FROM keys.
 
-SYNTAX/TO and SYNTAX/FROM should be Mis abstract syntax trees. SYNTAX/FROM will
+SYNTAX/TO and SYNTAX/FROM should be Mis Syntax Trees. SYNTAX/FROM will
 be merged into SYNTAX/TO, except any keywords from IGNORE/FROM.
 
 NOTE: Assumes SYNTAX/TO and SYNTAX/FROM are valid. Caller should call
@@ -405,7 +405,7 @@ CALLER should be calling function's name. It can be one of:
 
 KEY should be a keyword.
 
-SYNTAX should be a Mis abstract syntax trees.
+SYNTAX should be a Mis Syntax Trees.
 
 KVP should (each) be a cons of a KEY keyword and its value.
 example: '(:width . 10)
