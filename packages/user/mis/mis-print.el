@@ -124,11 +124,16 @@ CALLER should be calling function's name. It can be one of:
                                       inhibit-read-only)))
              (int<mis>:debug caller
                              "insert string...")
+             ;; Make sure each message to '*Messages*' is on a new line?
              (unless (zerop (current-column))
                (insert "\n"))
-             ;; TODO: Test this to make sure we don't get extra newlines. It looks correct?
-             ;; (insert string "\n")
-             (insert string))))))
+
+             (insert string)
+
+             (when (eq buffer/type :messages)
+               ;; '*Messages*' expects a newline at end of each message, so make
+               ;; sure to give it.
+               (insert "\n")))))))
 
 
 (defun int<mis>:print:output (caller metadata output)

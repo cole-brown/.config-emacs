@@ -80,9 +80,13 @@ Return:
       ((or :mis 'mis)
        :standard)
       ((pred bufferp)
-       :standard)
+       (if (string= "*Messages*" (buffer-name name))
+           :messages
+         :standard))
       ((pred stringp)
-       :standard)
+       (if (string= "*Messages*" name)
+           :messages
+         :standard))
       ((pred symbolp)
        :standard)
       (_
@@ -91,6 +95,7 @@ Return:
                        name)))))
 ;; (int<mis>:buffer:type 'test :mis)
 ;; (int<mis>:buffer:type 'test 'testing)
+;; (int<mis>:buffer:type 'test "*Messages*")
 
 
 (defun int<mis>:buffer:name (caller &optional name)
