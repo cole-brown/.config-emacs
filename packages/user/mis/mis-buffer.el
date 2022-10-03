@@ -82,12 +82,15 @@ Return:
       ((pred bufferp)
        :standard)
       ((pred stringp)
-       name)
+       :standard)
+      ((pred symbolp)
+       :standard)
       (_
        (int<mis>:error (list 'int<mis>:buffer:name caller)
                        "Cannot determine buffer type from `%S'."
                        name)))))
 ;; (int<mis>:buffer:type 'test :mis)
+;; (int<mis>:buffer:type 'test 'testing)
 
 
 (defun int<mis>:buffer:name (caller &optional name)
@@ -120,6 +123,8 @@ CALLER should be calling function's name. It can be one of:
        (buffer-name name))
       ((pred stringp)
        name)
+      ((pred symbolp)
+       (symbol-name name))
       (_
        (int<mis>:error (list 'int<mis>:buffer:name caller)
                        "Cannot determine buffer name from `%S'."
@@ -129,6 +134,7 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:buffer:name 'test 'message)
 ;; (int<mis>:buffer:name 'test :mis)
 ;; (int<mis>:buffer:name 'test "jeff")
+;; (int<mis>:buffer:name 'test 'jeff)
 ;; (int<mis>:buffer:name 'test (current-buffer))
 
 
