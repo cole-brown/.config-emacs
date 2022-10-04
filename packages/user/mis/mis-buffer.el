@@ -48,25 +48,26 @@ if it does not exist."
   :group 'mis:group
   :type  '(choice (const :tag ":messages (*Messages*)"                      :messages)
                   (const :tag ":mis (buffer named `mis:buffer:name' value)" :mis)
-                  string))
+                  (const :tag ":current (whatever `current-buffer' returns)" :current)
+                  (string :tag "Buffer Name")))
 
 
 ;;------------------------------------------------------------------------------
 ;; Buffer Functions
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:buffer:type (caller &optional name)
-  "Get a type keyword for buffer NAME.
+(defun int<mis>:buffer:type (caller &optional buffer)
+  "Get a type keyword for the BUFFER.
 
-NAME can be nil, a string, or a few different keywords/symbols.
+BUFFER can be nil, a string, or a few different keywords/symbols.
 If nil, use `mis:buffer:default'.
 Allowable keywords/symbols:
-  - `:messages', `messages'
-    - Send to *Messages* buffer.
-  - `:message', `message'
-    - Send to *Messages* buffer.
+  - `:messages', `messages', `:message', `message'
+    - Send to '*Messages*' buffer.
   - `:mis', `mis'
     - Send to `mis:buffer:name' buffer.
+  - `:current', `current', `:this', `this'
+    - Send to whatever buffer is the `current-buffer'.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -77,45 +78,32 @@ CALLER should be calling function's name. It can be one of:
 
 Return:
   - `:messages'
-  - `:standard'"
-  ;; NOTE: Keep in sync with `int<mis>:buffer:name'!
-  (let ((name (or name mis:buffer:default)))
-    (pcase name
-      ((or :messages 'messages :message 'message)
-       :messages)
-      ((or :mis 'mis)
-       :standard)
-      ((pred bufferp)
-       (if (string= "*Messages*" (buffer-name name))
-           :messages
-         :standard))
-      ((pred stringp)
-       (if (string= "*Messages*" name)
-           :messages
-         :standard))
-      ((pred symbolp)
-       :standard)
-      (_
-       (int<mis>:error (list 'int<mis>:buffer:name caller)
-                       "Cannot determine buffer type from `%S'."
-                       name)))))
+  - `:standard'
+  - error signal"
+  ;; Figure out buffer's type by translating to buffer's name and checking that.
+  (if (string= "*Messages*"
+               (int<mis>:buffer:name (list 'int<mis>:buffer:type caller)
+                                     buffer))
+      :messages
+    :standard))
 ;; (int<mis>:buffer:type 'test :mis)
 ;; (int<mis>:buffer:type 'test 'testing)
 ;; (int<mis>:buffer:type 'test "*Messages*")
+;; (int<mis>:buffer:type 'test :current)
 
 
-(defun int<mis>:buffer:name (caller &optional name)
-  "Get buffer name to use for output.
+(defun int<mis>:buffer:name (caller &optional buffer)
+  "Get BUFFER's name to use for output.
 
-NAME can be nil, a string, or a few different keywords/symbols.
+BUFFER can be nil, a string, or a few different keywords/symbols.
 If nil, use `mis:buffer:default'.
 Allowable keywords/symbols:
-  - `:messages', `messages'
-    - Send to *Messages* buffer.
-  - `:message', `message'
-    - Send to *Messages* buffer.
+  - `:messages', `messages', `:message', `message'
+    - Send to '*Messages*' buffer.
   - `:mis', `mis'
     - Send to `mis:buffer:name' buffer.
+  - `:current', `current', `:this', `this'
+    - Send to whatever buffer is the `current-buffer'.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -123,19 +111,21 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  ;; NOTE: Keep in sync with `int<mis>:buffer:name'!
-  (let ((name (or name mis:buffer:default)))
-    (pcase name
+  (let ((caller (list 'int<mis>:buffer:name caller))
+        (buffer (or buffer mis:buffer:default)))
+    (pcase buffer
       ((or :messages 'messages :message 'message)
        "*Messages*")
       ((or :mis 'mis)
        mis:buffer:name)
+      ((or :current 'current :this 'this)
+       (buffer-name (current-buffer)))
       ((pred bufferp)
-       (buffer-name name))
+       (buffer-name buffer))
       ((pred stringp)
-       name)
+       buffer)
       ((pred symbolp)
-       (symbol-name name))
+       (symbol-name buffer))
       (_
        (int<mis>:error (list 'int<mis>:buffer:name caller)
                        "Cannot determine buffer name from `%S'."
@@ -147,6 +137,7 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:buffer:name 'test "jeff")
 ;; (int<mis>:buffer:name 'test 'jeff)
 ;; (int<mis>:buffer:name 'test (current-buffer))
+;; (int<mis>:buffer:name 'test :current)
 
 
 (defun int<mis>:buffer:get-or-create (caller &optional name)
