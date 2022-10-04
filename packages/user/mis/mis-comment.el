@@ -359,13 +359,13 @@ CALLER should be calling function's name. It can be one of:
      ;;---
      ;; Contained in Mis Syntax Tree?
      ;;---
-     (
-      )
+     ((int<mis>:syntax:find caller
+                            syntax
+                            :comment position))
 
      ;;---
-     ;; Override?
+     ;; Contained in Override?
      ;;---
-    ;; If there's an override for POSITION, use that.
      ((alist-get position
                    (alist-get type
                               (alist-get major-mode int<mis>:comment:overrides))))
@@ -604,7 +604,7 @@ NOTE: Comment keyword args must always have both a keyword and a value."
                             (cons   :type          type)
                             ;; The comment start/end strings.
                             (cons   :prefix:major  (int<mis>:comment:get 'test syntax language type :prefix:major))
-                            (cons   :postfix:major (int<mis>:comment:get 'test syntax language type :prefix:major))
+                            (cons   :postfix:major (int<mis>:comment:get 'test syntax language type :postfix:major))
                             ;; Multiline comment middle lines start/end strings?
                             (when-let ((prefix/minor  (int<mis>:comment:get 'test syntax language type :prefix:minor)))
                               (cons :prefix:minor  prefix/minor))
