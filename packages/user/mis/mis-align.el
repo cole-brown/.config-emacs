@@ -97,8 +97,8 @@ Return an aligned string. If STRING is too long, returns it as-is
   (declare (pure t) (side-effect-free t))
 
   (let* ((caller  (list 'int<mis>:style:align caller))
-         (width   (int<mis>:style:width caller style))
-         (padding (int<mis>:style:padding caller style " ")))
+         (width   (int<mis>:style:width   caller style))
+         (padding (int<mis>:style:padding caller style nil " ")))
 
 
     (int<mis>:debug caller

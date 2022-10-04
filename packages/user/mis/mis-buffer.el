@@ -24,6 +24,12 @@
 ;; Settings
 ;;------------------------------------------------------------------------------
 
+(defcustom mis:buffer:name "ⓘ-mis-ⓘ"
+  "Name of Mis's buffer."
+  :group 'mis:group
+  :type '(string))
+
+
 (defcustom mis:buffer:default :messages
   "Default buffer to send Mis messages to when none is specified.
 
@@ -38,11 +44,11 @@ To send to the `mis:buffer:name' buffer, set to:
   - `:mis', `mis'
 
 Otherwise set to the string name of the desired buffer. Buffer will be created
-if it does not exist.")
-
-
-(defconst mis:buffer:name "ⓘ-mis-ⓘ"
-  "Name of Mis's buffer.")
+if it does not exist."
+  :group 'mis:group
+  :type  '(choice (const :tag ":messages (*Messages*)"                      :messages)
+                  (const :tag ":mis (buffer named `mis:buffer:name' value)" :mis)
+                  string))
 
 
 ;;------------------------------------------------------------------------------

@@ -93,8 +93,13 @@ Rest of the args: Probably Mis function calls.
                        ;; Parsing happens when these are evaluated, before
                        ;; `int<mis>:mis' is called.
                        ,@macro:rest)))))
-;; (mis :buffer 'foo
-;;      (message "hello there"))
+;; (mis
+;;  (mis:style :width 80)
+;;  (mis:line "-"))
+;; (mis
+;;  :buffer "*scratch*"
+;;  (mis:style :width 80)
+;;  (mis:line "-"))
 
 
 (defun int<mis>:mis (caller metatree &rest args)

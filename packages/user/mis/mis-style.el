@@ -43,17 +43,15 @@
 
 Keyword must be a member of `int<mis>:keywords:style'.
 
-Styler FUNCTION must have params:
-     (CALLER STRING SYNTAX STYLE &optional KEY VALUE)
-Or if function doesn't care about key/value:
-     (CALLER STRING STYLE &rest _)
-Or ignore even more if function doesn't care about them. e.g.:
+Styler FUNCTION must (at least) have params:
      (CALLER STRING &rest _)
+Stylers will be called with params:
+     (CALLER STRING SYNTAX STYLE KEY VALUE)
   - STRING will be the string to be styled.
   - SYNTAX should be a Mis Syntax Tree.
   - STYLE will be the current Mis Style Syntax Tree.
   - KEY will be the styling keyword encountered.
-    - Allows one func to handle multiple keywords, like `:trim', `:trim:left'...
+    - So one func can handle multiple keywords, like `:trim', `:trim:left'...
   - VALUE will be whatever the KEY's value is.")
 
 
@@ -143,7 +141,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller        (list 'int<mis>:style/string caller))
+  (let* ((caller        (list 'int<mis>:style/output-entry caller))
          (string/styled (int<mis>:output:get/string caller entry)) ; Initial assumption: it's already styled or nothing more to do.
          (metadata      (int<mis>:output:get/metadata caller entry)))
     (int<mis>:debug caller

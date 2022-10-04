@@ -500,6 +500,9 @@ Signal an error if invalid; return normalized value if valid."
       (:language
        (int<mis>:valid:string-symbol-nil? caller keyword value))
 
+      ((or :prefix:major :postfix:major :prefix:minor :postfix:minor)
+       (int<mis>:valid:string-or-nil? caller keyword value))
+
       ;;------------------------------
       ;; Fallthrough / Error
       ;;------------------------------

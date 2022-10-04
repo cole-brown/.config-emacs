@@ -40,6 +40,42 @@ Will check for the major mode or modes derived from it.
 Try to put the most common modes at the beginning of the list.")
 
 
+(defcustom mis:comment:overrides
+  '((org-mode . ((inline . ((:prefix:major  . "~")
+                            (:postfix:major . "~")))
+                 (block .  ((:prefix:major  . "#+begin_src%s")
+                            (:postfix:major . "#+end_src")))
+                 (quote .  ((:prefix:major  . "#+begin_src%s")
+                            (:postfix:major . "#+end_src")))))
+    (markdown-mode . ((inline . ((:prefix:major  . "`")
+                                 (:postfix:major . "`")))
+                      (block .  ((:prefix:major  . "```%s")
+                                 (:postfix:major . "```")))
+                      (quote .  ((:prefix:major  . "```%s")
+                                 (:postfix:major . "```"))))))
+  "Override start/end strings for comments by mode.
+
+Override `comment-start' & `comment-end' by setting `:prefix:major' &
+`:postfix:major'.
+
+Alist of major-mode to:
+  Alist of comment type (`inline', `block', `quote') to:
+    Alist of comment prefix/postfix (major & minor) strings.
+
+'%s' will be replaced by `:language' value or empty string."
+  :group 'mis:group
+  :type  '(alist :key-type   (symbol :tag "major-mode symbol")
+                 :value-type (alist :key-type   (choice (const inline)
+                                                        (const block)
+                                                        (const quote))
+                                    :value-type (alist :key-type (choice (const :prefix:major)
+                                                                         (const :postfix:major)
+                                                                         (const :prefix:minor)
+                                                                         (const :postfix:minor))
+                                                       :value-type string))))
+;; (alist-get :prefix:major (alist-get 'quote (alist-get 'org-mode int<mis>:comment:overrides)))
+
+
 ;;------------------------------------------------------------------------------
 ;; Helper Functions
 ;;------------------------------------------------------------------------------
@@ -270,6 +306,107 @@ LANGUAGE should be nil or string:
                          major-mode))))
 
 
+(defun int<mis>:comment:get (caller syntax language type position)
+  "Get comment characters string to prepend/postpend to the message string.
+
+SYNTAX should be a Mis Syntax Tree. It will be checked for prefix/postfix
+comment strings first, then the overrides in `mis:comment:overrides' will be
+checked, then Emacs will be checked (e.g. `comment-start').
+
+TYPE should be a return vaule from `int<mis>:comment:type/get'.
+
+POSITION should be one of:
+  - `:prefix:major'  - start of comment
+  - `:postfix:major' - end of comment
+  - `:prefix:minor'  - start of non-first line of multi-line comments
+  - `:postfix:minor' - end of non-last line of multi-line comments
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:comment:get caller)))
+    (int<mis>:debug caller
+                    "syntax:   %S"
+                    syntax)
+    (int<mis>:debug caller
+                    "language: %S"
+                    language)
+    (int<mis>:debug caller
+                    "type:     %S"
+                    type)
+    (int<mis>:debug caller
+                    "position: %S"
+                    position)
+    ;;------------------------------
+    ;; Error Checking
+    ;;------------------------------
+    (int<mis>:valid:comment/kvp? caller :type type)
+    (int<mis>:valid:member? caller
+                            'position
+                            position
+                            '(:prefix:major :prefix:minor :postfix:major :postfix:minor))
+    (int<mis>:valid:string-symbol-nil? 'int<mis>:comment:end
+                                       'language
+                                       language)
+
+    ;;------------------------------
+    ;; Figure out the comment strings.
+    ;;------------------------------
+    (cond
+     ;;---
+     ;; Contained in Mis Syntax Tree?
+     ;;---
+     (
+      )
+
+     ;;---
+     ;; Override?
+     ;;---
+    ;; If there's an override for POSITION, use that.
+     ((alist-get position
+                   (alist-get type
+                              (alist-get major-mode int<mis>:comment:overrides))))
+
+     ;;---
+     ;; Major Comment Delimiters:
+     ;;---
+     ;; Need to avoid `int<mis>:comment:start'/`int<mis>:comment:end' if
+     ;; `comment-normalize-vars' would cause a user prompt. It prompts when
+     ;; there's no `comment-start', so:
+     ((and (eq position :prefix:major)
+           (not (null comment-start)))
+      (int<mis>:comment:start type language))
+
+     ;; Same for the postfix. And still just check `comment-start' to avoid prompt.
+     ((and (eq position :postfix:major)
+           (not (null comment-start)))
+      (int<mis>:comment:end type language))
+
+     ;;---
+     ;; Minor Comment Delimiters:
+     ;;---
+     ((memq position '(:prefix:minor :postfix:minor))
+      ;; TODO: only available via overrides or... can we get from somewhere else?
+      ;; Dunno, but we're calling this for when it starts working here so... just return nil.
+      nil)
+
+     ;;---
+     ;; Fallthrough: Error
+     ;;---
+     (t
+      (int<mis>:error caller
+                      '("Don't know what to use to create a comment for: %S %S %S. "
+                        "No overrides in `int<mis>:comment:overrides' and nothing from Emacs.")
+                      language
+                      type
+                      position)))))
+;; (int<mis>:comment:get 'test 'lisp :inline :prefix:major)
+;; (int<mis>:comment:get 'test 'lisp :inline :prefix:major)
+
+
 ;; TODO: a func or something for "if type==block, insert-or-don't a newline
 ;; before-or-after-depending to separate from surrounding stuff"
 
@@ -465,10 +602,14 @@ NOTE: Comment keyword args must always have both a keyword and a value."
                             (when language
                               (cons :language      language))
                             (cons   :type          type)
-                            ;; TODO: `when' for `:postfix:minor'
-                            ;; TODO: `when' for `:prefix:minor'
-                            (cons   :postfix:major (int<mis>:comment:end type language))
-                            (cons   :prefix:major  (int<mis>:comment:start type language)))))
+                            ;; The comment start/end strings.
+                            (cons   :prefix:major  (int<mis>:comment:get 'test syntax language type :prefix:major))
+                            (cons   :postfix:major (int<mis>:comment:get 'test syntax language type :prefix:major))
+                            ;; Multiline comment middle lines start/end strings?
+                            (when-let ((prefix/minor  (int<mis>:comment:get 'test syntax language type :prefix:minor)))
+                              (cons :prefix:minor  prefix/minor))
+                            (when-let ((postfix/minor (int<mis>:comment:get 'test syntax language type :postfix:minor)))
+                              (cons :postfix:minor postfix/minor)))))
 ;; (mis:comment :align 'center "hello")
 ;; (mis:comment :type 'inline "hello")
 ;; (mis:comment :type 'block :align 'center "hello %s" "world")
@@ -477,6 +618,7 @@ NOTE: Comment keyword args must always have both a keyword and a value."
 ;; (mis:comment :width 80 :align 'center "foobar")
 ;; (mis:comment "foobar")
 ;; (mis:comment (mis:line "-"))
+;; (mis:comment :prefix:major "/*" :postfix:major "*/" :prefix:minor " *" :postfix:minor "" "foobar")
 
 
 ;;------------------------------------------------------------------------------
