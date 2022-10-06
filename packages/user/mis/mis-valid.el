@@ -499,7 +499,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let ((caller (list 'int<mis>:valid:style/exclusively?))) ;; TODO: caller as input param
+  (let ((caller (list 'int<mis>:valid:style/exclusively? caller)))
     ;; No styling is valid styling.
     (cond ((null syntax)
            (int<mis>:debug caller
