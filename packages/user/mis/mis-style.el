@@ -519,6 +519,87 @@ Return padding as a string."
 
 
 ;;------------------------------------------------------------------------------
+;; Compiler
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:compile:style (caller syntax style/ancestors)
+  "Compile Mis SYNTAX Tree using STYLE/ANCESTORS; return a Mis Output Tree.
+
+SYNTAX should be a `:style' syntax tree. It can contain styling of its own,
+which will override any styling in STYLE/ANCESTORS.
+Example:
+  '((:style (:align . center)
+            (:children (:format (:formatter . string)
+                                (:value . \"-=-\")))))
+
+STYLE/ANCESTORS should be nil or a Mis Syntax Tree of only `:style'.
+Example: (mis:style :width 80) -> '((:style (:width . 80)))
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller     (list 'int<mis>:compile:style caller))
+         (style/this (int<mis>:syntax:filter/style caller syntax))
+         (children   (int<mis>:syntax:find caller syntax :style :children))
+         value
+         value/metadata)
+    (int<mis>:debug caller "syntax:          %S" syntax)
+    (int<mis>:debug caller "style/ancestors: %S" style/ancestors)
+    (int<mis>:debug caller "style/this:      %S" style/this)
+    (int<mis>:debug caller "children:        %S" children)
+
+    ;;------------------------------
+    ;; Sanity Checks?
+    ;;------------------------------
+    ;; We should have some styling, probably, at least?
+    (unless style/this
+      (int<mis>:error caller
+                      '("SYNTAX is expected to be a `:style' Mis Output Tree "
+                        "with some styling. Found %S style kvps in: %S")
+                      style/this
+                      syntax))
+
+    ;;------------------------------
+    ;; No-op?
+    ;;------------------------------
+    (if (null children)
+        ;; Sometimes a solo style tree is valid, I think?
+        ;; So... not sure?
+        ;; (progn
+        ;;   (int<mis>:debug caller
+        ;;                   "No children; returning filtered style: %S"
+        ;;                   style/this)
+        ;;   style/this)
+        ;;
+        ;; Actually... Let's start of erroring and see if it actually is/should
+        ;; be valid...
+        (int<mis>:error caller
+                        '("Don't know what to compile for a `:style' Mis Output Tree "
+                          "without children: %S")
+                        syntax)
+
+      ;;------------------------------
+      ;; Compile children.
+      ;;------------------------------
+      ;; `int<mis>:compile:children' will handle merging our style with ancestors'.
+      (int<mis>:debug caller
+                      "Compile `:style' MST's children: %S"
+                      syntax)
+      (setq value (int<mis>:compile:children caller :style syntax style/ancestors))
+      (int<mis>:debug caller "<--value:  %S" value)
+
+      ;; Just return what `int<mis>:compile:children' gave us. It's a MOT and the string(s) is(/are) styled.
+      value)))
+;; (int<mis>:compile:style 'test (mis:line "-") (mis:style :width 80))
+
+
+(int<mis>:compiler:register :style #'int<mis>:compile:style)
+
+
+;;------------------------------------------------------------------------------
 ;; API: Styling
 ;;------------------------------------------------------------------------------
 

@@ -532,32 +532,46 @@ CALLER should be calling function's name. It can be one of:
            (int<mis>:debug caller
                            "SYNTAX has `:style'... is `:style' only styling?: %S"
                            syntax)
-           ;; All the entries of `:style' should be styling keywords/values.
-           (let ((valid-keys t))
-             (dolist (entry (int<mis>:syntax:get/value caller :style syntax))
-               (let ((key   (car entry))
-                     (value (cdr entry)))
-                 (unless (int<mis>:valid:style/kvp? caller key value)
-                   (int<mis>:debug caller
-                                   "Style SYNTAX has invalid key/value pair: %S = %S"
-                                   syntax
-                                   key
-                                   value)
-                   (setq valid-keys nil))))
+           ;; Do not let `int<mis>:valid:...' signal errors and break code flow.
+           ;; Non-exclusively styling trees are a-ok.
+           (condition-case _
+               ;; All the entries of `:style' should be styling keywords/values.
+               (let ((valid-keys t))
+                 (dolist (entry (int<mis>:syntax:get/value caller :style syntax))
+                   (let ((key   (car entry))
+                         (value (cdr entry)))
+                     (int<mis>:debug caller
+                                     "Style SYNTAX key `%S' valid? %S"
+                                     key
+                                     (int<mis>:valid:member? caller key key int<mis>:keywords:style))
+                     (unless (int<mis>:valid:member? caller key key int<mis>:keywords:style)
+                       (int<mis>:debug caller
+                                       "Style SYNTAX has invalid key `%S' = %S. SYNTAX: %S"
+                                       key
+                                       value
+                                       syntax)
+                       (setq valid-keys nil))))
 
-             (if valid-keys
-                 (progn
+                 (if valid-keys
+                     (progn
+                       (int<mis>:debug caller
+                                       "Ok; SYNTAX looks like only styling: %S"
+                                       syntax)
+                       ;; Return yep.
+                       t)
+
                    (int<mis>:debug caller
-                                   "Ok; SYNTAX looks like only styling: %S"
+                                   "Failure! Style SYNTAX is not only styling: %S"
                                    syntax)
-                   ;; Return yep.
-                   t)
-
-               (int<mis>:debug caller
-                               "Failure! Style SYNTAX is not only styling: %S"
-                               syntax)
-               ;; Return nope.
-               nil)))
+                   ;; Return nope.
+                   nil))
+             ;;---
+             ;; Condition-Case Signal Handlers:
+             ;;---
+             (error
+              ;; Probably a call to a `int<mis>:valid:...' function returned "no, not valid".
+              ;; Therefore this is not _only_ styling keywords, so return nope.
+              nil)))
 
           ;; Fallthrough: not styling so return nil.
           (t
@@ -648,7 +662,10 @@ Signal an error if invalid; return normalized value if valid."
 ;;------------------------------------------------------------------------------
 ;; Validation "Predicates"
 ;;------------------------------------------------------------------------------
-;; Signal an error on invalid input, instead of just returning nil.
+;; If valid, return the valid value.
+;;
+;; NOTE: nil can be a valid value, so these signal an error on invalid input.
+;; Use a `condition-case' if you need to validate and failure is a valid option.
 
 ;; TODO: For all the predicates: Remove `&rest _`, replace with nothing or `&optional no-error?`.
 

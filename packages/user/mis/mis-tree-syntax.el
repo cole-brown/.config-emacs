@@ -104,6 +104,66 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:syntax:get/style 'test :mummy '((:mummy (:test (:width . 10) (:align . :center)))))
 
 
+(defun int<mis>:syntax:filter/style (caller syntax)
+  "Filter SYNTAX down to only its style entries.
+
+SYNTAX should be nil or a Mis Syntax Tree with a `:style' entry.
+
+Return SYNTAX with non-style entries filtered out, or nil if nothing remains
+after filtering.
+Example 1:
+  (mis:style :align 'center \"Hello there.\")
+    -> '((:style (:children (:format (:formatter . string)
+                                     (:value . \"Hello there.\")))
+                 (:align . center)))
+  (int<mis>:style:filter (mis:style :align 'center \"Hello there.\"))
+    -> '((:style (:align . center)))
+
+Example 2:
+  (mis:style \"Hello there.\")
+    -> '((:style (:children (:format (:formatter . string)
+                                     (:value . \"Hello there.\")))))
+  (int<mis>:style:filter (mis:style :align 'center \"Hello there.\"))
+    -> nil
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:style:filter caller))
+         ;; All entries under `:style'.
+         (entries/style (int<mis>:syntax:get/value caller :style syntax))
+         ;; Only the entries under `:style' that are styling.
+         entries/filtered)
+
+    ;;------------------------------
+    ;; Sanity Checks
+    ;;------------------------------
+    (unless entries/style
+      (int<mis>:error caller
+                      "SYNTAX has no `:style' to filter. SYNTAX: %S, `:style' entries: %S"
+                      syntax
+                      entries/style))
+
+    ;;------------------------------
+    ;; Filtering
+    ;;------------------------------
+    (dolist (entry (nreverse entries/style))
+      (when (memq (car entry) int<mis>:keywords:style)
+        (push entry
+              entries/filtered)))
+
+    (when entries/filtered
+      (apply #'int<mis>:syntax:create
+             caller
+             :style
+             entries/filtered))))
+;; (int<mis>:syntax:filter/style 'test (mis:style :align 'center "Hello there."))
+;; (int<mis>:syntax:filter/style 'test (mis:style "Hello there."))
+
+
 (defun int<mis>:syntax:merge/style (caller category syntax style/parent)
   "Merge `:style' in SYNTAX and STYLE/PARENT together.
 
