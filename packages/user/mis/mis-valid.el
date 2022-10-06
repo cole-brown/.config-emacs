@@ -466,6 +466,15 @@ Signal an error if invalid; return normalized value if valid."
       ((or :trim :trim:left :trim:right)
        (int<mis>:valid:string-or-nil? caller keyword value))
 
+      ;; Style is allowed to have children right now. For example, center a few
+      ;; things by grouping them in a `mis:style':
+      ;;   (mis:style :align 'center
+      ;;              <thing-to-be-centered-1>
+      ;;              <thing-to-be-centered-2>
+      ;;              ...)
+      (:children
+       value)
+
       ;;------------------------------
       ;; Fallthrough / Error
       ;;------------------------------
@@ -473,6 +482,96 @@ Signal an error if invalid; return normalized value if valid."
        (int<mis>:error caller
                        "Don't know how to validate keyword %S"
                        keyword)))))
+
+
+(defun int<mis>:valid:style/exclusively? (caller syntax)
+  "Return non-nil if SYNTAX is _only_ styling; return nil otherwise.
+
+SYNTAX must be nil or must:
+  - Only have one branch.
+  - Only have `:style' branches.
+  - Only have styling keys in the `:style' branch.
+    - No sub-branches (children).
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:valid:style/exclusively?))) ;; TODO: caller as input param
+    ;; No styling is valid styling.
+    (cond ((null syntax)
+           (int<mis>:debug caller
+                           "Ok; Nil is a valid styling SYNTAX: %S"
+                           syntax)
+           t)
+
+          ;; Must have valid syntax.
+          ((not (int<mis>:valid:syntax? caller
+                                        'syntax
+                                        syntax
+                                        :no-error))
+           (int<mis>:debug caller
+                           "Invalid mis SYNTAX! %S"
+                           syntax)
+           nil)
+
+          ;; (Alist) syntax should contain only 1 element.
+          ((not (eq 1 (length syntax)))
+           (int<mis>:debug caller
+                           "Style SYNTAX should be length 1, got %d: %S"
+                           (length syntax)
+                           syntax)
+           nil)
+
+          ;; Key should be `:style'...
+          ((int<mis>:syntax:has caller
+                                syntax
+                                :style)
+           (int<mis>:debug caller
+                           "SYNTAX has `:style'... is `:style' only styling?: %S"
+                           syntax)
+           ;; All the entries of `:style' should be styling keywords/values.
+           (let ((valid-keys t))
+             (dolist (entry (int<mis>:syntax:get/value caller :style syntax))
+               (let ((key   (car entry))
+                     (value (cdr entry)))
+                 (unless (int<mis>:valid:style/kvp? caller key value)
+                   (int<mis>:debug caller
+                                   "Style SYNTAX has invalid key/value pair: %S = %S"
+                                   syntax
+                                   key
+                                   value)
+                   (setq valid-keys nil))))
+
+             (if valid-keys
+                 (progn
+                   (int<mis>:debug caller
+                                   "Ok; SYNTAX looks like only styling: %S"
+                                   syntax)
+                   ;; Return yep.
+                   t)
+
+               (int<mis>:debug caller
+                               "Failure! Style SYNTAX is not only styling: %S"
+                               syntax)
+               ;; Return nope.
+               nil)))
+
+          ;; Fallthrough: not styling so return nil.
+          (t
+           (int<mis>:debug caller
+                           "Style SYNTAX doesn't seem to be a Mis Styling Syntax Tree? %S"
+                           syntax)
+           nil))))
+;; (int<mis>:valid:style/exclusively? nil)
+;; (int<mis>:valid:style/exclusively? (mis:style :width 80))
+;; (int<mis>:valid:style/exclusively? (mis:style))
+;; (int<mis>:valid:style/exclusively? (mis:style :align 'center "Hello there."))
+;; Invalid:
+;;   `:string' is not a styling keyword and is not in children.
+;;   (int<mis>:valid:style/exclusively? '((:style (:align . center)) (:string . "hello")))
 
 
 (defun int<mis>:valid:comment/kvp? (caller keyword value)

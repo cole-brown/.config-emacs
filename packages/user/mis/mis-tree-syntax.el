@@ -13,7 +13,6 @@
 ;;; Code:
 
 
-(require 'mis-valid)
 (require 'mis-error)
 
 

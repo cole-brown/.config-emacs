@@ -158,10 +158,10 @@ LANGUAGE should be nil, string, or symbol:
   ;;------------------------------
   (comment-normalize-vars)
 
-  (int<mis>:debug 'int<mis>:comment:end
+  (int<mis>:debug 'int<mis>:comment:start
                   "language: %S"
                   language)
-  (int<mis>:debug 'int<mis>:comment:end
+  (int<mis>:debug 'int<mis>:comment:start
                   "type: %S"
                   type)
   (int<mis>:debug 'int<mis>:comment:start

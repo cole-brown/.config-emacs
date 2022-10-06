@@ -137,7 +137,7 @@ CALLER should be calling function's name. It can be one of:
         ;; Is this non-nil and /only/ styling info? Then it's global styling for
         ;; use in all of the things here.
         (cond ((and arg
-                    (int<mis>:style:exclusive? arg))
+                    (int<mis>:valid:style/exclusively? caller arg))
                ;; Make sure it's valid...ish.
                (int<mis>:valid:syntax? caller 'arg arg)
 

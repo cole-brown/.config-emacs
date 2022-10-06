@@ -34,9 +34,9 @@
 ;; Internal
 ;;------------------------------
 (require 'mis-error)
-(require 'mis-valid)
 (require 'mis-int-string)
 (require 'mis-tree-syntax)
+(require 'mis-valid)
 (require 'mis-tree-output)
 (require 'mis-parse)
 (require 'mis-buffer)

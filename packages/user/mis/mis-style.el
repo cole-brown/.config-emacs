@@ -252,7 +252,7 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
-    (cond ((not (int<mis>:style:exclusive? style/parent))
+    (cond ((not (int<mis>:valid:style/exclusively? caller style/parent))
            (int<mis>:error caller
                            "STYLE/PARENT must be nil or exclusively styling. Got: %S"
                            style/parent))
@@ -321,7 +321,7 @@ KEYWORD should be a keyword in `int<mis>:keywords:style'.
 If KEYWORD does exist, returns its value (even nil).
 If KEYWORD does not exist, returns `:does-not-exist'.
 
-STYLE should be nil or a Mis Syntax Tree of only `:style'.
+SYNTAX should be nil or a Mis Syntax Tree of only `:style'.
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -377,51 +377,6 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:style:get 'test :width (mis:style :width 42) (mis:style :padding "-"))
 ;; (int<mis>:style:get 'test :width (mis:style :padding "-") (mis:style :width 42))
 ;; (int<mis>:style:get 'test :width (mis:style :width 42 :padding "-") (mis:style :width 11))
-
-
-(defun int<mis>:style:exclusive? (syntax)
-  "Return non-nil if SYNTAX is _only_ styling; return nil otherwise."
-  ;; No styling is valid styling.
-  (cond ((null syntax)
-         t)
-
-        ;; Must have valid syntax.
-        ((not (int<mis>:valid:syntax? 'int<mis>:style:exclusive?
-                                      'syntax
-                                      syntax
-                                      :no-error))
-         (int<mis>:debug 'int<mis>:style:exclusive?
-                         "Invalid mis SYNTAX! %S"
-                         syntax)
-         nil)
-
-        ;; (Alist) syntax should contain only 1 element.
-        ((not (eq 1 (length syntax)))
-         (int<mis>:debug 'int<mis>:style:exclusive?
-                         "Style SYNTAX should be length 1, got %d: %S"
-                         (length syntax)
-                         syntax)
-         nil)
-
-        ;; Key should be `:style'.
-        ((int<mis>:syntax:has 'int<mis>:style:exclusive?
-                              syntax
-                              :style)
-         (int<mis>:debug 'int<mis>:style:exclusive?
-                         "Ok; style SYNTAX seems valid: %S"
-                         syntax)
-         t)
-
-        ;; Fallthrough: not styling so return nil.
-        (t
-         (int<mis>:debug 'int<mis>:style:exclusive?
-                         "Style SYNTAX doesn't seem to be a Mis Styling Syntax Tree? %S"
-                         syntax)
-         nil)))
-;; (int<mis>:style:exclusive? nil)
-;; (int<mis>:style:exclusive? (mis:style :width 80))
-;; (int<mis>:style:exclusive? (mis:style))
-;; (int<mis>:style:exclusive? '((:style (:align . center)) (:string . "hello")))
 
 
 (defun int<mis>:style:width (caller &optional syntax output default)
