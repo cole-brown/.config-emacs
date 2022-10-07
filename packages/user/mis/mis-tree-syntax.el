@@ -96,25 +96,24 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (when-let ((style/assoc
-              ;;------------------------------
-              ;; Special Case: We want the `:style' from `:style'.
-              ;;------------------------------
-              ;; Just get and return `:style'.
-              (if (eq category :style)
-                  (int<mis>:syntax:get/pair caller
-                                            :style
-                                            syntax)
+  ;;------------------------------
+  ;; Special Case: We want the `:style' from `:style'.
+  ;;------------------------------
+  ;; Filter `:style' branch down to just styling and return it.
+  (if (eq category :style)
+      (int<mis>:syntax:filter/style caller syntax)
 
-                ;;------------------------------
-                ;; Normal Case
-                ;;------------------------------
-                ;; Get `:style' from CATEGORY.
-                (int<mis>:syntax:get/pair caller
-                                          :style
-                                          (int<mis>:syntax:get/value caller category syntax)))))
+    ;;------------------------------
+    ;; Normal Case
+    ;;------------------------------
+    ;; Get `:style' from CATEGORY.
+    (when-let ((style/assoc (int<mis>:syntax:get/pair caller
+                                                      :style
+                                                      (int<mis>:syntax:get/value caller
+                                                                                 category
+                                                                                 syntax))))
     ;; Convert assoc into alist.
-    (list style/assoc)))
+    (list style/assoc))))
 ;; (int<mis>:syntax:get/style 'test :mummy '((:mummy (:style (:width . 10) (:align . :center)))))
 ;; (int<mis>:syntax:get/style 'test :mummy '((:mummy (:test (:width . 10) (:align . :center)))))
 ;; (int<mis>:syntax:get/style 'test :style (mis:style :align 'center "Hello there."))
