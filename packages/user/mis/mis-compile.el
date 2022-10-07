@@ -115,6 +115,9 @@ CALLER should be calling function's name. It can be one of:
          output/trees
          output
          output/styled)
+    (int<mis>:debug caller
+                    "syntax:           %S"
+                    syntax)
 
     ;;------------------------------
     ;; Compile!
@@ -203,6 +206,22 @@ CALLER should be calling function's name. It can be one of:
                                                 syntax
                                                 parent
                                                 :children)))
+    (int<mis>:debug caller
+                    "parent:          %S"
+                    parent)
+    (int<mis>:debug caller
+                    "syntax:          %S"
+                    syntax)
+    (int<mis>:debug caller
+                    "style/ancestors: %S"
+                    style/ancestors)
+    (int<mis>:debug caller
+                    "syntax/children: %S"
+                    syntax)
+    (int<mis>:debug caller
+                    "style/parents:   %S"
+                    style/parents)
+
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
@@ -281,6 +300,9 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (int<mis>:debug (list 'int<mis>:compile caller)
+                  "syntax: %S"
+                  syntax)
   ;; Just find the registered compiler and tell them to do it. Which is what
   ;; this function does, so just tell it to do it.
   (int<mis>:compile:syntax (list 'int<mis>:compile caller)
