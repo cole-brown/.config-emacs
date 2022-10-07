@@ -534,16 +534,12 @@ CALLER should be calling function's name. It can be one of:
                            syntax)
            ;; Do not let `int<mis>:valid:...' signal errors and break code flow.
            ;; Non-exclusively styling trees are a-ok.
-           (condition-case _
+           (condition-case err
                ;; All the entries of `:style' should be styling keywords/values.
                (let ((valid-keys t))
                  (dolist (entry (int<mis>:syntax:get/value caller :style syntax))
                    (let ((key   (car entry))
                          (value (cdr entry)))
-                     (int<mis>:debug caller
-                                     "Style SYNTAX key `%S' valid? %S"
-                                     key
-                                     (int<mis>:valid:member? caller key key int<mis>:keywords:style))
                      (unless (int<mis>:valid:member? caller key key int<mis>:keywords:style)
                        (int<mis>:debug caller
                                        "Style SYNTAX has invalid key `%S' = %S. SYNTAX: %S"
@@ -571,6 +567,10 @@ CALLER should be calling function's name. It can be one of:
              (error
               ;; Probably a call to a `int<mis>:valid:...' function returned "no, not valid".
               ;; Therefore this is not _only_ styling keywords, so return nope.
+              (int<mis>:debug caller
+                              "Style SYNTAX has non-styling data, probably: %S -> %S"
+                              (car err)
+                              (cdr err))
               nil)))
 
           ;; Fallthrough: not styling so return nil.
