@@ -13,6 +13,18 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Settings
+;;------------------------------------------------------------------------------
+
+(defvar int<mis>:error:caller/format :first
+  "Formatting options for `int<mis>:error:caller/string'.
+
+Formats:
+  - :full - print all callers
+  - :first - only print first caller (the erroring/debugging func)")
+
+
+;;------------------------------------------------------------------------------
 ;; Error Formatting
 ;;------------------------------------------------------------------------------
 
@@ -41,7 +53,7 @@ NAME should be either:
 
 
 (defun int<mis>:error:caller/normalize (&rest callers)
-  "Return CALLER & PARENTS as a list of callers.
+  "Return CALLERS as a list of callers.
 
 CALLERS should each be calling function's name. They can be one of:
   - a string
@@ -99,13 +111,27 @@ CALLER should be calling function's name. It can be one of:
   - a quoted symbol
   - a function-quoted symbol
   - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  ;;------------------------------
-  ;; Combine list of strings into one.
-  ;;------------------------------
-  (mapconcat #'identity
-             (nreverse (int<mis>:error:caller/normalize caller))
-             " <- "))
+    - e.g. '(#'error-caller \"parent\" 'grandparent)
+
+`int<mis>:error:caller/format' affects the returned string's formatting.
+  - `:full' - all callers in CALLER are printed.
+  - `:first' - only first in CALLER is printed."
+  (let ((normalized (nreverse (int<mis>:error:caller/normalize caller))))
+    ;;------------------------------
+    ;; Determine formatting.
+    ;;------------------------------
+    (pcase int<mis>:error:caller/format
+      ;; We don't care about tracing; just want to know the current caller.
+      (:first
+       (car normalized))
+      ;; Combine list of strings into one.
+      (:full
+       (mapconcat #'identity normalized " <- "))
+      ;; Dunno but this is used for erroring, so just sneak the dunno into the
+      ;; return value.
+      (_
+       (concat "(caller-fmt-unknown) "
+               (mapconcat #'identity normalized " <- "))))))
 ;; (int<mis>:error:caller/string '("foo" 'bar '(baz qux) '(quux . quuux)))
 ;; (int<mis>:error:caller/string '(baz bar foo))
 ;; (int<mis>:error:caller/string '(bar . foo))
