@@ -80,13 +80,13 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:syntax:get/syntax 'test :style '((:style (:width . 10) (:align . :center))))
 
 
-(defun int<mis>:syntax:get/style (caller parent syntax)
-  "Get the Mis Style Syntax Tree from PARENT in SYNTAX.
+(defun int<mis>:syntax:get/style (caller category syntax)
+  "Get the Mis Style Syntax Tree from CATEGORY in SYNTAX.
 
 It should be used as the primary source of styling. The parents' / ancestors'
 styling should be used as a fallback/secondary source.
 
-PARENT should be a keyword from `int<mis>:keywords:category/internal`.
+CATEGORY should be a keyword from `int<mis>:keywords:category/internal`.
 
 SYNTAX should be a Mis Syntax Tree.
 
@@ -96,12 +96,28 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (when-let ((style/assoc (int<mis>:syntax:get/pair caller
-                                                  :style
-                                                  (int<mis>:syntax:get/value caller parent syntax))))
-      (list style/assoc)))
+  (when-let ((style/assoc
+              ;;------------------------------
+              ;; Special Case: We want the `:style' from `:style'.
+              ;;------------------------------
+              ;; Just get and return `:style'.
+              (if (eq category :style)
+                  (int<mis>:syntax:get/pair caller
+                                            :style
+                                            syntax)
+
+                ;;------------------------------
+                ;; Normal Case
+                ;;------------------------------
+                ;; Get `:style' from CATEGORY.
+                (int<mis>:syntax:get/pair caller
+                                          :style
+                                          (int<mis>:syntax:get/value caller category syntax)))))
+    ;; Convert assoc into alist.
+    (list style/assoc)))
 ;; (int<mis>:syntax:get/style 'test :mummy '((:mummy (:style (:width . 10) (:align . :center)))))
 ;; (int<mis>:syntax:get/style 'test :mummy '((:mummy (:test (:width . 10) (:align . :center)))))
+;; (int<mis>:syntax:get/style 'test :style (mis:style :align 'center "Hello there."))
 
 
 (defun int<mis>:syntax:filter/style (caller syntax)
