@@ -150,7 +150,7 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Filtering
     ;;------------------------------
-    (dolist (entry (nreverse entries/style))
+    (dolist (entry entries/style)
       (when (memq (car entry) int<mis>:keywords:style)
         (push entry
               entries/filtered)))
@@ -159,7 +159,7 @@ CALLER should be calling function's name. It can be one of:
       (apply #'int<mis>:syntax:create
              caller
              :style
-             entries/filtered))))
+             (nreverse entries/filtered)))))
 ;; (int<mis>:syntax:filter/style 'test (mis:style :align 'center "Hello there."))
 ;; (int<mis>:syntax:filter/style 'test (mis:style "Hello there."))
 
@@ -206,6 +206,7 @@ CALLER should be calling function's name. It can be one of:
                styling/output)))))
 ;; (int<mis>:syntax:merge/style 'test :format (mis:string :width 42 "hi") (mis:style :width 20 :padding "-"))
 ;; (int<mis>:syntax:merge/style 'test :format (mis:string :width 42 "hi") nil)
+;; (int<mis>:syntax:merge/style 'test :style (mis:style :align 'center "Hello there.") nil)
 
 
 (defun int<mis>:syntax:set (caller key syntax)
