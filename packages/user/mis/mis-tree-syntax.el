@@ -179,7 +179,7 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:syntax:filter/style 'test (mis:style "Hello there."))
 
 
-(defun int<mis>:syntax:merge/style (caller category syntax style/parent)
+(defun int<mis>:syntax:merge/style (caller category syntax style/parent &rest ignore)
   "Merge `:style' in SYNTAX and STYLE/PARENT together.
 
 CATEGORY should be a keyword from `int<mis>:keywords:category/internal'. It is
@@ -188,6 +188,10 @@ the category in SYNTAX that we will look under for styling.
 SYNTAX should be nil or a Mis Syntax Tree.
 
 STYLE/PARENT should be nil or a Mis Syntax Tree.
+
+IGNORE should each be nil or a `:style' keyword (from
+`int<mis>:keywords:style'). If non-nil, that style key/value will be filtered
+out of returned Mis Style Syntax Tree.
 
 Return nil or a Mis Syntax Tree of only `:style'.
 
@@ -200,14 +204,19 @@ CALLER should be calling function's name. It can be one of:
   (let* ((caller (list 'int<mis>:style:merge caller))
          (style/child (int<mis>:syntax:get/style caller
                                                  category
-                                                 syntax)))
+                                                 syntax))
+         style/merged)
+
+    ;;------------------------------
+    ;; Merge.
+    ;;------------------------------
+    ;; Nothing to merge if no `style/parent'; just use `style/child'.
     (if (null style/parent)
-        ;; Nothing to merge; return SYNTAX's style (may be nil).
-        style/child
+        (setq style/merged (copy-alist style/child))
 
       ;; Merge parent styling into child styling. Child takes precedence.
       (let* ((styling/child (int<mis>:syntax:get/value caller :style style/child))
-            ;; Start off with all of parent's values...
+             ;; Start off with all of parent's values...
              (styling/output (copy-alist (int<mis>:syntax:get/value caller :style style/parent))))
 
         ;; Add/overwrite child's values
@@ -215,13 +224,33 @@ CALLER should be calling function's name. It can be one of:
           (setf (alist-get (car assoc/child) styling/output) (cdr assoc/child)))
 
         ;; Turn it into a Mis Syntax Tree and return.
-        (apply #'int<mis>:syntax:create
-               caller
-               :style
-               styling/output)))))
+        (setq style/merged (apply #'int<mis>:syntax:create
+                                  caller
+                                  :style
+                                  styling/output))))
+
+    ;;------------------------------
+    ;; Filter out any ignored styles...
+    ;;------------------------------
+    (when ignore
+      (int<mis>:debug caller
+                      "ignore: %S"
+                      ignore)
+      (let (entries/filtered)
+        (dolist (entry (int<mis>:syntax:get/value caller :style style/merged))
+          (unless (memq (car entry) ignore)
+            (push entry entries/filtered)))
+        ;; Recreate MST with only the filtered entries.
+        (setq style/merged (apply #'int<mis>:syntax:create
+                                  caller
+                                  :style
+                                  entries/filtered))))
+
+      style/merged))
 ;; (int<mis>:syntax:merge/style 'test :format (mis:string :width 42 "hi") (mis:style :width 20 :padding "-"))
 ;; (int<mis>:syntax:merge/style 'test :format (mis:string :width 42 "hi") nil)
 ;; (int<mis>:syntax:merge/style 'test :style (mis:style :align 'center "Hello there.") nil)
+;; (int<mis>:syntax:merge/style 'test :style (mis:style :align 'center :width 11 "Hello there.") nil :width)
 
 
 (defun int<mis>:syntax:set (caller key syntax)
