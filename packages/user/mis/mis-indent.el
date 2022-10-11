@@ -218,7 +218,7 @@ Return an indented string."
   (declare (pure t) (side-effect-free t))
 
   (let* ((caller  (list 'int<mis>:style:indent caller))
-         (padding (int<mis>:style:padding caller style " ")))
+         (padding (int<mis>:style:get/padding  caller style " ")))
 
     ;;------------------------------
     ;; Error Checks

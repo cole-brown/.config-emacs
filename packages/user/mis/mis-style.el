@@ -406,7 +406,7 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:style:get 'test :width (mis:style :width 42 :padding "-") (mis:style :width 11))
 
 
-(defun int<mis>:style:width (caller &optional syntax output default)
+(defun int<mis>:style:get/width (caller &optional syntax output default)
   "Return `:width' from SYNTAX, OUTPUT, or DEFAULT.
 
 SYNTAX should be nil or a Mis Syntax Tree of styling.
@@ -422,7 +422,7 @@ OUTPUT should be nil a Mis Output Tree.
 DEFAULT should be nil or a positive integer. If DEFAULT is not provided, will
 use buffer's `fill-column'.
 
-Prefers SYNTAX, then OUTPUT, then DEFAULT/`fill-column.
+Prefers SYNTAX, then OUTPUT, then DEFAULT/`fill-column'.
 
 Must be called in the context of the targeted output buffer so that
 `fill-column' can be correct.
@@ -436,7 +436,7 @@ CALLER should be calling function's name. It can be one of:
   ;;------------------------------
   ;; Get Width
   ;;------------------------------
-  (let* ((caller (list 'int<mis>:style:width caller))
+  (let* ((caller (list 'int<mis>:style:get/width caller))
          ;; Prefer: SYNTAX first...
          (width (or (int<mis>:syntax:find caller
                                           syntax
@@ -467,7 +467,7 @@ CALLER should be calling function's name. It can be one of:
     width))
 
 
-(defun int<mis>:style:padding (caller &optional syntax output default)
+(defun int<mis>:style:get/padding (caller &optional syntax output default)
   "Return `:padding' from SYNTAX, or DEFAULT.
 
 SYNTAX should be nil or a Mis Syntax Tree of styling.
@@ -494,7 +494,7 @@ Return padding as a string."
   ;;------------------------------
   ;; Error Checks
   ;;------------------------------
-  (let* ((caller (list 'int<mis>:style:padding caller))
+  (let* ((caller (list 'int<mis>:style:get/padding caller))
          (syntax/padding (int<mis>:valid:string1-char-nil?
                           caller
                           "syntax padding"
@@ -537,12 +537,79 @@ Return padding as a string."
     (if (characterp padding)
         (make-string 1 padding)
       padding)))
-;; (int<mis>:style:padding 'test (mis:style :padding "?"))
-;; (int<mis>:style:padding 'test nil)
-;; (int<mis>:style:padding 'test nil nil "!")
-;; (int<mis>:style:padding 'test nil nil ?!)
-;; (int<mis>:style:padding 'test (mis:style :padding "?") nil "!")
-;; (int<mis>:style:padding 'test (mis:style :width 10) nil "!")
+;; (int<mis>:style:get/padding 'test (mis:style :padding "?"))
+;; (int<mis>:style:get/padding 'test nil)
+;; (int<mis>:style:get/padding 'test nil nil "!")
+;; (int<mis>:style:get/padding 'test nil nil ?!)
+;; (int<mis>:style:get/padding 'test (mis:style :padding "?") nil "!")
+;; (int<mis>:style:get/padding 'test (mis:style :width 10) nil "!")
+
+
+(defun int<mis>:style:get/newlines (caller &rest input)
+  "Return `:newlines' from INPUT.
+
+INPUT should each be one of:
+  - a Mis Syntax Tree of styling (will look for `:newlines').
+  - nil/non-nil default value
+
+Checks INPUT in order presented, return first `:newlines' value found or default
+or nil.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list 'int<mis>:style:newlines caller))
+        found?
+        newlines?)
+    (while (and input
+                (not found?))
+      (let ((check (pop input)))
+        ;;------------------------------
+        ;; Mis Syntax Tree?
+        ;;------------------------------
+        (cond ((int<mis>:valid:syntax? caller
+                                       'input
+                                       check
+                                       :no-error)
+               (int<mis>:debug caller
+                               "Found MST: %S"
+                               check)
+               ;; Have to check if it has it first, then get its value since we
+               ;; need to check for a valid nil value.
+               (if (int<mis>:syntax:has caller check :style :newlines)
+                   (progn
+                     (setq found?    t
+                           newlines? (int<mis>:syntax:find caller
+                                                           check
+                                                           :style :newlines))
+                     (int<mis>:debug caller
+                                     "MST `:newlines': %S"
+                                     newlines?))
+                 (int<mis>:debug caller
+                                 "No `:newlines' in MST.")))
+
+              ;;------------------------------
+              ;; ...default value I guess?
+              ;;------------------------------
+              (t
+               (int<mis>:debug caller
+                               "Found default value: %S"
+                               check)
+               (setq found?    t
+                     newlines? check)))))
+
+    ;; So, what'd we find out?
+    (int<mis>:debug caller
+                    "<--newlines?: %S"
+                    newlines?)
+    newlines?))
+;; (int<mis>:style:newlines 'test (mis:style :newlines t))
+;; (int<mis>:style:newlines 'test (mis:style :newlines 'yes))
+;; (int<mis>:style:newlines 'test '((:style (:newlines . yes))))
+;; (int<mis>:style:newlines 'test)
 
 
 ;;------------------------------------------------------------------------------

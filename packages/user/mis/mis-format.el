@@ -185,7 +185,7 @@ CALLER should be calling function's name. It can be one of:
             ('repeat
              ;; Build & return the repeated string.
              (int<mis>:format:repeat value
-                                     (int<mis>:style:width caller style)))
+                                     (int<mis>:style:get/width caller style)))
 
             ('message
              (apply #'int<mis>:format:message
