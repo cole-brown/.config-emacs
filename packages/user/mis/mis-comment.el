@@ -73,7 +73,7 @@ Alist of major-mode to:
                                                                          (const :prefix:minor)
                                                                          (const :postfix:minor))
                                                        :value-type string))))
-;; (alist-get :prefix:major (alist-get 'quote (alist-get 'org-mode int<mis>:comment:overrides)))
+;; (alist-get :prefix:major (alist-get 'quote (alist-get 'org-mode mis:comment:overrides)))
 
 
 ;;------------------------------------------------------------------------------
@@ -368,7 +368,7 @@ CALLER should be calling function's name. It can be one of:
      ;;---
      ((alist-get position
                    (alist-get type
-                              (alist-get major-mode int<mis>:comment:overrides))))
+                              (alist-get major-mode mis:comment:overrides))))
 
      ;;---
      ;; Major Comment Delimiters:
@@ -399,7 +399,7 @@ CALLER should be calling function's name. It can be one of:
      (t
       (int<mis>:error caller
                       '("Don't know what to use to create a comment for: %S %S %S. "
-                        "No overrides in `int<mis>:comment:overrides' and nothing from Emacs.")
+                        "No overrides in `mis:comment:overrides' and nothing from Emacs.")
                       language
                       type
                       position)))))
