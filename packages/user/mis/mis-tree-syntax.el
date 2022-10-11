@@ -119,10 +119,13 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:syntax:get/style 'test :style (mis:style :align 'center "Hello there."))
 
 
-(defun int<mis>:syntax:filter/style (caller syntax)
-  "Filter SYNTAX down to only its style entries.
+(defun int<mis>:syntax:filter/style (caller syntax &rest ignore)
+  "Filter SYNTAX down to only its style entries, and filter IGNORE from styles.
 
 SYNTAX should be nil or a Mis Syntax Tree with a `:style' entry.
+
+IGNORE, if supplied, should each be a style keyword to be filtered out of
+return value.
 
 Return SYNTAX with non-style entries filtered out, or nil if nothing remains
 after filtering.
@@ -166,7 +169,8 @@ CALLER should be calling function's name. It can be one of:
     ;; Filtering
     ;;------------------------------
     (dolist (entry entries/style)
-      (when (memq (car entry) int<mis>:keywords:style)
+      (when (and (memq (car entry) int<mis>:keywords:style)
+                 (not (memq (car entry) ignore)))
         (push entry
               entries/filtered)))
 
@@ -177,6 +181,7 @@ CALLER should be calling function's name. It can be one of:
              (nreverse entries/filtered)))))
 ;; (int<mis>:syntax:filter/style 'test (mis:style :align 'center "Hello there."))
 ;; (int<mis>:syntax:filter/style 'test (mis:style "Hello there."))
+;; (int<mis>:syntax:filter/style 'test (mis:style :align 'center :newlines t "Hello there.") :newlines)
 
 
 (defun int<mis>:syntax:merge/style (caller category syntax style/parent &rest ignore)

@@ -189,6 +189,8 @@ will override any styling in STYLE/ANCESTORS.
 
 STYLE/ANCESTORS should be nil or a Mis Syntax Tree of only `:style'.
 
+Return Mis Output Tree of compiled/styled children.
+
 CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
@@ -198,10 +200,14 @@ CALLER should be calling function's name. It can be one of:
   (let* ((caller (list 'int<mis>:compile:children caller))
          ;; Update STYLE/ANCESTORS with our parents' styling for cascading into
          ;; the children.
-         (style/parents (int<mis>:syntax:merge/style caller
-                                                     parent
-                                                     syntax
-                                                     style/ancestors))
+         (style/this (int<mis>:syntax:merge/style caller
+                                                  parent
+                                                  syntax
+                                                  style/ancestors))
+         ;; Children are not allowed to inherit the `:newlines' style.
+         (style/children (int<mis>:syntax:filter/style caller
+                                                       style/this
+                                                       :newlines))
          (syntax/children (int<mis>:syntax:find caller
                                                 syntax
                                                 parent
@@ -219,8 +225,11 @@ CALLER should be calling function's name. It can be one of:
                     "syntax/children: %S"
                     syntax)
     (int<mis>:debug caller
-                    "style/parents:   %S"
-                    style/parents)
+                    "style/this:      %S"
+                    style/this)
+    (int<mis>:debug caller
+                    "style/children: %S"
+                    style/children)
 
     ;;------------------------------
     ;; Error Checks
@@ -244,44 +253,44 @@ CALLER should be calling function's name. It can be one of:
                                                   category
                                                   (cdr child))))
           (push (int<mis>:compile:syntax caller
-                                         syntax/child   ;; Childrens' styling will come from their syntax.
-                                         style/parents) ;; Parents' styling cascades into children.
+                                         syntax/child    ;; Childrens' styling will come from their syntax.
+                                         style/children) ;; Parents' styling cascades into children.
                 output/trees)))
 
-    ;;------------------------------
-    ;; Validate
-    ;;------------------------------
-    ;; Should have a list of Mis Output Trees after compiling.
-    ;; Combine into one Mis Output Tree while checking that.
-    (dolist (tree (nreverse output/trees))
-      (unless (int<mis>:valid:output? caller
-                                      'tree
-                                      tree
-                                      :no-error)
-        (int<mis>:error caller
-                        "Invalid Mis Output Tree in compiled result: tree: %S, from: %S"
-                        tree
-                        output/trees))
-      (setq output (int<mis>:output:append caller
-                                           output
-                                           tree)))
+      ;;------------------------------
+      ;; Validate
+      ;;------------------------------
+      ;; Should have a list of Mis Output Trees after compiling.
+      ;; Combine into one Mis Output Tree while checking that.
+      (dolist (tree (nreverse output/trees))
+        (unless (int<mis>:valid:output? caller
+                                        'tree
+                                        tree
+                                        :no-error)
+          (int<mis>:error caller
+                          "Invalid Mis Output Tree in compiled result: tree: %S, from: %S"
+                          tree
+                          output/trees))
+        (setq output (int<mis>:output:append caller
+                                             output
+                                             tree)))
 
-    ;;------------------------------
-    ;; Finalize
-    ;;------------------------------
-    ;; Style all of the MOT strings.
-    (int<mis>:debug caller
-                    "output to style:  %S"
-                    output)
-    (setq output/styled (int<mis>:style caller
-                                        output
-                                        nil
-                                        nil
-                                        style/parents))
-    (int<mis>:debug caller
-                    "<--styled output: %S"
-                    output/styled)
-    output/styled)))
+      ;;------------------------------
+      ;; Finalize
+      ;;------------------------------
+      ;; Style all of the MOT strings.
+      (int<mis>:debug caller
+                      "output to style:  %S"
+                      output)
+      (setq output/styled (int<mis>:style caller
+                                          output
+                                          nil
+                                          nil
+                                          style/this))
+      (int<mis>:debug caller
+                      "<--styled output: %S"
+                      output/styled)
+      output/styled)))
 ;; (int<mis>:compile:children 'test :parent '((:parent (:children (:format (:formatter . string) (:value . "-"))))))
 
 

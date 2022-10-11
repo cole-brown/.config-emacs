@@ -448,6 +448,32 @@ CALLER should be calling function's name. It can be one of:
                                                           (copy-alist metadata)
                                                           (list (cons :align (list 'affix align))))))
 
+    (int<mis>:debug caller
+                    "prefix:         %S"
+                    prefix)
+    (int<mis>:debug caller
+                    "postfix:        %S"
+                    postfix)
+    (int<mis>:debug caller
+                    "entry:          %S"
+                    entry)
+
+    (int<mis>:debug caller
+                    "string:         %S"
+                    string)
+    (int<mis>:debug caller
+                    "metadata:       %S"
+                    metadata)
+    (int<mis>:debug caller
+                    "align:          %S"
+                    align)
+    (int<mis>:debug caller
+                    "width:          %S"
+                    width)
+    (int<mis>:debug caller
+                    "metadata/affix: %S"
+                    metadata/affix)
+
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
@@ -505,16 +531,52 @@ CALLER should be calling function's name. It can be one of:
 
      ((eq align 'center)
       (let* ((prefix/length  (length prefix))
-             (postfix/length (length postfix)))
-        ;; Trim down each side by the length of the string being affixed there.
-        (apply #'int<mis>:output:create
-               caller
-               (int<mis>:string:affix prefix
-                                      postfix
-                                      (substring string
-                                                 prefix/length
-                                                 (- width postfix/length)))
-               metadata/affix)))
+             (postfix/length (length postfix))
+             (string/length  (length string))
+             (total/length   (+ prefix/length string/length postfix/length)))
+
+        (int<mis>:debug caller
+                        "CENTER ALIGN!:  %S"
+                        align)
+        (int<mis>:debug caller
+                        "prefix/length:  %S"
+                        prefix/length)
+        (int<mis>:debug caller
+                        "postfix/length:  %S"
+                        postfix/length)
+        (int<mis>:debug caller
+                        "string/length:  %S"
+                        string/length)
+        (int<mis>:debug caller
+                        "total/length:  %S"
+                        total/length)
+
+        (if (> total/length width)
+            ;; Centered string doesn't have enough width to allow for
+            ;; prefix/postfix; trim down each side by the length of the string
+            ;; being affixed there.
+            (apply #'int<mis>:output:create
+                   caller
+                   (int<mis>:string:affix prefix
+                                          postfix
+                                          (substring string
+                                                     prefix/length
+                                                     (- width postfix/length)))
+                   metadata/affix)
+          ;; TODO: Smart(er) centering?
+          ;; TODO: Count up the padding/whitespace at start of `string'.
+          ;; TODO: If enough padding/whitespace, chop some for absolute centering?
+          ;; TODO: Or maybe make that another style keyword... IDK.
+          ;; TODO: For now, a dumber "small string centering":
+
+          ;; "Centered" string is too small to remain;  have to mess it up a bit...
+          ;; Probably just leave string as-is and add our prefix/postfix?
+          (apply #'int<mis>:output:create
+                 caller
+                 (int<mis>:string:affix prefix
+                                        postfix
+                                        string)
+                 metadata/affix))))
 
      ((eq align 'right)
       (let* ((prefix/length  (length prefix))
@@ -785,14 +847,19 @@ CALLER should be calling function's name. It can be one of:
                     "<--output:      %S"
                     output/line)
     output/line))
-;; (int<mis>:output:finalize/lines 'test
-;;                                 '((:output
-;;                                    ((:string . "foo-0") (:metadata (:bar:0 . baz0)))
-;;                                    ((:string . "foo-1") (:metadata (:bar:1 . baz1)))
-;;                                    ((:string . "foo-2") (:metadata (:bar:2 . baz2)))
-;;                                    ((:string . "narf") (:metadata (:zort . poit)))
-;;                                    ((:string . "egad") (:metadata (:troz . fiddely-posh))))))
-;;
+;; (apply #'int<mis>:output/string:affix
+;;        'test
+;;        "/* "
+;;        " */"
+;;        (int<mis>:output:get/entries 'test
+;;                                     (int<mis>:output:finalize/lines 'test
+;;                                                                     '((:output
+;;                                                                        ((:string . "foo-0") (:metadata (:bar:0 . baz0)))
+;;                                                                        ((:string . "foo-1") (:metadata (:bar:1 . baz1)))
+;;                                                                        ((:string . "foo-2") (:metadata (:bar:2 . baz2)))
+;;                                                                        ((:string . "narf") (:metadata (:zort . poit)))
+;;                                                                        ((:string . "egad") (:metadata (:troz . fiddely-posh))))))))
+
 ;; (int<mis>:output:finalize/lines 'test
 ;;                                 '((:output
 ;;                                    ((:string . "\nfoo-0") (:metadata (:bar:0 . baz0)))
