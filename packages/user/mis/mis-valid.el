@@ -62,7 +62,8 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
     :padding
     :align ;; Uses: `:width', `:padding'
     :indent
-    :trim :trim:left :trim:right)
+    :trim :trim:left :trim:right
+    :newlines)
   "Valid style keywords.")
 
 
@@ -466,6 +467,9 @@ Signal an error if invalid; return normalized value if valid."
       ((or :trim :trim:left :trim:right)
        (int<mis>:valid:string-or-nil? caller keyword value))
 
+      (:newlines
+       (int<mis>:valid:boolean? caller keyword value))
+
       ;; Style is allowed to have children right now. For example, center a few
       ;; things by grouping them in a `mis:style':
       ;;   (mis:style :align 'center
@@ -668,6 +672,25 @@ Signal an error if invalid; return normalized value if valid."
 ;; Use a `condition-case' if you need to validate and failure is a valid option.
 
 ;; TODO: For all the predicates: Remove `&rest _`, replace with nothing or `&optional no-error?`.
+
+(defun int<mis>:valid:boolean? (caller name value &rest _)
+  "Return normalized t/nil boolean for VALUE.
+
+A valid boolean input VALUE means either nil or non-nil.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  ;; Convert VALUE to canonical boolean t/nil values.
+  (if value
+      t
+    nil))
+
 
 (defun int<mis>:valid:normalize->symbol (name keyword-or-symbol)
   "Normalizes a keyword or a symbol to a symbol.
