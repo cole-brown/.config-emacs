@@ -119,6 +119,33 @@ CALLER should be calling function's name. It can be one of:
 (int<mis>:styler:register :padding #'int<mis>:style:styler/no-op)
 
 
+(defun int<mis>:style:newlines (caller string _ _ _ newline?)
+  "Ensure STRING ends in a newline if NEWLINE? is truthy.
+
+STRING must be a string.
+
+NEWLINE? must be nil/non-nil.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (if (and newline?
+           (stringp string)
+           (not (string-suffix-p "\n" string)))
+      (concat string "\n")
+    string))
+;; (int<mis>:style:newlines 'test "hello" nil nil nil t)
+;; (int<mis>:style:newlines 'test "hello" nil nil nil nil)
+;; (int<mis>:style:newlines 'test "hello\n" nil nil nil t)
+;; (int<mis>:style:newlines 'test "hello\n" nil nil nil nil)
+
+
+(int<mis>:styler:register :newlines #'int<mis>:style:newlines)
+
+
 (defun int<mis>:style/output-entry (caller entry syntax style/complete)
   "`int<mis>:style' helper: Style a single ENTRY from a Mis Output Tree.
 For example, assuming Mis Output Tree is:
@@ -631,6 +658,7 @@ NOTE: Styles must always have both a keyword and a value."
 ;; (mis:style :align 'center :width 11 "hello")
 ;; (mis:style :indent 'auto "hello")
 ;; (mis:style :padding "?")
+;; (mis:style :newlines t)
 
 
 ;;------------------------------------------------------------------------------
