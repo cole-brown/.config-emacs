@@ -173,6 +173,7 @@ CALLER should be calling function's name. It can be one of:
         (int<mis>:debug caller
                         "current-buffer (printing): %S"
                         (current-buffer))
+
         ;; Loop on the output strings/metadatas to finalize & print.
         (dolist (entry (int<mis>:output:get/entries caller output))
           (int<mis>:print:output/entry caller
