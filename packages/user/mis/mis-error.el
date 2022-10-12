@@ -20,8 +20,15 @@
   "Formatting options for `int<mis>:error:caller/string'.
 
 Formats:
-  - :full - print all callers
+  - :full  - print all callers
   - :first - only print first caller (the erroring/debugging func)")
+
+
+(defvar int<mis>:debugging? nil
+  "Enable/disable `int<mis>:debug' output.
+
+Set to non-nil to enable.
+Set to nil to disable.")
 
 
 ;;------------------------------------------------------------------------------
@@ -237,10 +244,6 @@ ARGS should be the `format' ARGS for MESSAGE."
 ;;------------------------------------------------------------------------------
 ;; Debugging
 ;;------------------------------------------------------------------------------
-
-(defvar int<mis>:debugging? nil
-  "Set to non-nil to enable `int<mis>:debug' output.")
-
 
 (defun int<mis>:debug (caller message &rest args)
   "If debugging, output a debug MESSAGE, formatted with ARGS, from CALLER.

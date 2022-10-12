@@ -25,6 +25,12 @@
 ;; Output API
 ;;------------------------------------------------------------------------------
 
+(defconst mis:newline "\n"
+  "Newline constant; just in case you wanted one?")
+
+(defvaralias 'mis:n 'mis:newline)
+
+
 (defun mis:string (&rest args)
   "Parse ARGS into a Mis message/string syntax tree.
 
