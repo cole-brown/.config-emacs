@@ -208,6 +208,35 @@
   (gcmh-mode 1))
 
 
+;;------------------------------
+;; Mis (Pretty Printing)
+;;------------------------------
+
+(defvar innit:path:package:mis (path:join innit:path:packages:user "mis")
+  "`use-package' doesn't like having a function call for `:load-path', thus this.")
+
+
+(imp:use-package mis
+  ;; This is my own package, so...
+  ;;   1) Don't try to install.
+  :ensure nil
+  ;;   2) Here's where it is; add this dir to the `load-path'.
+  :load-path innit:path:package:mis
+  ;;   ...?
+  ;;   3) I guess I need to make this explicit since we aren't trying to install
+  ;;      anything?
+  :after deferred
+
+  ;; ;;--------------------
+  ;; :custom
+  ;; ;;--------------------
+  ;;
+  ;; mis:buffer:name
+  ;; mis:buffer:default
+  ;; mis:comment:overrides
+  )
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
