@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # contributor: Cole Brown <code@brown.dev>
-# name: spy-header: emacs file.el header/structure
-# key: spy-header
+# name: /header: emacs file.el header/structure
+# key: /header
 # --
 ;; -*- mode: emacs-lisp; lexical-binding: t -*-
 
