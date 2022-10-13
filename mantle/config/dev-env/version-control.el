@@ -184,8 +184,7 @@
 ;; Autogit
 ;;------------------------------------------------------------------------------
 
-;; Autogit is configured set up in secrets repo and it looks something like
-;; this:
+;; Autogit is configured in secrets repo and it looks something like this:
 ;;    (imp:use-package autogit
 ;;    ;; This is my own package, so...
 ;;    ;;   1) Don't try to install.

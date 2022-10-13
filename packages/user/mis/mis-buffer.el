@@ -30,7 +30,7 @@
   :type '(string))
 
 
-(defcustom mis:buffer:default :messages
+(defcustom mis:buffer:default :mis
   "Default buffer to send Mis messages to when none is specified.
 
 To send to the *Messages* buffer, set to one of:
