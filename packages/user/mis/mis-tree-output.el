@@ -87,8 +87,8 @@ CALLER should be calling function's name. It can be one of:
 ;;                                      (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
 
 
-(defun int<mis>:output:update/metadata (caller existing new)
-  "Update/overwrite EXISTING metadata with NEW metatada.
+(defun int<mis>:output/metadata:update (caller existing new)
+  "Update/overwrite EXISTING metadata with NEW metadata.
 
 EXISTING and NEW should be nil or a Mis Output Tree's Entry's metadata (e.g. a
 return value from `int<mis>:output:get/metadata'.
@@ -96,7 +96,7 @@ return value from `int<mis>:output:get/metadata'.
 Return updated EXISTING Mis Output Tree. Caller should save the return value as
 the update is not guaranteed to be in-place.
 Example:
-  (setq metadata/existing (int<mis>:output:update/metadata 'example
+  (setq metadata/existing (int<mis>:output/metadata:update 'example
                                                             metadata/existing
                                                             metadata/new))
 
@@ -106,7 +106,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let ((caller (list 'int<mis>:output:update/metadata)))
+  (let ((caller (list 'int<mis>:output/metadata:update)))
     (dolist (each/new new)
       (let ((key (car each/new))
             (value (cdr each/new)))
@@ -114,24 +114,124 @@ CALLER should be calling function's name. It can be one of:
         (setf (alist-get key existing) value)))
 
     existing))
-;; (int<mis>:output:update/metadata
-;;  'test
-;;  (int<mis>:output:get/metadata
-;;   'test
-;;   (nth 0 (int<mis>:output:get/entries 'test
-;;                                       (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
-;;  (int<mis>:output:get/metadata
-;;   'test
-;;   (nth 0 (int<mis>:output:get/entries 'test
-;;                                       (int<mis>:output:create 'test "also this" '(:align . center))))))
+;; Update one thing:
+(int<mis>:output/metadata:update
+ 'test
+ (int<mis>:output:get/metadata
+  'test
+  (nth 0 (int<mis>:output:get/entries 'test
+                                      (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
+ (int<mis>:output:get/metadata
+  'test
+  (nth 0 (int<mis>:output:get/entries 'test
+                                      (int<mis>:output:create 'test "also this" '(:align . center))))))
 ;;
-;; (int<mis>:output:update/metadata
+;; Update multiple things:
+(int<mis>:output/metadata:update
+ 'test
+ (int<mis>:output:get/metadata
+  'test
+  (nth 0 (int<mis>:output:get/entries 'test
+                                      (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
+ (int<mis>:output:get/metadata
+  'test
+  (nth 0 (int<mis>:output:get/entries 'test
+                                      (int<mis>:output:create 'test "also this" '(:buffer . "bar") '(:align . center))))))
+;;
+;; "Update" is nil:
+;; (int<mis>:output/metadata:update
 ;;  'test
 ;;  (int<mis>:output:get/metadata
 ;;   'test
 ;;   (nth 0 (int<mis>:output:get/entries 'test
 ;;                                       (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
 ;;  nil)
+
+
+(defun int<mis>:output:update/metadata (caller output &rest metadata)
+  "Update/overwrite metadata in Mis OUTPUT Tree with new METADATA.
+
+OUTPUT should be a Mis Output Tree or nil.
+
+METADATA should each be a keyword/value cons.
+
+Return updated Mis OUTPUT Tree. Caller should save the return value as
+the update is not guaranteed to be in-place.
+Example:
+  (setq metadata/existing
+        (int<mis>:output:update/metadata 'example
+                                         metadata/existing
+                                         '(:foo . 42)
+                                         '(:bar \"an metadatum\")))
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list 'int<mis>:output:update/metadata))
+         (mot/entries (int<mis>:output:get/entries caller output))
+         (mot/length (length mot/entries))
+         output/updated)
+
+    (int<mis>:debug caller
+                    "output: %S"
+                    output)
+    (int<mis>:debug caller
+                    "metadata: %S"
+                    metadata)
+
+    ;;------------------------------
+    ;; Sanity Checks
+    ;;------------------------------
+    (cond ((> mot/length 1)
+           ;; Not sure what to do with multiple MOT entries... Update all of their
+           ;; metadatas? For now, error.
+           (int<mis>:error caller
+                           "Expected only one entry in Mis OUTPUT Tree. Got %S entries: %S"
+                           (length mot/entries)
+                           output))
+
+          ;;------------------------------
+          ;; Update Metadata
+          ;;------------------------------
+          ((< mot/length 1)
+           ;; No Mis Output Tree, so... just create one?
+           (apply #'int<mis>:output:create
+                  caller
+                  nil
+                  metadata))
+
+          (t
+           (dolist (mot/entry mot/entries)
+             (let* ((existing (int<mis>:output:get/metadata caller mot/entry))
+                    (updated  (int<mis>:output/metadata:update caller existing metadata)))
+               (int<mis>:debug caller
+                               "%S -> %S"
+                               existing
+                               updated)
+               (setq output/updated
+                     (int<mis>:output:append caller
+                                             output/updated
+                                             (int<mis>:output:create caller
+                                                                     (int<mis>:output:get/string caller mot/entry)
+                                                                     updated)))))
+
+           (int<mis>:debug caller
+                           "<-output: %S"
+                           output/updated)
+           output/updated))))
+;; (int<mis>:output:update/metadata
+;;  'test
+;;  (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good))
+;;  '(:output . string)
+;;  '(:align . center))
+;; (int<mis>:output:update/metadata
+;;  'test
+;;  nil
+;;  '(:output . string)
+;;  '(:align . center))
 
 
 (defun int<mis>:output:create/entry (caller string &rest metadata)
@@ -444,7 +544,7 @@ CALLER should be calling function's name. It can be one of:
          ;;     '(:align . center)
          ;;   To:
          ;;     '(:align . (affix center))
-         (metadata/affix (int<mis>:output:update/metadata caller
+         (metadata/affix (int<mis>:output/metadata:update caller
                                                           (copy-alist metadata)
                                                           (list (cons :align (list 'affix align))))))
 
@@ -784,7 +884,7 @@ CALLER should be calling function's name. It can be one of:
                                                   (zero-or-more "\n")
                                                   string-end)
                                               string/line))
-                         (int<mis>:output:update/metadata caller metadata/line metadata/entry/line))
+                         (int<mis>:output/metadata:update caller metadata/line metadata/entry/line))
 
                         ;; Otherwise, use only the new metadata.
                         (t
@@ -914,7 +1014,7 @@ CALLER should be calling function's name. It can be one of:
                           string/finalized))
         ;; Combine metadatas.
         (setq metadata/finalized
-              (int<mis>:output:update/metadata caller metadata/finalized metadata/entry))
+              (int<mis>:output/metadata:update caller metadata/finalized metadata/entry))
         (int<mis>:debug caller
                         "meta:          %S"
                         metadata/finalized)))

@@ -196,18 +196,10 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let ((caller (list 'int<mis>:buffer:metadata caller)))
-    (apply #'int<mis>:output:create
-           caller
-           nil
-           (int<mis>:output:update/metadata
-            caller
-            (int<mis>:output:get/metadata caller output)
-            (int<mis>:output:get/metadata caller
-                                          (int<mis>:output:create/entry
-                                           caller
-                                           nil
-                                           (cons :buffer:object (int<mis>:buffer:get-or-create caller buffer))
-                                           (cons :buffer:name   (int<mis>:buffer:name          caller buffer))))))))
+    (int<mis>:output:update/metadata caller
+                                     output
+                                     (cons :buffer:object (int<mis>:buffer:get-or-create caller buffer))
+                                     (cons :buffer:name   (int<mis>:buffer:name          caller buffer)))))
 ;; (int<mis>:buffer:metadata 'test nil nil)
 ;; (int<mis>:output/metadata:find 'test
 ;;                                :buffer:name
