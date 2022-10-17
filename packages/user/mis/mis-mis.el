@@ -30,74 +30,136 @@
 (defmacro mis (&rest args)
   "Output a message built from ARGS.
 
-Top-Level Keywords:
-  - `:buffer'
-    - Something `int<mis>:buffer:name' can understand like:
-      - nil
-        - Send to `mis:buffer:default'.
-      - `:messages', `messages'
-        - Send to '*Messages*' buffer.
-      - `:message', `message'
-        - Send to '*Messages*' buffer.
-      - `:mis', `mis'
-        - Send to `mis:buffer:name' buffer.
-      - A string.
-        - Send to the buffer name in the string.
+Top-Level Keywords (Optional):
+  - `:output' - `:buffer', `buffer'  (default)
+                - Insert Mis message into a buffer.
+              - `:string', `string'
+                - Return Mis message as a string.
+
+  - `:buffer' - `:mis', `mis'  (default)
+                - Insert into `mis:buffer:name' buffer.
+              - `:messages', `messages', `:message', `message'
+                - Insert into '*Messages*' buffer.
+              - `:current', `current'
+                - Insert into `current-buffer'.
+              - A string.
+                - Insert into the buffer name in the string.
 
 Rest of the args: Probably Mis function calls.
+Example:
+  (mis
+   :buffer 'current
+   (mis:comment :width 80
+                :padding \" \"
+                :newlines t
+                (mis:line \"-\")
+                (mis:style :align 'center \"Hello there.\")
+                (mis:line \"-\")))
+
   - TODO: Lots of documentation in here?"
-  (let ((macro:keywords/expected '(:buffer))
-        macro:key
-        macro:buffer
-        macro:rest
-        macro:metatree)
+  (let ((macro:keywords/expected '(:buffer :output))
+        macro:parse/key
+        macro:parse/key/output
+        macro:parse/key/buffer
+        macro:args/rest)
+
+    ;;------------------------------
+    ;; Parse for Top-Level Keywords
+    ;;------------------------------
     (dolist (arg args)
       (if (memq arg macro:keywords/expected)
-          (setq macro:key arg) ; Save keyword.
-        (if macro:key
-            (progn
-              ;; Get keyword's value into the correct variable.
-              (cond ((eq macro:key :buffer)
-                     (setq macro:buffer arg))
+          (setq macro:parse/key arg) ; Save keyword.
+        (if macro:parse/key
+            (let ((macro:parse/value arg))
+              ;; Allow both quoted and unquoted symbols for top-level args.
+              ;; For example, either of these:
+              ;;   (mis :output string ...)
+              ;;   (mis :output 'string ...)
+              (while (memq (car-safe macro:parse/value) '(quote function))
+                (message "hi: %S" macro:parse/value)
+                (setq macro:parse/value (cadr macro:parse/value)))
+              (message "bye: %S" macro:parse/value)
+
+              ;; Validate keyword's value & save into the correct variable.
+              (cond ((eq macro:parse/key :buffer)
+                     (int<mis>:buffer:name 'mis macro:parse/value)
+                     (setq macro:parse/key/buffer macro:parse/value))
+
+                    ((eq macro:parse/key :output)
+                     (setq macro:parse/key/output (int<mis>:valid:symbol-or-keyword? 'mis
+                                                                                     'macro:parse/value
+                                                                                     macro:parse/value
+                                                                                     int<mis>:valid:output/types)))
+
                     (t
                      (int<mis>:error 'mis
                                      "Unhandled top-level key/value: %S = %S"
-                                     macro:key
-                                     arg)))
-              (setq macro:key nil))
+                                     macro:parse/key
+                                     macro:parse/value)))
+              (setq macro:parse/key nil))
           ;; Else it's something else and we'll deal with it after sorting the args.
-          (push arg macro:rest))))
+          (push arg macro:args/rest))))
 
-    ;; `(message "buffer:   %S" ,macro:buffer)
+    (setq macro:args/rest (nreverse macro:args/rest))
 
-    ;; Finalize the parsed parameters.
-    (setq macro:rest     (nreverse macro:rest)
-          macro:metatree `(int<mis>:buffer:metadata 'mis ,macro:buffer nil)
-          macro:buffer   `(int<mis>:output/metadata:find 'mis
-                                                         :buffer:object
-                                                         ,macro:metatree))
+    ;;------------------------------
+    ;; Finalize Params
+    ;;------------------------------
 
-    ;; `(message "buffer:   %S" ,macro:buffer)
-    ;; `(message "metatree: %S" ,macro:metatree)
-    ;; `(message "rest:     %S" ',macro:rest)
+    `(let ((macro:output ',macro:parse/key/output)
+           (macro:buffer ,macro:parse/key/buffer)
+           macro:metatree)
 
-    ;; So far, none of the `mis:___' parser/compiler calls has actually been
-    ;; evaluated and we got our top-level args like `buffer'. This is necessary
-    ;; as we need to be in the buffer's context before evaluating anything so
-    ;; that widths and styles and such are determined correctly.
-    `(with-current-buffer ,macro:buffer
-       (save-mark-and-excursion
-         ;; In our buffer now... So evalute and resolve things.
-         (int<mis>:mis 'mis
-                       ,macro:metatree
-                       ;; Parsing happens when these are evaluated, before
-                       ;; `int<mis>:mis' is called.
-                       ,@macro:rest)))))
+       (int<mis>:debug 'mis "output (parsed):   %S" macro:output)
+       (unless macro:output
+         (setq macro:output 'buffer))
+       (int<mis>:debug 'mis "output (final):    %S" macro:output)
+
+       ;; NOTE: Allow a `:buffer' param even when we're not outputting to a buffer.
+       ;; That buffer will be where we parse & compile so that we are in the
+       ;; correct context for building the output (e.g. `mis:comment' needs to know
+       ;; about comment strings set by the buffer's major mode).
+
+       (int<mis>:debug 'mis "buffer (parsed):   %S" macro:buffer)
+       (setq macro:metatree (int<mis>:buffer:metadata 'mis macro:buffer nil)
+             macro:buffer   (int<mis>:output/metadata:find 'mis
+                                                           :buffer:object
+                                                           macro:metatree))
+       (int<mis>:debug 'mis "buffer (final):    %S" macro:buffer)
+
+       (int<mis>:debug 'mis "metadata (buffer): %S" macro:metatree)
+       ;; BUG HUNT! Good up til here...
+       (setq macro:metatree (int<mis>:output:update/metadata 'mis
+                                                             macro:metatree
+                                                             (cons :output macro:output)))
+       (int<mis>:debug 'mis "metadata (all):    %S" macro:metatree)
+       ;; BUG HUNT! Bad now.
+
+       ;;------------------------------
+       ;; Parse, Compile, & Output
+       ;;------------------------------
+
+       ;; So far, none of the `mis:___' parser/compiler calls has actually been
+       ;; evaluated and we got our top-level args like `buffer'. This is necessary
+       ;; as we need to be in the buffer's context before evaluating anything so
+       ;; that widths and styles and such are determined correctly.
+       (with-current-buffer macro:buffer
+         (save-mark-and-excursion
+           ;; In our buffer now... So evalute and resolve things.
+           (int<mis>:mis 'mis
+                         macro:metatree
+                         ;; Parsing happens when these are evaluated, before
+                         ;; `int<mis>:mis' is called.
+                         ,@macro:args/rest))))))
 ;; (mis
 ;;  (mis:style :width 80)
 ;;  (mis:line "-"))
 ;; (mis
 ;;  :buffer "*scratch*"
+;;  (mis:style :width 80)
+;;  (mis:line "-"))
+;; (mis
+;;  :output 'string
 ;;  (mis:style :width 80)
 ;;  (mis:line "-"))
 
@@ -113,6 +175,7 @@ ARGS should be Mis Output Trees. That is, it should have been Mis API calls
 METATREE should be nil or a Mis Output Tree of top-level metadata like:
   - `:buffer:name'
   - `:buffer:object'
+  - `:output'
 
 BUFFER should be the buffer object.
 
@@ -185,8 +248,8 @@ CALLER should be calling function's name. It can be one of:
     ;; Compile Mis syntax into strings.
     ;;------------------------------
     ;; Compile each parsed Mis Syntax Tree in `content' in current (reverse)
-    ;; order & push to compiled Mis Output Trees to `output' list. Final step will then have `output' in
-    ;; forwards order.
+    ;; order & push to compiled Mis Output Trees to `output' list. Final step
+    ;; will then have `output' in forwards order.
     (while content
       (int<mis>:debug caller
                       "compile: %S"
@@ -202,7 +265,7 @@ CALLER should be calling function's name. It can be one of:
                     output)
 
     ;;------------------------------
-    ;; Print Output
+    ;; Output
     ;;------------------------------
     ;; Now we should only have outputs left; print 'em.
     (int<mis>:print caller

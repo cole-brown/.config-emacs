@@ -21,13 +21,11 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Printing
+;; Print to String
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:print:output/entry (caller buffer/type entry)
-  "Print Mis Output Tree ENTRY string to current buffer.
-
-BUFFER/TYPE should be a value from `int<mis>:buffer:type'.
+(defun int<mis>:print/string:output/entry (caller entry)
+  "Return final Mis Output Tree ENTRY string.
 
 ENTRY should be an alist with key/value conses.
   - valid keys: `:string', `:metadata'
@@ -38,15 +36,13 @@ For example, if the full Mis Output Tree is:
 Then ENTRY should be, e.g.:
   '((:string . \"foo\")  (:metadata (:bar . baz)))
 
-Caller should be in correct position of correct buffer.
-
 CALLER should be calling function's name. It can be one of:
   - a string
   - a quoted symbol
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller   (list 'int<mis>:print:output/entry caller))
+  (let* ((caller   (list 'int<mis>:print/string:output/entry caller))
          (string   (int<mis>:output:get/string caller entry))
          (metadata (int<mis>:output:get/metadata caller entry)))
     (int<mis>:debug caller
@@ -77,12 +73,114 @@ CALLER should be calling function's name. It can be one of:
                            entry))
 
           ;;------------------------------
+          ;; Print String
+          ;;------------------------------
+          (t
+           (int<mis>:debug caller
+                           "print to string: %S"
+                           string)
+           ;; Print string? Ok; here is string.
+            string))))
+
+
+(defun int<mis>:print/string (caller metadata list/output)
+  "Finalize and print strings in list of Mis Output Trees LIST/OUTPUT.
+
+LIST/OUTPUT should be nil or a list of Mis Output Trees.
+
+METADATA should be nil or a Mis Output Tree of any top-level metadata (like the
+output buffer settings).
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller        (list 'int<mis>:print caller))
+         output/strings)
+
+    (int<mis>:debug caller
+                    "metadata:    %S"
+                    metadata)
+    (int<mis>:debug caller
+                    "list/output: %S"
+                    list/output)
+
+    ;; Gather strings from each output...
+    (dolist (output list/output)
+      (dolist (entry (int<mis>:output:get/entries caller output))
+        (push (int<mis>:print/string:output/entry caller entry)
+              output/strings)))
+
+    ;; Return as a single string.
+    (apply #'concat (nreverse output/strings))))
+
+
+;;------------------------------------------------------------------------------
+;; Print to Buffer
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:print/buffer:output/entry (caller buffer/type entry)
+  "Print Mis Output Tree ENTRY string to current buffer.
+
+BUFFER/TYPE should be a return value from `int<mis>:buffer:type'.
+
+ENTRY should be an alist with key/value conses.
+  - valid keys: `:string', `:metadata'
+NOTE: ENTRY should be one of the output alists of a full Mis Output Tree.
+For example, if the full Mis Output Tree is:
+  '((:output ((:string . \"foo\")  (:metadata (:bar . baz)))
+             ((:string . \"zort\") (:metadata (:poit . narf)))))
+Then ENTRY should be, e.g.:
+  '((:string . \"foo\")  (:metadata (:bar . baz)))
+
+Caller should be in correct buffer.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller   (list 'int<mis>:print/buffer:output/entry caller))
+         (metadata (int<mis>:output:get/metadata caller entry)))
+    (int<mis>:debug caller
+                    "buffer type: %S"
+                    buffer/type)
+    (int<mis>:debug caller
+                    "print metadata: %S"
+                    metadata)
+
+    (let ((string (int<mis>:print/string:output/entry caller entry)))
+      (int<mis>:debug caller
+                      "print string: %S"
+                      string)
+
+      ;;------------------------------
+      ;; No-Ops
+      ;;------------------------------
+      ;; Null string is ok; we do nothing.
+      (cond ((null string)
+             (int<mis>:debug caller
+                             "print nothing == do nothing. string: %S"
+                             string)
+             nil)
+
+          ;;------------------------------
+          ;; Errors
+          ;;------------------------------
+          ;; Errors with the string have already been delt with in
+          ;; `int<mis>:print/string:output/entry'.
+
+          ;;------------------------------
           ;; Print String to Buffer
           ;;------------------------------
           (t
            (int<mis>:debug caller
-                           "buffer/type: %S"
-                           buffer/type)
+                           "print to buffer `%S': %S"
+                           buffer/type
+                           string)
 
            ;;---
            ;; Special Shenanigans™ Part 01: '*Messages*' Side-Effects
@@ -133,55 +231,10 @@ CALLER should be calling function's name. It can be one of:
              (when (eq buffer/type :messages)
                ;; '*Messages*' expects a newline at end of each message, so make
                ;; sure to give it.
-               (insert "\n")))))))
+               (insert "\n"))))))))
 
 
-(defun int<mis>:print:output (caller metadata output)
-  "Finalize and print strings in Mis OUTPUT Tree to the output buffer.
-
-OUTPUT should be a Mis Output Tree.
-
-METADATA should be nil or a Mis Output Tree of any top-level metadata (like the
-output buffer settings).
-
-CALLER should be calling function's name. It can be one of:
-  - a string
-  - a quoted symbol
-  - a function-quoted symbol
-  - a list of the above, most recent first
-    - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller  (list 'int<mis>:print:output caller))
-         (buffer/object (int<mis>:output/metadata:find caller :buffer:object metadata))
-         (buffer/name   (int<mis>:output/metadata:find caller :buffer:name   metadata))
-         (buffer/type   (int<mis>:buffer:type          caller buffer/name)))
-
-    (int<mis>:debug caller
-                    "current-buffer (before): %S"
-                    (current-buffer))
-    (int<mis>:debug caller
-                    '("print to:\n"
-                      "  buffer/name:   %S\n"
-                      "  buffer/type:   %S\n"
-                      "  buffer/object: %S")
-                    buffer/name
-                    buffer/type
-                    buffer/object)
-
-    ;; Enter buffer & save mark/excursion once, then print each string.
-    (with-current-buffer buffer/object
-      (save-mark-and-excursion
-        (int<mis>:debug caller
-                        "current-buffer (printing): %S"
-                        (current-buffer))
-
-        ;; Loop on the output strings/metadatas to finalize & print.
-        (dolist (entry (int<mis>:output:get/entries caller output))
-          (int<mis>:print:output/entry caller
-                                       buffer/type
-                                       entry))))))
-
-
-(defun int<mis>:print (caller metadata list/output)
+(defun int<mis>:print/buffer (caller metadata list/output)
   "Finalize and print strings in list of Mis Output Trees LIST/OUTPUT.
 
 LIST/OUTPUT should be nil or a list of Mis Output Trees.
@@ -210,6 +263,7 @@ CALLER should be calling function's name. It can be one of:
     (int<mis>:debug caller
                     "current-buffer (before): %S"
                     (current-buffer))
+
     (int<mis>:debug caller
                     '("print to:\n"
                       "  buffer/name:   %S\n"
@@ -232,6 +286,52 @@ CALLER should be calling function's name. It can be one of:
             (int<mis>:print:output/entry caller
                                          buffer/type
                                          entry)))))))
+
+
+;;------------------------------------------------------------------------------
+;; Print Somewhere
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:print (caller metatree list/output)
+  "Finalize and print strings in list of Mis Output Trees LIST/OUTPUT.
+
+LIST/OUTPUT should be nil or a list of Mis Output Trees.
+
+METATREE should be nil or a Mis Output Tree of any top-level metadata (like the
+output buffer settings).
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller        (list 'int<mis>:print caller))
+         (output/type   (int<mis>:output/metadata:find caller :output metatree))
+         (func/print    (cond ((eq output/type 'buffer) #'int<mis>:print/buffer)
+                              ((eq output/type 'string) #'int<mis>:print/string)
+                              (t                        (int<mis>:error caller
+                                                                        "Unhandled output type `%S' from metadata: %S"
+                                                                        output/type
+                                                                        metatree)))))
+    (int<mis>:debug caller
+                    "metadata:    %S"
+                    metatree)
+    (int<mis>:debug caller
+                    "list/output: %S"
+                    list/output)
+    (int<mis>:debug caller
+                    '("printing:\n"
+                      "  output/type:   %S\n"
+                      "  func/print:    %S")
+                    output/type
+                    func/print)
+
+    ;; Return whatever the delegated function returns.
+    (funcall func/print
+             caller
+             metatree
+             list/output)))
 
 
 ;;------------------------------------------------------------------------------

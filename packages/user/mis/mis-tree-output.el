@@ -198,30 +198,37 @@ CALLER should be calling function's name. It can be one of:
           ;;------------------------------
           ((< mot/length 1)
            ;; No Mis Output Tree, so... just create one?
-           (apply #'int<mis>:output:create
-                  caller
-                  nil
-                  metadata))
+           (setq output/updated
+                 (apply #'int<mis>:output:create
+                        caller
+                        nil
+                        metadata)))
 
           (t
            (dolist (mot/entry mot/entries)
+             ;; Update this entry's existing metadata with the new metadata.
              (let* ((existing (int<mis>:output:get/metadata caller mot/entry))
                     (updated  (int<mis>:output/metadata:update caller existing metadata)))
                (int<mis>:debug caller
-                               "%S -> %S"
-                               existing
+                               "existing: %S"
+                               existing)
+               (int<mis>:debug caller
+                               "updated: %S"
                                updated)
+               ;; Add this entry w/ updated metadata to the MOT we'll return.
                (setq output/updated
+                     ;; fooooo
                      (int<mis>:output:append caller
                                              output/updated
-                                             (int<mis>:output:create caller
-                                                                     (int<mis>:output:get/string caller mot/entry)
-                                                                     updated)))))
+                                             (apply #'int<mis>:output:create
+                                                    caller
+                                                    (int<mis>:output:get/string caller mot/entry)
+                                                    updated)))))))
 
-           (int<mis>:debug caller
-                           "<-output: %S"
-                           output/updated)
-           output/updated))))
+    (int<mis>:debug caller
+                    "<-output: %S"
+                    output/updated)
+    output/updated))
 ;; (int<mis>:output:update/metadata
 ;;  'test
 ;;  (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good))

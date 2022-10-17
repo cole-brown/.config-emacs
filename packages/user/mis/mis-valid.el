@@ -84,6 +84,7 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
 
 (defconst int<mis>:keywords:metadata
   '(:buffer
+    :output
     :align
     :width)
   "Valid metadata keywords.")
@@ -127,6 +128,15 @@ See indent's styler, `int<mis>:style:indent' for what indent symbols mean.
 Also valid is:
   - any positive integer
   - a string")
+
+
+(defconst int<mis>:valid:output/types
+  '(buffer
+    string)
+  "Valid Mis output types.
+
+Keyword and symbol both allowed; use `int<mis>:valid:symbol-or-keyword?' to
+validate.")
 
 
 ;;------------------------------------------------------------------------------
@@ -904,6 +914,65 @@ CALLER should be calling function's name. It can be one of:
                     valids
                     (type-of value)
                     value)))
+
+
+(defun int<mis>:valid:symbol-or-keyword? (caller name value valid-symbols &rest _)
+  "Normalize VALUE and validate against VALID-SYMBOLS.
+
+Convert VALUE to a symbol if it's a keyword, then compare to the list of
+VALID-SYMBOLS.
+
+VALID-SYMBOLS should be a list of valid symbols; will use `memq' to evaluate
+membership.
+
+NAME should be VALUE's symbol name as a symbol or string.
+
+For example, if you want all of these to be valid:
+  '(foo :foo bar :bar baz :baz)
+Then check like so:
+  (let ((example-input :foo))
+    (int<mis>:valid:symbol-or-keyword? 'example
+                                       'example-input
+                                       example-input
+                                       '(foo bar baz)))
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  ;; Normalize to symbol for returning.
+  (let ((value/symbol (cond ((keywordp value)
+                             ;; Convert from keyword to symbol.
+                             (intern (string-remove-prefix ":" (symbol-name value))))
+                            ((symbolp value)
+                             value)
+                            (t
+                             (int<mis>:error caller
+                                             "%s must be a keyword or symbol. Got %S: %S"
+                                             (int<mis>:error:name name)
+                                             (type-of value)
+                                             value)))))
+    ;; Validate the valids first...
+    (unless (seq-every-p (lambda (x) "Validate VALID-SYMBOLS."
+                           (and (symbolp nil)
+                                (not (keywordp x))))
+                         valid-symbols)
+      (int<mis>:error caller
+                      "%s must be a list of only symbols (no keywords). Got: %S"
+                      (int<mis>:error:name name)
+                      valid-symbols))
+
+    ;; Validate & return normalized value.
+    (if (memq value/symbol valid-symbols)
+        value/symbol
+      (int<mis>:error caller
+                      "%s must be one of: %S. Got %S: %S"
+                      (int<mis>:error:name name)
+                      valid-symbols
+                      (type-of value/symbol)
+                      value/symbol))))
 
 
 (defun int<mis>:valid:indent? (caller name value &rest _)
