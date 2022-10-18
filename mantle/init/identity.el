@@ -1,27 +1,54 @@
 ;;; config/identity.el -*- lexical-binding: t; -*-
 
 
-(imp:require :modules 'spy 'io 'signature)
+(imp:require :tools 'signature)
 
 
 ;;------------------------------------------------------------------------------
-;; Hello, my name is...
+;;                               !! - NOTE - !!
 ;;------------------------------------------------------------------------------
-
-;; Some functionality uses this to identify you, e.g. GPG configuration, email
-;; clients, file templates and snippets.
-(setq user-full-name "Cole Brown"
-      user-mail-address "code@brown.dev")
+;; I am setting this stuff in my systems/secrets repo.
 
 
-;;------------------------------------------------------------------------------
-;; Signatures & Marks
-;;------------------------------------------------------------------------------
+;; ;;------------------------------------------------------------------------------
+;; ;; Hello, my name is...
+;; ;;------------------------------------------------------------------------------
+;;
+;; ;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; ;; clients, file templates and snippets.
+;; (setq user-full-name    "Cole Brown"
+;;       user-mail-address "code@brown.dev")
+;;
+;;
+;; ;;------------------------------------------------------------------------------
+;; ;; Signatures & Marks
+;; ;;------------------------------------------------------------------------------
+;;
+;; (signature:create "♫" user-full-name)
+;;
+;;
+;; ;;------------------------------------------------------------------------------
+;; ;; Emails for Signatures
+;; ;;------------------------------------------------------------------------------
+;;
+;; (signature:set 'id 'email
+;;                 :namespace :work
+;;                 :value "jeff.jefferson@example.com"
+;;                 :docstr "Work Email")
+;;
+;; (signature:set 'id 'email
+;;                 :namespace :home
+;;                 :value "jeff@example.com"
+;;                 :docstr "Home Email")
+;;
+;; (signature:set 'id 'email
+;;                 :namespace :default
+;;                 :value "code@example.com"
+;;                 :docstr "Open Source Coding Email")
 
-(spy:signature/create "♫" user-full-name)
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :dot-emacs 'config 'identity)
+(imp:provide :mantle 'init 'user 'identity)

@@ -28,6 +28,30 @@
 
 
 ;;------------------------------
+;; User / Identity
+;;------------------------------
+;; Needed early so that secret init can init signatures/identities too.
+
+;;---
+;; Modules
+;;---
+(imp:load :feature  '(:tools)
+          :path     (imp:path:join innit:path:module "tools")
+          :filename "init")
+
+(imp:load :feature  '(:tools signature)
+          :path     (imp:path:join innit:path:module "tools" "signature")
+          :filename "init")
+
+;;---
+;; User Init
+;;---
+(imp:load :feature  '(:mantle init user identity)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "identity")
+
+
+;;------------------------------
 ;; Systems
 ;;------------------------------
 
