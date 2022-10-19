@@ -20,11 +20,36 @@
 ;;------------------------------------------------------------------------------
 ;; Keybinds Dependencies
 ;;------------------------------------------------------------------------------
-;; Just assume all keybinds in here need `general'. Most of them will.
-(imp:eval:after (:keybind general ready)
 
-  ;; TODO: ...something, surely.
-  )
+(let ((path/here (imp:path:current:dir/relative :mantle)))
+  ;; Just assume all keybinds in here need `general'. Most of them will.
+  (imp:eval:after (:keybind general ready)
+   ;; TODO: fix indentation?
+
+   ;;------------------------------
+   ;; Set up local & global leaders' common infix menus.
+   ;;------------------------------
+   (imp:load :feature  '(:mantle config user keybinds infixes)
+             :path     path/here
+             :filename "infixes")
+
+   ;; TODO: Do we have an evil vs non-evil check for whether to load Emacs or
+   ;; Evil keybind files?
+
+
+   ;;------------------------------
+   ;; Emacs Keybinds
+   ;;------------------------------
+
+
+   ;;------------------------------
+   ;; Evil Keybinds
+   ;;------------------------------
+   (imp:eval:after (:and evil evil-collection)
+
+    (imp:load :feature  '(:mantle config user keybinds signature)
+              :path     path/here
+              :filename "signature"))))
 
 
 ;;------------------------------------------------------------------------------
