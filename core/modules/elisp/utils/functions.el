@@ -16,7 +16,7 @@
 ;; Delete Functions
 ;;------------------------------------------------------------------------------
 
-(defun elisp:func/delete (symbol)
+(defun elisp:func:delete (symbol)
   "Delete a function by its SYMBOL by calling:
 1. `fmakunbound' - Removes the function definition.
 2. `makunbound'  - Removes the variable binding.
@@ -83,6 +83,21 @@ Originaly from `doom-unquote'."
   (while (memq (car-safe arg) '(quote function))
     (setq arg (cadr arg)))
   arg)
+
+
+;;------------------------------------------------------------------------------
+;; Interactive Commands
+;;------------------------------------------------------------------------------
+
+(defmacro elisp:cmd (&rest body)
+  "Return (lambda () (interactive) ,@BODY)
+
+A factory for quickly producing interaction commands, particularly for keybinds
+or aliases.
+
+Proudly nicked from Doom's core-lib.el."
+  (declare (doc-string 1) (pure t) (side-effect-free t))
+  `(lambda (&rest _) (interactive) ,@body))
 
 
 ;;------------------------------------------------------------------------------
