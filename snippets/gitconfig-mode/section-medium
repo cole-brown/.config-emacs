@@ -4,6 +4,6 @@
 # key: sec/med
 # --
 
-`(mis0/comment/wrap (make-string 30 ?-) (mis0/string/trim t))`
-`(mis0/comment/wrap "" (mis0/string/trim t))` ${0:`yas-selected-text`}
-`(mis0/comment/wrap (make-string 30 ?-) (mis0/string/trim t))`
+`(mis :buffer 'current (mis:comment :width 30 :padding " " (mis:line "-")))`
+`(mis :buffer 'current (mis:comment ""))` ${1:`yas-selected-text`}
+`(mis :buffer 'current (mis:comment :width 30 :padding " " (mis:line "-")))`$0

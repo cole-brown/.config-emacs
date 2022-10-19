@@ -3,32 +3,31 @@
 # name: /ert: emacs unit test (ert-deftest)
 # key: /ert
 # --
+;;------------------------------
+;; ${1:`(let ((string yas-selected-text))
+           (if (string-match (rx (syntax open-parenthesis)
+                                  "defun"
+                                  (one-or-more whitespace)
+                                  (group
+                                   (one-or-more graphic)))
+                              string)
+              (match-string 1 string)
+            "<func being tested>"))`}
+;;------------------------------
 
-;;------------------------------------------------------------------------------
-;; Test: ${1:`(let ((string yas-selected-text))
-                 (if (string-match (rx (syntax open-parenthesis)
-                                        "defun"
-                                        (one-or-more whitespace)
-                                        (group
-                                         (one-or-more graphic)))
-                                    string)
-                    (match-string 1 string)
-                  "<func being tested"))`}
-;;------------------------------------------------------------------------------
+(ert-deftest test<${2:lib/file}>::$1 ()
+  "Test that \`$1' ${3:<does something>}."
+  (test<$2>:fixture
+      ;;===
+      ;; Test name, setup & teardown func.
+      ;;===
+      "test<${2:lib/file}>::$1"
+      ${4:nil}
+      ${5:nil}
 
-;; `(first (split-string yas-selected-text "\n"))`
-(ert-deftest ert/$1 ()
-  "Test that \`$1' ${3:<does something>}.
-"
-  (ert/${2:`(string-trim-right (buffer-name) "-ert[.]el")`}/setup)
+    ;;===
+    ;; Run the test.
+    ;;===
 
-  ;; <maybe tests here>
-
-  (ert/util/with-json connect-ert/data/player-status-in-full
-
-    ;; <maybe tests here>
     $0
-
-    )
-
-  (ert/$2/teardown))
+    ))

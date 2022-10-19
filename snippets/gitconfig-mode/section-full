@@ -4,6 +4,6 @@
 # key: sec/full
 # --
 
-${1:$(mis0/comment/line (mis0/string/indent 'existing) (mis0/string/trim t))}
-`(mis0/comment/wrap "" (mis0/string/indent 'existing) (mis0/string/trim t))` $1
-${1:$(mis0/comment/line (mis0/string/indent 'existing) (mis0/string/trim t))}$0
+`(mis :buffer 'current (mis:comment :padding " " (mis:line "-")))`
+`(mis :buffer 'current (mis:comment ""))` ${1:`yas-selected-text`}
+`(mis :buffer 'current (mis:comment :padding " " (mis:line "-")))`$0
