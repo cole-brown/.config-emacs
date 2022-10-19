@@ -163,27 +163,32 @@ Signature Types:
 (Optional) Keywords are:
   - :namespace <keyword> - Namespace signature is stored under.
   - :timestamp <non-nil> - Append \" [YYYY-MM-DD]\" (org inactive) timestamp.
-  - :comment   <non-nil> - Wrap signature in comment characters if appropriate."
+  - :comment   <non-nil> - Wrap signature in comment characters if appropriate.
+  - :default   <string>  - Fallback string if signature doesn't exist."
   ;; Break `args' up into type list and keyword args, then check for any of the
   ;; optional keywords.
-  (-let* (((type keys) (spy:lisp/func.args args :namespace :timestamp :comment))
-          ((&plist :namespace :timestamp :comment) keys))
+  (-let* (((type keys) (elisp:parse:args+kwargs args :namespace :timestamp :comment :default))
+          ((&plist :namespace :timestamp :comment :default) keys))
 
-    ;; First, we need the signature...
-    (let ((sig (signature:get type :namespace namespace)))
-      ;; Add timestamp if desired.
-      ;; Add it first - commenting could append to end.
-      (when timestamp
-        (setq sig (concat sig
-                          " "
-                          (spy:datetime/string.get 'org-inactive))))
+    ;; First, do we even have this signature?
+    (if-let ((sig (signature:get type :namespace namespace)))
+        (progn
+          ;; Add timestamp if desired.
+          ;; Add it first - commenting could append to end.
+          (when timestamp
+            (setq sig (concat sig
+                              " "
+                              (spy:datetime/string.get 'org-inactive))))
 
-      (when comment
-        ;; Append ':' and wrap sig with comment characters if necessary.
-        (setq sig (mis0/comment/wrap (concat sig ":"))))
+          (when comment
+            ;; Append ':' and wrap sig with comment characters if necessary.
+            (setq sig (mis0/comment/wrap (concat sig ":"))))
 
-      ;; Return it.
-      sig)))
+          ;; Return it.
+          sig)
+
+      ;; Didn't find the signature... Is there a default to return?
+      default)))
 ;; (signature:string 'id 'sigil)
 ;; (signature:string 'sigil 'todo :namespace :work)
 ;; (signature:string 'sigil 'todo :timestamp t :comment t)
@@ -210,7 +215,8 @@ Signature Types:
 (Optional) Keywords are:
   - :namespace <keyword> - Namespace signature is stored under.
   - :timestamp <non-nil> - Append \" [YYYY-MM-DD]\" (org inactive) timestamp.
-  - :comment   <non-nil> - Wrap signature in comment characters if appropriate."
+  - :comment   <non-nil> - Wrap signature in comment characters if appropriate.
+  - :default   <string>  - Fallback string if signature doesn't exist."
    (insert (apply #'signature:string args))
    (when (bound-and-true-p evil-mode)
      (evil-insert-state)))
