@@ -67,32 +67,61 @@ Add keybinds to the leader using function `keybind:leader/local'.")
 ;; Helpers
 ;;------------------------------------------------------------------------------
 
-(defun keybind:leader (prefix/root prefix/key)
-  "Create a leader `:prefix' string from PREFIX/ROOT and PREFIX/KEY.
+(defun keybind:prefix (prefix &rest infix)
+  "Create a leader `:prefix' string from PREFIX and INFIX.
 
-PREFIX/ROOT can be a string or one of the keywords: `:global', `:local'
+PREFIX can be a string or one of the keywords: `:global', `:local'
 
-PREFIX/KEY must be a string."
+INFIX must be a string.
+
+See also function `keybind:infix'."
   (let ((prefix/keywords (list :global keybind:leader/global:prefix
                                :local  keybind:leader/local:prefix)))
-    (cond ((not (stringp prefix/key))
-           (error "keybind:leader: PREFIX/KEY must be a string, got: %S"
-                  prefix/key))
-          ((and (not (stringp prefix/root))
-                (not (plist-member prefix/keywords prefix/root)))
-           (error "keybind:leader: PREFIX/ROOT must be a string or one of %S, got: %S"
-                  (seq-filter #'keywordp prefix/keywords)
-                  prefix/root))
-          ((plist-member prefix/keywords prefix/root)
-             (string-join (list (plist-get prefix/keywords prefix/root)
-                                prefix/key)
-                          " "))
-          (t
-             (string-join (list prefix/root
-                                prefix/key)
-                          " ")))))
-;; (keybind:leader :global "g")
-;; (keybind:leader :local  "g")
+    ;;------------------------------
+    ;; Validate
+    ;;------------------------------
+    ;; PREFIX
+    (unless (or (stringp prefix)
+                (plist-member prefix/keywords prefix))
+     (error "keybind:prefix: PREFIX must be a string or one of %S, got: %S"
+            (seq-filter #'keywordp prefix/keywords)
+            prefix))
+
+    ;; INFIX
+    (dolist (i infix)
+      (unless (stringp i)
+        (error "keybind:prefix: INFIX must be a string. Got %S: %S"
+               (type-of i)
+               i)))
+
+    ;;------------------------------
+    ;; Create Leader String
+    ;;------------------------------
+    (string-join (cons (if (plist-member prefix/keywords prefix)
+                           (plist-get prefix/keywords prefix)
+                         prefix)
+                       infix)
+                     " ")))
+;; (keybind:prefix :global "g")
+;; (keybind:prefix :local  "g")
+
+
+(defun keybind:infix (&rest infix)
+  "Concat INFIX strings for a general `:infix' key's value.
+
+For example:
+  (keybind:leader/global:def
+   :infix (keybind:infix \"i\" \"s\") ;; insert -> signature
+   [...]"
+  (dolist (i infix)
+    (unless (stringp i)
+      (error "keybind:infix: INFIX must be a string. Got %S: %S"
+             (type-of i)
+             i)))
+
+  (mapconcat #'identity infix " "))
+;; (keybind:infix :i "s")
+;; (keybind:infix "i" "s")
 
 
 ;;------------------------------------------------------------------------------

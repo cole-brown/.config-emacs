@@ -32,7 +32,7 @@
   ;;--------------------
 
   ;; Bind to `emacs-lisp' local leader
-  (:prefix  (keybind:leader :local "")
+  (:prefix  (keybind:prefix :local "")
    :states  keybind:leader/local:states
    :keymaps keybind:leader/local:keymaps
 
