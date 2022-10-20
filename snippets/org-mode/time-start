@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # contributor: Cole Brown <code@brown.dev>
-# key: time/start
-# name: spy/org/time.start: org start/finish list timestamps
+# name: /time/start: org start/finish list timestamps
+# key: /time/start
 # --
-- started:  `(spy:datetime/string.get 'iso-8601 'long)`
+- started:  `(datetime:string/get 'rfc-3339 'datetime)`
 - finished: $0
