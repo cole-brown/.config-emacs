@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # contributor: Cole Brown <code@brown.dev>
-# name: header: python-mode new file header
-# key: header
+# name: /header: python-mode new file header
+# key: /header
 # --
 
 # coding: utf-8
