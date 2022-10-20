@@ -538,14 +538,14 @@ Check/return first to be non-nil of:
     (if using jerky/+dlv).
   - Jerky key: 'namespace 'system
   - `jerky:namespace/default'"
-  (let ((namespace
-         (if (and (boundp 'int<jerky>:dlv:namespace/local)
-                  (not (null int<jerky>:dlv:namespace/local)))
-             int<jerky>:dlv:namespace/local
+  (let ((namespace (cond ((and (boundp 'int<jerky>:dlv:namespace/local)
+                               (not (null int<jerky>:dlv:namespace/local)))
+                          int<jerky>:dlv:namespace/local)
 
-           (if-let ((system (jerky:get 'namespace 'system)))
-               system
-             jerky:namespace/default))))
+                         ((jerky:get 'namespace 'system))
+
+                         (t
+                          jerky:namespace/default))))
     (nub:debug :jerky
         "jerky:namespace:get"
         '(:namespace)
@@ -554,7 +554,7 @@ Check/return first to be non-nil of:
         "  namespace/local: %S\n"
         "  system:          %S\n"
         "  default:         %S\n"
-        "  result:          %S")
+        "  <--:             %S")
       (imp:provided? :jerky 'dlv)
       (if (boundp 'int<jerky>:dlv:namespace/local)
           int<jerky>:dlv:namespace/local
