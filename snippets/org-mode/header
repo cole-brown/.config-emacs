@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # contributor: Cole Brown <code@brown.dev>
-# name: header: new file.org header
-# key: header
+# name: /header: new file.org header
+# key: /header
 # notes: Double time stamps were being inserted. Found reason:
 #   "This happens because org-insert-time-stamp inserts a time stamp (like the
 # name says), but also returns the time stamp. Yasnippit inserts the return
@@ -20,7 +20,7 @@
                                       (split-string (file-name-sans-extension file-name) "_")
                                       "_"))
                         (capitalize file-name)))`}
-#+AUTHOR:      ${2:Cole Brown}
-#+EMAIL:       ${3:`(signature:get 'id 'email :namespace (jerky/namespace.get))`}
-#+DATE:        ${4:`(datetime:string/get 'org-inactive)`}
+#+AUTHOR:      ${2:`(signature:string 'id 'name :default (user-full-name))`}
+#+EMAIL:       ${3:`(signature:get 'id 'email :namespace (jerky:namespace:get) :default (message-user-mail-address))`}
+#+DATE:        ${4:`(datetime:string/get 'rfc-3339 'date)`}
 $0
