@@ -1,8 +1,8 @@
 # -*- mode: snippet -*-
 # contributor: Cole Brown <code@brown.dev>
 # expand-env: ((width (mantle:snippet:number:parse :input 80 "Width: ")))
-# name: section <width>: prog-mode comment header section w/ settable width
-# key: sec//
+# name: /sec//: section <width>: prog-mode comment header section w/ settable width
+# key: /sec//
 # --
 
 ${1:$(mis :buffer 'current (mis:comment :width width (mis:line "-")))}

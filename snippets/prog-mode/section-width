@@ -1,10 +1,10 @@
 # -*- mode: snippet -*-
 # contributor: Cole Brown <code@brown.dev>
-# expand-env: ((width (mis0/style/width (mantle:snippet:number:parse :input 80 "Width: "))))
-# name: section <width>: prog-mode comment header section w/ settable width
-# key: sec//
+# expand-env: ((width (mantle:snippet:number:parse :input 80 "Width: ")))
+# name: /sec//: section <width>: prog-mode comment header section w/ settable width
+# key: /sec//
 # --
 
-${1:$(mis0/comment/line width (mis0/string/indent 'existing) (mis0/string/trim t))}
-`(mis0/comment/wrap ""  width (mis0/string/indent 'existing) (mis0/string/trim t))` $1
-${1:$(mis0/comment/line width (mis0/string/indent 'existing) (mis0/string/trim t))}$0`(mantle:snippet:number:cache/clear)`
+${1:$(mis :buffer 'current (mis:comment :width width (mis:line "-")))}
+`(mis :buffer 'current (mis:comment ""))` ${1:`yas-selected-text`}
+${1:$(mis :buffer 'current (mis:comment :width width (mis:line "-")))}$0

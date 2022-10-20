@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # contributor: Cole Brown <code@brown.dev>
-# name: section full: prog-mode full-width comment header section
-# key: sec/full
+# name: /sec/full: section full: prog-mode full-width comment header section
+# key: /sec/full
 # --
 
 `(mis :buffer 'current (mis:comment :padding " " (mis:line "-")))`

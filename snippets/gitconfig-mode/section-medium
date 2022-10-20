@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # contributor: Cole Brown <code@brown.dev>
-# name: section medium: prog-mode "medium"-width (30) comment header
-# key: sec/med
+# name: /sec/med: section medium: prog-mode "medium"-width (30) comment header
+# key: /sec/med
 # --
 
 `(mis :buffer 'current (mis:comment :width 30 :padding " " (mis:line "-")))`

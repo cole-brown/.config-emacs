@@ -1,7 +1,7 @@
 # -*- mode: snippet -*-
 # contributor: Cole Brown <code@brown.dev>
-# name: section fancy: fancy prog-mode comment header section
-# key: sec/fancy
+# name: /sec/fancy: section fancy: fancy prog-mode comment header section
+# key: /sec/fancy
 # --
 
 ${1:Will do its thing on exit.$(when yas/moving-away-p
