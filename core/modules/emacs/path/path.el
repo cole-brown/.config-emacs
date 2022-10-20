@@ -461,7 +461,7 @@ non-nil to continue and nil to halt the walk."
 
 
 (defun path:walk (root callback)
-  "Walks the directory tree starting at ROOT, calls CALLBACk for each child.
+  "Walk the directory tree starting at ROOT, call CALLBACK for each child.
 
 CALLBACK should accept params:
   1) string - path of child, absolute
@@ -525,8 +525,7 @@ non-nil to continue and nil to halt the walk."
 ;; TODO: `path:validate' function?
 
 (defun int<path>:append (parent next)
-  "Append NEXT element as-is to parent, adding dir separator between them if
-needed.
+  "Append NEXT element to PARENT, adding dir separator between them.
 
 PARENT & NEXT are normalized via `str:normalize:name', so keywords or symbol
 names can be used as well as strings."
@@ -579,7 +578,7 @@ names can be used as well as strings."
 
 
 (defun int<path>:filter:strings:keep (item)
-  "`-keep' needs the item itself returned, so you can't just use `stringp'."
+  "`-keep' needs the ITEM itself returned, so you can't just use `stringp'."
   (and (stringp item) item))
 
 
@@ -695,7 +694,7 @@ Returned PLIST will have these keys (if their values are non-nil).
   "Join PATH & any SEGMENTs, then remove any file extensions/suffixes.
 
 Example:
-  (path:name:dir \"/foo\" \"bar.baz\")
+  (path:name:base \"/foo\" \"bar.baz\")
     -> \"/foo/bar\""
   (file-name-sans-extension (path:join path segment)))
 
@@ -721,9 +720,14 @@ Return an absolute path.
 
 Does not fix or validate PATH or SEGMENT components; they are expected to be
 valid."
-  (expand-file-name (apply #'path:join
-                           path
-                           segment)))
+  ;; Force the return value to be a file path by ensuring trailing "/" and then
+  ;; removing it.
+  (directory-file-name
+   (file-name-as-directory
+    ;; Get a normalized path.
+    (expand-file-name (apply #'path:join
+                             path
+                             segment)))))
 ;; (path:canonicalize:file "~" "personal" "something.exe" "zort.txt")
 ;; (path:canonicalize:file "~" "personal" "something.exe" ".")
 ;; (path:canonicalize:file "~" "personal" "something.exe" "..")
@@ -818,7 +822,7 @@ Raises an error if ROOT is not nil and not a string."
 ;;------------------------------------------------------------------------------
 
 (defun path:current:file ()
-  "Return the emacs lisp file this function is called from.
+  "Return the Emacs Lisp file this function is called from.
 
 Works when:
   - byte compiling
@@ -827,7 +831,7 @@ Works when:
     - `load-file-name'
     - `current-load-list'
   - visiting/evaluating
-    - `buffer-file-name'
+    - function `buffer-file-name'
 
 Raises an error signal if it cannot find a file path."
   (cond
@@ -846,12 +850,12 @@ Raises an error signal if it cannot find a file path."
    ;;------------------------------
    ;; Error: Didn't find anything valid.
    ;;------------------------------
-   ((error "path:current:file: Cannot get the current file's path."))))
+   ((error "path:current:file: Cannot get the current file's path"))))
 ;; (path:current:file)
 
 
 (defun path:current:dir ()
-  "Return the directory of the emacs lisp file this function is called from.
+  "Return the directory of the Emacs Lisp file this function is called from.
 
 Uses `path:current:file' and just chops off the filename."
   (when-let (path (path:current:file))

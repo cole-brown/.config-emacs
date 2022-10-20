@@ -19,7 +19,8 @@ Example:
   (file:name \"/foo/bar.tar.gz\")
   (file:name \"c:/foo/bar.tar.gz\")
     -> \"bar.tar.gz\""
-  (file-name-nondirectory (path:join path segment)))
+  (file-name-nondirectory (apply #'path:join path segment)))
+;; (file:name "/foo" "bar.tar.gz")
 
 
 (defun file:name:base (path &rest segment)
@@ -38,6 +39,7 @@ Examples:
   (file:name \"c:/foo/bar.tar.gz\")
     -> \"bar.tar\""
   (file-name-sans-extension (file:name path segment)))
+;; (file:name "c:/foo/bar.baz")
 
 
 ;;------------------------------------------------------------------------------

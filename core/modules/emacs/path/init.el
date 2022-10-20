@@ -42,6 +42,8 @@
             :filename "files")
   (imp:load :feature  '(:path regex)
             :filename "regex")
+  (imp:load :feature  '(:path git)
+            :filename "git")
 
   ;; End load timing.
   )
