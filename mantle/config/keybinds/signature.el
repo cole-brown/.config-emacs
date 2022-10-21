@@ -101,4 +101,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'keybinds 'identity)
+(imp:provide :mantle 'config 'user 'keybinds 'signature)
