@@ -27,8 +27,6 @@
  ;; Signatures
  ;;------------------------------
 
-;; (general-define-key
-;; :states keybind:leader/global:states
 (keybind:leader/global:def
  :infix (keybind:infix "i" "s")      ;; insert -> signature
  "" '(nil :which-key "Signature...") ;; Infix Title
@@ -44,17 +42,19 @@
 
  ;; Signature for the end of an email or something.
  "s" (list (elisp:cmd (signature:insert 'name 'sign))
-           :which-key (concat "Sign: " (signature:string 'name 'sign)))
+           :which-key (concat "Sign: " (signature:string 'name 'sign))))
 
- ;; IDs
- (:prefix ("i" . "ID")
-  ;; Just the Sigil.
-  "s" (list (elisp:cmd (signature:insert 'id 'sigil))
-            :which-key (concat "Sigil: " (signature:string 'id 'sigil)))
+(keybind:leader/global:def
+ :infix (keybind:infix "i" "s" "i")      ;; insert -> signature -> ID
+ "" '(nil :which-key "ID...") ;; Infix Title
 
-  ;; Just the Name.
-  "n" (list (elisp:cmd (signature:insert 'id 'name))
-            :which-key (concat "Name: " (signature:string 'id 'name)))))
+ ;; Just the Sigil.
+ "s" (list (elisp:cmd (signature:insert 'id 'sigil))
+           :which-key (concat "Sigil: " (signature:string 'id 'sigil)))
+
+ ;; Just the Name.
+ "n" (list (elisp:cmd (signature:insert 'id 'name))
+           :which-key (concat "Name: " (signature:string 'id 'name))))
 
 ;;------------------------------
 ;; Emails
@@ -74,7 +74,8 @@
 (when (signature:exists? 'id 'email :namespace :home)
   (keybind:leader/global:def
    :infix (keybind:infix "i" "s" "e") ;; insert -> signature -> email
-   "" '(nil :which-key "Email...")    ;; Infix Title
+   ;; TODO: Do I need to redefine the title?
+   ;; "" '(nil :which-key "Email...")    ;; Infix Title
 
    "h" (list (elisp:cmd (signature:insert 'id 'email :namespace :home))
              :which-key (concat "home: " (signature:string 'id 'email :namespace :home)))))
@@ -83,7 +84,8 @@
 (when (signature:exists? 'id 'email :namespace :default)
   (keybind:leader/global:def
    :infix (keybind:infix "i" "s" "e") ;; insert -> signature -> email
-   "" '(nil :which-key "Email...")    ;; Infix Title
+   ;; TODO: Do I need to redefine the title?
+   ;; "" '(nil :which-key "Email...")    ;; Infix Title
 
    "c" (list (elisp:cmd (signature:insert 'id 'email :namespace :default))
                 :which-key (concat "default: " (signature:string 'id 'email :namespace :default)))))
