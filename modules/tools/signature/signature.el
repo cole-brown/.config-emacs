@@ -50,7 +50,7 @@ ARGS should be sig's type, followed by keyword pairs:
   - required: :value <value>
   - optional: :namespace <namespace>
   - optional: :docstr <docstr>"
- (apply #'jerky/set 'signature args))
+ (apply #'jerky:set 'signature args))
 ;; (signature:set 'id 'hail :value "hi")
 ;; (signature:get 'id 'hail)
 ;; (signature:get 'id 'email :namespace :home)
@@ -61,7 +61,7 @@ ARGS should be sig's type, followed by keyword pairs:
 
 ARGS should be sig's type, followed by keyword pairs:
   - optional: :namespace <namespace>"
-  (not (null (apply #'jerky/has 'signature args))))
+  (not (null (apply #'jerky:has 'signature args))))
 
 
 ;;------------------------------------------------------------------------------
