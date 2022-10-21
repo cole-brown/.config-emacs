@@ -354,16 +354,16 @@ Example:
 ;;------------------------------------------------------------------------------
 
 ;;------------------------------
-;; int<imp>:feature:exists?
+;; imp:feature:exists?
 ;;------------------------------
 
-(ert-deftest test<imp/feature>::int<imp>:feature:exists? ()
-  "Test that `int<imp>:feature:exists?' behaves appropriately."
+(ert-deftest test<imp/feature>::imp:feature:exists? ()
+  "Test that `imp:feature:exists?' behaves appropriately."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::int<imp>:feature:exists?"
+      "test<imp/feature>::imp:feature:exists?"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
@@ -385,32 +385,32 @@ Example:
     ;; Exists?
     ;;------------------------------
 
-    (should (int<imp>:feature:exists? '(:test)))
-    (should (int<imp>:feature:exists? '(:test exists)))
-    (should (int<imp>:feature:exists? '(:test exists here)))
-    (should (int<imp>:feature:exists? '(:test exists too)))
+    (should (imp:feature:exists? '(:test)))
+    (should (imp:feature:exists? '(:test exists)))
+    (should (imp:feature:exists? '(:test exists here)))
+    (should (imp:feature:exists? '(:test exists too)))
 
-    (should (int<imp>:feature:exists? '(:test foo)))
-    (should (int<imp>:feature:exists? '(:test foo bar)))
-    (should (int<imp>:feature:exists? '(:test foo bar baz)))
-    (should (int<imp>:feature:exists? '(:test foo qux)))
-    (should (int<imp>:feature:exists? '(:test foo qux quux)))
-    (should (int<imp>:feature:exists? '(:test foo qux qox)))
-    (should (int<imp>:feature:exists? '(:test foo qux qox qix)))
-    (should (int<imp>:feature:exists? '(:test foo qux qox qix qex)))
-    (should (int<imp>:feature:exists? '(:test foo qux qox qix qex qax)))
+    (should (imp:feature:exists? '(:test foo)))
+    (should (imp:feature:exists? '(:test foo bar)))
+    (should (imp:feature:exists? '(:test foo bar baz)))
+    (should (imp:feature:exists? '(:test foo qux)))
+    (should (imp:feature:exists? '(:test foo qux quux)))
+    (should (imp:feature:exists? '(:test foo qux qox)))
+    (should (imp:feature:exists? '(:test foo qux qox qix)))
+    (should (imp:feature:exists? '(:test foo qux qox qix qex)))
+    (should (imp:feature:exists? '(:test foo qux qox qix qex qax)))
 
     ;;------------------------------
     ;; Doesn't Exist?
     ;;------------------------------
-    (should-not (int<imp>:feature:exists? '(:imp)))
-    (should-not (int<imp>:feature:exists? '(:jeff)))
-    (should-not (int<imp>:feature:exists? '(:test foo baz)))
-    (should-not (int<imp>:feature:exists? '(:test qux)))))
+    (should-not (imp:feature:exists? '(:imp)))
+    (should-not (imp:feature:exists? '(:jeff)))
+    (should-not (imp:feature:exists? '(:test foo baz)))
+    (should-not (imp:feature:exists? '(:test qux)))))
 
 
-(ert-deftest test<imp/feature>::int<imp>:feature:exists?::regression:no-features-error ()
-  "Test that `int<imp>:feature:exists?' behaves appropriately when `imp:features' is nil.
+(ert-deftest test<imp/feature>::imp:feature:exists?::regression:no-features-error ()
+  "Test that `imp:feature:exists?' behaves appropriately when `imp:features' is nil.
 
 Bug was that it `int<imp>:tree:contains?' would raise an error when trying to
 look for the features chain if `imp:features' was nil."
@@ -418,7 +418,7 @@ look for the features chain if `imp:features' was nil."
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/feature>::int<imp>:feature:exists?"
+      "test<imp/feature>::imp:feature:exists?"
       #'test<imp/feature>:setup
       #'test<imp/feature>:teardown
 
@@ -428,7 +428,7 @@ look for the features chain if `imp:features' was nil."
 
     ;; Should just get `nil' when we have no features at all.
     (should-not imp:features)
-    (should-not (int<imp>:feature:exists? '(:test)))))
+    (should-not (imp:feature:exists? '(:test)))))
 
 
 

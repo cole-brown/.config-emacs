@@ -21,7 +21,7 @@
 Returns non-nil on success."
   (let ((feature:normal (int<imp>:feature:normalize feature)))
     ;; Already provided?
-    (cond ((imp:provided? feature:normal)
+    (cond ((imp:feature? feature:normal)
            t)
 
           ;; Can we load it?

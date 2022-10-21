@@ -175,7 +175,7 @@ Returns non-nil if loaded."
      ;; Already Loaded?
      ;;------------------------------
      ;; Does imp already have the feature loaded?
-     ((imp:provided? feature:normal)
+     ((imp:feature:exists? feature:normal)
       (int<imp>:debug func/name
                       "Feature is already provided by imp: %S"
                       feature:emacs)

@@ -31,20 +31,8 @@ If FILE-NAME is a string, returns true if loading that exact
     load-in-progress))
 
 
-(defun imp:provided? (&rest feature)
-  "Checks for FEATURE in `imp:features'."
-  (int<imp>:feature:exists? feature))
-;; (imp:provided? :imp)
-;; (imp:provided? :imp 'path)
-;; (imp:provided? :dne)
-;; (imp:providedp :imp)
-;; (imp:feature? :imp)
-;; (imp:featurep :imp)
-;; Should just say `nil' if `imp:features' is nil.
-;;   (let (imp:features)
-;;     (imp:provided? :foo))
-
-(defalias 'imp:providedp 'imp:provided?)
+(defalias 'imp:provided? 'imp:feature?)
+(defalias 'imp:providedp 'imp:feature?)
 
 
 (defun imp:provide (&rest feature)

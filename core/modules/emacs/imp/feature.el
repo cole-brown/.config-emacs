@@ -88,20 +88,20 @@ by `imp:features:locate'.")
 ;; Feature Helpers
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:feature:exists? (features)
+(defun imp:feature:exists? (features)
   "Check for list of FEATURES in the `imp:features' tree."
   ;; When not `imp:features', always return `nil'.
   (when imp:features
     (not (null (int<imp>:tree:contains? (int<imp>:list:flatten features)
                                         imp:features)))))
-;; (int<imp>:feature:exists? '(:imp))
-;; (int<imp>:feature:exists? '(:imp provide))
-;; (int<imp>:feature:exists? '(:imp (provide)))
+;; (imp:feature:exists? '(:imp))
+;; (imp:feature:exists? '(:imp provide))
+;; (imp:feature:exists? '(:imp (provide)))
 
 
 (defun imp:feature? (&rest feature)
   "Check if FEATURE is provided by 'imp' or Emacs."
-  (or (imp:provided? feature)
+  (or (imp:feature:exists? feature)
       (featurep (imp:feature:normalize:imp->emacs feature))))
 ;; (imp:feature? 'which-key)
 ;; (imp:feature? :which-key)
@@ -350,7 +350,7 @@ Normalize FEATURE:BASE and FEATURE into an imp feature
 Return normalized feature symobl if loaded.
 Raise an error signal if not found.
 Only check `imp:features' variable; does not check Emacs' `features' list."
-  (if (int<imp>:feature:exists? (cons feature:base feature))
+  (if (imp:feature:exists? (cons feature:base feature))
       t
     (int<imp>:error "imp:feature:assert"
                     "No `%S' feature exists in imp's features!"
