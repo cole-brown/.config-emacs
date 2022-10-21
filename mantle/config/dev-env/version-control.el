@@ -184,6 +184,7 @@
 ;; Autogit
 ;;------------------------------------------------------------------------------
 
+;; TODO: uncomment autogit use-package.
 ;; Autogit is configured in secrets repo and it looks something like this:
 ;;    (imp:use-package autogit
 ;;    ;; This is my own package, so...

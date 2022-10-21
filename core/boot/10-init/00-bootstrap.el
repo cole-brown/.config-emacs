@@ -222,10 +222,6 @@
   :ensure nil
   ;;   2) Here's where it is; add this dir to the `load-path'.
   :load-path innit:path:package:mis
-  ;;   ...?
-  ;;   3) I guess I need to make this explicit since we aren't trying to install
-  ;;      anything?
-  :after deferred
 
   ;; ;;--------------------
   ;; :custom

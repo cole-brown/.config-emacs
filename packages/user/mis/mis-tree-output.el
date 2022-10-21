@@ -115,28 +115,28 @@ CALLER should be calling function's name. It can be one of:
 
     existing))
 ;; Update one thing:
-(int<mis>:output/metadata:update
- 'test
- (int<mis>:output:get/metadata
-  'test
-  (nth 0 (int<mis>:output:get/entries 'test
-                                      (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
- (int<mis>:output:get/metadata
-  'test
-  (nth 0 (int<mis>:output:get/entries 'test
-                                      (int<mis>:output:create 'test "also this" '(:align . center))))))
+;; (int<mis>:output/metadata:update
+;;  'test
+;;  (int<mis>:output:get/metadata
+;;   'test
+;;   (nth 0 (int<mis>:output:get/entries 'test
+;;                                       (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
+;;  (int<mis>:output:get/metadata
+;;   'test
+;;   (nth 0 (int<mis>:output:get/entries 'test
+;;                                       (int<mis>:output:create 'test "also this" '(:align . center))))))
 ;;
 ;; Update multiple things:
-(int<mis>:output/metadata:update
- 'test
- (int<mis>:output:get/metadata
-  'test
-  (nth 0 (int<mis>:output:get/entries 'test
-                                      (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
- (int<mis>:output:get/metadata
-  'test
-  (nth 0 (int<mis>:output:get/entries 'test
-                                      (int<mis>:output:create 'test "also this" '(:buffer . "bar") '(:align . center))))))
+;; (int<mis>:output/metadata:update
+;;  'test
+;;  (int<mis>:output:get/metadata
+;;   'test
+;;   (nth 0 (int<mis>:output:get/entries 'test
+;;                                       (int<mis>:output:create 'test "this" '(:buffer . "foo") '(:align . lawful-good)))))
+;;  (int<mis>:output:get/metadata
+;;   'test
+;;   (nth 0 (int<mis>:output:get/entries 'test
+;;                                       (int<mis>:output:create 'test "also this" '(:buffer . "bar") '(:align . center))))))
 ;;
 ;; "Update" is nil:
 ;; (int<mis>:output/metadata:update
