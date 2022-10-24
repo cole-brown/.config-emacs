@@ -17,7 +17,7 @@
 ;;------------------------------------------------------------------------------
 
 (defun int<imp>:load:file (filepath)
-  "Loads FILEPATH.
+  "Load FILEPATH.
 
 Lexically clears `file-name-handler-alist' for loading.
 
@@ -39,14 +39,18 @@ Returns result of `load' or signals error."
                           filepath
                           loaded)
           loaded)
-      (error (int<imp>:error "int<imp>:load:file"
+      (error (int<imp>:error func/name
                              "imp fail to load filepath: %s\n  - error: %S"
                              filepath
                              err)))))
 
 
 (defun int<imp>:load:paths (feature path:root paths:relative)
-  "Load PATHS:RELATIVE files (list of path strings relative to PATH:ROOT path string).
+  "Load PATHS:RELATIVE files.
+
+PATH:ROOT should be an absolute path string.
+
+PATHS:RELATIVE should be a list of path strings relative to PATH:ROOT.
 
 Returns or'd result of loading feature's files if feature is found;
 returns non-nil if feature's files were all loaded successfully.
@@ -67,7 +71,7 @@ FEATURE is only for `imp:timing' use."
     ;; Return `load-result' when done with loading.
     ;; TODO: map/reduce instead of dolist?
     (dolist (relative paths:relative load-result)
-      (let ((path:absolute (int<imp>:path:normalize path:root relative :file:load)))
+      (let ((path:absolute (int<imp>:path:canonical path:root relative :file:load)))
         (int<imp>:debug func/name
                         '("loading:\n"
                           "  root:             %s\n"

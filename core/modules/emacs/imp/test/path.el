@@ -527,17 +527,17 @@
 
 
 ;;------------------------------
-;; int<imp>:path:normalize:string
+;; int<imp>:path:safe:string
 ;;------------------------------
 
-(ert-deftest test<imp/path>::int<imp>:path:normalize:string ()
-  "Test that `int<imp>:path:normalize:string' translates feature names
+(ert-deftest test<imp/path>::int<imp>:path:safe:string ()
+  "Test that `int<imp>:path:safe:string' translates feature names
 to paths properly."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/path>::int<imp>:path:normalize:string"
+      "test<imp/path>::int<imp>:path:safe:string"
       nil
       nil
 
@@ -546,29 +546,29 @@ to paths properly."
     ;;===
 
     (should (string= "imp"
-                     (int<imp>:path:normalize:string :imp)))
+                     (int<imp>:path:safe:string :imp)))
 
     ;; Should lose ~ and convert both slashes to hyphens:
     (should (string= "-jeff.d-"
-                     (int<imp>:path:normalize:string "~/jeff.d/")))
+                     (int<imp>:path:safe:string "~/jeff.d/")))
 
     ;; Should remain the same:
     (should (string= "config"
-                     (int<imp>:path:normalize:string "config")))))
+                     (int<imp>:path:safe:string "config")))))
 
 
 ;;------------------------------
-;; int<imp>:path:normalize:list
+;; int<imp>:path:safe:list
 ;;------------------------------
 
-(ert-deftest test<imp/path>::int<imp>:path:normalize:list ()
-  "Test that `int<imp>:path:normalize:list' translates feature names
+(ert-deftest test<imp/path>::int<imp>:path:safe:list ()
+  "Test that `int<imp>:path:safe:list' translates feature names
 to paths properly."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/path>::int<imp>:path:normalize:list"
+      "test<imp/path>::int<imp>:path:safe:list"
       nil
       nil
 
@@ -579,7 +579,7 @@ to paths properly."
     ;; Should translate `:imp' to "imp".
     (let* ((expected '("imp"))
            (input    '(:imp))
-           (output   (int<imp>:path:normalize:list input)))
+           (output   (int<imp>:path:safe:list input)))
       (should expected)
       (should input)
       (should output)
@@ -596,7 +596,7 @@ to paths properly."
     ;; Should lose both slashes and ~:
     (let* ((expected '("-jeff.d-"))
            (input    '("~/jeff.d/"))
-           (output   (int<imp>:path:normalize:list input)))
+           (output   (int<imp>:path:safe:list input)))
       (should expected)
       (should input)
       (should output)
@@ -613,7 +613,7 @@ to paths properly."
     ;; Now do an actual list...
     (let* ((expected '("imp" "test-" "normalize" "list"))
            (input    '(:imp "test/" "~normalize" :list))
-           (output   (int<imp>:path:normalize:list input)))
+           (output   (int<imp>:path:safe:list input)))
       (should expected)
       (should input)
       (should output)
@@ -737,17 +737,17 @@ to paths properly."
 
 
 ;;------------------------------
-;; int<imp>:path:normalize:path
+;; int<imp>:path:canonical:path
 ;;------------------------------
 
-(ert-deftest test<imp/path>::int<imp>:path:normalize:path ()
-  "Test that `int<imp>:path:normalize:path' normalizes a list of features
+(ert-deftest test<imp/path>::int<imp>:path:canonical:path ()
+  "Test that `int<imp>:path:canonical:path' normalizes a list of features
 to a path properly."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/path>::int<imp>:path:normalize:path"
+      "test<imp/path>::int<imp>:path:canonical:path"
       nil
       nil
 
@@ -760,16 +760,16 @@ to a path properly."
     ;;------------------------------
 
     ;; Everything should be a symbol.
-    (should-error (int<imp>:path:normalize:path '("foo" "bar" "baz")))
-    (should-error (int<imp>:path:normalize:path '(:foo "bar" "baz")))
-    (should-error (int<imp>:path:normalize:path '(:foo bar "baz")))
-    (should-error (int<imp>:path:normalize:path '(:foo bar 'baz)))
+    (should-error (int<imp>:path:canonical:path '("foo" "bar" "baz")))
+    (should-error (int<imp>:path:canonical:path '(:foo "bar" "baz")))
+    (should-error (int<imp>:path:canonical:path '(:foo bar "baz")))
+    (should-error (int<imp>:path:canonical:path '(:foo bar 'baz)))
 
     ;;------------------------------
     ;; Valid:
     ;;------------------------------
     (should (string= (imp:path:join "foo" "bar" "baz")
-                     (int<imp>:path:normalize:path '(:foo bar baz))))))
+                     (int<imp>:path:canonical:path '(:foo bar baz))))))
 
 
 ;;------------------------------
@@ -1029,16 +1029,16 @@ to a path properly."
 
 
 ;;------------------------------
-;; int<imp>:path:normalize
+;; int<imp>:path:canonical
 ;;------------------------------
 
-(ert-deftest test<imp/path>::int<imp>:path:normalize ()
-  "Test that `int<imp>:path:normalize' normalize paths properly."
+(ert-deftest test<imp/path>::int<imp>:path:canonical ()
+  "Test that `int<imp>:path:canonical' normalize paths properly."
   (test<imp>:fixture
       ;;===
       ;; Test name, setup & teardown func.
       ;;===
-      "test<imp/path>::int<imp>:path:normalize"
+      "test<imp/path>::int<imp>:path:canonical"
       nil
       nil
 
@@ -1051,9 +1051,9 @@ to a path properly."
     ;;------------------------------
 
     ;; Should still error if not absolute path...
-    (should-error (int<imp>:path:normalize "bar" "../other/path"))
+    (should-error (int<imp>:path:canonical "bar" "../other/path"))
 
-    (let ((path (int<imp>:path:normalize "/foo/bar" "../other/path")))
+    (let ((path (int<imp>:path:canonical "/foo/bar" "../other/path")))
       (should path)
       (should (stringp path))
       (should (string= "/foo/other/path"
@@ -1066,39 +1066,39 @@ to a path properly."
     ;;---
     ;; This just doesn't exist at all.
     ;;---
-    (should-error (int<imp>:path:normalize "/foo/bar" "../other/path" :file))
-    (should-error (int<imp>:path:normalize "/foo/bar" "../other/path" :file:load))
-    (should-error (int<imp>:path:normalize "/foo/bar" "../other/path" :dir))
+    (should-error (int<imp>:path:canonical "/foo/bar" "../other/path" :file))
+    (should-error (int<imp>:path:canonical "/foo/bar" "../other/path" :file:load))
+    (should-error (int<imp>:path:canonical "/foo/bar" "../other/path" :dir))
 
     ;;---
     ;; And these are invalid assert keywords.
     ;;---
-    (should-error (int<imp>:path:normalize "/foo/bar" "../other/path" :jeff))
-    (should-error (int<imp>:path:normalize "/foo/bar" "../other/path" :error))
-    (should-error (int<imp>:path:normalize "/foo/bar" "../other/path" t))
+    (should-error (int<imp>:path:canonical "/foo/bar" "../other/path" :jeff))
+    (should-error (int<imp>:path:canonical "/foo/bar" "../other/path" :error))
+    (should-error (int<imp>:path:canonical "/foo/bar" "../other/path" t))
 
     ;;---
     ;; Valid file.
     ;;---
-    (should-error (int<imp>:path:normalize test<imp>:path:root:test
+    (should-error (int<imp>:path:canonical test<imp>:path:root:test
                                            "../path.el"
                                            :dir))
-    (should (int<imp>:path:normalize test<imp>:path:root:test
+    (should (int<imp>:path:canonical test<imp>:path:root:test
                                      "../path.el"
                                      :file))
-    (should (int<imp>:path:normalize test<imp>:path:root:test
+    (should (int<imp>:path:canonical test<imp>:path:root:test
                                      "../path"
                                      :file:load))
 
     ;;---
     ;; Valid dir.
     ;;---
-    (should (int<imp>:path:normalize test<imp>:path:root:test
+    (should (int<imp>:path:canonical test<imp>:path:root:test
                                      ".."
                                      :dir))
-    (should-error (int<imp>:path:normalize test<imp>:path:root:test
+    (should-error (int<imp>:path:canonical test<imp>:path:root:test
                                            ".."
                                            :file))
-    (should-error (int<imp>:path:normalize test<imp>:path:root:test
+    (should-error (int<imp>:path:canonical test<imp>:path:root:test
                                            ".."
                                            :file:load))))

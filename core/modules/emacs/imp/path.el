@@ -157,7 +157,7 @@ Example:
 
 
 ;;------------------------------------------------------------------------------
-;; Canonical / Normalized Paths
+;; Canonical Paths
 ;;------------------------------------------------------------------------------
 
 (defun imp:path:canonical (path &optional root)
@@ -205,7 +205,7 @@ signals an error."
 (defun int<imp>:path:file:exists? (root &rest paths)
   "Return canonical path to file if it exists, else nil.
 
-Join ROOT and PATHS together into a filepath and canonicalize (normalize) it.
+Join ROOT and PATHS together into a filepath and canonicalize it.
 Then checks that:
   1) It exists as a file.
   2) The file is readable."
@@ -402,10 +402,10 @@ KWARGS should be a plist. All default to t:
 
 
 ;;------------------------------------------------------------------------------
-;; Normalize
+;; Safing Paths
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:path:normalize:string (symbol-or-string)
+(defun int<imp>:path:safe:string (symbol-or-string)
   "Translate SYMBOL-OR-STRING to a path string.
 
 Use `int<imp>:path:replace:rx' translations."
@@ -415,7 +415,7 @@ Use `int<imp>:path:replace:rx' translations."
         regex
         replacement)
     ;; Defaults first.
-    (int<imp>:debug "int<imp>:path:normalize:string" "defaults:")
+    (int<imp>:debug "int<imp>:path:safe:string" "defaults:")
     (dolist (pair
              (int<imp>:alist:get/value 'default int<imp>:path:replace:rx)
              name)
@@ -423,13 +423,13 @@ Use `int<imp>:path:replace:rx' translations."
             replacement (if (symbolp (nth 1 pair))
                             (symbol-value (nth 1 pair))
                           (nth 1 pair)))
-      (int<imp>:debug "int<imp>:path:normalize:string" "  rx: %S" regex)
-      (int<imp>:debug "int<imp>:path:normalize:string" "  ->: %S" replacement)
+      (int<imp>:debug "int<imp>:path:safe:string" "  rx: %S" regex)
+      (int<imp>:debug "int<imp>:path:safe:string" "  ->: %S" replacement)
       (setq name (replace-regexp-in-string regex replacement name)))
 
     ;; Now the system-specifics, if any. Return `name' from `dolist' because
     ;; we're done.
-    (int<imp>:debug "int<imp>:path:normalize:string" "system(%S):" system-type)
+    (int<imp>:debug "int<imp>:path:safe:string" "system(%S):" system-type)
     (dolist (pair
              (int<imp>:alist:get/value system-type int<imp>:path:replace:rx)
              name)
@@ -438,24 +438,24 @@ Use `int<imp>:path:replace:rx' translations."
                             (symbol-value (nth 1 pair))
                           (nth 1 pair)))
       (unless (null regex)
-        (int<imp>:debug "int<imp>:path:normalize:string" "  rx: %S" regex)
-        (int<imp>:debug "int<imp>:path:normalize:string" "  ->: %S" replacement)
+        (int<imp>:debug "int<imp>:path:safe:string" "  rx: %S" regex)
+        (int<imp>:debug "int<imp>:path:safe:string" "  ->: %S" replacement)
         (setq name (replace-regexp-in-string regex replacement name))))))
-;;   (int<imp>:path:normalize:string :imp)
+;;   (int<imp>:path:safe:string :imp)
 ;; Should lose both slashes and ~:
-;;   (int<imp>:path:normalize:string "~/emacs.d/")
+;;   (int<imp>:path:safe:string "~/emacs.d/")
 ;; Should remain the same:
-;;   (int<imp>:path:normalize:string "config")
+;;   (int<imp>:path:safe:string "config")
 ;; Test func name -> valid path:
-;;   (int<imp>:path:normalize:string "test<imp/feature/at>::int<imp>:feature:paths")
+;;   (int<imp>:path:safe:string "test<imp/feature/at>::int<imp>:feature:paths")
 
 
-(defun int<imp>:path:normalize:list (feature)
+(defun int<imp>:path:safe:list (feature)
   "Normalize FEATURE (a list of symbols/keywords) to a list of strings.
 
 Returns the list of normalized string."
-  (mapcar #'int<imp>:path:normalize:string feature))
-;; (int<imp>:path:normalize:list '(:root test feature))
+  (mapcar #'int<imp>:path:safe:string feature))
+;; (int<imp>:path:safe:list '(:root test feature))
 
 
 ;;------------------------------------------------------------------------------
@@ -698,10 +698,47 @@ Downcases path on case-insensitive OSes."
 ;; (int<imp>:path:platform-agnostic "C:\\Foo\\Bar")
 
 
+(defun int<imp>:path:input->str (input)
+  "Ensure INPUT is a string.
+
+INPUT should be a string, keyword, or symbol.
+  - If it's a string, use as-is.
+  - If it's a keyword/symbol, use the symbol's name sans \":\".
+    - 'foo -> \"foo\"
+    - :foo -> \"foo\"
+
+Return a string."
+  (cond ((null input) ;; Let nil through so `imp:path:join` functions correctly.
+         nil)
+
+        ((stringp input) ;; String good. Want string.
+         input)
+
+        ;; Symbol? Use its name.
+        ((symbolp input)
+         ;; But strip the keyword colon.
+         (replace-regexp-in-string ":" "" (symbol-name input)))
+
+        (t
+         (int<imp>:error "int<imp>:path:input->str"
+                         "INPUT must be string or keyword/symbol. Got %S: %S"
+                         (type-of input)
+                         input))))
+;; (int<imp>:path:input->str nil)
+;; (int<imp>:path:input->str :foo)
+;; (int<imp>:path:input->str 'foo)
+;; (int<imp>:path:input->str "foo")
+;; (int<imp>:path:input->str :/bar)
+;; (int<imp>:path:input->str '/bar)
+;; (int<imp>:path:input->str "/bar")
+
+
 (defun int<imp>:path:append (parent next)
   "Append NEXT element as-is to PARENT, adding dir separator if needed.
 
 NEXT and PARENT are expected to be strings."
+  (let ((parent (int<imp>:path:input->str parent))
+        (next   (int<imp>:path:input->str next)))
   ;; Error checks first.
   (cond ((and parent
               (not (stringp parent)))
@@ -722,7 +759,8 @@ NEXT and PARENT are expected to be strings."
          next)
 
         (t
-         (concat (file-name-as-directory parent) next))))
+         (concat (file-name-as-directory parent) next)))))
+;; (int<imp>:path:append :/foo 'bar)
 
 
 (defun imp:path:join (&rest path)
@@ -731,6 +769,7 @@ NEXT and PARENT are expected to be strings."
 (imp:path:join \"jeff\" \"jill.el\")
   ->\"jeff/jill.el\""
    (seq-reduce #'int<imp>:path:append
+               ;; flatten and convert to strings.
                (int<imp>:list:flatten path)
                nil))
 ;; (imp:path:join "/foo" "bar.el")
@@ -749,7 +788,7 @@ NEXT and PARENT are expected to be strings."
 ;; (int<imp>:path:sans-extension "foo" "bar/" "baz.el")
 
 
-(defun int<imp>:path:normalize (root relative &optional assert-exists sans-extension)
+(defun int<imp>:path:canonical (root relative &optional assert-exists sans-extension)
   "Join ROOT and RELATIVE paths, normalize, and return the path string.
 
 If ASSERT-EXISTS is `:file', raises an error if normalized path is not an
@@ -765,7 +804,7 @@ If SANS-EXTENSION is non-nil, returns a path without an extension
 \(e.g. suitable for loading '.elc' or '.el' files.).
 
 Returns normalized path."
-  (let ((func/name "int<imp>:path:normalize")
+  (let ((func/name "int<imp>:path:canonical")
         (valid:assert-exists '(nil :file :file:load :dir)))
     (int<imp>:debug func/name
                     '("inputs:\n"
@@ -880,17 +919,17 @@ Returns normalized path."
                                      (file-name-sans-extension path)
                                    path))))))
 ;; Just Normalize:
-;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load")
-;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load.el")
-;;   (int<imp>:path:normalize "loading" "dont-load.el")
+;;   (int<imp>:path:canonical "/path/to/imp/test/loading" "dont-load")
+;;   (int<imp>:path:canonical "/path/to/imp/test/loading" "dont-load.el")
+;;   (int<imp>:path:canonical "loading" "dont-load.el")
 ;; Normalize w/o extension:
-;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load.el" nil t)
-;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load" nil t)
+;;   (int<imp>:path:canonical "/path/to/imp/test/loading" "dont-load.el" nil t)
+;;   (int<imp>:path:canonical "/path/to/imp/test/loading" "dont-load" nil t)
 ;; Error:
-;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load" :file)
+;;   (int<imp>:path:canonical "/path/to/imp/test/loading" "dont-load" :file)
 ;; Ok:
-;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load" :file:load)
-;;   (int<imp>:path:normalize "/path/to/imp/test/loading" "dont-load.el" :file:load)
+;;   (int<imp>:path:canonical "/path/to/imp/test/loading" "dont-load" :file:load)
+;;   (int<imp>:path:canonical "/path/to/imp/test/loading" "dont-load.el" :file:load)
 
 
 ;;------------------------------------------------------------------------------
