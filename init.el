@@ -45,8 +45,10 @@
   ;; Load Ordered Init Directories
   ;;------------------------------------------------------------------------------
 
-  ;; This was done in "early-init.el":
-  ;;   (innit:load "early-init.el" "00-early")
+  ;;------------------------------
+  ;; Early Init
+  ;;------------------------------
+  ;; "early-init.el" loaded the "00-early" init directory files.
   ;; Now we need to load the rest.
 
 
@@ -69,7 +71,9 @@
                                                           "10-init")
                                                   0
                                                   100))
-  (innit:load file/this "10-init")
+  (imp:load :feature  '(:core boot init)
+            :path     (imp:path:join innit:path:core/boot "10-init")
+            :filename "00-init.el")
   (progress-reporter-done progress-reporter)
 
 
@@ -87,7 +91,9 @@
                                                           "20-config")
                                                   0
                                                   100))
-  (innit:load file/this "20-config")
+  (imp:load :feature  '(:core boot config)
+            :path     (imp:path:join innit:path:core/boot "20-config")
+            :filename "00-init.el")
   (progress-reporter-done progress-reporter)
 
 
@@ -105,12 +111,14 @@
                                                           "99-finalize")
                                                   0
                                                   100))
-  (innit:load file/this "99-finalize")
+  (imp:load :feature  '(:core boot config)
+            :path     (imp:path:join innit:path:core/boot "99-finalize")
+            :filename "00-init.el")
   (progress-reporter-done progress-reporter)
 
 
   ;;------------------------------------------------------------------------------
-  ;; The End.
+  ;; The End is Nigh!
   ;;------------------------------------------------------------------------------
   (nub:debug
       :innit
@@ -119,4 +127,9 @@
     '("Boot Loader: 100 Done"
       :line:new
       "Now witness the firepower of this full armed and operational operating system.")))
+
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
 (imp:provide :root 'init 'standard)
