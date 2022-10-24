@@ -29,16 +29,16 @@
     (error "[ERROR] 'init.el': Failed 'core/boot' init. Emacs should be version 28.1 or newer, running Emacs %S"
            emacs-version))
 
-  ;; 2) Do we have our `innit` functions?
-  (unless (or (fboundp 'innit:status:get)
-              (functionp 'innit:status:get))
-    (error "[ERROR] 'init.el': 'early-init.el' did not run? `innit:status:get' function is not defined"))
+  ;; 2) Do we have our `imp` functions?
+  (unless (or (fboundp 'imp:feature?)
+              (functionp 'imp:feature?))
+    (error "[ERROR] 'init.el': 'early-init.el' did not run? `imp:feature?' function is not defined"))
 
-  ;; 3) Do we have a successful status for early-init?
-  (unless (innit:status:get "00-early")
-    (error "[ERROR] 'init.el': 'early-init.el' failed 'core/boot' init. `innit:status' for '00-early' is: %S\ninnit:statuses:\n%S"
-           (innit:status:get "00-early")
-           (pp-to-string innit:status)))
+  ;; 3) Do we have the early-init feature? If not, we never finished loading "early-init.el".
+  (unless (imp:feature? :root 'init 'early)
+    (error (concat "[ERROR] 'init.el': 'early-init.el' failed to provide imp feature `%S'. "
+                   "Check `imp:cmd:features:print' for whatever it did manage to provide?")
+           '(:root init early)))
 
 
   ;;------------------------------------------------------------------------------

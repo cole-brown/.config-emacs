@@ -35,4 +35,4 @@ of the features imp has provided."
   "Pretty print `imp:features' to a temp buffer."
   (interactive)
   (pp-display-expression imp:features imp:output:features:buffer))
-;; (imp:features:print)
+;; (imp:cmd:features:print)
