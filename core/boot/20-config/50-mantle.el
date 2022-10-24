@@ -1,4 +1,4 @@
-;;; 00-config.el --- Configure packages & stuff -*- lexical-binding: t; -*-
+;;; 50-mantle.el --- Hand init over to user. -*- lexical-binding: t; -*-
 ;;
 ;; Author: Cole Brown <code@brown.dev>
 ;; URL:    https://github.com/cole-brown/.config-emacs
@@ -8,21 +8,10 @@
 ;; Move along.
 ;;
 ;;; Commentary:
+;;
+;; Hand init over to user.
+;;
 ;;; Code:
-
-
-(imp:require :system 'multiplexer 'dlv)
-
-
-;;------------------------------------------------------------------------------
-;; Configure: Pre-Mantle (Before User's Config)
-;;------------------------------------------------------------------------------
-
-;;------------------------------
-;; This System's Domain DLVs
-;;------------------------------
-;; Set DLV system domain for all registered functions & args lists.
-(system:multiplexer:dlv:domain/all)
 
 
 ;;------------------------------------------------------------------------------
@@ -36,4 +25,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :core 'boot '20-config 'config)
+(imp:provide :core 'boot 'config 'mantle)

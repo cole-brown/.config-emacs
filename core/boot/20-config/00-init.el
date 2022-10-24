@@ -1,4 +1,4 @@
-;;; 00-init.el --- normal init stuff -*- lexical-binding: t; -*-
+;;; 00-init.el --- configure stuff -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -11,7 +11,9 @@
 ;;
 ;;; Commentary:
 ;;
-;; normal init settings
+;; normal init's configuration & set-up steps
+;;
+;; Importantly, this is where user's init/config in 'mantle' is called.
 ;;
 ;;; Code:
 
@@ -21,25 +23,21 @@
 ;;------------------------------------------------------------------------------
 
 (imp:timing
-    '(:core boot init)
+    '(:core boot config)
     (imp:file:current)
     (imp:path:current:dir)
 
   (let ((path (imp:path:current:dir/relative :core)))
-    (imp:load :feature  '(:core boot init bootstrap)
+    (imp:load :feature  '(:core boot config system)
               :path     (imp:path:current:dir/relative :core)
-              :filename "01-bootstrap.el")
+              :filename "10-system.el")
 
-    (imp:load :feature  '(:core boot init settings)
+    (imp:load :feature  '(:core boot config mantle)
               :path     (imp:path:current:dir/relative :core)
-              :filename "10-settings.el")
-
-    (imp:load :feature  '(:core boot init mantle)
-              :path     (imp:path:current:dir/relative :core)
-              :filename "20-mantle.el")))
+              :filename "50-mantle.el")))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :core 'boot 'init)
+(imp:provide :core 'boot 'config)
