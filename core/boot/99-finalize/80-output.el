@@ -1,4 +1,4 @@
-;;; 00-finalize.el --- Final touches -*- lexical-binding: t; -*-
+;;; 80-output.el --- Output some things. -*- lexical-binding: t; -*-
 ;;
 ;; Author: Cole Brown <code@brown.dev>
 ;; URL:    https://github.com/cole-brown/.config-emacs
@@ -8,6 +8,9 @@
 ;; Move along.
 ;;
 ;;; Commentary:
+;;
+;; Output some things.
+;;
 ;;; Code:
 
 
@@ -24,11 +27,15 @@
 
 
 ;;------------------------------------------------------------------------------
-;; The End.
+;; The End is Nigh!
 ;;------------------------------------------------------------------------------
 (nub:debug
     :innit
     (imp:file:current)
     '(:innit :finalize)
-  "Boot Loader: 99 Finalize :: Every Has Been Done.")
-(imp:provide :core 'boot '99-finalize 'finalize)
+  "Boot Loader: 99 Finalize :: Everything Has Been Done.")
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
+(imp:provide :core 'boot 'finalize 'output)
