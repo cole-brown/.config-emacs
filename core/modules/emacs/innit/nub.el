@@ -49,7 +49,8 @@ nil means use nub's defaults."
   :type  '(alist :key-type (choice (const :error)
                                    (const :warning)
                                    (const :info)
-                                   (const :debug))
+                                   (const :debug)
+                                   (const nil))
                  :value-type string))
 
 
@@ -61,7 +62,8 @@ nil means use nub's defaults."
   :type  '(alist :key-type (choice (const :error)
                                    (const :warning)
                                    (const :info)
-                                   (const :debug))
+                                   (const :debug)
+                                   (const nil))
                 :value-type boolean))
 
 

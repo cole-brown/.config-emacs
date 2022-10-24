@@ -158,11 +158,9 @@
       tags/this
     "Boot Loader: 00 Early")
 
-  (imp:timing
-      '(:innit early-init load)
-      file/this
-      (imp:path:current:dir)
-    (innit:load file/this "00-early")))
+  (imp:load :feature  '(:core boot early)
+            :path     (imp:path:join innit:path:core/boot "00-early")
+            :filename "00-init.el"))
 
 
 ;;------------------------------------------------------------------------------
