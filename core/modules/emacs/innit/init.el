@@ -47,8 +47,6 @@
             :filename "status")
   (imp:load :feature  '(:innit debug)
             :filename "debug")
-  (imp:load :feature  '(:innit load)
-            :filename "load")
   (imp:load :feature  '(:innit optimize)
             :filename "optimize")
   (imp:load :feature  '(:innit package)

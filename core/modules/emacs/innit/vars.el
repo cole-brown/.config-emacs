@@ -47,13 +47,6 @@
   "Absolute path to the \"snippets\" subdirectory.")
 
 
-(defconst innit:rx:filename
-  (rx string-start
-      (one-or-more printing) ".el"
-      string-end)
-  "Base filename must match to be loaded by `innit:load:files:ordered'.")
-
-
 (defconst innit:interactive? (not noninteractive)
   "If non-nil, Emacs is in interactive mode.")
 
