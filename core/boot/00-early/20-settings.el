@@ -31,6 +31,16 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Mute Emacs Info Stuff
+;;------------------------------------------------------------------------------
+
+;; Reduce *Message* noise at startup. An empty scratch buffer (or whatever)
+;; is more than enough.
+(setq inhibit-startup-screen            t                ; Don't make/display the "*GNU Emacs*" buffer.
+      inhibit-startup-echo-area-message user-login-name) ; See var docstring for why user login name.
+
+
+;;------------------------------------------------------------------------------
 ;; Interactive vs Non-interactive
 ;;------------------------------------------------------------------------------
 
@@ -64,13 +74,6 @@
   ;; Disable warnings from legacy advice system. They aren't useful, and what can
   ;; we do about them, besides changing packages upstream?
   (setq ad-redefinition-action 'accept)
-
-
-  ;; Reduce *Message* noise at startup. An empty scratch buffer (or the dashboard)
-  ;; is more than enough.
-  (setq inhibit-startup-screen t
-        ;; See var docstring for why user login name.
-        inhibit-startup-echo-area-message user-login-name)
 
 
   ;; There can also be a "default.el" init file, found via the standard search
