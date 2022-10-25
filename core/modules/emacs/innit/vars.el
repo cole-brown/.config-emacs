@@ -69,10 +69,10 @@
 ;; "init.el" will check that version exists as a check that early-init happened.
 (defconst int<innit>:version
   '(:major 4
-    :minor 0
+    :minor 2
     ;; Can be ISO-8601 or RFC-3339 date or datetime.
     ;; Will get smashed down to just digits.
-    :revision "2022-04-27"
+    :revision "2022-10-25"
     ;; (datetime:string/get 'iso-8601 'short)
     ;; (datetime:string/get 'yyyymmdd)
     )

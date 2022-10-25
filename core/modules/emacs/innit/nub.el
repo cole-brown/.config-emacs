@@ -49,8 +49,7 @@ nil means use nub's defaults."
   :type  '(alist :key-type (choice (const :error)
                                    (const :warning)
                                    (const :info)
-                                   (const :debug)
-                                   (const nil))
+                                   (const :debug))
                  :value-type string))
 
 
@@ -62,8 +61,7 @@ nil means use nub's defaults."
   :type  '(alist :key-type (choice (const :error)
                                    (const :warning)
                                    (const :info)
-                                   (const :debug)
-                                   (const nil))
+                                   (const :debug))
                 :value-type boolean))
 
 
@@ -94,10 +92,6 @@ nil means use nub's defaults."
                                      (const :default))))
 
 
-;; TODO-00: Does `nub' even support tags (yet)?
-;; TODO-00:   - Don't see a way to tag `nub' messages...
-;; TODO-00:   - But I do see a lot of vars/funcs for nub tags so... ¯\_(ツ)_/¯
-;;
 ;; TODO-01: s/defvar/defcustom/ & add some default tags & tag innit's nub messages once I figure out nub tags?
 (defvar innit:nub:debug-tags:interactive nil
   "Default debug tags to show as auto-complete hints for `nub'."
