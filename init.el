@@ -111,7 +111,7 @@
                                                           "99-finalize")
                                                   0
                                                   100))
-  (imp:load :feature  '(:core boot config)
+  (imp:load :feature  '(:core boot finalize)
             :path     (imp:path:join innit:path:core/boot "99-finalize")
             :filename "00-init.el")
   (progress-reporter-done progress-reporter)
