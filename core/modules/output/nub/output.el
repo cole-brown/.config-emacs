@@ -332,6 +332,8 @@ signaled."
 (defmacro nub:output:sink (user buffer-name pop-to-buffer?)
   "Create & return a nub sink function.
 
+USER should be the nub user.
+
 BUFFER-NAME should be a string.
 
 POP-TO-BUFFER? should be nil/non-nil. If non-nil, `pop-to-buffer' will be called
@@ -359,7 +361,12 @@ Returns a lambda function."
 
          ;; Show buffer?
          (when ,macro<nub>:pop?
-           (pop-to-buffer buffer))))))
+           ;; TODO: Do this only during start-up?
+           ;; Don't want to end up with multiple windows after start up, so be a good
+           ;; steward and just use the same window as whatever's already here.
+           (let ((display-buffer-alist (list (list ,macro<nub>:buffer
+                                                   'display-buffer-same-window))))
+             (pop-to-buffer buffer nil :no-record)))))))
 ;; (funcall (nub:output:sink :test "test-buffer" nil)
 ;;          "hello %s" "there")
 

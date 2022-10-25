@@ -398,7 +398,11 @@ does nothing instead."
 
     ;; Show buffer if desired.
     (when imp:timing:buffer:show
-      (display-buffer name))))
+      ;; Don't want to end up with multiple windows after start up, so be a good
+      ;; steward and just use the same window as whatever's already here.
+      (let ((display-buffer-alist (list (list name
+                                              'display-buffer-same-window))))
+        (display-buffer name)))))
 
 
 (defun int<imp>:timing:message (type formatting &rest args)
