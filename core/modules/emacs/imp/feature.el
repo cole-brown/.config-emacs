@@ -111,6 +111,31 @@ by `imp:features:locate'.")
 (defalias 'imp:featurep 'imp:feature?)
 
 
+(defun int<imp>:feature:count (&optional tree)
+  "Count features in TREE.
+
+TREE should be a list of lists and/or symbols.
+TREE should be a branch of `imp:features`.
+
+Return count of leaf nodes in TREE."
+  (cond ((null tree) 0)
+
+        ((not (consp tree)) 1)
+
+        (t
+         (+ (int<imp>:feature:count (car tree))
+            (int<imp>:feature:count (cdr tree))))))
+
+
+(defun imp:feature:count ()
+  "Count features in `imp:features`.
+
+Return count of leaf nodes."
+  (int<imp>:feature:count imp:features))
+;; (imp:feature:count)
+
+
+
 ;;------------------------------------------------------------------------------
 ;; Normalization
 ;;------------------------------------------------------------------------------
