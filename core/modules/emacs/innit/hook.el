@@ -251,7 +251,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
 
 (defun int<innit>:hook:run (hook)
   "Run HOOK (a hook function) with better error handling.
-Meant to be used with `run-hook-wrapped'."
+Meant to be used with `innit:hook:run` (or at least `run-hook-wrapped')."
   (condition-case-unless-debug e
       (funcall hook)
     (error

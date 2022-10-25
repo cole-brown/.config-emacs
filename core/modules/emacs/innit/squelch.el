@@ -29,8 +29,13 @@ LOCKNAME, and MUSTBENEW.
 
 Will set VISIT to `no-message' before calling `write-region' unless it is
 non-nil."
-  (unless visit (setq visit 'no-message))
-  (funcall #'write-region start end filename append visit lockname mustbenew))
+  (write-region start
+                end
+                filename
+                append
+                (or visit 'no-message)
+                lockname
+                mustbenew))
 
 
 (defun innit:squelch:load (file &optional noerror nomessage nosuffix must-suffix)
@@ -38,8 +43,12 @@ non-nil."
 
 See `load' for details on args: FILE, NOERROR, NOMESSAGE, NOSUFFIX, MUST-SUFFIX
 
-Ignore NOMESSAGE and call `load' with NOMESSAGE == t instead."
-  (funcall #'load file noerror t nosuffix must-suffix))
+Ignore NOMESSAGE and call `load' with NOMESSAGE == `:no-message' instead."
+  (load file
+        noerror
+        :no-message
+        nosuffix
+        must-suffix))
 
 
 (defun innit:squelch:message (&rest _)

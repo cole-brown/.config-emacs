@@ -31,6 +31,9 @@
   ;;---
   ;; <mantle-user-set-up>
   ;;---
+  ;; `innit:theme:path' and `innit:theme:file' are already set to something,
+  ;; either when defined or in e.g. "settings.el". If you want to, redefine
+  ;; here/now instead.
 
   ;; Set to your theme's directory?
   ;; Default is here AKA `innit:theme:path'
@@ -63,10 +66,6 @@
   ;; Initialize `innit' For Theming
   ;;------------------------------------------------------------------------------
 
-  ;; `innit:theme:path' and `innit:theme:file' are already set to something,
-  ;; either when defined or in e.g. "settings.el". If you want to, redefine
-  ;; here/now instead.
-  ;;
   ;; `innit:theme:init' sets Emacs' theme variables from `innit:theme:path', so
   ;; they must be correct for your theme by the time `innit:theme:init' runs right
   ;; about.... now:

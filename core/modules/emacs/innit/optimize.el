@@ -41,13 +41,14 @@ Default to no messages (nil).")
 (defvar innit:display:load-file nil
   "Allow `load-file' to output its message(s) during init?
 
-Default to no (`nil').")
+Default to no (nil).")
 
 
 ;;------------------------------------------------------------------------------
 ;; Predicate / Guard
 ;;------------------------------------------------------------------------------
 
+;; TODO: Does start up go faster when ~innit:optimized?~ is true?
 (defun innit:optimize? ()
   "Guard predicate for optimizing interactive start-up.
 
