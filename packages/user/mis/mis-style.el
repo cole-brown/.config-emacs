@@ -726,7 +726,7 @@ CALLER should be calling function's name. It can be one of:
 ;; (int<mis>:style:get 'test :width (mis:style :width 42 :padding "-") (mis:style :width 11))
 
 
-(defun int<mis>:style:get/width (caller &optional syntax output default)
+(defun int<mis>:style:get/width (caller syntax output default)
   "Return `:width' from SYNTAX, OUTPUT, or DEFAULT.
 
 SYNTAX should be nil or a Mis Syntax Tree of styling.
@@ -787,7 +787,7 @@ CALLER should be calling function's name. It can be one of:
     width))
 
 
-(defun int<mis>:style:get/padding (caller &optional syntax output default)
+(defun int<mis>:style:get/padding (caller syntax output default)
   "Return `:padding' from SYNTAX, or DEFAULT.
 
 SYNTAX should be nil or a Mis Syntax Tree of styling.
@@ -857,8 +857,8 @@ Return padding as a string."
     (if (characterp padding)
         (make-string 1 padding)
       padding)))
-;; (int<mis>:style:get/padding 'test (mis:style :padding "?"))
-;; (int<mis>:style:get/padding 'test nil)
+;; (int<mis>:style:get/padding 'test (mis:style :padding "?") nil nil)
+;; (int<mis>:style:get/padding 'test nil nil nil)
 ;; (int<mis>:style:get/padding 'test nil nil "!")
 ;; (int<mis>:style:get/padding 'test nil nil ?!)
 ;; (int<mis>:style:get/padding 'test (mis:style :padding "?") nil "!")
