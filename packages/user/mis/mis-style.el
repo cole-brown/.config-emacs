@@ -93,7 +93,7 @@ Or if function doesn't care about anything: (CALLER STRING &rest _)
 
 
 ;;------------------------------------------------------------------------------
-;; Styling
+;; Stylers
 ;;------------------------------------------------------------------------------
 
 (defun int<mis>:style:styler/no-op (caller string &rest _)
@@ -145,6 +145,181 @@ CALLER should be calling function's name. It can be one of:
 
 (int<mis>:styler:register :newlines #'int<mis>:style:newlines)
 
+
+(defun int<mis>:style:propertize (caller string _ _ _ properties)
+  "Propertize STRING with PROPERTIES.
+
+STRING should be the string to be styled.
+
+Ignored are:
+  - SYNTAX - a Mis Syntax Tree
+  - STYLE  - a Mis Style Syntax Tree
+  - KEY    - the styling keyword encountered
+
+PROPERTIES should be something that function `propertize' understands.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  ;; Dunno any error checks we can do. Just propertize and return.
+  (apply #'propertize
+         string
+         properties))
+;; (int<mis>:style:propertize 'test "hello" nil nil :propertize '(face error))
+
+
+(int<mis>:styler:register :propertize #'int<mis>:style:propertize)
+
+
+(defun int<mis>:style:face (caller string syntax style key face)
+  "Style STRING with FACE.
+
+STRING should be the string to be styled.
+
+Ignored are:
+  - SYNTAX - a Mis Syntax Tree
+  - STYLE  - a Mis Style Syntax Tree
+  - KEY    - the styling keyword encountered
+
+FACE should be a /defined/ face symbol name. That is, it should exist in return
+value of function `face-list'.
+  - To see all face names and sample text, call function `list-faces-display'.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list "int<mis>:style:face" caller)))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (cond ((not (symbolp face))
+           (int<mis>:error caller
+                           "FACE must be a symbol! Got %S: `%S'"
+                           (type-of face)
+                           face))
+          ((not (memq face (face-list)))
+           (int<mis>:error caller
+                           "FACE `%S' is not a currently defined face! See `list-faces-display' or `face-list'."
+                           face)))
+
+    ;;------------------------------
+    ;; Style!
+    ;;------------------------------
+    (int<mis>:style:propertize caller
+                               string
+                               syntax
+                               style
+                               key
+                               (list 'face face))))
+;; (int<mis>:style:face 'test "hello" nil nil :face 'error)
+
+
+(int<mis>:styler:register :face #'int<mis>:style:face)
+
+
+(defun int<mis>:style:weight (caller string syntax style key value)
+  "Set STRING's weight to a weight defined by KEY and VALUE.
+
+STRING should be the string to be styled.
+
+Ignored are:
+  - SYNTAX - a Mis Syntax Tree
+  - STYLE  - a Mis Style Syntax Tree
+
+KEY should a keyword:
+  - `:weight'
+  - `:bold'
+
+VALUE depends on KEY:
+  - If KEY is `:weight', VALUE must be one of these symbols (from densest to
+    faintest):
+    - `ultra-bold'
+    - `extra-bold'
+    - `bold'
+    - `semi-bold'
+    - `normal'
+    - `semi-light'
+    - `light'
+    - `extra-light'
+    - `ultra-light'
+  - If KEY is `:bold', VALUE must be:
+    - one of the `:weight' symbols
+    - t (for `bold')
+    - nil (for `normal')
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list "int<mis>:style:weight" caller))
+         ;; TODO: Check `font-weight-table' for valid weight name?
+         (weights/valid '(ultra-bold extra-bold bold semi-bold normal semi-light light extra-light ultra-light))
+         properties)
+    ;;------------------------------
+    ;; Error Checks & Normalization
+    ;;------------------------------
+    ;; We're accepting `:weight' and `:bold'. We need to normalize to a face property list of '(:weight <weight-keyword>)'.
+    ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html
+    (cond ((eq key :weight)
+           (if (memq value weights/valid)
+               (setq properties (list :weight value))
+             (int<mis>:error caller
+                             "VALUE must be a valid weight! Valid: %S, Got: %S"
+                             weights/valid
+                             face)))
+
+          ((eq key :bold)
+           (cond ((memq value weights/valid)
+                  (setq properties (list :weight value)))
+                 ((eq value t)
+                  (setq properties '(:weight bold)))
+                 ((eq value nil)
+                  (setq properties '(:weight normal)))
+                 (t
+                  (int<mis>:error caller
+                                  "VALUE must be a valid weight! Valid: %S, Got: %S"
+                                  (append weights/valid '(t nil))
+                                  face))))
+
+          (t
+           (int<mis>:error caller
+                           "KEY must be `:weight' or `:bold'! Got %S: `%S'"
+                           (type-of key)
+                           key)))
+
+    ;;------------------------------
+    ;; Style!
+    ;;------------------------------
+    (int<mis>:style:propertize caller
+                               string
+                               syntax
+                               style
+                               key
+                               (list 'face properties))))
+;; (int<mis>:style:weight 'test "hello" nil nil :weight 'bold)
+;; (int<mis>:style:weight 'test "hello" nil nil :bold t)
+
+
+(int<mis>:styler:register :weight #'int<mis>:style:weight)
+
+
+;; TODO: More face attributes?
+;; TODO: https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html
+;; TODO: `:slant' / `:italic'
+;; TODO: `:foreground' & `:background'
+
+
+;;------------------------------------------------------------------------------
+;; Styling
+;;------------------------------------------------------------------------------
 
 (defun int<mis>:style/output-entry (caller entry syntax style/complete)
   "`int<mis>:style' helper: Style a single ENTRY from a Mis Output Tree.

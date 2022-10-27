@@ -150,8 +150,8 @@ properties."
         text
       ;; Properties are backwards, so fix that.
       (apply #'propertize text (nreverse properties)))))
-;; (int<autogit>:string:propertize :text "hello there" :prop :autogit)
-;; (int<autogit>:display:message :messages (int<autogit>:string:propertize "hello there" :autogit))
+;; (int<autogit>:string:propertize :text "hello there" :prop :face:self)
+;; (int<autogit>:display:message :messages (int<autogit>:string:propertize "hello there" :face:self))
 ;; (propertize "hello there" 'face 'package-name)
 
 
