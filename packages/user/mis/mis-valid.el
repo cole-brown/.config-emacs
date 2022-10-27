@@ -674,6 +674,73 @@ Signal an error if invalid; return normalized value if valid."
 
 
 ;;------------------------------------------------------------------------------
+;; Normalization Functions
+;;------------------------------------------------------------------------------
+
+(defun int<mis>:valid:normalize->symbol (caller name keyword-or-symbol)
+  "Normalizes a keyword or a symbol to a symbol.
+Remove ':' from the front of the keyword/symbol name if present.
+
+NAME should be KEYWORD-OR-SYMBOL's symbol name as a symbol or string.
+
+KEYWORD-OR-SYMBOL should be a keyword or a symbol.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let ((caller (list "int<mis>:valid:normalize->symbol" caller)))
+    (cond ((keywordp keyword-or-symbol)
+           (intern (string-remove-prefix ":" (symbol-name keyword-or-symbol))))
+          ((symbolp keyword-or-symbol)
+           keyword-or-symbol)
+          (t
+           (int<mis>:error caller
+                           "%s must be a keyword or symbol. Got %S: %S"
+                           (int<mis>:error:name name)
+                           (type-of keyword-or-symbol)
+                           keyword-or-symbol)))))
+;; (int<mis>:valid:normalize->symbol 'test 'type :foo)
+;; (int<mis>:valid:normalize->symbol 'test 'type 'foo)
+;; (int<mis>:valid:normalize->symbol 'test 'type [])
+
+
+(defun int<mis>:valid:normalize->string (caller name symbol-or-string)
+  "Normalizes a keyword, symbol, or string to a string.
+Remove ':' from the front of the keyword/symbol name if present.
+
+NAME should be SYMBOL-OR-STRING's symbol name as a symbol or string.
+
+SYMBOL-OR-STRING should be a keyword or a symbol.
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list "int<mis>:valid:normalize->symbol" caller)))
+    (string-remove-prefix ":"
+                          (cond ((symbolp symbol-or-string)
+                                 (symbol-name symbol-or-string))
+                                ((stringp symbol-or-string)
+                                 symbol-or-string)
+                                (t
+                                 (int<mis>:error caller
+                                                 "%s must be a keyword, symbol, or string. Got %S: %S"
+                                                 (int<mis>:error:name name)
+                                                 (type-of symbol-or-string)
+                                                 symbol-or-string))))))
+;; (int<mis>:valid:normalize->string 'test 'type :foo)
+;; (int<mis>:valid:normalize->string 'test 'type 'foo)
+;; (int<mis>:valid:normalize->string 'test 'type "foo")
+;; (int<mis>:valid:normalize->string 'test 'type ":foo")
+;; (int<mis>:valid:normalize->symbol 'test 'type [])
+
+
+;;------------------------------------------------------------------------------
 ;; Validation "Predicates"
 ;;------------------------------------------------------------------------------
 ;; If valid, return the valid value.
@@ -700,26 +767,6 @@ CALLER should be calling function's name. It can be one of:
   (if value
       t
     nil))
-
-
-(defun int<mis>:valid:normalize->symbol (name keyword-or-symbol)
-  "Normalizes a keyword or a symbol to a symbol.
-That is, removes ':' from the symbol name if present.
-
-NAME should be KEYWORD-OR-SYMBOL's symbol name as a symbol or string.
-
-KEYWORD-OR-SYMBOL should be a keyword or a symbol."
-  (cond ((keywordp keyword-or-symbol)
-         (make-symbol (string-remove-prefix ":" (symbol-name keyword-or-symbol))))
-        ((symbolp keyword-or-symbol)
-         keyword-or-symbol)
-        (t
-         (int<mis>:error caller
-                         "%s must be a keyword or symbol. Got type %S: %S"
-                         (int<mis>:error:name keyword-or-symbol)
-                         value))))
-;; (int<mis>:valid:normalize->symbol 'type :foo)
-;; (int<mis>:valid:normalize->symbol 'type 'foo)
 
 
 (defun int<mis>:valid:positive-integer? (caller name value &rest _)
@@ -827,6 +874,8 @@ CALLER should be calling function's name. It can be one of:
                     (int<mis>:error:name name)
                     (type-of value)
                     value)))
+;; (int<mis>:valid:string-or-symbol? 'test 'input :foo)
+;; (int<mis>:valid:string-or-symbol? 'test 'input "foo")
 
 
 (defun int<mis>:valid:string-symbol-nil? (caller name value &rest _)
@@ -943,17 +992,8 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   ;; Normalize to symbol for returning.
-  (let ((value/symbol (cond ((keywordp value)
-                             ;; Convert from keyword to symbol.
-                             (intern (string-remove-prefix ":" (symbol-name value))))
-                            ((symbolp value)
-                             value)
-                            (t
-                             (int<mis>:error caller
-                                             "%s must be a keyword or symbol. Got %S: %S"
-                                             (int<mis>:error:name name)
-                                             (type-of value)
-                                             value)))))
+  (let* ((caller (list "int<mis>:valid:symbol-or-keyword?" caller))
+         (value/symbol (int<mis>:valid:normalize->symbol caller name value)))
     ;; Validate the valids first...
     (unless (seq-every-p (lambda (x) "Validate VALID-SYMBOLS."
                            (and (symbolp nil)

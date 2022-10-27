@@ -151,7 +151,9 @@ LANGUAGE should be nil, string, or symbol:
                                 'type
                                 type
                                 int<mis>:valid:comment/types)
-    (setq type (int<mis>:valid:normalize->symbol 'type type)))
+    (setq type (int<mis>:valid:normalize->symbol 'int<mis>:comment:start
+                                                 'type
+                                                 type)))
 
   ;;------------------------------
   ;; Set-up.
@@ -244,7 +246,9 @@ LANGUAGE should be nil or string:
                                 'type
                                 type
                                 int<mis>:valid:comment/types)
-    (setq type (int<mis>:valid:normalize->symbol 'type type)))
+    (setq type (int<mis>:valid:normalize->symbol "int<mis>:comment:end"
+                                                 'type
+                                                 type)))
 
   ;;------------------------------
   ;; Set-up.

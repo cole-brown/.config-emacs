@@ -309,12 +309,157 @@ CALLER should be calling function's name. It can be one of:
 
 
 (int<mis>:styler:register :weight #'int<mis>:style:weight)
+(int<mis>:styler:register :bold   #'int<mis>:style:weight)
 
 
-;; TODO: More face attributes?
-;; TODO: https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html
-;; TODO: `:slant' / `:italic'
-;; TODO: `:foreground' & `:background'
+(defun int<mis>:style:slant (caller string syntax style key value)
+  "Set STRING's slant to a slant defined by KEY and VALUE.
+
+STRING should be the string to be styled.
+
+Ignored are:
+  - SYNTAX - a Mis Syntax Tree
+  - STYLE  - a Mis Style Syntax Tree
+
+KEY should a keyword:
+  - `:slant'
+  - `:italic'
+
+VALUE depends on KEY:
+  - If KEY is `:slant', VALUE must be one of these symbols (from densest to
+    faintest):
+    - `italic'
+    - `oblique'
+    - `normal'
+    - `reverse-italic'
+    - `reverse-oblique'
+  - If KEY is `:italic', VALUE must be:
+    - one of the `:slant' symbols
+    - t (for `italic')
+    - nil (for `normal')
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list "int<mis>:style:slant" caller))
+         ;; TODO: Check `font-slant-table' for valid slant name?
+         (slants/valid '(italic oblique normal reverse-italic reverse-oblique))
+         properties)
+    ;;------------------------------
+    ;; Error Checks & Normalization
+    ;;------------------------------
+    ;; We're accepting `:slant' and `:italic'. We need to normalize to a face property list of '(:slant <slant-keyword>)'.
+    ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Face-Attributes.html
+    (cond ((eq key :slant)
+           (if (memq value slants/valid)
+               (setq properties (list :slant value))
+             (int<mis>:error caller
+                             "VALUE must be a valid slant! Valid: %S, Got: %S"
+                             slants/valid
+                             face)))
+
+          ((eq key :italic)
+           (cond ((memq value slants/valid)
+                  (setq properties (list :slant value)))
+                 ((eq value t)
+                  (setq properties '(:slant italic)))
+                 ((eq value nil)
+                  (setq properties '(:slant normal)))
+                 (t
+                  (int<mis>:error caller
+                                  "VALUE must be a valid slant! Valid: %S, Got: %S"
+                                  (append slants/valid '(t nil))
+                                  face))))
+
+          (t
+           (int<mis>:error caller
+                           "KEY must be `:slant' or `:italic'! Got %S: `%S'"
+                           (type-of key)
+                           key)))
+
+    ;;------------------------------
+    ;; Style!
+    ;;------------------------------
+    (int<mis>:style:propertize caller
+                               string
+                               syntax
+                               style
+                               key
+                               (list 'face properties))))
+;; (int<mis>:style:slant 'test "hello" nil nil :slant 'italic)
+;; (int<mis>:style:slant 'test "hello" nil nil :italic t)
+
+
+(int<mis>:styler:register :slant  #'int<mis>:style:slant)
+(int<mis>:styler:register :italic #'int<mis>:style:slant)
+
+
+(defun int<mis>:style:color (caller string syntax style key value)
+  "Set STRING's color to a color defined by KEY and VALUE.
+
+STRING should be the string to be styled.
+
+Ignored are:
+  - SYNTAX - a Mis Syntax Tree
+  - STYLE  - a Mis Style Syntax Tree
+
+KEY should a keyword:
+  - `:foreground'
+  - `:background'
+
+VALUE should be a string, symbol, or keyword. If it is a symbol or keyword, it
+is converted to a string and stripped of any leading colon.
+  - a system-defined color name
+  - a hexadecimal color specification
+    - '#rgb' and 'RGB:r/g/b', where 'r', 'g', and 'b' are 1-4 hex digits long
+  - see Info node `Color Names' for full info
+  - basically things that `color-defined-p' returns t for
+
+CALLER should be calling function's name. It can be one of:
+  - a string
+  - a quoted symbol
+  - a function-quoted symbol
+  - a list of the above, most recent first
+    - e.g. '(#'error-caller \"parent\" 'grandparent)"
+  (let* ((caller (list "int<mis>:style:foreground" caller))
+         (keys/valid '(:foreground :background))
+         ;; `unspecified' is a special case; otherwise we need a string.
+         (value (if (eq value 'unspecified)
+                    'unspecified
+                  (int<mis>:valid:normalize->string caller 'value value)))
+         properties)
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (unless (memq key keys/valid)
+      (int<mis>:error caller
+                      "KEY must be one of keywords: %S Got: %S"
+                      keys/valid
+                      key))
+    (unless (color-defined-p value)
+      (int<mis>:error caller
+                      "VALUE must be a recognized/defined color! Not a color: %S"
+                      value))
+
+    ;;------------------------------
+    ;; Style!
+    ;;------------------------------
+    (int<mis>:style:propertize caller
+                               string
+                               syntax
+                               style
+                               key
+                               (list 'face (list key value)))))
+;; (int<mis>:style:color 'test "hello" nil nil :foreground 'red)
+;; (int<mis>:style:color 'test "hello" nil nil :background 'red)
+;; (int<mis>:style:color 'test "hello" nil nil :middleground 'red)
+
+
+(int<mis>:styler:register :foreground  #'int<mis>:style:color)
+(int<mis>:styler:register :background  #'int<mis>:style:color)
 
 
 ;;------------------------------------------------------------------------------
