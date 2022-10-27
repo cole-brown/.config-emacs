@@ -76,14 +76,11 @@ Example:
               ;;   (mis :output string ...)
               ;;   (mis :output 'string ...)
               (while (memq (car-safe macro:parse/value) '(quote function))
-                (message "hi: %S" macro:parse/value)
                 (setq macro:parse/value (cadr macro:parse/value)))
-              (message "bye: %S" macro:parse/value)
 
               ;; Validate keyword's value & save into the correct variable.
               (cond ((eq macro:parse/key :buffer)
-                     (int<mis>:buffer:name 'mis macro:parse/value)
-                     (setq macro:parse/key/buffer macro:parse/value))
+                     (setq macro:parse/key/buffer (int<mis>:buffer:name 'mis macro:parse/value)))
 
                     ((eq macro:parse/key :output)
                      (setq macro:parse/key/output (int<mis>:valid:symbol-or-keyword? 'mis
@@ -162,6 +159,10 @@ Example:
 ;;  :output 'string
 ;;  (mis:style :width 80)
 ;;  (mis:line "-"))
+;; (mis :buffer 'messages (mis:line "-"))
+;; (mis :output 'string
+;;      :buffer 'messages
+;;      (mis:line "-"))
 
 
 (defun int<mis>:mis (caller metatree &rest args)

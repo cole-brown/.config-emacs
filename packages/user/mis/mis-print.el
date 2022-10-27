@@ -283,9 +283,9 @@ CALLER should be calling function's name. It can be one of:
         (dolist (output list/output)
           ;; Loop on this output tree's entries of strings/metadatas to finalize & print.
           (dolist (entry (int<mis>:output:get/entries caller output))
-            (int<mis>:print:output/entry caller
-                                         buffer/type
-                                         entry)))))))
+            (int<mis>:print/buffer:output/entry caller
+                                                buffer/type
+                                                entry)))))))
 
 
 ;;------------------------------------------------------------------------------

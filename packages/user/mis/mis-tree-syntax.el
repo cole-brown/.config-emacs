@@ -159,11 +159,12 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Sanity Checks
     ;;------------------------------
-    (unless entries/style
-      (int<mis>:error caller
-                      "SYNTAX has no `:style' to filter. SYNTAX: %S, `:style' entries: %S"
-                      syntax
-                      entries/style))
+    ;; Allow `nil' style. Not having any style at all is a valid style (aka "normal text please").
+    ;; (unless entries/style
+    ;;   (int<mis>:error caller
+    ;;                   "SYNTAX has no `:style' to filter. SYNTAX: %S, `:style' entries: %S"
+    ;;                   syntax
+    ;;                   entries/style))
 
     ;;------------------------------
     ;; Filtering
