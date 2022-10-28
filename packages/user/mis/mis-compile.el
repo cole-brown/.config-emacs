@@ -113,8 +113,7 @@ CALLER should be calling function's name. It can be one of:
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:compile:syntax caller))
          output/trees
-         output
-         output/styled)
+         output)
     (int<mis>:debug caller
                     "syntax:           %S"
                     syntax)
@@ -159,21 +158,12 @@ CALLER should be calling function's name. It can be one of:
                                            output
                                            tree)))
     ;;------------------------------
-    ;; Finalize
+    ;; Done
     ;;------------------------------
-    ;; Style all of the MOT strings.
     (int<mis>:debug caller
-                    "output to style:  %S"
+                    "<--output: %S"
                     output)
-    (setq output/styled (int<mis>:style caller
-                                        output
-                                        nil
-                                        nil
-                                        style/parents))
-    (int<mis>:debug caller
-                    "<--styled output: %S"
-                    output/styled)
-    output/styled))
+    output))
 ;; (int<mis>:compile:syntax 'test (mis:string "-"))
 ;; (int<mis>:compile:syntax 'test (mis:line "-"))
 
@@ -243,8 +233,7 @@ CALLER should be calling function's name. It can be one of:
     ;; Compile
     ;;------------------------------
     (let* (output/trees
-           output
-           output/styled)
+           output)
 
       ;; And now we can just loop into the core compiling function.
       (dolist (child syntax/children)
@@ -276,21 +265,12 @@ CALLER should be calling function's name. It can be one of:
                                              tree)))
 
       ;;------------------------------
-      ;; Finalize
+      ;; Done
       ;;------------------------------
-      ;; Style all of the MOT strings.
       (int<mis>:debug caller
-                      "output to style:  %S"
+                      "<--output: %S"
                       output)
-      (setq output/styled (int<mis>:style caller
-                                          output
-                                          nil
-                                          nil
-                                          style/this))
-      (int<mis>:debug caller
-                      "<--styled output: %S"
-                      output/styled)
-      output/styled)))
+      output)))
 ;; (int<mis>:compile:children 'test :parent '((:parent (:children (:format (:formatter . string) (:value . "-"))))))
 
 
