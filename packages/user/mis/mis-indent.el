@@ -122,19 +122,21 @@ Return indentation amount as an integer (number of padding characters)."
           ;; ???
           ;;------------------------------
           (t
-           (int<mis>:error 'int<mis>:indent:string
+           (int<mis>:error 'int<mis>:indent:amount
                            "Unhandled indentation %S!"
                            indentation)))))
 
 
-(defun int<mis>:indent:string (string indentation padding &optional buffer position)
-  "Indent STRING according to INDENTATION & PADDING.
+(defun int<mis>:indent:string (indentation padding &optional buffer position)
+  "Create an indent string according to INDENTATION & PADDING.
 
 INDENTATION should be:
   `fixed'    -> indent to `current-column'
   `existing' -> do not indent; use `current-column' as indent amount.
   `auto'     -> indent according to `indent-according-to-mode'
-  an integer -> that number of spaces
+  an integer -> that number of PADDING characters
+  a string   -> return string as-is
+  nil        -> return nil (for \"no indentation on this side of the string\")
 
 PADDING /must/ be a string of length 1 and will only be used if INDENTATION is
 an integer.
@@ -151,7 +153,11 @@ Return indentation string."
   ;;------------------------------
   ;; Build & Return Indentation String
   ;;------------------------------
-  (cond ((stringp indentation)
+  (cond ((null indentation)
+         ;; No indentation is ok.
+         nil)
+
+        ((stringp indentation)
          ;; Already ready; return as-is.
          indentation)
 
@@ -198,10 +204,13 @@ STYLE should be a Mis Syntax Tree of styling.
       - If not supplied, it will default to a space (\" \").
 
 INDENTATION should be one of:
-  - any positive integer
+  - a positive integer
   - a string
   - a member of `int<mis>:valid:indent/types'
     - it should be normalized to a non-keyword member
+  - a plist with:
+    - keys `:left' and `:right'
+    - values of either positive integers or strings
 
 CALLER should be calling function's name. It can be one of:
   - a string
@@ -234,13 +243,28 @@ Return an indented string."
                             indentation)
 
     ;;------------------------------
-    ;; Indent String & Return
+    ;; What kind of indentation?
     ;;------------------------------
-    (apply #'int<mis>:string:lines/affix
-           (int<mis>:indent:string string indentation padding)
-           nil
-           (int<mis>:string:lines/split string))))
-;; (int<mis>:style:indent 'test "hello" nil :indent "xyz: ")
+    (let (indentation/left
+          indentation/right)
+      (if (not (listp indentation))
+          ;; No right indentation; left is just what's provided.
+          (setq indentation/left indentation
+                indentation/right nil)
+
+        ;; Both left & right indentation. Get both of them from the plist.
+        (setq indentation/left (plist-get indentation :left)
+              indentation/right (plist-get indentation :right)))
+
+      ;;------------------------------
+      ;; Indent String & Return
+      ;;------------------------------
+      (apply #'int<mis>:string:lines/affix
+             (int<mis>:indent:string indentation/left padding)
+             (int<mis>:indent:string indentation/right padding)
+             (int<mis>:string:lines/split string)))))
+;; (int<mis>:style:indent 'test "hello" nil nil :indent "xyz: ")
+;; (int<mis>:style:indent 'test "hello" nil nil :indent '(:left 2 :right 4))
 
 
 ;; Register the indent styler.

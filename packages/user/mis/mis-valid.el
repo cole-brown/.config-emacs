@@ -1038,6 +1038,9 @@ VALUE can be:
   - `:auto' / `auto'
   - a positive integer
   - a string
+  - a plist with:
+    - keys `:left' and `:right'
+    - values of either positive integers or strings
 
 NAME should be VALUE's symbol name as a symbol or string.
 
@@ -1047,28 +1050,70 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (cond ((integerp value)
-         ;; Ensure it's the right kind of integer & return.
-         (int<mis>:valid:positive-integer? (list 'int<mis>:valid:indent? caller)
-                                           name
-                                           value))
+  (let ((caller (list 'int<mis>:valid:indent? caller)))
+    (cond ((integerp value)
+           ;; Ensure it's the right kind of integer & return.
+           (int<mis>:valid:positive-integer? caller name value))
 
-        ((stringp value)
-         ;; Could check for empty strings if we want, but let's try just
-         ;; allowing anything for now...
-         value)
+          ((stringp value)
+           ;; Could check for empty strings if we want, but let's try just
+           ;; allowing anything for now...
+           value)
 
-        ((memq value int<mis>:valid:indent/types)
-         ;; It's the right kind of symbol, so return it.
-         value)
+          ;; For list to be valid, it must:
+          ;;   1. be a plist
+          ;;   2. have (both & only) keys `:left' and `:right'
+          ;;   3. have valid values for the keys
+          ((and (listp value)
+                (= (length value) 4))
+           (if-let ((value/left  (plist-get value :left))
+                    (value/right (plist-get value :right)))
+               (progn
+                 ;; Not done yet; make sure the values are valid.
+                 (cond  ((integerp value/left)
+                         (int<mis>:valid:positive-integer? caller name value/left))
+                        ((stringp value/left)
+                         value/left)
+                        (t
+                         (int<mis>:error caller
+                                         "%S `:left' must be a positive integer or a string. Got %S: %S"
+                                         (int<mis>:error:name name)
+                                         (type-of value/left)
+                                         value/left)))
+                 (cond  ((integerp value/right)
+                         (int<mis>:valid:positive-integer? caller name value/right))
+                        ((stringp value/right)
+                         value/right)
+                        (t
+                         (int<mis>:error caller
+                                         "%S `:right' must be a positive integer or a string. Got %S: %S"
+                                         (int<mis>:error:name name)
+                                         (type-of value/right)
+                                         value/right)))
+                 ;; If we get here, plist's keys and values are valid. So return the plist.
+                 value)
 
-        (t
-         (int<mis>:error caller
-                         "%S must be an integer or one of: %S. Got %S: %S"
-                         (int<mis>:error:name name)
-                         int<mis>:valid:indent/types
-                         (type-of value)
-                         value))))
+             ;; Invalid: List doesn't have the right structure.
+             (int<mis>:error caller
+                             '("%S must be a positive integer, a string, "
+                               "a plist with `:left' and `:right' keys and values that are positive integers or strings, "
+                               "or one of: %S. Got %S: %S")
+                             (int<mis>:error:name name)
+                             int<mis>:valid:indent/types
+                             (type-of value)
+                             value)))
+
+          ((memq value int<mis>:valid:indent/types)
+           ;; It's the right kind of symbol, so return it.
+           value)
+
+          (t
+           (int<mis>:error caller
+                           "%S must be a positive integer, a string, a plist, or one of: %S. Got %S: %S"
+                           (int<mis>:error:name name)
+                           int<mis>:valid:indent/types
+                           (type-of value)
+                           value)))))
 
 
 ;;------------------------------------------------------------------------------
