@@ -2,10 +2,10 @@
 ;;
 ;; Copyright (C) 2022 Cole Brown
 ;;
-;; Author: Cole Brown <code@brown.dev>
+;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:  2019-10-23
-;; Modified: 2022-08-15
+;; Created:    2019-10-23
+;; Modified:   2022-10-28
 ;;
 ;;; Commentary:
 ;;
@@ -63,8 +63,22 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
     :align ;; Uses: `:width', `:padding'
     :indent
     :trim :trim:left :trim:right
-    :newlines)
+    :newlines
+    :propertize
+    :face
+    :weight
+    :bold
+    :slant
+    :italic
+    :foreground
+    :background)
   "Valid style keywords.")
+
+
+(defconst int<mis>:keywords:style/no-cascade
+  '(:newlines
+    :indent)
+  "Style keywords that are not allowed to cascade down into childrens' styles.")
 
 
 (defconst int<mis>:keywords:comment

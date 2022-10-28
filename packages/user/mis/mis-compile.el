@@ -194,10 +194,11 @@ CALLER should be calling function's name. It can be one of:
                                                   parent
                                                   syntax
                                                   style/ancestors))
-         ;; Children are not allowed to inherit the `:newlines' style.
-         (style/children (int<mis>:syntax:filter/style caller
-                                                       style/this
-                                                       :newlines))
+         ;; Children are not allowed to inherit certain styles.
+         (style/children (apply #'int<mis>:syntax:filter/style
+                                caller
+                                style/this
+                                int<mis>:keywords:style/no-cascade))
          (syntax/children (int<mis>:syntax:find caller
                                                 syntax
                                                 parent
