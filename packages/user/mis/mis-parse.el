@@ -240,7 +240,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
                                                 syntax/parsed)
               ;; Clear so rest of the function can check it correctly.
               syntax/parsed nil)
-        (int<mis>:debug caller "to: syntax/out:        %S" syntax/out))
+        (int<mis>:debug caller "to:   syntax/out:      %S" syntax/out))
       (int<mis>:debug caller "syntax/parsed final:   %S" syntax/parsed)
       (int<mis>:debug caller "args left over:        %S" args)
 
@@ -274,29 +274,19 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
         ;; Done parsing `args'; we might need to finalize & append some
         ;; `args/non-mst' from the end of `args'.
         (when args/non-mst
-          ;; TODO: Do we:
-          ;; TODO:   1. Handle `:string' special case here.
-          ;; TODO:   2. Make `mis:string' handle it?
-          ;; TODO:   3. Eliminate the special case? e.g. `:string' always has its value in its children?
-          ;; ;; If the parsing CATEGORY is `:string', this last batch is the root
-          ;; ;; output.
-          ;; (if (eq category :string)
-          ;;     (setq syntax/out (int<mis>:syntax:merge caller
-          ;;                                             syntax/out
-          ;;                                             (apply #'int<mis>:parse:message
-          ;;                                                    caller
-          ;;                                                    (nreverse args/non-mst))))
-          ;;   ;; Otherwise it's just another child syntax tree.
-          ;;   (setq syntax/in (apply #'int<mis>:parse:message
-          ;;                          caller
-          ;;                          (nreverse args/non-mst))
-          ;;         args/non-mst nil))
-
-          ;; For now, always add it to `syntax/in'.
-          (setq syntax/in (apply #'int<mis>:parse:message
+          ;; If the parsing CATEGORY is `:string', this last batch is the root
+          ;; output.
+          (if (eq category :string)
+              (setq syntax/out (int<mis>:syntax:merge caller
+                                                      syntax/out
+                                                      (apply #'int<mis>:parse:message
+                                                             caller
+                                                             (nreverse args/non-mst))))
+            ;; Otherwise it's just another child syntax tree to add to `syntax/in'.
+            (setq syntax/in (apply #'int<mis>:parse:message
                                    caller
                                    (nreverse args/non-mst))
-                  args/non-mst nil)))
+                  args/non-mst nil))))
 
       (int<mis>:debug caller "syntax/out:            %S" syntax/out)
       (int<mis>:debug caller "syntax/in:             %S" syntax/in)
