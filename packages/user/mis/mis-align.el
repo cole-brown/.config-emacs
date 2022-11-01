@@ -126,16 +126,19 @@ Return an aligned string. If STRING is too long, returns it as-is
     (int<mis>:valid:string? caller
                             'string
                             string)
-    (int<mis>:valid:member? caller
-                            'alignment
-                            alignment
-                            int<mis>:valid:align/types)
+    (int<mis>:valid:member/normalize? caller
+                                      'alignment
+                                      alignment
+                                      int<mis>:valid:align/types)
 
     ;;------------------------------
     ;; Align String & Return
     ;;------------------------------
     ;; Choose the proper alignment function for the ALIGNMENT type.
-    (cond ((>= (length string) width)
+    (cond ((memq alignment int<mis>:valid:clear/types)
+           ;; Actually... no alignment; thanks.
+           string)
+          ((>= (length string) width)
            ;; STRING is too long to align; just return as-is.
            string)
           ((eq alignment 'center)

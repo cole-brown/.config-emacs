@@ -44,6 +44,7 @@ INDENTATION should be:
   `existing' -> do not indent; use `current-column' as indent amount.
   `auto'     -> indent according to `indent-according-to-mode'
   an integer -> that number of spaces
+  nil/etc    -> no indentation
 
 BUFFER should be:
   - nil -> the `current-buffer'
@@ -91,6 +92,11 @@ Return indentation amount as an integer (number of padding characters)."
           ((stringp indentation)
            (length indentation))
 
+          ;; Check for clear types first, as they're also in the indent types list.
+          ((memq indentation int<mis>:valid:clear/types)
+           0)
+
+          ;; Not a clear, so it'll be an actual indent type.
           ((memq indentation int<mis>:valid:indent/types)
            ;; Else need to ask the buffer about indentation.
            (let (amount)
@@ -153,7 +159,8 @@ Return indentation string."
   ;;------------------------------
   ;; Build & Return Indentation String
   ;;------------------------------
-  (cond ((null indentation)
+  (cond ((or (null indentation)
+             (memq indentation int<mis>:valid:clear/types))
          ;; No indentation is ok.
          nil)
 
@@ -245,26 +252,30 @@ Return an indented string."
     ;;------------------------------
     ;; What kind of indentation?
     ;;------------------------------
-    (let (indentation/left
-          indentation/right)
-      (if (not (listp indentation))
-          ;; No right indentation; left is just what's provided.
-          (setq indentation/left indentation
-                indentation/right nil)
+    (if (memq indentation int<mis>:valid:clear/types)
+        ;; No indent actually; thanks.
+        string
+      (let (indentation/left
+            indentation/right)
+        (if (not (listp indentation))
+            ;; No right indentation; left is just what's provided.
+            (setq indentation/left indentation
+                  indentation/right nil)
 
-        ;; Both left & right indentation. Get both of them from the plist.
-        (setq indentation/left (plist-get indentation :left)
-              indentation/right (plist-get indentation :right)))
+          ;; Both left & right indentation. Get both of them from the plist.
+          (setq indentation/left (plist-get indentation :left)
+                indentation/right (plist-get indentation :right)))
 
-      ;;------------------------------
-      ;; Indent String & Return
-      ;;------------------------------
-      (apply #'int<mis>:string:lines/affix
-             (int<mis>:indent:string indentation/left padding)
-             (int<mis>:indent:string indentation/right padding)
-             (int<mis>:string:lines/split string)))))
+        ;;------------------------------
+        ;; Indent String & Return
+        ;;------------------------------
+        (apply #'int<mis>:string:lines/affix
+               (int<mis>:indent:string indentation/left padding)
+               (int<mis>:indent:string indentation/right padding)
+               (int<mis>:string:lines/split string))))))
 ;; (int<mis>:style:indent 'test "hello" nil nil :indent "xyz: ")
 ;; (int<mis>:style:indent 'test "hello" nil nil :indent '(:left 2 :right 4))
+;; (int<mis>:style:indent 'test "hello" nil nil :indent 'clear)
 
 
 ;; Register the indent styler.

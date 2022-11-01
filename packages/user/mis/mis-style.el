@@ -194,7 +194,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let ((caller (list "int<mis>:style:face" caller)))
+  (let ((caller (list 'int<mis>:style:face caller)))
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
@@ -259,7 +259,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller (list "int<mis>:style:weight" caller))
+  (let* ((caller (list 'int<mis>:style:weight caller))
          ;; TODO: Check `font-weight-table' for valid weight name?
          (weights/valid '(ultra-bold extra-bold bold semi-bold normal semi-light light extra-light ultra-light))
          properties)
@@ -344,7 +344,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller (list "int<mis>:style:slant" caller))
+  (let* ((caller (list 'int<mis>:style:slant caller))
          ;; TODO: Check `font-slant-table' for valid slant name?
          (slants/valid '(italic oblique normal reverse-italic reverse-oblique))
          properties)
@@ -424,7 +424,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller (list "int<mis>:style:foreground" caller))
+  (let* ((caller (list 'int<mis>:style:foreground caller))
          (keys/valid '(:foreground :background))
          ;; `unspecified' is a special case; otherwise we need a string.
          (value (if (eq value 'unspecified)

@@ -84,7 +84,8 @@ Alist of major-mode to:
   "Finalize TYPE into one of: `inline', `block', `quote'.
 
 Must be run in context of output buffer."
-  (if (not (eq type 'default))
+  (if (and (not (eq type 'default))
+           (not (memq type int<mis>:valid:clear/types)))
       ;; The specific types are already finalized.
       type
     ;; Need to figure out what "default" means...
@@ -99,6 +100,7 @@ Must be run in context of output buffer."
       (or final
           'inline))))
 ;; (int<mis>:comment:type/get 'default)
+;; (int<mis>:comment:type/get 'clear)
 
 
 ;; TODO: Use this somewhere?
@@ -147,10 +149,10 @@ LANGUAGE should be nil, string, or symbol:
                                      'language
                                      language)
 
-  (when (int<mis>:valid:member? 'int<mis>:comment:start
-                                'type
-                                type
-                                int<mis>:valid:comment/types)
+  (when (int<mis>:valid:member/normalize? 'int<mis>:comment:start
+                                          'type
+                                          type
+                                          int<mis>:valid:comment/types)
     (setq type (int<mis>:valid:normalize->symbol 'int<mis>:comment:start
                                                  'type
                                                  type)))
@@ -242,10 +244,10 @@ LANGUAGE should be nil or string:
                                      'language
                                      language)
 
-  (when (int<mis>:valid:member? 'int<mis>:comment:end
-                                'type
-                                type
-                                int<mis>:valid:comment/types)
+  (when (int<mis>:valid:member/normalize? 'int<mis>:comment:end
+                                          'type
+                                          type
+                                          int<mis>:valid:comment/types)
     (setq type (int<mis>:valid:normalize->symbol "int<mis>:comment:end"
                                                  'type
                                                  type)))
@@ -348,10 +350,10 @@ CALLER should be calling function's name. It can be one of:
     ;; Error Checking
     ;;------------------------------
     (int<mis>:valid:comment/kvp? caller :type type)
-    (int<mis>:valid:member? caller
-                            'position
-                            position
-                            '(:prefix:major :prefix:minor :postfix:major :postfix:minor))
+    (int<mis>:valid:member/exact? caller
+                                  'position
+                                  position
+                                  '(:prefix:major :prefix:minor :postfix:major :postfix:minor))
     (int<mis>:valid:string-symbol-nil? 'int<mis>:comment:end
                                        'language
                                        language)

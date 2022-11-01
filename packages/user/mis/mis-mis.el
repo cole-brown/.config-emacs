@@ -83,10 +83,10 @@ Example:
                      (setq macro:parse/key/buffer (int<mis>:buffer:name 'mis macro:parse/value)))
 
                     ((eq macro:parse/key :output)
-                     (setq macro:parse/key/output (int<mis>:valid:symbol-or-keyword? 'mis
-                                                                                     'macro:parse/value
-                                                                                     macro:parse/value
-                                                                                     int<mis>:valid:output/types)))
+                     (setq macro:parse/key/output (int<mis>:valid:member/normalize? 'mis
+                                                                                    'macro:parse/value
+                                                                                    macro:parse/value
+                                                                                    int<mis>:valid:output/types)))
 
                     (t
                      (int<mis>:error 'mis

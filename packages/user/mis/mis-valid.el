@@ -105,23 +105,45 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
 
 
 ;;------------------------------
+;; General Keywords/Symbols
+;;------------------------------
+
+(defconst int<mis>:valid:clear/types
+  '(none nil null clear)
+  "Allow user to clear/disallow inheritance from ancestors' styling.
+
+NOTE: Keyword and symbol must both be allowed; use
+`int<mis>:valid:member/normalize?' to validate & normalize.
+
+e.g. mis string:
+  (mis:string :padding \"-\"
+              :align 'center
+              (mis:string :align 'clear
+                          :padding \" \"
+                          :indent '(:left 5 :right 5)
+                          \"string with spaces then hyphens around\"))")
+
+
+;;------------------------------
 ;; Keywords/Symbols for a specific Mis keyword.
 ;;------------------------------
 
 (defconst int<mis>:valid:align/types
-  ;; keyword / symbol
-  '(:left      left
-    :center    center
-    :right     right)
+  ;; Only specify symbol here; `int<mis>:valid:member/normalize?' will also allow keyword.
+  (append (list 'left
+                'center
+                'right)
+          int<mis>:valid:clear/types)
   "Valid Mis alignment types.")
 
 
 (defconst int<mis>:valid:comment/types
-  ;; keyword / symbol
-  '(:inline  inline
-    :block   block
-    :quote   quote
-    :default default)
+  ;; Only specify symbol here; `int<mis>:valid:member/normalize?' will also allow keyword.
+  (append (list 'inline
+                'block
+                'quote
+                'default)
+          int<mis>:valid:clear/types)
   "Valid Mis comment types.
 
 'inline' is a standard single-line comment.
@@ -132,9 +154,10 @@ AKA:  (input-category-keyword internal-category-keyword-0 ...)")
 
 (defconst int<mis>:valid:indent/types
   ;; keyword / symbol
-  '(:fixed    fixed
-    :existing existing
-    :auto     auto)
+  (append (list 'fixed
+                'existing
+                'auto)
+          int<mis>:valid:clear/types)
   "Valid Mis indent types.
 
 See indent's styler, `int<mis>:style:indent' for what indent symbols mean.
@@ -149,7 +172,7 @@ Also valid is:
     string)
   "Valid Mis output types.
 
-Keyword and symbol both allowed; use `int<mis>:valid:symbol-or-keyword?' to
+Keyword and symbol both allowed; use `int<mis>:valid:member/normalize?' to
 validate.")
 
 
@@ -483,7 +506,7 @@ Signal an error if invalid; return normalized value if valid."
        value)
 
       (:align
-       (int<mis>:valid:member? caller keyword value int<mis>:valid:align/types))
+       (int<mis>:valid:member/normalize? caller keyword value int<mis>:valid:align/types))
 
       (:indent
        (int<mis>:valid:indent? caller keyword value))
@@ -568,7 +591,7 @@ CALLER should be calling function's name. It can be one of:
                  (dolist (entry (int<mis>:syntax:get/value caller :style syntax))
                    (let ((key   (car entry))
                          (value (cdr entry)))
-                     (unless (int<mis>:valid:member? caller key key int<mis>:keywords:style)
+                     (unless (int<mis>:valid:member/exact? caller key key int<mis>:keywords:style)
                        (int<mis>:debug caller
                                        "Style SYNTAX has invalid key `%S' = %S. SYNTAX: %S"
                                        key
@@ -636,7 +659,7 @@ Signal an error if invalid; return normalized value if valid."
       ;; Keyword Validators
       ;;------------------------------
       (:type
-       (int<mis>:valid:member? caller keyword value int<mis>:valid:comment/types))
+       (int<mis>:valid:member/normalize? caller keyword value int<mis>:valid:comment/types))
 
       (:language
        (int<mis>:valid:string-symbol-nil? caller keyword value))
@@ -705,7 +728,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let ((caller (list "int<mis>:valid:normalize->symbol" caller)))
+  (let ((caller (list 'int<mis>:valid:normalize->symbol caller)))
     (cond ((keywordp keyword-or-symbol)
            (intern (string-remove-prefix ":" (symbol-name keyword-or-symbol))))
           ((symbolp keyword-or-symbol)
@@ -735,7 +758,7 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let* ((caller (list "int<mis>:valid:normalize->symbol" caller)))
+  (let* ((caller (list 'int<mis>:valid:normalize->symbol caller)))
     (string-remove-prefix ":"
                           (cond ((symbolp symbol-or-string)
                                  (symbol-name symbol-or-string))
@@ -955,7 +978,7 @@ CALLER should be calling function's name. It can be one of:
          value)))
 
 
-(defun int<mis>:valid:member? (caller name value valids &rest _)
+(defun int<mis>:valid:member/exact? (caller name value valids &rest _)
   "Signal an error if VALUE is not a member of VALIDS, else return VALUE.
 
 VALIDS should be a list of valid values for VALUE; will use `memq' to evaluate
@@ -979,7 +1002,7 @@ CALLER should be calling function's name. It can be one of:
                     value)))
 
 
-(defun int<mis>:valid:symbol-or-keyword? (caller name value valid-symbols &rest _)
+(defun int<mis>:valid:member/normalize? (caller name value valid-symbols &rest _)
   "Normalize VALUE and validate against VALID-SYMBOLS.
 
 Convert VALUE to a symbol if it's a keyword, then compare to the list of
@@ -994,7 +1017,7 @@ For example, if you want all of these to be valid:
   '(foo :foo bar :bar baz :baz)
 Then check like so:
   (let ((example-input :foo))
-    (int<mis>:valid:symbol-or-keyword? 'example
+    (int<mis>:valid:member/normalize? 'example
                                        'example-input
                                        example-input
                                        '(foo bar baz)))
@@ -1006,7 +1029,7 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   ;; Normalize to symbol for returning.
-  (let* ((caller (list "int<mis>:valid:symbol-or-keyword?" caller))
+  (let* ((caller (list 'int<mis>:valid:member/normalize? caller))
          (value/symbol (int<mis>:valid:normalize->symbol caller name value)))
     ;; Validate the valids first...
     (unless (seq-every-p (lambda (x) "Validate VALID-SYMBOLS."
@@ -1103,9 +1126,8 @@ CALLER should be calling function's name. It can be one of:
                              (type-of value)
                              value)))
 
-          ((memq value int<mis>:valid:indent/types)
-           ;; It's the right kind of symbol, so return it.
-           value)
+          ;; Correct symbol/keyword? Return normalized symbol.
+          ((int<mis>:valid:member/normalize? caller name value int<mis>:valid:indent/types))
 
           (t
            (int<mis>:error caller
