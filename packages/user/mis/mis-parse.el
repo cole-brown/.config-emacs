@@ -51,7 +51,7 @@
 ;; Parsing
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:parse:message (caller &rest args)
+(defun int<mis>:parse:string (caller &rest args)
   "Parse message ARGS into a Mis Syntax Tree.
 
 CALLER should be calling function's name. It can be one of:
@@ -60,12 +60,21 @@ CALLER should be calling function's name. It can be one of:
   - a function-quoted symbol
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
-  (let ((caller (list 'int<mis>:parse:message caller))
+  (let ((caller (list 'int<mis>:parse:string caller))
         (args/len (length args))
         syntax)
-    (int<mis>:debug caller "args:      %S" syntax)
+    (int<mis>:debug caller "args:      %S" args)
     (when args
       (cond ((and (= args/len 1)
+                  (keywordp (nth 0 args))
+                  (eq :children (nth 0 args)))
+             ;; Figure out what your children are in order to get your string.
+             (setq syntax (int<mis>:syntax:create caller
+                                                  :format
+                                                  (cons :formatter 'children)
+                                                  (cons :value 'children))))
+
+            ((and (= args/len 1)
                   (stringp (nth 0 args)))
              ;; Just a single string.
              (setq syntax (int<mis>:syntax:create caller
@@ -84,10 +93,10 @@ CALLER should be calling function's name. It can be one of:
                                                   (cons :value (nth 0 args)))))
 
             (t
-             ;; Generic message format string and args.
+             ;; A `format' string and args.
              (setq syntax (int<mis>:syntax:create caller
                                                   :format
-                                                  (cons :formatter 'message)
+                                                  (cons :formatter 'format)
                                                   ;; Everything!
                                                   (cons :value args))))))
     (int<mis>:debug caller "<--syntax: %S" syntax)
@@ -242,12 +251,14 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
               syntax/parsed nil)
         (int<mis>:debug caller "to:   syntax/out:      %S" syntax/out))
       (int<mis>:debug caller "syntax/parsed final:   %S" syntax/parsed)
-      (int<mis>:debug caller "args left over:        %S" args)
 
       ;;------------------------------
       ;; Deal with MSTs, strings, etc. in ARGS.
       ;;------------------------------
       (let (args/non-mst)
+        (when args
+          (int<mis>:debug caller "args left over:        %S" args))
+
         (while args
           (let ((arg (pop args)))
             (if (not (int<mis>:valid:syntax? caller 'arg arg :no-error))
@@ -263,7 +274,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
               (when args/non-mst
                 (setq syntax/in (int<mis>:syntax:append caller
                                                         syntax/in
-                                                        (apply #'int<mis>:parse:message
+                                                        (apply #'int<mis>:parse:string
                                                                caller
                                                                (nreverse args/non-mst)))
                       args/non-mst nil))
@@ -271,22 +282,30 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
               (setq syntax/in (int<mis>:syntax:append caller
                                                       syntax/in
                                                       arg)))))
+
         ;; Done parsing `args'; we might need to finalize & append some
         ;; `args/non-mst' from the end of `args'.
         (when args/non-mst
-          ;; If the parsing CATEGORY is `:string', this last batch is the root
-          ;; output.
-          (if (eq category :string)
-              (setq syntax/out (int<mis>:syntax:merge caller
-                                                      syntax/out
-                                                      (apply #'int<mis>:parse:message
-                                                             caller
-                                                             (nreverse args/non-mst))))
-            ;; Otherwise it's just another child syntax tree to add to `syntax/in'.
-            (setq syntax/in (apply #'int<mis>:parse:message
-                                   caller
-                                   (nreverse args/non-mst))
-                  args/non-mst nil))))
+          (int<mis>:debug caller "args, non-syntax:      %S" args/non-mst)
+          (let ((syntax/string (apply #'int<mis>:parse:string
+                                      caller
+                                      (nreverse args/non-mst))))
+            ;; If the parsing CATEGORY is `:string' and we have no children,
+            ;; this last batch is the root string formatter.
+            (if (and (eq category :string)
+                     (null syntax/in))
+                (setq syntax/out (int<mis>:syntax:merge caller syntax/out syntax/string))
+              ;; Otherwise it's just another child syntax tree to add to `syntax/in'.
+              (setq syntax/in    (int<mis>:syntax:append caller
+                                                         syntax/in
+                                                         syntax/string)
+                    args/non-mst nil)))))
+
+      ;; Another `:string' special case: When the `:string' has no string to
+      ;; string - it needs to get a string from its children.
+      (when (and (eq category :string)
+                 (null syntax/out))
+        (setq syntax/out (int<mis>:parse:string caller :children)))
 
       (int<mis>:debug caller "syntax/out:            %S" syntax/out)
       (int<mis>:debug caller "syntax/in:             %S" syntax/in)
@@ -304,7 +323,8 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
       ;;------------------------------
       ;; Keep separate from the parsing so we enforce a more human-friendly
       ;; ordering to the alists, though it won't matter to the builder/compiler.
-      ;; Just friendly to the programmer to have these first in the output alist.
+      ;; Just friendly to the programmer to have these +first+ last in the final
+      ;; output alist.
       (if syntax/parsed
           (setq syntax/out (apply #'int<mis>:syntax:create-or-update
                                   caller
@@ -343,6 +363,7 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
 ;; (int<mis>:parse 'test :line '(:line :style) "-")
 ;; (int<mis>:parse 'test :style :style :width 80)
 ;; (int<mis>:parse 'test :style :style :padding "?")
+;; string inside "string" w/ just style otherwise
 ;;
 ;; Parse a syntax tree -> Get a syntax tree.
 ;; (int<mis>:parse 'test :comment '(:comment :style) '((:format (:formatter repeat :string "-"))))
@@ -361,6 +382,15 @@ Optional VALID parameter is for valid/expected category keywords. It should be:
 ;;                 (mis:line "1")
 ;;                 "\n"
 ;;                 (mis:line "2"))
+;;
+;; String w/ styling inside string w/ styling:
+;; (int<mis>:parse 'test :string '(:style :string)
+;;                 :padding "-"
+;;                 :align 'center
+;;                 (int<mis>:parse 'test :string '(:style :string)
+;;                                 :padding " "
+;;                                 :indent '(:left 5 :right 5)
+;;                                 "string with spaces padding it"))
 
 
 ;;------------------------------------------------------------------------------
