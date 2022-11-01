@@ -24,26 +24,26 @@
 ;; Basic Formatting
 ;;------------------------------------------------------------------------------
 
-(defun int<mis>:format:message (caller message &rest args)
-  "Format MESSAGE & ARGS in preparation for 'mis' formatting operations.
+(defun int<mis>:format:string (caller string &rest args)
+  "Format STRING & ARGS in preparation for 'mis' formatting operations.
 
 CALLER should be calling function's name. It can be either:
   - a string
   - a quoted symbol
   - or a function-quoted symbol
 
-MESSAGE should be a string that `format' understands.
+STRING should be a string that `format' understands.
 
-ARGS should be the `format' ARGS for MESSAGE."
-  (cond ((not (stringp message))
+ARGS should be the `format' ARGS for STRING."
+  (cond ((not (stringp string))
          (int<mis>:error caller
-                         "MESSAGE must be a string; got %S: %S"
-                         (type-of message)
-                         message))
+                         "STRING must be a string; got %S: %S"
+                         (type-of string)
+                         string))
 
         ;; Ok; format and return.
         (t
-         (apply #'format message args))))
+         (apply #'format string args))))
 
 
 ;;------------------------------------------------------------------------------
@@ -187,8 +187,8 @@ CALLER should be calling function's name. It can be one of:
              (int<mis>:format:repeat value
                                      (int<mis>:style:get/width caller style nil nil)))
 
-            ('message
-             (apply #'int<mis>:format:message
+            ('format
+             (apply #'int<mis>:format:string
                     caller
                     value))
 

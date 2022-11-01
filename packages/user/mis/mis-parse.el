@@ -68,11 +68,12 @@ CALLER should be calling function's name. It can be one of:
       (cond ((and (= args/len 1)
                   (keywordp (nth 0 args))
                   (eq :children (nth 0 args)))
-             ;; Figure out what your children are in order to get your string.
+             ;; Once you get it by compiling/finalizing your children, it should
+             ;; just be a string, so just `string' formatter is fine.
              (setq syntax (int<mis>:syntax:create caller
                                                   :format
-                                                  (cons :formatter 'children)
-                                                  (cons :value 'children))))
+                                                  (cons :formatter 'string)
+                                                  (cons :value 'child))))
 
             ((and (= args/len 1)
                   (stringp (nth 0 args)))
