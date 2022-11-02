@@ -21,7 +21,7 @@
 ;;------------------------------------------------------------------------------
 
 ;; http://pages.sachachua.com/.emacs.d/Sacha.html#org0676afd
-(use-package recentf
+(imp:use-package recentf
   ;;--------------------
   :custom
   ;;--------------------

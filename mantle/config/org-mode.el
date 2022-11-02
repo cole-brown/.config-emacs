@@ -577,7 +577,7 @@ Then runs COMMAND interactively with ARGS."
 ;;------------------------------
 ;;
 ;; ;; Display the titles with nice unicode bullets instead of the text ones.
-;; (use-package org-bullets
+;; (imp:use-package org-bullets
 ;;   :disabled ;; is this making things slow?
 ;;   :after org
 ;;   :demand t
