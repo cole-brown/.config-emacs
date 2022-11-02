@@ -756,8 +756,8 @@ valid."
 (defun path:canonicalize:absolute (path &rest segment)
   "Canonicalize/normalize a file PATH and path SEGMENTS.
 
-Attempts to preserve file/directory-ness off PATH - that is, tries to
-preserve the final slash if it exists.
+Will attempt to preserve file/directory-ness of PATH - that is, try to preserve
+the final slash if it exists.
 
 Return an absolute path.
 
@@ -775,6 +775,57 @@ valid."
 (defalias 'path:canonicalize       'path:canonicalize:absolute)
 (defalias 'path:absolute           'path:canonicalize:absolute)
 (defalias 'path:abs                'path:canonicalize:absolute)
+
+
+(defun path:abbreviate:file (path &rest segment)
+  "Create file path from PATH & SEGMENTs, shortened using `directory-abbrev-alist'.
+
+Return an absolute path.
+
+Does not fix or validate PATH or SEGMENT components; they are expected to be
+valid."
+  (abbreviate-file-name
+   (apply #'path:canonicalize:file path segment)))
+
+
+(defalias 'path:abbrev:file        'path:abbreviate:file)
+
+
+(defun path:abbreviate:dir (path &rest segment)
+  "Create dir path from PATH & SEGMENTs, shortened using `directory-abbrev-alist'.
+
+Return an absolute path.
+
+Does not fix or validate PATH or SEGMENT components; they are expected to be
+valid."
+  (abbreviate-file-name
+   (apply #'path:canonicalize:dir path segment)))
+
+
+(defalias 'path:abbrev:dir         'path:abbreviate:dir)
+
+
+(defun path:abbreviate:absolute (path &rest segment)
+  "Create path from PATH & SEGMENTs, shortened using `directory-abbrev-alist'.
+
+Will attempt to preserve file/directory-ness of PATH - that is, try to preserve
+the final slash if it exists.
+
+Return an absolute path.
+
+Does not fix or validate PATH or SEGMENT components; they are expected to be
+valid."
+  (let ((path/joined (apply #'path:join path segment)))
+    (funcall (if (path:directory? path/joined)
+                 #'path:abbreviate:dir
+               #'path:abbreviate:file)
+             path/joined)))
+;; (path:abbreviate:absolute "/foo" "bar")
+;; (path:abbreviate:absolute "/foo" "bar/")
+
+
+(defalias 'path:abbreviate         'path:abbreviate:absolute)
+(defalias 'path:abbrev             'path:abbreviate:absolute)
 
 
 ;;------------------------------------------------------------------------------
