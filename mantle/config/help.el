@@ -100,7 +100,7 @@
           ;; So remove if weird?
           which-key-show-operator-state-maps t))
 
-  (which-key-mode))
+  (which-key-mode +1))
 
 
 ;;------------------------------

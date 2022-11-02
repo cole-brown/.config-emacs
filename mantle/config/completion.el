@@ -75,7 +75,7 @@
 (imp:eval:after (:and selectrum orderless)
 
   ;; Persist history over Emacs restarts
-  (savehist-mode)
+  (savehist-mode +1)
 
   ;; Optional performance optimization
   ;; by highlighting only the visible candidates.
@@ -115,7 +115,7 @@
 
   ;; Must be in the :init section of use-package such that the mode gets
   ;; enabled right away. Note that this forces loading the package.
-  (marginalia-mode)
+  (marginalia-mode +1)
 
   ;;--------------------
   :bind
