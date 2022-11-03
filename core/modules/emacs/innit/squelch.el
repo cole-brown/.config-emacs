@@ -17,6 +17,8 @@
 ;;; Code:
 
 
+(require 'cl-macs)
+
 ;;------------------------------------------------------------------------------
 ;; Silent Function Replacements
 ;;------------------------------------------------------------------------------
@@ -121,6 +123,102 @@ Usage:
 
 Originally from Doom's `doom-shut-up-a' function."
   (innit:squelch (apply fn args)))
+
+
+(cl-defmacro innit:squelch/unless (&rest forms
+                                   &key  interactive?
+                                         innit-debug?
+                                         allow-message?
+                                   &allow-other-keys)
+  "Run FORMS, probably without generating any output.
+
+If INTERACTIVE? is non-nil, squelch unless called by user (as per function
+`called-interactively-p').
+
+If INNIT-DEBUG? is non-nil, squelch unless debugging (as per function
+`innit:debug?').
+
+If ALLOW-MESSAGE? is non-nil, allow `message' output to '*Messages*' buffer.
+Will clear the minibuffer after FORMS are run.
+  - Set `inhibit-message' and `save-silently' lexically before running FORMS.
+
+If ALLOW-MESSAGE? is nil or not provided, silence calls to `message', `load',
+`write-region' and anything that writes to `standard-output'.
+
+Originally from Doom's `quiet!' macro."
+  ;;------------------------------
+  ;; Filter keys from FORMS
+  ;;------------------------------
+  (let (macro:key
+        macro:body)
+    (dolist (form forms)
+      ;; If this is one of our keywords, save that fact for the next `form' in FORMS.
+      (cond ((memq form '(:interactive? :innit-debug? :allow-message?))
+             (setq macro:key form))
+
+            ;; Last `form' was one of our keywords, so this one is its value.
+            ;; Ignore its value; already set in the keyword's variable.
+            (macro:key
+             (setq macro:key nil)
+             nil)
+
+            ;; Just a form; save to the filtered list.
+            (t
+             (push form macro:body))))
+
+    ;; Get the body forms back into correct order.
+    (setq macro:body (nreverse macro:body))
+
+    ;;------------------------------
+    ;; To Squelch or not to Squelch?
+    ;;------------------------------
+    (cond
+     ;;------------------------------
+     ;; Normal / Unsquelched
+     ;;------------------------------
+     ;; Squelch unless debugging?
+     ((and innit-debug?
+           ;; Could use `innit:debug?' optional param `:any' here, if we want to
+           ;; not squelch for any of: `innit:debug?', `debug-on-error',
+           ;; `init-file-debug'.
+           (innit:debug?))
+      ;; We are debugging and don't want to squelch!
+      `(progn ,@macro:body))
+
+     ;; Squelch unless interactive?
+     ((and interactive?
+           (called-interactively-p 'any))
+      ;; Called by user directly or via keybind/macro; don't squelch!
+      `(progn ,@macro:body))
+
+     ;;------------------------------
+     ;; Squelched
+     ;;------------------------------
+     ;; Allow message output?
+     ;;   - But only if Emacs able to be interacted with (e.g. not batch mode).
+     ((and allow-message?
+           innit:interactive?)
+      ;; Be less bossy; allow output to *Messages* buffer but not to the
+      ;; minibuffer.
+      `(let ((inhibit-message t)
+             (save-silently t))
+         (prog1
+             ,@macro:body
+           ;; And we "prevent" output to the minibuffer by... Clearing anything
+           ;; out of the minibuffer after it's already been output to the
+           ;; minibuffer. Mission Accomplished.
+           (message ""))))
+
+     ;; Full powered squelching!
+     (t
+      ;; Prevent output by just redefining commonly chatty functions.
+      `(cl-letf ((standard-output                  #'innit:squelch:standard-output)
+                 ((symbol-function #'message)      #'innit:squelch:message)
+                 ((symbol-function #'load)         #'innit:squelch:load)
+                 ((symbol-function #'write-region) #'innit:squelch:write-region))
+         ,@macro:body)))))
+;; (innit:squelch/unless :interactive? t :allow-message? t (message "hello there"))
+;; (innit:squelch/unless :interactive? t (message "hello there"))
 
 
 ;;------------------------------------------------------------------------------
