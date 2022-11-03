@@ -96,7 +96,11 @@
     ;; Undo-tree is too chatty about saving its history files. This doesn't
     ;; totally suppress it logging to *Messages*, it only stops it from appearing
     ;; in the echo-area.
-    (advice-add #'undo-tree-save-history :around #'innit:advice:squelch)
+    (define-advice undo-tree-save-history (:around (fn &rest args) mantle:user:squelch)
+      "Undo-tree is too chatty about saving its history files; prevent it from using minibuffer."
+      (innit:squelch/unless :interactive? t
+                            :allow-messages? t
+                            (apply fn args)))
 
     (global-undo-tree-mode +1)))
 
