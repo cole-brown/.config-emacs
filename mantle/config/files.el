@@ -24,39 +24,50 @@
 (imp:use-package recentf
   :demand t
 
-  ;;--------------------
-  :init
-  ;;--------------------
-
-  (defun mantle:recentf:file/truename (file)
-    "Proudly nicked from Doom's 'core/core-editor.el'."
-    (if (or (not (file-remote-p file))
-            (equal "sudo" (file-remote-p file 'method)))
-        (abbreviate-file-name (file-truename (tramp-file-name-localname tfile)))
-      file))
-
-  ;; REVIEW: Use this in lieu of `mantle:recentf:file/truename' when we drop
-  ;;   Emacs 28 support. See emacs-mirror/emacs@32906819addd.
-  ;; (setq recentf-show-abbreviated t)
-
-  (innit:hook:defun
-   (list :name    "recentf:touch/buffer"
-         :file    (path:current:file)
-         :docstr  "Bump file in recent file list when it is switched or written to."
-         :squelch t
-         :quiet   t)
-   (when buffer-file-name
-     (recentf-add-file buffer-file-name))
-   ;; Return nil for `write-file-functions'
-   nil)
-
-  (innit:hook:defun
-   (list :name    "recentf:touch/dired"
-         :file    (path:current:file)
-         :docstr  "Add dired directories to recentf file list."
-         :squelch t
-         :quiet   t)
-   (recentf-add-file default-directory))
+  ;; TODO: Do I want this functionality from Doom or no? It has errors, currently, if not '--debug-init'.
+  ;; ;;--------------------
+  ;; :init
+  ;; ;;--------------------
+  ;;
+  ;; (defun mantle:recentf:file/truename (file)
+  ;;   "Proudly nicked from Doom's 'core/core-editor.el'."
+  ;;   (if (or (not (file-remote-p file))
+  ;;           (equal "sudo" (file-remote-p file 'method)))
+  ;;       (abbreviate-file-name (file-truename (tramp-file-name-localname tfile)))
+  ;;     file))
+  ;;
+  ;; ;; REVIEW: Use this in lieu of `mantle:recentf:file/truename' when we drop
+  ;; ;;   Emacs 28 support. See emacs-mirror/emacs@32906819addd.
+  ;; ;; (setq recentf-show-abbreviated t)
+  ;;
+  ;; (innit:hook:defun
+  ;;  (list :name    "recentf:touch/buffer"
+  ;;        :file    (path:current:file)
+  ;;        :docstr  "Bump file in recent file list when it is switched or written to."
+  ;;        :squelch t
+  ;;        :quiet   t)
+  ;;  (when buffer-file-name
+  ;;    (recentf-add-file buffer-file-name))
+  ;;  ;; Return nil for `write-file-functions'
+  ;;  nil)
+  ;;
+  ;; (innit:hook:defun
+  ;;  (list :name    "recentf:touch/dired"
+  ;;        :file    (path:current:file)
+  ;;        :docstr  "Add dired directories to recentf file list."
+  ;;        :squelch t
+  ;;        :quiet   t)
+  ;;  (recentf-add-file default-directory))
+  ;;
+  ;;
+  ;; ;;--------------------
+  ;; :hook
+  ;; ;;--------------------
+  ;;
+  ;; (((window-selection-change-functions
+  ;;    write-file-functions)
+  ;;   . mantle:hook:recentf:touch/buffer) ;; (innit:hook:func/name:symbol "recentf:touch/buffer" nil)
+  ;;  (dired-mode-hook . mantle:hook:recentf:touch/dired)) ;; (innit:hook:func/name:symbol "recentf:touch/dired" nil)
 
 
   ;;--------------------
@@ -71,17 +82,6 @@
 
   ;; How many saved items to /show/.
   (recentf-max-menu-items  20)
-
-
-  ;;--------------------
-  :hook
-  ;;--------------------
-
-  ;; TODO: Do I want this functionality from Doom or no?
-  (((window-selection-change-functions
-     write-file-functions)
-    . mantle:hook:recentf:touch/buffer) ;; (innit:hook:func/name:symbol "recentf:touch/buffer" nil)
-   (dired-mode-hook . mantle:hook:recentf:touch/dired)) ;; (innit:hook:func/name:symbol "recentf:touch/dired" nil)
 
 
   ;;--------------------
