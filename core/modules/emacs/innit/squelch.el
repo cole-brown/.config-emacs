@@ -23,6 +23,20 @@
 ;; Silent Function Replacements
 ;;------------------------------------------------------------------------------
 
+;;------------------------------
+;; Save Originals
+;;------------------------------
+
+(defconst innit:unsquelched:write-region    (symbol-function #'write-region))
+(defconst innit:unsquelched:load            (symbol-function #'load))
+(defconst innit:unsquelched:message         (symbol-function #'message))
+(defconst innit:unsquelched:standard-output standard-output)
+
+
+;;------------------------------
+;; Silent Replacements
+;;------------------------------
+
 (defun innit:squelch:write-region (start end filename &optional append visit lockname mustbenew)
   "Silent version of `write-region'.
 
@@ -31,13 +45,14 @@ LOCKNAME, and MUSTBENEW.
 
 Will set VISIT to `no-message' before calling `write-region' unless it is
 non-nil."
-  (write-region start
-                end
-                filename
-                append
-                (or visit 'no-message)
-                lockname
-                mustbenew))
+  (funcall innit:unsquelched:write-region
+           start
+           end
+           filename
+           append
+           (or visit 'no-message)
+           lockname
+           mustbenew))
 
 
 (defun innit:squelch:load (file &optional noerror nomessage nosuffix must-suffix)
@@ -46,11 +61,12 @@ non-nil."
 See `load' for details on args: FILE, NOERROR, NOMESSAGE, NOSUFFIX, MUST-SUFFIX
 
 Ignore NOMESSAGE and call `load' with NOMESSAGE == `:no-message' instead."
-  (load file
-        noerror
-        :no-message
-        nosuffix
-        must-suffix))
+  (funcall innit:unsquelched:load
+           file
+           noerror
+           :no-message
+           nosuffix
+           must-suffix))
 
 
 (defun innit:squelch:message (&rest _)
@@ -100,10 +116,10 @@ Originally from Doom's `quiet!' macro."
                (message "")))
         ;; Full powered squelching; prevent output by just redefining commonly
         ;; chatty functions.
-        `(cl-letf ((standard-output               #'innit:squelch:standard-output)
-                  ((symbol-function message)      #'innit:squelch:message)
-                  ((symbol-function load)         #'innit:squelch:load)
-                  ((symbol-function write-region) #'innit:squelch:write-region))
+        `(cl-letf ((standard-output                 #'innit:squelch:standard-output)
+                  ((symbol-function #'message)      #'innit:squelch:message)
+                  ((symbol-function #'load)         #'innit:squelch:load)
+                  ((symbol-function #'write-region) #'innit:squelch:write-region))
            ,@forms))))
 
 
