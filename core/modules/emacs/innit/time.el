@@ -50,25 +50,14 @@ If STRING? is non-nil, return the message as a string instead of displaying it."
           (features/emacs (length features))
           message)
 
-      ;; TODO: A correct count for innit loads?
-      ;;   - There's stuff `imp' loaded that is only in `imp'.
-      ;;   - There's stuff `imp' loaded that is also in Emacs' feature list.
-      ;; Doom used load paths and a count variable:
-      ;;   (funcall (if string? #'format #'message)
-      ;;            "`innit' loaded %d packages across %d modules in %.03fs"
-      ;;            (- (length load-path) (length (get 'load-path 'initial-value)))
-      ;;            (if doom-modules (hash-table-count doom-modules) 0)
-      ;;            (or innit:time
-      ;;                (setq innit:time
-      ;;                      (float-time (time-subtract (current-time) before-init-time)))))
       (setq message
             (mapconcat #'identity
                        (-filter #'stringp
-                                '("innit:"
-                                  (format "  time:           %.03fs" time)
-                                  (when features/imp
-                                    (format "  imp features:   %4d" features/imp))
-                                  (format "  emacs features: %4d" features/emacs)))
+                                (list "innit:"
+                                      (format "       init time: %8.03fs" time)
+                                      (when features/imp
+                                        (format "    imp features: %4d" features/imp))
+                                      (format "  emacs features: %4d" features/emacs)))
                        "\n"))
 
       ;; Where to output?
