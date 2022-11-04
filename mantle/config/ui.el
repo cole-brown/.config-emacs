@@ -168,15 +168,18 @@
 ;; the %c, %C, and %l constructs are ignored.  It is used only on frames for
 ;; which no explicit name has been set (see `modify-frame-parameters').
 (customize-set-variable 'frame-title-format
-                        '("%b@"
+                        ;; buffer name
+                        '("｢%b｣"
+                          ;; system/host name
+                          " @"
                           (:eval (or (file-remote-p default-directory 'host) system-name))
-                          " — Emacs"))
+                          ;; And I guess we should say what we are...
+                          " — Emacs "
+                          emacs-version))
 
 ;; This is for the Emacs icon thingy in the OS app list/taskbar.
-(customize-set-variable 'icon-title-format
-                        '("%b@"
-                          (:eval (or (file-remote-p default-directory 'host) system-name))
-                          " — Emacs"))
+;; Just have it be the same as the `frame-title-format'.
+(customize-set-variable 'icon-title-format frame-title-format)
 
 
 
