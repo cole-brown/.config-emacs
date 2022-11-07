@@ -24,6 +24,7 @@
 ;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ;;------------------------------------------------------------------------------
 
+(imp:require :nub)
 (imp:require :datetime)
 (imp:require :innit)
 (imp:require :jerky)
@@ -279,29 +280,6 @@
 ;; Org-Journal
 ;;------------------------------------------------------------------------------
 
-;;------------------------------
-;; Namespaced Commands
-;;------------------------------
-;; TODO: Move to `:mode/org' module?
-(defun mode:org/journal:namespaced (namespace command &rest args)
-  "Run an org-journal COMMAND in NAMESPACE.
-
-Sets (lexical context) all org-journal custom vars related to NAMESPACE.
-Then runs COMMAND interactively with ARGS."
-  ;; TODO: Why is this interative? If it needs to be, add a way to actually set the params interactively...
-  (interactive)
-  (let ((org-journal-file-format (jerky:get 'org 'journal 'file 'format
-                                            :namespace namespace))
-        (org-journal-dir (jerky:get 'path 'org 'journal
-                                    :namespace namespace)))
-    (apply #'funcall-interactively command args)))
-;; (mode:org/journal:namespaced :home #'message "%s %s" org-journal-file-format org-journal-dir)
-;; (mode:org/journal:namespaced :work #'message "%s %s" org-journal-file-format org-journal-dir)
-
-
-;;------------------------------
-;; Org-Journal Set-Up
-;;------------------------------
 (imp:use-package org-journal
   :after org
 
@@ -331,6 +309,78 @@ Then runs COMMAND interactively with ARGS."
                             ".logbook.org")
              :docstr "`org-journal-file-format' for :work")
 
+  ;;---
+  ;; Domain Keybinds
+  ;;---
+  (defun mode:org/journal:namespaced (namespace command &rest args)
+    "Run an org-journal COMMAND in NAMESPACE.
+
+Sets (lexical context) all org-journal custom vars related to NAMESPACE.
+Then runs COMMAND interactively with ARGS."
+    ;; Interactive for maintaining `called-interactively-p', I think? I don't remember exactly...
+    (interactive)
+    (let ((org-journal-file-format (jerky:get 'org 'journal 'file 'format
+                                              :namespace namespace))
+          (org-journal-dir (jerky:get 'path 'org 'journal
+                                      :namespace namespace)))
+      (apply #'funcall-interactively command args)))
+  ;; (mode:org/journal:namespaced :home #'message "%s %s" org-journal-file-format org-journal-dir)
+  ;; (mode:org/journal:namespaced :work #'message "%s %s" org-journal-file-format org-journal-dir)
+
+
+  (defun mode:org/journal:keybind (namespace letter)
+    "Create keybinds for NAMESPACE in global leader under LETTER.
+
+NAMESPACE must be a keyword. NAMESPACE must exist as a namespace in Jerky.
+
+LETTER must be a 1-character string."
+    (if (not (jerky:namespace:has namespace))
+        ;; TODO: Raise `innit:error:???' instead of warn?
+        (nub:warning
+         :innit
+         (imp:path:join (imp:path:current:dir/relative :mantle)
+                        (imp:path:current:file))
+         "No `%1$S' namespace in Jerky; cannot set up `%2$S' keybinds for `%1$S'."
+         namespace
+         'org-journal)
+      (if (not (jerky:get 'path 'org 'journal :namespace namespace))
+          ;; TODO: Raise `innit:error:???' instead of warn?
+          (nub:warning
+           :innit
+           (imp:path:join (imp:path:current:dir/relative :mantle)
+                          (imp:path:current:file))
+           "No `%1$S' key in `%2$S' namespace in Jerky; cannot set up `%3$S' keybinds for `%2$S'."
+           (jerky:key:string 'path 'org 'journal)
+           namespace
+           'org-journal)
+
+        ;; Ok; make our NAMESPACE keybinds!
+        (keybind:leader/global:def
+         :infix (keybind:infix "n" letter) ;; notes -> NAMESPACE journal
+         "" (list nil :which-key (format "Journal: `%S'..." namespace)) ;; Infix Title
+
+         letter (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                              #'org-journal-new-entry
+                                                              current-prefix-arg))
+                      :which-key (format "`%S' - New Entry" namespace))
+         "j" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                           #'org-journal-new-entry
+                                                           current-prefix-arg))
+                   :which-key (format "`%S' - New Entry" namespace))
+
+         "J" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                           #'org-journal-new-scheduled-entry
+                                                           current-prefix-arg))
+                   :which-key (format "`%S' - New Scheduled Entry" namespace))
+
+         "v" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                           #'org-journal-open-current-journal-file))
+                   :which-key (format "`%S' - Visit Journal" namespace))
+
+         "s" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                           #'org-journal-search-forever
+                                                           nil))
+                   :which-key (format "`%S' - Search Journal" namespace))))))
 
   ;;--------------------
   :custom
@@ -382,10 +432,17 @@ Then runs COMMAND interactively with ARGS."
   ;; configuration
   ;;--------------------
 
-  ;; Keybinds are in:
-  ;;   - TODO: WHERE ARE KEYBINDS IN sn-004???
-  ;;   - Previously: config/keybinds/org-mode.el
-  )
+  ;; Insert dir local variable(s) for namespaces.
+  (dolist (namespace '(:work :home))
+    (dlv:set (jerky:get 'path 'org 'journal :namespace namespace)
+             'org-journal-mode
+             (list 'org-journal-dir
+                   (jerky:get 'path 'org 'journal :namespace namespace)
+                   :safe)))
+
+    ;; Create the keybinds.
+    (mode:org/journal:keybind :work "w")
+    (mode:org/journal:keybind :home "h"))
 
 
 ;;------------------------------------------------------------------------------
