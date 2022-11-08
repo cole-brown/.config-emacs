@@ -74,9 +74,12 @@
 ;;------------------------------
 ;; I use Dvorak, plus I like to tweak things, so... change the basic Vim
 ;; keybinds and such:
-(imp:load :feature  '(:mantle config user keyboard)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "keyboard")
+
+;; TODO: A file for keyboard settings? This was just keybinds.
+;; TODO: Or just create the setting here?
+;; (imp:load :feature  '(:mantle config user keyboard)
+;;           :path     (imp:path:current:dir/relative :mantle)
+;;           :filename "keyboard")
 
 
 ;;------------------------------
