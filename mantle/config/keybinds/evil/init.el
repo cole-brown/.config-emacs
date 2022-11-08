@@ -37,10 +37,7 @@
   ;;------------------------------
   (imp:load :feature  '(:mantle config user keybinds evil evil)
             :path     path/here
-            :filename "evil")
-
-
-   )
+            :filename "evil"))
 
 
 ;;------------------------------------------------------------------------------

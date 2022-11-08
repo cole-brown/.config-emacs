@@ -204,6 +204,9 @@
 (general-define-key
  :states 'normal
  :prefix "s"
+ "" (list :ignore t
+          :which-key "Evil States")
+
  "h" #'evil-insert
  "n" #'evil-append
  "t" #'evil-open-below
@@ -225,29 +228,7 @@
  "v" #'evil-visual-char
  "V" #'evil-visual-line)
 
-(general-define-key
- :prefix "s"
- "" (list :ignore t
-          :which-key "Evil States"))
 
-
-;; ┌────────────────────────────────┐
-;; │ Mode: Org-Mode                 │
-;; └────────────────────────────────┘
-
-(imp:eval:after (:and org evil-org)
-                (general-define-key
-                 :states 'normal
-                 :keymaps '(evil-org-mode-map)
-                 ;; Special Org Version of `evil-open-below'.
-                 :prefix "s"
-                 "t" #'evil-org-open-below)
-
-                (general-define-key
-                 :keymaps '(evil-org-mode-map)
-                 :prefix "s"
-                 "" (list :ignore t
-                          :which-key "Evil States")))
 
 
 ;; ┌────────────────────────────────┐

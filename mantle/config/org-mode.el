@@ -90,7 +90,6 @@
   ((org-mode . mantle:hook:org/jump-to-now-target) ;; (innit:hook:func/name:symbol "org/jump-to-now-target" nil)
    (org-mode . mantle:hook:org/local-settings))    ;; (innit:hook:func/name:symbol "org/local-settings"     nil)
 
-
   ;;--------------------
   :custom
   ;;--------------------
@@ -239,6 +238,21 @@
   ;;   (advice-add 'org-indent--compute-prefixes
   ;;               :after #'org:advice/org-indent/prefix-munger)
   )
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+(imp:eval:after (:and (:keybind general ready)
+                      evil
+                      evil-collection
+                      org
+                      evil-org)
+  (general-define-key
+   :states 'normal
+   :keymaps '(evil-org-mode-map)
+   ;; Special Org Version of `evil-open-below'.
+   :prefix "s"
+   "t" #'evil-org-open-below))
 
 
 ;; TODO: Delete after checking org-mode to see if these can be deleted.
