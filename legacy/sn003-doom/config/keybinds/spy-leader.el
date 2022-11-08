@@ -282,69 +282,6 @@ If no region is active, fills current line."
 
 
        ;;------------------------------
-       ;; Signatures
-       ;;------------------------------
-       (:prefix ("s" . "Signatures")
-        ;; Insert Signatures:
-
-        ;; TODO namespace, timestamp, comment:
-        :desc (concat "TODO: " (spy:signature 'sigil 'todo))
-        "t"   (cmd! (spy:signature/insert 'sigil 'todo :timestamp t :comment t))
-
-        ;; Sigil for Note Prefix.
-        :desc (concat "Note: " (spy:signature 'sigil 'note))
-        "n" (cmd! (spy:signature/insert 'sigil 'note))
-
-
-        ;; Signature for the end of an email or something.
-        :desc (concat "Sign: " (spy:signature 'name 'sign))
-        "s" (cmd! (spy:signature/insert 'name 'sign))
-
-        ;; IDs
-        (:prefix ("i" . "ID")
-         ;; Just the Sigil.
-         :desc (concat "Sigil: " (spy:signature 'id 'sigil))
-         "s" (cmd! (spy:signature/insert 'id 'sigil))
-
-         ;; Just the Name.
-         :desc (concat "Name: " (spy:signature 'id 'name))
-         "n" (cmd! (spy:signature/insert 'id 'name)))
-
-        ;; Emails
-        ;;   - Only show if we have any.
-        (:when (spy:signature/exists 'id 'email)
-         (:prefix ("e" . "Emails")
-          ;; work namespace.
-          (:when (spy:signature/exists 'id 'email :namespace :work)
-           :desc (concat "work: " (spy:signature 'id 'email :namespace :work))
-           "w" (cmd! (spy:signature/insert 'id 'email :namespace :work)))
-
-          ;; home namespace.
-          (:when (spy:signature/exists 'id 'email :namespace :home)
-           :desc (concat "home: " (spy:signature 'id 'email :namespace :home))
-           "h" (cmd! (spy:signature/insert 'id 'email :namespace :home)))
-
-          ;; default namespace.
-          (:when (spy:signature/exists 'id 'email :namespace :default)
-           :desc (concat "default: " (spy:signature 'id 'email :namespace :default))
-           "c" (cmd! (spy:signature/insert 'id 'email :namespace :default)))
-
-
-          ;; TODO: Search for sigil, todo...
-
-          ;; /Emails
-          ))
-
-        ;; /Signatures
-        )
-
-       ;;------------------------------
-       ;; Org-Journal
-       ;;------------------------------
-       ;; They are in org-journal's entry in leader. See config/org-mode.el
-
-
-       ;;------------------------------
        ;; File/Dir Names
        ;;------------------------------
        :desc "Copy Buffer's File Name"    "k" #'spy:cmd:file-or-dir-name/clipboard
