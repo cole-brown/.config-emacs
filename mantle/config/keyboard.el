@@ -75,6 +75,7 @@
    ;; Unbind from `evil-insert-line'.
    "I" #'nil)
 
+
   ;; ┌────────────────────────────────┐
   ;; │ Keymap:                        │
   ;; │  - `evil-snipe-mode-map'       │
@@ -91,6 +92,7 @@
                         ;; Unbind 's' and 't' from snipe.
                         "s" #'nil
                         "t" #'nil))
+
 
   ;; ┌────────────────────────────────┐
   ;; │ Keymap:                        │
@@ -177,6 +179,7 @@
    "C-o"   #'evil-beginning-of-line
    "C-u"   #'evil-end-of-line)
 
+
   ;; ┌────────────────────────────────┐
   ;; │ Evil States                    │
   ;; └────────────────────────────────┘
@@ -216,8 +219,9 @@
    "" (list :ignore t
             :which-key "Evil States"))
 
+
   ;; ┌────────────────────────────────┐
-  ;; │ Undo Tree                      │
+  ;; │ Package: Undo Tree             │
   ;; └────────────────────────────────┘
 
   (imp:eval:after undo-tree
@@ -232,6 +236,7 @@
      ;; `undo-tree-visualizer-selection-mode-map'
      ;; `undo-tree-visualizer-mode-map'
      ))
+
 
   ;; ┌────────────────────────────────┐
   ;; │ Mode: Org-Mode                 │
@@ -249,7 +254,15 @@
      :keymaps '(evil-org-mode-map)
      :prefix "s"
      "" (list :ignore t
-              :which-key "Evil States"))))
+              :which-key "Evil States")))
+
+
+  ;; ┌────────────────────────────────┐
+  ;; │ Module: Taskspace              │
+  ;; └────────────────────────────────┘
+
+  (imp:eval:after taskspace
+    (taskspace:keybind:general #'keybind:leader/global:def)))
 
 
 ;;------------------------------------------------------------------------------
