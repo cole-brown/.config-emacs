@@ -27,29 +27,46 @@
    ;; TODO: fix indentation?
 
    ;;------------------------------
-   ;; Set up local & global leaders' common infix menus.
+   ;; Prereqs
    ;;------------------------------
+   ;; Set up local & global leaders' common infix menus.
    (imp:load :feature  '(:mantle config user keybinds infixes)
              :path     path/here
              :filename "infixes")
 
    ;; TODO: Do we have an evil vs non-evil check for whether to load Emacs or
-   ;; Evil keybind files?
+   ;;       Evil keybind files?
+   ;; TODO: What're them flags I have and are they useful here?
 
+   ;;------------------------------
+   ;; Common or Smart Keybinds
+   ;;------------------------------
+   ;; Keybinds that don't care about Emacs/Evil, or can figure out which kind to create.
+
+   (imp:load :feature  '(:mantle config user keybinds signature)
+             :path     path/here
+             :filename "signature")
 
    ;;------------------------------
    ;; Emacs Keybinds
    ;;------------------------------
-
+   ;; TODO: Do these need to be after anything?
+   ;; TODO:   - No `evil' to load...
+   ;; TODO:   - `general' is already loaded...
+   ;; (imp:eval:after TODO-something-or-other-maybe?
+   ;;
+   ;;  (imp:load :feature  '(:mantle config user keybinds emacs)
+   ;;            :path     (imp:path:join path/here "emacs")
+   ;;            :filename "init"))
 
    ;;------------------------------
    ;; Evil Keybinds
    ;;------------------------------
    (imp:eval:after (:and evil evil-collection)
 
-    (imp:load :feature  '(:mantle config user keybinds signature)
-              :path     path/here
-              :filename "signature"))))
+    (imp:load :feature  '(:mantle config user keybinds evil)
+              :path     (imp:path:join path/here "evil")
+              :filename "init"))))
 
 
 ;;------------------------------------------------------------------------------
