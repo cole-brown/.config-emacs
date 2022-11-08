@@ -39,8 +39,10 @@
   ;;------------------------------------------------------------------------------
   ;; Post-General
   ;;------------------------------------------------------------------------------
-  ;; Delay everything in here until after general.
-  (let ((path/here (imp:path:current:dir/relative :keybind)))
+  ;; Need to determine path now while still loading; once `imp:eval:after' runs
+  ;; it won't be able to determine the correct path.
+  (let ((path/rel (imp:path:current:dir/relative :keybind)))
+    ;; Delay everything in here until after general.
     (imp:eval:after general
 
       ;;--------------------------------------------------------------------------
@@ -48,7 +50,7 @@
       ;;--------------------------------------------------------------------------
 
       (imp:load :feature  '(:keybind general leaders)
-                :path     path/here
+                :path     path/rel
                 :filename "leaders.el")
 
 
