@@ -35,38 +35,18 @@
 ;; DOOM!
 ;;------------------------------------------------------------------------------
 
-;; TODO: more options for making keybind:
-;; (&optional orphaned description prefix)
 (defun taskspace:keybind:doom ()
   "Create keybinds in Doom, or raise an error if not in Doom.
 
 Create a keymap; insert into doom/evil or vanilla Emacs as
 appropriate/parameters say.
 
-Creates the taskspace keymap under the doom leader key (default SPC)
-TODO: unless ORPHANED is not nil.
-
-TODO: Uses DESCRIPTION if it is a string, else the description is 'taskspace'.
-
-TODO: Uses PREFIX as the keymap prefix if not nil, else tries to use:
-TODO:   - doom/evil emacs: doom-leader(?) n T
-TODO:   - vanilla emacs:   TODO
-TODO:
-TODO: PREFIX for doom/evil should be either:
-TODO:   1) a key string:
-TODO:      - \"t\"
-TODO:      - \"n t\"
-TODO:        - \"nt\" is equivalent
-TODO:   2) a cons of (key-string . description-str):
-TODO:      - (\"t\" . \"taskspace\")
-TODO:      - (\"n t\" . \"taskspace\")
-TODO:   3) a list of 1 or 2 for setting into a sub-map:
-TODO:      - (\"t\" (\"n\" (\"t\" . \"taskspace\")))"
+Creates the taskspace keymap under the doom leader key (default SPC)"
   (if (null (symbolp 'doom!)) ;; Doom's loading function should mean this is doom?
       (nub:error
-          :taskspace
-          "taskspace:keybind:doom"
-        "We are not in a Doom Emacs environment..? Cannot set Doom Emacs keybinds.")
+       :taskspace
+       "taskspace:keybind:doom"
+       "We are not in a Doom Emacs environment..? Cannot set Doom Emacs keybinds.")
 
     ;; Map under the Doom leader, probably.
     (map! :leader
@@ -91,93 +71,71 @@ TODO:      - (\"t\" (\"n\" (\"t\" . \"taskspace\")))"
            (:prefix ("d" . "dired")
             :desc "task dired buffer" "d" #'taskspace:dired:task
             :desc "root dired buffer" "r" #'taskspace:dired:root)))))
-;; TODO: prefix: ;; Put it under the prefix(es).
-;; TODO: prefix: (cond
-;; TODO: prefix:  ;;---
-;; TODO: prefix:  ;; NIL
-;; TODO: prefix:  ;;---
-;; TODO: prefix:  ;; Return just the keybinds.
-;; TODO: prefix:  ((null prefix)
-;; TODO: prefix:   (int<taskspace>:keybind/doom))
-;; TODO: prefix:
-;; TODO: prefix:  ;;---
-;; TODO: prefix:  ;; STRING
-;; TODO: prefix:  ;;---
-;; TODO: prefix:  ;; Put keybinds under the prefix str.
-;; TODO: prefix:  ((stringp prefix)
-;; TODO: prefix:   (list prefix (int<taskspace>:keybind/doom)))
-;; TODO: prefix:
-;; TODO: prefix:  ;;---
-;; TODO: prefix:  ;; CONS
-;; TODO: prefix:  ;;---
-;; TODO: prefix:  ;; Put keybinds under the prefix /CONS/.
-;; TODO: prefix:  ;; ONLY CONS!!!
-;; TODO: prefix:  ;; No lists.
-;; TODO: prefix:  ;; Just cons.
-;; TODO: prefix:  ;; https://emacs.stackexchange.com/questions/10489/predicate-function-for-dotted-pairs
-;; TODO: prefix:  ((and (cdr var) (atom (cdr var)))
-;; TODO: prefix:   ;; Create list with description, key, and our keybids.
-;; TODO: prefix:   (list
-;; TODO: prefix:    :desc (nth 1 prefix)
-;; TODO: prefix:    (nth 0 prefix)
-;; TODO: prefix:    (int<taskspace>:keybind/doom)))
-;; TODO: prefix:
-;; TODO: prefix:  ;;---
-;; TODO: prefix:  ;; LIST
-;; TODO: prefix:  ;;---
-;; TODO: prefix:  ((listp prefix)
-;; TODO: prefix:   ;; Build first layer and do a recursion...
-;; TODO: prefix:   (-let [(this-prefix . rest) prefix]
-;; TODO: prefix:     (
-;; TODO: prefix:      )))
-;; TODO: prefix:
-;; TODO: prefix:   (list
-;; TODO: prefix:    :desc (nth 1 prefix)
-;; TODO: prefix:    (nth 0 prefix)
-;; TODO: prefix:
-;; TODO: prefix:    prefix (int<taskspace>:keybind/doom)))
-;; TODO: prefix:
-;; TODO: prefix:
-;; TODO: prefix: (defun int<taskspace>:no-error-predicate (func value)
-;; TODO: prefix:   "Checks if VALUE fulfills FUNC function predicate.
-;; TODO: prefix:
-;; TODO: prefix: Wraps check in a `condition-case-unless-debug', returns nil if error signal caught."
-;; TODO: prefix:   (condition-case-unless-debug nil
-;; TODO: prefix:       (funcall func value)
-;; TODO: prefix:     (error nil)))
-;; TODO: prefix:
-;; TODO: prefix:
-;; TODO: prefix: (defun int<taskspace>:keybind/doom.level (key description rest)
-;; TODO: prefix:   "Creates a level of a doom `map!'.
-;; TODO: prefix:
-;; TODO: prefix: KEY must be a string for the key(s) to use for this level of the keybind tree.
-;; TODO: prefix:
-;; TODO: prefix: DESCRIPTION must be a (short) description string or nil.
-;; TODO: prefix:
-;; TODO: prefix: REST must be a function to call, or a deeper (child) level of the keybind tree."
-;; TODO: prefix:   ;; Error check our inputs...
-;; TODO: prefix:   (cond ((not (int<taskspace>:no-error-predicate #'stringp key))
-;; TODO: prefix:          (error "%s: Key must be a string: %S"
-;; TODO: prefix:                 "int<taskspace>:keybind/doom.level" key))
-;; TODO: prefix:
-;; TODO: prefix:         ((and (not (null description))
-;; TODO: prefix:               (not (int<taskspace>:no-error-predicate #'stringp description)))
-;; TODO: prefix:          (error "%s: Description must be nil or a string: %S"
-;; TODO: prefix:                 "int<taskspace>:keybind/doom.level" description))
-;; TODO: prefix:
-;; TODO: prefix:         ((null rest)
-;; TODO: prefix:          (error "%s: Must have something to bind: %S"
-;; TODO: prefix:                 "int<taskspace>:keybind/doom.level" rest))
-;; TODO: prefix:
-;; TODO: prefix:         ;;---
-;; TODO: prefix:         ;; Success - make the level.
-;; TODO: prefix:         ;;---
-;; TODO: prefix:         (t
-;; TODO: prefix:          (if (null description)
-;; TODO: prefix:              (list key rest)
-;; TODO: prefix:            (list :desc description
-;; TODO: prefix:                  key
-;; TODO: prefix:                  rest)))))
+
+
+;;------------------------------------------------------------------------------
+;; General
+;;------------------------------------------------------------------------------
+
+(defun taskspace:keybind:general (definer)
+  "Create keybinds using the supplied General definer.
+
+If using `evil', consider placing this in your config:
+  ;; https://github.com/emacs-evil/evil-collection#making-spc-work-similarly-to-spacemacs
+  ;; NOTE: `evil-collection' binds over SPC in many packages. To use SPC as a
+  ;; leader key with `general', first set these override states:
+  (setq general-override-states '(insert
+                                  emacs
+                                  hybrid
+                                  normal
+                                  visual
+                                  motion
+                                  operator
+                                  replace))
+
+Next, create a DEFINER function. For example:
+  (general-create-definer keybind:leader/notes:def
+    :prefix  \"SPC n\"
+    :states  '(normal visual motion)
+    :keymaps 'override)
+
+Finally, call this function with your DEFINER:
+  (taskspace:keybind:general #'keybind:leader/notes:def)"
+  (unless (featurep 'general)
+    (nub:error
+     :taskspace
+     "taskspace:keybind:general"
+     "`General' keybind feature is not loaded/defined! Cannot create keybinds."))
+
+  ;;---
+  ;; Top Level Commands...
+  ;;---
+  (funcall definer
+           :infix "t"
+           "" (list nil :which-key "Taskspace...") ;; Infix Title
+
+           "t" (list #'taskspace:create :which-key "New")
+           "v" (list #'taskspace:notes  :which-key "Visit")
+           "s" (list #'taskspace:shell  :which-key "Shell"))
+
+  ;;---
+  ;; 'Copy to Kill Ring' Functions:
+  ;;---
+  (funcall definer
+           :infix "t k"
+            "" (list nil :which-key "Copy/Kill...") ;; Infix Title
+
+            "k" (list #'taskspace:dwim:dir  :which-key "dir")
+            "n" (list #'taskspace:dwim:name :which-key "name"))
+
+  ;;---
+  ;; 'Open a Dired Buffer' Functions:
+  ;;---
+  (funcall definer
+           :infix "t d"
+           "" (list nil :which-key "Dired...") ;; Infix Title
+           "d" (list #'taskspace:dired:task :which-key "task's dired buffer")
+           "r" (list #'taskspace:dired:root :which-key "root's dired buffer")))
 
 
 ;;------------------------------------------------------------------------------
