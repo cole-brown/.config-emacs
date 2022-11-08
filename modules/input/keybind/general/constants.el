@@ -18,6 +18,14 @@
 
 
 ;;------------------------------------------------------------------------------
+;; General Constants
+;;------------------------------------------------------------------------------
+
+(defconst keybind:override:keymaps 'override
+  "`kbd' type string to use as the primary keybinds leader key.")
+
+
+;;------------------------------------------------------------------------------
 ;; Global Leader
 ;;------------------------------------------------------------------------------
 ;; https://github.com/noctuid/general.el#evil-examples
@@ -34,7 +42,7 @@ Add keybinds to the leader using function `keybind:leader/global'.")
 Add keybinds to the leader using function `keybind:leader/global'.")
 
 
-(defconst keybind:leader/global:keymaps 'override
+(defconst keybind:leader/global:keymaps keybind:override:keymaps
   "`kbd' type string to use as the primary keybinds leader key.
 
 Add keybinds to the leader using function `keybind:leader/global'.")
@@ -57,7 +65,7 @@ Add keybinds to the leader using function `keybind:leader/local'.")
 Add keybinds to the leader using function `keybind:leader/local'.")
 
 
-(defconst keybind:leader/local:keymaps 'override
+(defconst keybind:leader/local:keymaps keybind:override:keymaps
   "`kbd' type string to use as the primary keybinds leader key.
 
 Add keybinds to the leader using function `keybind:leader/local'.")

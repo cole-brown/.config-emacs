@@ -55,6 +55,23 @@
 
 
     ;;--------------------
+    :general
+    ;;--------------------
+    ;; No prefix. Used very frequently.
+    (:states  'normal
+     :keymaps keybind:override:keymaps
+     "h" (list #'undo-tree-undo :which-key "undo")
+     "n" (list #'undo-tree-redo :which-key "redo")
+     "t" (list #'undo-tree-visualize :which-key "visualize")
+     "c" (list #'undo-tree-switch-branch :which-key "switch undo branch")
+
+     ;; TODO: Keybinds for these maps:
+     ;; `undo-tree-visualizer-selection-mode-map'
+     ;; `undo-tree-visualizer-mode-map'
+     )
+
+
+    ;;--------------------
     :config
     ;;--------------------
 

@@ -232,24 +232,6 @@
 
 
 ;; ┌────────────────────────────────┐
-;; │ Package: Undo Tree             │
-;; └────────────────────────────────┘
-
-(imp:eval:after undo-tree
-                (general-define-key
-                 :states 'normal
-                 "h" #'undo-tree-undo
-                 "n" #'undo-tree-redo
-                 "t" #'undo-tree-visualize
-                 "c" #'undo-tree-switch-branch
-
-                 ;; TODO: Keybinds for these maps:
-                 ;; `undo-tree-visualizer-selection-mode-map'
-                 ;; `undo-tree-visualizer-mode-map'
-                 ))
-
-
-;; ┌────────────────────────────────┐
 ;; │ Mode: Org-Mode                 │
 ;; └────────────────────────────────┘
 
