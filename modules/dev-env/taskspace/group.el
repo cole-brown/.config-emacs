@@ -89,18 +89,18 @@ Each entry in the alist is a list of: (keyword string settings-variable)
       "Function to call to open shell buffer. `shell' and `eshell' work. "
       "Opens the current taskspace's top dir in an emacs shell buffer."))
 
-    (:dir/tasks (path:absolute:dir "taskspace" user-emacs-directory)
+    (:dir/tasks (path:absolute:dir user-emacs-directory "taskspace")
      (concat
       "User's root taskspace folder for small work tasks. "
       "All taskspaces for this group will be created here."))
 
-    (:dir/notes (path:absolute:dir "taskspace" user-emacs-directory)
+    (:dir/notes (path:absolute:dir user-emacs-directory "taskspace")
      (concat
       "User's folder for all notes that are in `:noteless' taskspaces. "
       "Unused in `:self-contained' taskspaces."))
 
-    (:file/new/copy (path:absolute:dir "taskspace-new"
-                                       (int<taskspace>:config :default :dir/tasks))
+    (:file/new/copy (path:absolute:dir (int<taskspace>:config :default :dir/tasks)
+                                       "taskspace-new")
      "User's folder for files to copy into new taskspaces.")
 
     (:file/new/generate (((int<taskspace>:config :default :file/notes) "") ;; empty file

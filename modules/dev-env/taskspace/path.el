@@ -340,16 +340,17 @@ Get children directories of taskspace/dir, ignoring:
   (let (task-dirs) ;; empty list for return value
     ;; loop on each file in the directory
     (dolist (file
-             (path:children (int<taskspace>:config group :dir/tasks) :absolute-paths)
+             (path:children (int<taskspace>:config group :dir/tasks)
+                            :absolute-paths
+                            :dir) ;; Only want dirs.
              task-dirs)
-      (when (and (path:exists? file :dir) ;; Only want dirs and...
-                 (not (member ;; ignore things in ignore list
-                       (file:name file)
-                       (int<taskspace>:config group :dir/tasks/ignore))))
+      ;; ignore things in ignore list
+      (when (not (member (file:name file)
+                         (int<taskspace>:config group :dir/tasks/ignore)))
         (push file task-dirs)))
-    ;; dolist returns our constructed list since we put it as `result'
-    ;; so we're done
-    ))
+  ;; dolist returns our constructed list since we put it as `result'
+  ;; so we're done
+  ))
 ;; (message "%s" (int<taskspace>:dir:list:all :home))
 
 
