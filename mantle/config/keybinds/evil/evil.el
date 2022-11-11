@@ -110,10 +110,10 @@
 ;; │   - `evil-org-mode-map'        │
 ;; └────────────────────────────────┘
 (imp:eval:after (:and org evil-org)
-                (general-define-key :states 'normal
-                                    :keymaps '(evil-org-mode-map)
-                                    ;; Unbind from `evil-open-below'.
-                                    "o" #'nil))
+  (general-define-key :states 'normal
+                      :keymaps '(evil-org-mode-map)
+                      ;; Unbind from `evil-open-below'.
+                      "o" #'nil))
 
 
 ;; ╔═════════════════════════════════════════════════════════════════════════╗
@@ -133,6 +133,7 @@
 ;;       further, to the beginning of the previous word.
 
 (general-define-key
+ :keymaps keybind:override:keymaps
  :states '(motion visual normal)
  ;; ──┬────────────────
  ;;   │ ↑ ↓ ← →
@@ -143,6 +144,7 @@
  "u" #'evil-forward-char)
 
 (general-define-key
+ :keymaps keybind:override:keymaps
  :states 'motion
 
  ;; ──┬────────────────
@@ -198,10 +200,8 @@
 ;;   - Except Dvorak, so CHTN keys.
 ;; H & ; (Dvorak D & S) are "extra left" and "extra right", basically.
 
-;; TODO: define a prefix differently?
-;; 'general' has `general-create-definer' for "frequently used prefix keys" (e.g. SPC leader key).
-;; https://github.com/noctuid/general.el#evil-examples
 (general-define-key
+ :keymaps keybind:override:keymaps
  :states 'normal
  :prefix "s"
  "" (list :ignore t
@@ -216,12 +216,14 @@
  "T" #'evil-replace-state)
 
 (general-define-key
+ :keymaps keybind:override:keymaps
  :states 'visual
  :prefix "s"
  "h" #'evil-insert
  "n" #'evil-append)
 
 (general-define-key
+ :keymaps keybind:override:keymaps
  :states 'motion
  :prefix "s"
  ;; TODO: Leave original Qwerty 'v' as Dvorak 'v' or change?
@@ -229,17 +231,7 @@
  "V" #'evil-visual-line)
 
 
-
-
-;; ┌────────────────────────────────┐
-;; │ Module: Taskspace              │
-;; └────────────────────────────────┘
-
-(imp:eval:after taskspace
-                (taskspace:keybind:general #'keybind:leader/global:def))
-
-
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'keyboard 'evil 'evil)
+(imp:provide :mantle 'config 'user 'keybinds 'evil 'evil)
