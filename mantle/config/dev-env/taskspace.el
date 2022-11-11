@@ -74,9 +74,6 @@ and see what file it's defined in."
             "     ├┼┼┤                             ...                              ├┼┼┤"
             "     └┴┴┴──────────────────────────────────────────────────────────────┴┴┴┘"))
 
-  (defvar mantle:user:taskspace:groups
-   '((:default "Defaults"       taskspace:group:default))
-    "Accumulator for known taskspace groups.")
 
   ;;---
   ;; "Home" Domain
@@ -105,7 +102,7 @@ and see what file it's defined in."
                       ;; notes.org: setup with org header snippet ready to go
                       ((int<taskspace>:config ,group :file/notes)
                        ,group-fn)))))
-            mantle:user:taskspace:groups)
+            taskspace:groups)
 
       ;; DLVs should have been set during secrets init via `system:multiplexer:dlv:add'.
       ))
@@ -137,16 +134,25 @@ and see what file it's defined in."
                       ;; notes.org: setup with org header snippet ready to go
                       ((int<taskspace>:config ,group :file/notes)
                        ,group-fn)))))
-            mantle:user:taskspace:groups)
+            taskspace:groups)
 
       ;; DLVs should have been set during secrets init via `system:multiplexer:dlv:add'.
       ))
 
-  ;;------------------------------
-  :custom
-  ;;------------------------------
-
-  (taskspace:groups mantle:user:taskspace:groups)
+  ;; ;;------------------------------
+  ;; :custom
+  ;; ;;------------------------------
+  ;;
+  ;; This doesn't work:
+  ;;   (taskspace:groups mantle:user:taskspace:groups)
+  ;;
+  ;; 1. Building settings into a variable in `:init' doesn't work as it runs
+  ;;    after `:custom'?
+  ;; 2. Building settings into a variable in `:preface' doesn't work as I end up
+  ;;    with doubled entries in `taskspace:groups'?!
+  ;;
+  ;; I am :confused:, but ok whatever; pushing directly into `taskspace:groups'
+  ;; during `:init' works.
 
 
   ;;------------------------------
