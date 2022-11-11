@@ -1,4 +1,4 @@
-;;; config/init.el --- Configure User Stuff -*- lexical-binding: t; -*-
+;;; mantle/config/init.el --- Configure User Stuff -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>

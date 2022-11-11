@@ -77,7 +77,7 @@ Creates the taskspace keymap under the doom leader key (default SPC)"
 ;; General
 ;;------------------------------------------------------------------------------
 
-(defun taskspace:keybind:general (definer)
+(defmacro taskspace:keybind:general (&rest args)
   "Create keybinds using the supplied General definer.
 
 If using `evil', consider placing this in your config:
@@ -93,49 +93,51 @@ If using `evil', consider placing this in your config:
                                   operator
                                   replace))
 
-Next, create a DEFINER function. For example:
-  (general-create-definer keybind:leader/notes:def
+Call this function with the desired keybind settings:
+  (taskspace:keybind:general
     :prefix  \"SPC n\"
     :states  '(normal visual motion)
-    :keymaps 'override)
-
-Finally, call this function with your DEFINER:
-  (taskspace:keybind:general #'keybind:leader/notes:def)"
+    :keymaps 'override)"
   (unless (featurep 'general)
     (nub:error
      :taskspace
      "taskspace:keybind:general"
      "`General' keybind feature is not loaded/defined! Cannot create keybinds."))
 
-  ;;---
-  ;; Top Level Commands...
-  ;;---
-  (funcall definer
-           :infix "t"
-           "" (list nil :which-key "Taskspace...") ;; Infix Title
+  `(progn
+     ;;---
+     ;; Top Level Commands...
+     ;;---
+     (general-define-key ,@args
+                         :infix "t"
+                         "" (list nil :which-key "Taskspace...") ;; Infix Title
 
-           "t" (list #'taskspace:create :which-key "New")
-           "v" (list #'taskspace:notes  :which-key "Visit")
-           "s" (list #'taskspace:shell  :which-key "Shell"))
+                         "t" (list #'taskspace:create :which-key "New")
+                         "v" (list #'taskspace:notes  :which-key "Visit")
+                         "s" (list #'taskspace:shell  :which-key "Shell"))
 
-  ;;---
-  ;; 'Copy to Kill Ring' Functions:
-  ;;---
-  (funcall definer
-           :infix "t k"
-            "" (list nil :which-key "Copy/Kill...") ;; Infix Title
+     ;;---
+     ;; 'Copy to Kill Ring' Functions:
+     ;;---
+     (general-define-key ,@args
+                         :infix "t k"
+                         "" (list nil :which-key "Copy/Kill...") ;; Infix Title
 
-            "k" (list #'taskspace:dwim:dir  :which-key "dir")
-            "n" (list #'taskspace:dwim:name :which-key "name"))
+                         "k" (list #'taskspace:dwim:dir  :which-key "dir")
+                         "n" (list #'taskspace:dwim:name :which-key "name"))
 
-  ;;---
-  ;; 'Open a Dired Buffer' Functions:
-  ;;---
-  (funcall definer
-           :infix "t d"
-           "" (list nil :which-key "Dired...") ;; Infix Title
-           "d" (list #'taskspace:dired:task :which-key "task's dired buffer")
-           "r" (list #'taskspace:dired:root :which-key "root's dired buffer")))
+     ;;---
+     ;; 'Open a Dired Buffer' Functions:
+     ;;---
+     (general-define-key ,@args
+                         :infix "t d"
+                         "" (list nil :which-key "Dired...") ;; Infix Title
+                         "d" (list #'taskspace:dired:task :which-key "task's dired buffer")
+                         "r" (list #'taskspace:dired:root :which-key "root's dired buffer"))))
+;; (taskspace:keybind:general
+;;     :prefix  "SPC n"
+;;     :states  '(normal visual motion)
+;;     :keymaps 'override)
 
 
 ;;------------------------------------------------------------------------------

@@ -153,7 +153,9 @@ and see what file it's defined in."
   :config
   ;;------------------------------
 
-  (taskspace:keybind:general #'keybind:leader/global:def))
+  (taskspace:keybind:general :prefix  (keybind:prefix :global "n")
+                             :states  keybind:leader/global:states
+                             :keymaps keybind:leader/global:keymaps))
 
 
 ;;------------------------------------------------------------------------------
