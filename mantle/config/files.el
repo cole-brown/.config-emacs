@@ -16,6 +16,11 @@
 ;;
 ;;; Code:
 
+
+(imp:require :datetime)
+(imp:require :buffer)
+
+
 ;;------------------------------------------------------------------------------
 ;; recentf for recent files
 ;;------------------------------------------------------------------------------
@@ -138,6 +143,106 @@
 
   ;; Enable!
   (recentf-mode +1))
+
+
+;;------------------------------------------------------------------------------
+;; Search: Deadgrep (uses Ripgrep)
+;;------------------------------------------------------------------------------
+
+;;------------------------------
+;; ripgrep
+;;------------------------------
+;; https://github.com/BurntSushi/ripgrep
+;;
+;; This needs installed on the computer separately from Emacs.
+;;
+;;   "ripgrep is a line-oriented search tool that recursively searches your
+;; current directory for a regex pattern. By default, ripgrep will respect your
+;; .gitignore and automatically skip hidden files/directories and binary files.
+;; ripgrep has first class support on Windows, macOS and Linux, with binary
+;; downloads available for every release. ripgrep is similar to other popular
+;; search tools like The Silver Searcher, ack and grep."
+
+
+;;------------------------------
+;; deadgrep
+;;------------------------------
+;; https://github.com/Wilfred/deadgrep
+;; "Deadgrep is the fast, beautiful text search that your Emacs deserves."
+(imp:use-package deadgrep
+  :demand t
+
+  ;;--------------------
+  :init
+  ;;--------------------
+
+  (defun mantle:user:deadgrep:default-directory (search-term)
+    "Search for SEARCH-TERM with `deadgrep' at `default-directory'."
+    (interactive (list (deadgrep--read-search-term)))
+    (call-interactively #'deadgrep
+                        search-term
+                        default-directory))
+
+
+  (defun mantle:user:deadgrep:buffer:kill ()
+    "Kill all deadgrep buffers."
+    (interactive)
+    (message "[%s] Kill 'deadgrep' buffers..."
+             (datetime:string/get 'rfc-3339 'datetime))
+    (buffer:kill:matching ".*deadgrep.*"
+                              :internal
+                              :modified
+                              :process))
+
+
+  ;;--------------------
+  :general
+  ;;--------------------
+
+  ;;---
+  ;; Global Keybinds
+  ;;---
+  (:states  'normal
+   :keymaps keybind:override:keymaps
+   :infix "/"
+
+   "/" (list #'deadgrep                               :which-key "`rg' @ project root")
+   "." (list #'mantle:user:deadgrep:default-directory :which-key "`rg' @ default-directory")
+   "?" (list #'mantle:user:deadgrep:default-directory :which-key "`rg' @...")
+
+   "q" (list #'mantle:user:deadgrep:default-directory :which-key "Kill All 'deadgrep' Buffers"))
+
+
+  ;;---
+  ;; `deadgrep-mode-map' Keybinds
+  ;;---
+  (:states  'normal
+   :keymaps deadgrep-mode-map ;; TODO: Rebind (more) keybinds from this map!
+   :infix "/"
+
+   ;; 'kill-or-quit' instead of 'quit-or-kill'
+   "q" (list #'window:kill-or-quit :which-key "Quit or Kill 'deadgrep' Window")
+
+   ;; Swap these two around.
+   "RET"   (list #'deadgrep-visit-result-other-window :which-key "Visit Result")
+   "S-RET" (list #'deadgrep-visit-result              :which-key "Visit Result (w/ This Window)")
+
+   ;; Bind for EEEVIL!
+   "g r" (list #'deadgrep-restart :which-key "↺ Refresh"))
+
+
+  ;;--------------------
+  :config
+  ;;--------------------
+
+  ;;---
+  ;; Project Root Overrides
+  ;;---
+  ;; TODO: Search per-comp configs for `deadgrep-project-root' to find what's set?
+  ;;   - `deadgrep-project-root-overrides'
+  ;;   - `deadgrep-project-root-function'
+  )
+
 
 
 ;;------------------------------------------------------------------------------

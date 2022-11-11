@@ -40,6 +40,22 @@
 ;;   https://github.com/magit/magit
 
 (imp:use-package magit
+
+  ;;--------------------
+  :init
+  ;;--------------------
+
+  (defun mantle:user:magit:buffer:kill ()
+    "Kill all magit buffers."
+    (interactive)
+    (message "[%s] Kill 'magit' buffers..."
+             (datetime:string/get 'rfc-3339 'datetime))
+    (buffer:kill:matching ".*magit.*"
+                          :internal
+                          :modified
+                          :process))
+
+
   ;;--------------------
   :general
   ;;--------------------
@@ -54,7 +70,8 @@
    ;;---
    ;; Magit Keybinds
    ;;---
-   "g" 'magit-status
+   "g" (list #'magit-status                           :which-key "Status")
+   "q" (list #'mantle:user:deadgrep:default-directory :which-key "Kill All 'deadgrep' Buffers")
 
    ;; TODO: More keybinds!
    ;; TODO: And use `:repeat' / `:jump'?
