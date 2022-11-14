@@ -49,8 +49,9 @@
 ;;------------------------------------------------------------------------------
 
 (imp:load :feature  '(:mantle config user hydra)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "hydra")
+          :path     (imp:path:join (imp:path:current:dir/relative :mantle)
+                                   "hydra")
+          :filename "init")
 
 (imp:load :feature  '(:mantle config user general)
           :path     (imp:path:current:dir/relative :mantle)

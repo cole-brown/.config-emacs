@@ -1,4 +1,4 @@
-;;; mantle/config/hydra.el - hydras, pretty and otherwise -*- lexical-binding: t; -*-
+;;; mantle/config/hydra/init.el - hydras, pretty and otherwise -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -119,6 +119,15 @@
 ;;   ;; (hydra-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
 ;;   ;; (hydra-posframe-poshandler 'posframe-poshandler-frame-bottom-left-corner)
 ;;   )
+
+
+;;------------------------------------------------------------------------------
+;; Other Hydra Things
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config user hydra nesting)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "nesting")
 
 
 ;;------------------------------------------------------------------------------

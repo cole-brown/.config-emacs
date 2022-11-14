@@ -1,4 +1,28 @@
-;;; spy/hydra/nesting.el -*- lexical-binding: t; -*-
+;;; mantle/config/hydra/nesting.el -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2022-07-13
+;; Modified:   2022-07-13
+;; URL:        https://github.com/cole-brown/.config-emacs
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Hydra Inception:
+;;
+;; 1. Call one hydra from another hydra.
+;; 2. Nest hydras inside of each other.
+;;
+;;; Code:
+
+
+;; TODO: Move this and hydra use-package to a mantle module?
+;; TODO: Or is this the correct place & way to do this?
+
 
 ;;------------------------------------------------------------------------------
 ;; Nesting Hydra Helpers
@@ -14,13 +38,13 @@
 ;;   ("q" nil "exit" :exit t))
 
 
-(defun spy:hydra/nest (hydra)
+(defun hydra:nest (hydra)
   "Enter HYDRA from current hydra.
 
 NOTE: Use `:exit t' or appropriate color for exiting the caller hydra!"
   (funcall (intern-soft (concat (symbol-name hydra) "/body"))))
 ;; (defun test/body () (message "hello there"))
-;; (spy:hydra/nest 'test)
+;; (hydra:nest 'test)
 
 
 ;;------------------------------------------------------------------------------
@@ -28,33 +52,33 @@ NOTE: Use `:exit t' or appropriate color for exiting the caller hydra!"
 ;;------------------------------------------------------------------------------
 ;; https://github.com/abo-abo/hydra/wiki/Nesting-Hydras
 
-(defvar sss:hydra/stack nil
+(defvar int<hydra>:stack nil
   "A list of the stack of hydras currently in use.")
 
 
-(defun sss:hydra/push (func)
+(defun int<hydra>:push (func)
   "Add the hydra FUNC to the stack."
-  (push func sss:hydra/stack))
+  (push func int<hydra>:stack))
 
 
-(defun spy:hydra/push (hydra)
+(defun hydra:push (hydra)
   "Add the HYDRA to the stack and enter its `<hydra>/body'.
 
 Example:
   With a hydra named `s:hydra:qux':
-    (spy:hydra/push 's:hydra:qux)
+    (hydra:push 's:hydra:qux)
       - Will push to the stack: '(s:hydra:qux/body)"
   ;; Create function call to `hydra' body function.
   (let ((hydra/body (intern-soft (concat (symbol-name hydra) "/body"))))
     ;; Call the hydra, then push to stack to save state.
     (funcall 'hydra/body)
-    (push hydra/body sss:hydra/stack)))
+    (push hydra/body int<hydra>:stack)))
 
 
-(defun spy:hydra/pop ()
-  "Pop a hydra body off of `sss:hydra/stack' if one exists and call it."
+(defun hydra:pop ()
+  "Pop a hydra body off of `int<hydra>:stack' if one exists and call it."
   (interactive)
-  (let ((hydra/func/body (pop sss:hydra/stack)))
+  (let ((hydra/func/body (pop int<hydra>:stack)))
     (when hydra/func/body
       (funcall hydra/func/body))))
 
@@ -108,4 +132,4 @@ Example:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :modules 'spy 'hydra 'nesting)
+(imp:provide :mantle 'config 'user 'hydra 'nesting)
