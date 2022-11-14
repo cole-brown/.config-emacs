@@ -20,6 +20,7 @@
 ;;------------------------------------------------------------------------------
 ;; Global
 ;;------------------------------------------------------------------------------
+;; NOTE: Keep in alphanumerical order!
 
 (keybind:leader/global:def
  :infix (keybind:infix "i") ;; insert
@@ -32,6 +33,11 @@
  ;; Infix Title
  "" '(nil :which-key "Notes..."))
 
+
+(keybind:leader/global:def
+ :infix (keybind:infix "t") ;; text
+ ;; Infix Title
+ "" '(nil :which-key "Text..."))
 
 (keybind:leader/global:def
  :infix (keybind:infix "/") ;; search

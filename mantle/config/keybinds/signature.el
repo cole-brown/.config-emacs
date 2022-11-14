@@ -27,8 +27,6 @@
 (imp:eval:after (:and evil evil-collection)
 
   ;; NOTE: /mantle/config/keyboard.el has the new general defs
-  ;; NOTE: /legacy/sn003-doom/config/keybinds/spy-leader.el has the old shit
-
 
   ;;------------------------------
   ;; Signatures
