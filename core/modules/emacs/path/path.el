@@ -115,8 +115,39 @@ CALLER should be the name of the calling function, for use in the error messages
 
 
 (defun path:absolute? (path)
-  "Return non-nil if PATH is an absolute path."
-  (file-name-absolute-p path))
+  "Return non-nil if PATH is an absolute path.
+
+`file-name-absolute-p' only cares about current system; it is not able to
+say \"we're on linux but yeah, 'C:/' is absolute.\"
+
+This understands paths regardless of current system type.
+
+See `int<path>:system:types' for system types it can handle."
+  ;; Check for various absolute paths, return truthy.
+  ;; Failure to absolute means relative.
+
+  ;; `file-name-absolute-p' only cares about current system; it is not able to
+  ;; say "we're on linux but yeah, 'C:/' is absolute."
+  ;; But check it anyways; it's probably smarter for all the edge cases?
+  (cond ((file-name-absolute-p path)
+         t)
+
+        ;; Assume "/" is the root of a Linuxy/Unixy path.
+        ((string-prefix-p "/" path)
+         t)
+
+        ;; Check for Windows drive prefixes.
+        ((string-match-p (rx-to-string '(and string-start letter ":")
+                                       :no-group)
+                         path)
+         t)
+
+        ;; ¯\_(ツ)_/¯
+        ;; Guess it's relative then?
+        (t
+         nil)))
+;; (path:absolute? "C:/")
+;; (path:absolute? "/")
 
 
 (defun path:exists? (path &optional type)
