@@ -583,6 +583,20 @@ names can be used as well as strings."
 
 
 ;;------------------------------
+;; Split on Dir Separators
+;;------------------------------
+
+(defun path:split (&rest path)
+  "Split all PATH strings by directory separators, return one list."
+  (split-string (apply #'path:join path)
+                "[/\\]"
+                :omit-nulls))
+;; (path:split "/foo/bar" "/baz")
+;; (path:split "c:/foo/bar" "/baz")
+;; (path:split "c:\\foo\\bar" "\\baz")
+
+
+;;------------------------------
 ;; Path Segments
 ;;------------------------------
 
@@ -666,24 +680,6 @@ Returned PLIST will have these keys (if their values are non-nil).
       ;; Return segments plist.
       output)))
 ;; (path:segments "/foo/bar" "/baz")
-
-
-;;------------------------------
-;; Split on Dir Separators
-;;------------------------------
-
-(defun path:split (&rest segment)
-  "Split all SEGMENT strings by directory separators, return one list."
-  ;; `path:segments' will do the heavy lifting.
-  (let ((segments (apply #'path:segments segment)))
-    ;; Now just convert the plist into a list, and drop any nulls.
-    (-keep #'int<path>:filter:strings:keep
-           (-flatten (list
-                      (plist-get segments :drive)
-                      (plist-get segments :root)
-                      (plist-get segments :parents)
-                      (plist-get segments :name))))))
-;; (path:split "/foo/bar" "/baz")
 
 
 ;;------------------------------------------------------------------------------
