@@ -37,6 +37,21 @@
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Kinds-of-Files.html")
 
 
+(defconst int<path>:system:types
+  '((:windows . windows-nt)
+    (:linux   . gnu/linux)
+    (:wsl     . nil)
+
+    ;; TODO: This should be like `:wsl' except "/cygdrive/<drive>/" instead of "/mnt/<drive>/"
+    ;; (:cygwin  . cygwin)
+
+    ;; NOTE: Not an actual system type; should be figured out.
+    (:auto    . nil))
+  "Alist of supported system types to `system-type' value.
+
+NOTE: `:wsl' doesn't know it's `:wsl'; so it can't have a `system-type' value.")
+
+
 (defconst path:rx:names:ignore
   (list
    ;; Ignore "." and ".." entries.
@@ -621,11 +636,6 @@ Filter out nil."
   "Separators for Windows and Linux paths.")
 
 
-(defun int<path>:filter:strings:keep (item)
-  "`-keep' needs the ITEM itself returned, so you can't just use `stringp'."
-  (and (stringp item) item))
-
-
 ;;------------------------------
 ;; Split on Dir Separators
 ;;------------------------------
@@ -644,86 +654,138 @@ Filter out nil."
 ;; Path Segments
 ;;------------------------------
 
-(defun path:segments (&rest path)
-  "Split all PATH strings by directory separators, return a plist.
+(defun int<path>:normalize:system-type (type &optional type-of-auto)
+  "Normalize TYPE.
+
+TYPE should be a valid value of `system-type', which see.
+  - Also acceptable: `:auto', `:windows', `:linux', `:mac'
+
+Return value will be a keyword & valid key of `int<path>:system:types'.
+
+NOTE: TYPE `:auto' will be normalized to TYPE-OF-AUTO, or to system's type if
+TYPE-OF-AUTO is nil."
+  (let ((keyword (if-let ((assoc (rassoc type int<path>:system:types)))
+                     ;; Got a `system-type' we support; return the keyword.
+                     (car assoc)
+                   ;; Is it a supported keyword already?
+                   (if (assoc type int<path>:system:types)
+                       type
+                     ;; Dunno; give up.
+                     (error "int<path>:normalize:system-type: Unknown/unsupported system type: %S"
+                            type)))))
+
+    ;; Figured out the type keyword; do we need to resolve `:auto'?
+    (when (eq keyword :auto)
+      (setq keyword (or type-of-auto
+                        (car (rassoc system-type int<path>:system:types))))
+      (unless keyword
+        (error "int<path>:normalize:system-type: Unsupported system type for `:auto': %S"
+               (or type-of-auto system-type))))
+
+    keyword))
+;; (int<path>:normalize:system-type :auto)
+;; (int<path>:normalize:system-type :windows)
+;; (int<path>:normalize:system-type 'windows-nt)
+;; (int<path>:normalize:system-type 'gnu/linux)
+
+
+(defun path:segments (type &rest path)
+  "Split PATH by directory separators, return a plist.
+
+TYPE should be a valid value of `system-type', which see.
+  - Also acceptable: `:auto', `:windows', `:linux', `:mac'
 
 Returned PLIST will have these keys (if their values are non-nil).
-  :drive   - Drive letter / name
+  :drive   - Only if TYPE is `:windows'.
+           - Drive letter / name
            - \"C:/foo/bar\" -> \"C:\"
   :root    - Root of the path (\"/\", \"C:\\\", etc.)
            - \"C:/foo/bar\" -> \"/\"
            - \"/foo/bar\" -> \"/\"
   :parents - Parent directory ancestors of PATH.
+           - \"C:/foo/bar\" -> '(\"foo\" \"bar\")
            - \"/foo/bar/baz\" -> '(\"foo\" \"bar\")
   :name    - Name of the final path element.
            - \"/foo/bar/baz\" -> \"baz\"
            - \"/foo/bar/\" -> \"bar\"
            - \"/foo/bar.tar.gz\" -> \"bar.tar.gz\""
-  (let (drive
+  (setq path (apply #'path:join path))
+  (let ((type (int<path>:normalize:system-type type))
+        drive
         root
         ;; `segments' will get split into `parents' and `name'.
         segments
         parents
         name
         output
-        ;; Get rid of any nulls or invalid segments.
-        (paths (-keep #'int<path>:filter:strings:keep path)))
-    (if (null paths)
-        (error "path:segments: PATH has no strings to split: %S"
-               path)
+        ;; Normalize inputs into a list of path components.
+        (paths (path:split path)))
 
-      ;;------------------------------
-      ;; Parse input.
-      ;;------------------------------
-      ;; Path is absolute if first/only segment is absolute.
-      (when (path:absolute? (car paths))
+    (unless paths
+      (error "path:segments: PATH has no strings to split: %S"
+             path))
 
-        ;; If absolute, set the root directory.
-        (setq root "/")
+  ;;------------------------------
+  ;; Parse input.
+  ;;------------------------------
+  ;;---
+  ;; Root & Drive
+  ;;---
+  ;; Path is absolute if first/only segment is absolute.
+  (when (path:absolute? path)
 
-        ;; If on windows, set the root drive.
-        (when (eq system-type 'windows-nt)
-          (save-match-data
-            (when (string-match (rx-to-string '(and string-start letter ":")
-                                              :no-group)
-                                (car paths))
-              (setq drive (match-string 0 (car paths)))))))
+    ;; If absolute, set the root directory.
+    (setq root "/")
 
-      ;; Split each input into segments.
-      (dolist (path paths)
-        (dolist (segment (split-string path
-                                       int<path>:separators:rx
-                                       t
-                                       split-string-default-separators))
-          (push segment segments)))
+    ;; If a Windows path, set the root drive.
+    (when (eq type :windows)
+      (save-match-data
+        (when (string-match (rx-to-string '(and string-start (group letter) ":")
+                                          :no-group)
+                            (car paths))
+          (setq drive (match-string 1 (car paths))
+                root  (format "%s:/" drive)
+                paths (cdr paths)))))) ;; Drop drive ("C:") off of list of dirs.
 
-      ;; `segments' is backwards, so first item is file/dir `name',
-      ;; rest need to be reversed into the `parents'.
-      (setq name    (car segments)
-            parents (nreverse (cdr segments)))
+  ;;---
+  ;; Parents & Name
+  ;;---
+  ;; Split each input into segments.
+  (dolist (path paths)
+    (dolist (segment (split-string path
+                                   int<path>:separators:rx
+                                   t
+                                   split-string-default-separators))
+      (push segment segments)))
 
-      ;;------------------------------
-      ;; Build output plist (in reverse).
-      ;;------------------------------
-      (when name
-        (push name output)
-        (push :name output))
+  ;; `segments' is backwards, so first item is file/dir `name',
+  ;; rest need to be reversed into the `parents'.
+  (setq name    (car segments)
+        parents (nreverse (cdr segments)))
 
-      (when parents
-        (push parents output)
-        (push :parents output))
+  ;;------------------------------
+  ;; Build output plist (in reverse).
+  ;;------------------------------
+  (when name
+    (push name output)
+    (push :name output))
 
-      (when root
-        (push root output)
-        (push :root output))
+  (when parents
+    (push parents output)
+    (push :parents output))
 
-      (when drive
-        (push drive output)
-        (push :drive output))
+  (when root
+    (push root output)
+    (push :root output))
 
-      ;; Return segments plist.
-      output)))
-;; (path:segments "/foo/bar" "/baz")
+  (when drive
+    (push drive output)
+    (push :drive output))
+
+  ;; Return segments plist.
+  output))
+;; (path:segments :linux "/foo/bar" "/baz")
+;; (path:segments :windows "C:/foo/bar" "/baz")
 
 
 ;;------------------------------------------------------------------------------
@@ -962,84 +1024,107 @@ Uses `path:current:file' and just chops off the filename."
 ;;   Windows emacs, Cygwin paths: https://www.emacswiki.org/emacs/cygwin-mount.el
 ;;   Cygwin/WSL emacs, win paths: https://github.com/victorhge/windows-path
 ;; but..: aren't on melpa, haven't been updated in years, etc.
-(defun path:translate (from to dir)
-  "Translates a path style, e.g. from Windows to WSL.
+(defun path:translate (from to translate-path)
+  "Translate a path style, e.g. from Windows to WSL.
 
-FROM and TO should be one of: (:windows :wsl :linux)
-DIR should be a string.
+FROM and TO should be one of: (:auto :windows :wsl :linux)
+If FROM is `:auto', attempt to determine TRANSLATE-PATH's OS automatically.
+If TO is `:auto', it will be:
+  - `:linux' if FROM is `:windows'
+  - `:windows' if FROM is `:wsl' or `:linux'
+
+TRANSLATE-PATH should be a string.
 
 For `:windows' -> `:wsl':
   - Translates '<drive>:' to '/mnt/<drive>'.
-  - Translates '\\' to '/'.
-"
-  (let ((trans dir))
-    ;; Translate: :windows -> :wsl
-    (cond ((and (eq from :windows)
-                (eq to   :wsl))
-           (let ((drive nil)
-                 (path nil))
-             ;; Regex to:
-             ;;   1) Find <drive> letter.
-             ;;   2) Ignore ':'.
-             ;;   3) Find <path>.
-             (if (not (string-match (rx string-start
-                                        ;; Get drive letter as a capture group.
-                                        (group (= 1 (any "a-z" "A-Z")))
-                                        ":"
-                                        (group (zero-or-more anything))
-                                        string-end)
-                                    dir))
-                 ;; No match - no translation.
-                 (setq trans "")
-               (setq drive (downcase (match-string 1 dir))
-                     path (match-string 2 dir))
-               (setq trans (concat "/mnt/"
-                                   drive
-                                   (replace-regexp-in-string (rx "\\")
-                                                             "/"
-                                                             path))))))
+  - Translates '\\' to '/'."
+  ;;------------------------------
+  ;; Resolve `:auto'?
+  ;;------------------------------
+  (setq from (if (eq from :auto)
+                 (int<path>:type translate-path)
+               (int<path>:normalize:system-type from)))
 
-          ;; Translate: :windows -> :wsl
+  (setq to (if (eq to :auto)
+               (if (eq from :windows)
+                   :linux
+                 :windows)
+             (int<path>:normalize:system-type to)))
+
+  ;;------------------------------
+  ;; Translate path.
+  ;;------------------------------
+  (let ((segments (path:segments from translate-path))
+        ;; Initial assumption: no translation needed.
+        (path/translated translate-path))
+
+    ;;---
+    ;; Relative -> Relative?
+    ;;---
+    (cond ((not (path:absolute? translate-path))
+           (setq path/translated translate-path))
+
+          ;;---
+          ;; `:windows' -> `:wsl'
+          ;;---
+          ((and (eq from :windows)
+                (eq to   :wsl))
+           (setq path/translated (path:join "/mnt"
+                                  (downcase (plist-get segments :drive))
+                                  (plist-get segments :parents)
+                                  (plist-get segments :name))))
+
+          ;;---
+          ;; `:wsl' -> `:windows'
+          ;;---
           ((and (eq from :wsl)
                 (eq to   :windows))
            ;; Replace '/mnt/<drive>' with '<drive>:'.
-           (let ((drive nil)
-                 (path nil))
-             ;; Regex to:
-             ;;   1) Trim off leading "/mnt/".
-             ;;   2) Find <drive> letter.
-             ;;   3) Find <path>.
-             (if (not (string-match (rx string-start
-                                        "/mnt/"
-                                        ;; Get drive letter as a capture group.
-                                        (group (= 1 (any "a-z" "A-Z")))
-                                        (group (or (and (not (any "a-z" "A-Z"))
-                                                        (zero-or-more anything))
-                                                   string-end)))
-                                    dir))
-                 ;; No match - no translation.
-                 (setq trans "")
+           (if (string= (nth 0 (plist-get segments :parents))
+                        "mnt")
+               (setq path/translated (path:join
+                                      ;; Drive letter is right after "mnt".
+                                      (concat (upcase (nth 1 (plist-get segments :parents)))
+                                                        ":")
+                                      ;; Next, everything after drive letter:
+                                      (cddr (plist-get segments :parents))
+                                      (plist-get segments :name)))
+             ;; No match - no translation.
+             (error "path:translate: Cannot translate `%S' -> `%S'. Path is not in a WSL \"/mnt/<windows-drive>\" directory: %s"
+                    from to translate-path)))
 
-               ;; Get drive and path from regex matching, then build
-               ;; translation.
-               (setq drive (upcase (match-string 1 dir))
-                     path (match-string 2 dir)
-                     trans (concat drive
-                                   ":"
-                                   (if (and (not (null path))
-                                            (not (string= "" path)))
-                                       path
-                                     "/"))))))
+          ;;---
+          ;;`:linux' -> `:windows'
+          ;;---
+          ((and (eq from :linux)
+                (eq to   :windows))
+           ;; Best we can do is guess at a Windows drive?
+           (setq path/translated (path:join "C:"
+                                            (plist-get segments :parents)
+                                            (plist-get segments :name))))
 
-          ;; Fallthrough -> error out.
+          ;;---
+          ;;`:windows' -> `:linux'
+          ;;---
+          ((and (eq from :windows)
+                (eq to   :linux))
+           ;; Just drop the Windows drive?
+           (setq path/translated (path:join "/"
+                                            (plist-get segments :parents)
+                                            (plist-get segments :name))))
+
+          ;;---
+          ;; Unsupported Translation; Error Out
+          ;;---
           (t
-           (error "path:translate currently does not support %s -> %s: %s"
-                  from to path)))
+           (error "path:translate: Unsuppoprted translation: `%S' -> `%S' for path %s"
+                  from to translate-path)))
 
     ;; Return the translation.
-    trans))
+    path/translated))
 ;; (path:translate :windows :wsl "D:/path/to/somewhere.txt")
-;; (path:translate :windows :wsl "D:/path/to/somewhere.txt")
+;; (path:translate :windows :auto "D:/path/to/somewhere.txt")
+;; (path:translate :auto :wsl "D:/path/to/somewhere.txt")
 ;; (path:translate :wsl :windows "/mnt/d/path/to/somewhere.txt")
 ;; Should not be able to translate so should return "".
 ;; (path:translate :windows :wsl "~/path/to/somewhere.txt")
