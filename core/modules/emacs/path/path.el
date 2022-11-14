@@ -584,19 +584,32 @@ names can be used as well as strings."
 ;; (int<path>:append nil nil)
 
 
+;; TODO: Make `list` module, move there?
+(defun int<path>:flatten (list)
+  "Flatten LIST to a single, non-nested list.
+
+Filter out nil."
+  (declare (pure t) (side-effect-free t))
+
+  (if (and (listp list) (listp (cdr list)))
+      (mapcan #'int<path>:flatten list)
+    (list list)))
+
+
 (defun path:join (&rest path)
-  "Combines PATH elements together into a path platform-agnostically.
+  "Flatten & combine PATH elements together into a path platform-agnostically.
 
 (path:join \"jeff\" \"jill.el\")
   ->\"jeff/jill.el\""
   (seq-reduce #'int<path>:append
-              (apply #'str:normalize:name->list path)
+              (apply #'str:normalize:name->list (int<path>:flatten path))
               nil))
 ;; (path:join "jeff" "jill")
 ;; (path:join "jeff" "jill/")
 ;; (path:join "jeff" nil)
 ;; (path:join "" nil)
 ;; (path:join nil)
+;; (path:join '("jeff" :jill) "hill")
 
 
 ;;------------------------------------------------------------------------------
