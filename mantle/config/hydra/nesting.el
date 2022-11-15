@@ -22,6 +22,7 @@
 
 ;; TODO: Move this and hydra use-package to a mantle module?
 ;; TODO: Or is this the correct place & way to do this?
+;; TODO: I think it should be a module. Mantle or core?
 
 
 ;;------------------------------------------------------------------------------
@@ -39,12 +40,20 @@
 
 
 (defun hydra:nest (hydra)
-  "Enter HYDRA from current hydra.
+  "Call entry function for defined HYDRA.
+
+For us in:
+  - Entering a hydra from another hydra.
+  - Entering a hydra from keybinds.
+  - Not needing to remember the name of your HYDRA's entry function.
 
 NOTE: Use `:exit t' or appropriate color for exiting the caller hydra!"
   (funcall (intern-soft (concat (symbol-name hydra) "/body"))))
 ;; (defun test/body () (message "hello there"))
 ;; (hydra:nest 'test)
+
+
+(defalias 'hydra:call 'hydra:nest)
 
 
 ;;------------------------------------------------------------------------------

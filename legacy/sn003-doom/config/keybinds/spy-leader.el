@@ -30,38 +30,6 @@
                                         ; and it's easy on Dvorak.
 
        ;;------------------------------
-       ;; Transpose
-       ;;------------------------------
-       (:prefix ("t" . "Transpose")
-        ;; Emacs
-        :desc "Characters"                  "c" #'transpose-chars
-        :desc "Words"                       "w" #'transpose-words
-        :desc "Lines"                       "l" #'transpose-lines
-        :desc "Sentences"                   "s" #'transpose-sentences
-        :desc "Paragraphs"                  "p" #'transpose-paragraphs
-        :desc "S-Expressions"               "x" #'transpose-sexps
-
-        ;; Org-Mode
-        :desc "Org-Mode Words"              "o" #'org-transpose-words
-        :desc "Org-Mode Elements"           "e" #'org-transpose-element
-        :desc "Org-Mode Table"              "t" #'org-table-transpose-table-at-point)
-
-
-       ;;------------------------------
-       ;; Box Drawning
-       ;;------------------------------
-       ;; Hydra
-       :desc "Unicode Box"                  "b" #'spy:art.box/draw
-
-
-       ;;------------------------------
-       ;; Case Conversion
-       ;;------------------------------
-       ;; Hydra
-       :desc "Case Conversion"              "'" #'str:hydra:case/body
-
-
-       ;;------------------------------
        ;; File/Dir Names
        ;;------------------------------
        :desc "Copy Buffer's File Name"    "k" #'spy:cmd:file-or-dir-name/clipboard

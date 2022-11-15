@@ -1,4 +1,4 @@
-;;; init.el --- `:input' namespace -*- lexical-binding: t; -*-
+;;; modules/input/init.el --- `:input' namespace -*- lexical-binding: t; -*-
 ;;
 ;; Author:   Cole Brown <code@brown.dev>
 ;; URL:      https://github.com/cole-brown/.config-emacs

@@ -19,16 +19,22 @@
 ;;; Code:
 
 
-;; TODO: move `buffer' shit to `buffer'.
+;; TODO: Move `buffer' shit to `buffer'.
+;; TODO: Put `buffer' hydra in e.g. (imp:require :buffer '+hydra)?
+;;       - `str' has: (imp:require :str '+hydra '+case)
 
 (require 'hydra)
+
+
+(imp:require :str '+hydra '+case)
+(imp:require :buffer)
 
 
 ;;------------------------------------------------------------------------------
 ;; Line Joining Hydra
 ;;------------------------------------------------------------------------------
 
-;; Call `hydra:join-lines/body' to enter.
+;; Call `buffer:hydra:join-lines/body' to enter.
 (defhydra buffer:hydra:join-lines (:color red  ;; Allow & quit on non-hydra-heads.
                                    :hint none) ;; no hint - just docstr
   "
@@ -278,6 +284,15 @@ If optional JUSTIFY? is non-nil, justify the text filled (see function
 
 
 ;;------------------------------------------------------------------------------
+;; Load Files
+;;------------------------------------------------------------------------------
+
+;; Load Unicode line Art Hydras.
+(imp:load :feature  '(:input art)
+          :filename "art")
+
+
+;;------------------------------------------------------------------------------
 ;; Keybinds
 ;;------------------------------------------------------------------------------
 
@@ -293,7 +308,14 @@ If optional JUSTIFY? is non-nil, justify the text filled (see function
   (keybind:leader/global:def
    :infix (keybind:infix "t")
 
-   "j" (list #'hydra:join-lines/body :which-key "Join Lines..."))
+   ;; ASCII/Unicode Lines Box Art Hydra
+   "b" '(art:cmd:box/draw                     :which-key "Unicode Box...")
+
+   ;; Join Lines Hydra
+   "j" '((hydra:call buffer:hydra:join-lines) :which-key "Join Lines...")
+
+   ;; Case Conversion Hydra
+   "'" '((hydra:call str:hydra:case/body)     :which-key "Case Conversion..."))
 
 
   ;;------------------------------
@@ -302,7 +324,7 @@ If optional JUSTIFY? is non-nil, justify the text filled (see function
 
   ;; TODO: Should these be in ':' instead? Are they alread in ':' somewhere?
   (keybind:leader/global:def
-   :infix (keybind:infix "t a")      ;; text -> alignment
+   :infix (keybind:infix "t a")        ;; text -> alignment
    "" '(nil :which-key "Alignment...") ;; Infix Title
 
    "a" (list #'buffer:cmd:align-before :which-key "Align Before")
@@ -344,7 +366,7 @@ If optional JUSTIFY? is non-nil, justify the text filled (see function
   ;; Fill
   ;;------------------------------
   (keybind:leader/global:def
-   :infix (keybind:infix "t f")      ;; text -> fill
+   :infix (keybind:infix "t f")   ;; text -> fill
    "" '(nil :which-key "Fill...") ;; Infix Title
 
    ;; Regions
@@ -382,6 +404,35 @@ If optional JUSTIFY? is non-nil, justify the text filled (see function
    ;; Unfill
    "u" (list #'buffer:cmd:fill/paragraph/unfill
              :which-key "Unfill ¶"))
+
+
+  ;;------------------------------
+  ;; Transpose
+  ;;------------------------------
+  (keybind:leader/global:def
+   :infix (keybind:infix "t t")        ;; text -> fill
+   "" '(nil :which-key "Transpose...") ;; Infix Title
+
+   ;; Emacs
+   "c" (list #'transpose-chars      :which-key "Characters")
+
+   "w" (list #'transpose-words      :which-key "Words")
+
+   "l" (list #'transpose-lines      :which-key "Lines")
+
+   "s" (list #'transpose-sentences  :which-key "Sentences")
+
+   "p" (list #'transpose-paragraphs :which-key "Paragraphs")
+
+   "x" (list #'transpose-sexps      :which-key "S-Expressions")
+
+   ;; Org-Mode
+   "o" (list #'org-transpose-words                :which-key "Org-Mode Words")
+
+   "e" (list #'org-transpose-element              :which-key "Org-Mode Elements")
+
+   "t" (list #'org-table-transpose-table-at-point :which-key "Org-Mode Table"))
+
 
   )
 
