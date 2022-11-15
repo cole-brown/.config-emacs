@@ -1,6 +1,8 @@
 ;;; emacs/buffer/manage.el -*- lexical-binding: t; -*-
 
 
+(require 'cl-lib)
+
 ;;------------------------------------------------------------------------------
 ;; Kill Functions
 ;;------------------------------------------------------------------------------
@@ -9,10 +11,13 @@
 
 ;; Like `kill-buffer-ask' but no confirmation for unmodified buffers.
 (defun buffer:kill:ask (buffer-or-name &optional delete-process)
-  "Kill BUFFER-OR-NAME if confirmed. No confirm given for unmodified
-buffers; just kill.
+  "Kill BUFFER-OR-NAME if confirmed.
 
-Returns buffer-name on kill, nil on no kill."
+No confirm given for unmodified buffers; just kill.
+
+If DELETE-PROCESS is non-nil, also delete buffer's processes.
+
+Return `buffer-name' of buffer on kill, nil on no kill."
   (let ((buffer (get-buffer buffer-or-name)))
     ;; so... kill?
     (if (or
@@ -23,17 +28,17 @@ Returns buffer-name on kill, nil on no kill."
                               (buffer-name buffer))))
         ;; ok - kill
         (prog1
-            ;; return name when killed
+            ;; Return name when killed.
             (buffer-name buffer)
           (when delete-process (buffer:process:delete buffer))
           (kill-buffer buffer))
-      ;; else, ret nil when no kill
+
+      ;; Return nil when nothing killed.
       nil)))
 
 
 (defun buffer:kill:special (arg)
-  "Kills my special(ly named) buffers, and deletes any process they may have
-running.
+  "Kill special(ly named) buffers and deletes any process they may have running.
 
 If ARG is the keyword `:regex', use `buffer:regex/bookend' to kill
 special buffers.
@@ -44,7 +49,6 @@ stcring/regexp is 'correctly' guarded by them, adding them in if needed. It uses
 
 If ARG is not a string, assume it's a buffer and try to kill it's process and it
 directly."
-
   (cond ((null arg)
          (user-error "buffer:kill:special: Cannot kill; null arg: %S" arg))
 
@@ -73,8 +77,9 @@ directly."
 
 
 (defun buffer:process:delete (buffer-or-name)
-  "Gets buffer, gets buffer's process (if any), and ends/deletes/kills/SIGKILLs
-it. BUFFER-OR-NAME must be exact."
+  "Get buffer, get buffer's process (if any), and delete/kill that process.
+
+BUFFER-OR-NAME must be exact."
   (let ((proc (get-buffer-process (get-buffer buffer-or-name))))
     (if (not (process-live-p proc))
         (message "No live process in '%s'?" buffer-or-name)
@@ -229,6 +234,31 @@ for kewords like:
     - Do not output the informative messages."
   (interactive "sKill buffers matching regex: ")
   (buffer:kill:matching regex))
+
+
+;;;###autoload
+(defun buffer:cmd:kill (buffer &optional dont-save)
+  "Kill BUFFER globally.
+
+Ensure all windows previously showing this buffer have switched to a real buffer
+or the fallback buffer.
+
+If DONT-SAVE, don't prompt to save modified buffers (discarding their changes).
+
+On loan from Doom's \"core/autoload/buffers.el\"."
+  (interactive (list (current-buffer)
+                     current-prefix-arg))
+
+  (cl-assert (bufferp buffer) t)
+
+  ;; Clear "buffer is modified" flag if we don't care about saving?
+  (when (and (buffer-modified-p buffer) dont-save)
+    (with-current-buffer buffer
+      (set-buffer-modified-p nil)))
+
+  ;; Will ask if they want to delete a modified buffer.
+  (buffer:kill:ask buffer
+                   :delete-process))
 
 
 ;;------------------------------------------------------------------------------

@@ -222,6 +222,8 @@ Return an absolute path string."
        (progn
          (message "File path copied: 「%s」" path)
          path)))))
+;; (buffer:cmd:clipboard:file-or-dir-name)
+;; (buffer:cmd:clipboard:file-or-dir-name t)
 
 
 ;;------------------------------------------------------------------------------

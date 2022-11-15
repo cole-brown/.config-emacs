@@ -1181,6 +1181,44 @@ Return:
 
 
 ;;------------------------------------------------------------------------------
+;; Project Paths
+;;------------------------------------------------------------------------------
+
+
+(defun path:project:root (&optional dir)
+  "Return the project root of DIR (default: `default-directory').
+Returns nil if not in a project."
+  (let ((projectile-project-root
+         (unless dir (bound-and-true-p projectile-project-root)))
+        projectile-require-project-root)
+    (projectile-project-root dir)))
+
+
+(defun path:project? (&optional dir)
+  "Return t if DIR (default: `default-directory') is a valid project directory."
+  (and (path:project:root dir)
+       t))
+
+
+;;------------------------------------------------------------------------------
+;; Dired
+;;------------------------------------------------------------------------------
+
+;;;###autoload
+(defun path:cmd:dired (arg)
+  "Open a directory in Dired.
+
+If prefix ARG is non-nil, prompt for a known project to open in Dired.
+
+Proudly nicked from Doom's \"modules/config/default/autoload/files.el\"."
+  (interactive "P")
+  (apply #'dired
+         (if arg
+             (list (completing-read "Open dired in project: " projectile-known-projects))
+           (dired-read-dir-and-switches ""))))
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :path 'path)
