@@ -1,35 +1,69 @@
-;;; config/spy/art.el -*- lexical-binding: t; -*-
+;;; modules/input/art.el --- Artsy Stuff -*- lexical-binding: t; -*-
+;;
+;; Author:   Cole Brown <code@brown.dev>
+;; URL:      https://github.com/cole-brown/.config-emacs
+;; Created:  2022-07-11
+;; Modified: 2022-07-11
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Artsy Stuff
+;;
+;;; Code:
 
 
 (require 'hydra)
+
+
+(imp:require :elisp 'utils 'predicates)
+(imp:require :mantle 'config 'user 'hydra)
 
 
 ;;------------------------------------------------------------------------------
 ;; Helpers
 ;;------------------------------------------------------------------------------
 
-(defun spy:evil:replace-state:toggle ()
+;; TODO: move to... keybinds or keyboard or evil or something, IDK?
+(defun buffer:overwrite:toggle ()
   "Toggle overwrite mode.
 
+Evil-Aware / Evil-Optional
+
 Toggles between 'insert' and 'replace' evil states."
-  (if (evil-replace-state-p)
-      (evil-append 0)
-    (evil-replace-state)))
+  ;; TODO: if evil evil-replace else emacs-replace
+  (if (elisp:evil?)
+    (if (evil-replace-state-p)
+        (evil-append 0)
+      (evil-replace-state))
+
+    (overwrite-mode)))
 
 
 ;; TODO: Move to buffer.el...
-(defun spy:buffer:insert-or-overwrite (character)
+(defun buffer:insert-or-overwrite (character)
   "Insert or overwrite CHARACTER into active buffer at point.
+
+Evil-Aware / Evil-Optional
 
 Need to fix the hydra's deleting before figuring out the integration into
 evil's replace state backspace 'undo' functionality."
   ;; If overwriting, first delete a character at point so we end up "replacing" it.
-  (when (evil-replace-state-p)
-    ;; TODO: Will this let evil's backspace/delete 'undo' functionality work?
-    ;; (evil-replace-pre-command)
+  (if (elisp:evil?)
+      (when (evil-replace-state-p)
+        ;; TODO: Will this let evil's backspace/delete 'undo' functionality work?
+        ;; (evil-replace-pre-command)
 
-    ;; TODO: Will this work on its own to allow evil's 'undo' functionality?
-    (evil-delete-char (point) (1+ (point))))
+        ;; TODO: Will this work on its own to allow evil's 'undo' functionality?
+        (evil-delete-char (point) (1+ (point))))
+
+    (when overwrite-mode
+      (delete-char  (point) (1+ (point)))))
+
+  ;; Now we can "replace" with the new char.
   (insert character))
 
 
@@ -169,7 +203,7 @@ evil's replace state backspace 'undo' functionality."
 ;; Single Lines Hydra
 ;;------------------------------------------------------------------------------
 
-(defhydra hydra:art/box/single (:color amaranth ;; default to warn if non-hydra key
+(defhydra art:hydra:box/single (:color amaranth ;; default to warn if non-hydra key
                                 ;;:color pink   ;; defaults to not exit unless explicit
                                 ;;:idle 0.75    ;; no help for x seconds
                                 :hint none)     ;; no hint - just docstr)
@@ -190,20 +224,20 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Box Characters
   ;;------------------------------
-  ("'" (spy:buffer:insert-or-overwrite "┌") "┌") ;; down and right
-  ("," (spy:buffer:insert-or-overwrite "┬") "┬") ;; down and horizontal
-  ("." (spy:buffer:insert-or-overwrite "┐") "┐") ;; down and left
+  ("'" (buffer:insert-or-overwrite "┌") "┌") ;; down and right
+  ("," (buffer:insert-or-overwrite "┬") "┬") ;; down and horizontal
+  ("." (buffer:insert-or-overwrite "┐") "┐") ;; down and left
 
-  ("a" (spy:buffer:insert-or-overwrite "├") "├") ;; vertical and right
-  ("o" (spy:buffer:insert-or-overwrite "┼") "┼") ;; vertical and horizontal
-  ("e" (spy:buffer:insert-or-overwrite "┤") "┤") ;; vertical and left
+  ("a" (buffer:insert-or-overwrite "├") "├") ;; vertical and right
+  ("o" (buffer:insert-or-overwrite "┼") "┼") ;; vertical and horizontal
+  ("e" (buffer:insert-or-overwrite "┤") "┤") ;; vertical and left
 
-  (";" (spy:buffer:insert-or-overwrite "└") "└") ;; up and right
-  ("q" (spy:buffer:insert-or-overwrite "┴") "┴") ;; up and horizontal
-  ("j" (spy:buffer:insert-or-overwrite "┘") "┘") ;; up and left
+  (";" (buffer:insert-or-overwrite "└") "└") ;; up and right
+  ("q" (buffer:insert-or-overwrite "┴") "┴") ;; up and horizontal
+  ("j" (buffer:insert-or-overwrite "┘") "┘") ;; up and left
 
-  ("p" (spy:buffer:insert-or-overwrite "─") "─") ;; horizontal
-  ("u" (spy:buffer:insert-or-overwrite "│") "│") ;; vertical
+  ("p" (buffer:insert-or-overwrite "─") "─") ;; horizontal
+  ("u" (buffer:insert-or-overwrite "│") "│") ;; vertical
 
   ;;---
   ;; Not Working in Emacs w/ Current Fonts:
@@ -217,20 +251,20 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;; _A_: ?A?  ^ ^  ^ ^  _E_: ?E?   _U_: ?U?   _I_: ?I?     ^ ^        ^ ^        ^ ^            _X_: ?X?
   ;; ^ ^  ^ ^  _Q_: ?Q?  ^ ^  ^ ^   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^            ^ ^           ^ ^  (hi)
   ;;
-  ;; ("y" (spy:buffer:insert-or-overwrite "┄") "┄") ;; triple dash horizontal
-  ;; ("i" (spy:buffer:insert-or-overwrite "┆") "┆") ;; triple dash vertical
+  ;; ("y" (buffer:insert-or-overwrite "┄") "┄") ;; triple dash horizontal
+  ;; ("i" (buffer:insert-or-overwrite "┆") "┆") ;; triple dash vertical
   ;;
   ;; ;; These are named backwards by Unicode - don't blame me.
-  ;; ("<" (spy:buffer:insert-or-overwrite "╷") "╷") ;; down
-  ;; ("A" (spy:buffer:insert-or-overwrite "╶") "╶") ;; right
-  ;; ("Q" (spy:buffer:insert-or-overwrite "╵") "╵") ;; up
-  ;; ("E" (spy:buffer:insert-or-overwrite "╴") "╴") ;; left
+  ;; ("<" (buffer:insert-or-overwrite "╷") "╷") ;; down
+  ;; ("A" (buffer:insert-or-overwrite "╶") "╶") ;; right
+  ;; ("Q" (buffer:insert-or-overwrite "╵") "╵") ;; up
+  ;; ("E" (buffer:insert-or-overwrite "╴") "╴") ;; left
   ;;
-  ;; ("P" (spy:buffer:insert-or-overwrite "╌") "╌") ;; double dash horizontal
-  ;; ("U" (spy:buffer:insert-or-overwrite "╎") "╎") ;; double dash vertical
+  ;; ("P" (buffer:insert-or-overwrite "╌") "╌") ;; double dash horizontal
+  ;; ("U" (buffer:insert-or-overwrite "╎") "╎") ;; double dash vertical
   ;;
-  ;; ("Y" (spy:buffer:insert-or-overwrite "┈") "┈") ;; quadruple dash horizontal
-  ;; ("I" (spy:buffer:insert-or-overwrite "┊") "┊") ;; quadruple dash vertical
+  ;; ("Y" (buffer:insert-or-overwrite "┈") "┈") ;; quadruple dash horizontal
+  ;; ("I" (buffer:insert-or-overwrite "┊") "┊") ;; quadruple dash vertical
 
 
   ;;------------------------------
@@ -244,9 +278,9 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Misc.
   ;;------------------------------
-  ("<SPC>" (spy:buffer:insert-or-overwrite " ") "insert space")
+  ("<SPC>" (buffer:insert-or-overwrite " ") "insert space")
   ("<insert>"
-   (funcall #'spy:evil:replace-state:toggle)
+   (funcall #'mantle:evil:replace-state:toggle)
    (if (evil-replace-state-p)
        "insert state"
      "replace state"))
@@ -259,7 +293,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Get Me Out Of Here!!!
   ;;------------------------------
-  ("d"   (spy:hydra/nest 'hydra:art/box/double) "double lines (╬)" :exit t)
+  ("d"   (hydra:nest 'hydra:art/box/double) "double lines (╬)" :exit t)
   ("G"   nil                 "quit (to insert state)" :color blue)
   ("g"   (evil-normal-state) "quit (to normal state)" :color blue)
   ("C-g" (evil-normal-state) "quit (to normal state)" :color blue))
@@ -269,7 +303,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
 ;; Double Lines Hydra
 ;;------------------------------------------------------------------------------
 
-(defhydra hydra:art/box/double (:color amaranth ;; default to warn if non-hydra key
+(defhydra art:hydra:box/double (:color amaranth ;; default to warn if non-hydra key
                                 ;;:color pink   ;; defaults to not exit unless explicit
                                 ;;:idle 0.75    ;; no help for x seconds
                                 :hint none)     ;; no hint - just docstr)
@@ -294,20 +328,20 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;; Box Characters:
   ;; Double Lines! Double Lines!
   ;;------------------------------
-  ("'" (spy:buffer:insert-or-overwrite "╔") "╔") ;; double down and right
-  ("," (spy:buffer:insert-or-overwrite "╦") "╦") ;; double down and horizontal
-  ("." (spy:buffer:insert-or-overwrite "╗") "╗") ;; double down and left
+  ("'" (buffer:insert-or-overwrite "╔") "╔") ;; double down and right
+  ("," (buffer:insert-or-overwrite "╦") "╦") ;; double down and horizontal
+  ("." (buffer:insert-or-overwrite "╗") "╗") ;; double down and left
 
-  ("a" (spy:buffer:insert-or-overwrite "╠") "╠") ;; double vertical and righ
-  ("o" (spy:buffer:insert-or-overwrite "╬") "╬") ;; double vertical and horizontal
-  ("e" (spy:buffer:insert-or-overwrite "╣") "╣") ;; double vertical and left
+  ("a" (buffer:insert-or-overwrite "╠") "╠") ;; double vertical and righ
+  ("o" (buffer:insert-or-overwrite "╬") "╬") ;; double vertical and horizontal
+  ("e" (buffer:insert-or-overwrite "╣") "╣") ;; double vertical and left
 
-  (";" (spy:buffer:insert-or-overwrite "╚") "╚") ;; double up and right
-  ("q" (spy:buffer:insert-or-overwrite "╩") "╩") ;; double up and horizontal
-  ("j" (spy:buffer:insert-or-overwrite "╝") "╝") ;; double up and left
+  (";" (buffer:insert-or-overwrite "╚") "╚") ;; double up and right
+  ("q" (buffer:insert-or-overwrite "╩") "╩") ;; double up and horizontal
+  ("j" (buffer:insert-or-overwrite "╝") "╝") ;; double up and left
 
-  ("p" (spy:buffer:insert-or-overwrite "═") "═") ;; double horizontal
-  ("u" (spy:buffer:insert-or-overwrite "║") "║") ;; double vertical
+  ("p" (buffer:insert-or-overwrite "═") "═") ;; double horizontal
+  ("u" (buffer:insert-or-overwrite "║") "║") ;; double vertical
 
   ;;------------------------------
   ;; Movement Keys
@@ -320,9 +354,9 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Misc.
   ;;------------------------------
-  ("<SPC>" (spy:buffer:insert-or-overwrite " ") "insert space")
+  ("<SPC>" (buffer:insert-or-overwrite " ") "insert space")
   ("<insert>"
-   (funcall #'spy:evil:replace-state:toggle)
+   (funcall #'mantle:evil:replace-state:toggle)
    (if (evil-replace-state-p)
        "insert state"
      "replace state"))
@@ -335,7 +369,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Get Me Out Of Here!!!
   ;;------------------------------
-  ("d"   (spy:hydra/nest 'hydra:art/box/single) "single lines (┼)" :exit t)
+  ("d"   (hydra:nest 'art:hydra:box/single) "single lines (┼)" :exit t)
   ("G"   nil                 "quit (to insert state)" :color blue)
   ("g"   (evil-normal-state) "quit (to normal state)" :color blue)
   ("C-g" (evil-normal-state) "quit (to normal state)" :color blue))
@@ -375,12 +409,16 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
 ;; "╜" ;; up double and left single
 
 
-(defun spy:art.box/draw ()
-  "`spy' namespaced function to get into the box drawing hydra.
-"
+;;------------------------------------------------------------------------------
+;; Hydras' Entry Function
+;;------------------------------------------------------------------------------
+
+(defun art:cmd:box/draw ()
+  "Get into the box drawing hydra in the proper evil state."
   (interactive)
-  (evil-insert 0)
-  (call-interactively #'hydra:art/box/single/body))
+  (when (elisp:evil?)
+    (evil-insert 0))
+  (call-interactively #'art:hydra:box/single/body))
 ;; ┌────┐
 ;; ├────┤
 ;; │ hi │
@@ -390,4 +428,4 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
 ;;------------------------------------------------------------------------------
 ;; The End
 ;;------------------------------------------------------------------------------
-(imp:provide :dot-emacs 'config 'spy 'art)
+(imp:provide :input 'art)
