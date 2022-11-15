@@ -100,6 +100,23 @@ Proudly nicked from Doom's core-lib.el."
   `(lambda (&rest _) (interactive) ,@body))
 
 
+(defmacro elisp:cmd/with-args (command &optional prefix-arg &rest args)
+  "Return a closure that interactively calls COMMAND with ARGS and PREFIX-ARG.
+
+Like `elisp:cmd', but allows you to change `current-prefix-arg' or pass arguments to
+COMMAND. This macro is meant to be used as a target for keybinds (e.g. with
+`define-key' or `general-def').
+
+Proudly nicked from Doom's core-lib.el."
+  (declare (doc-string 1) (pure t) (side-effect-free t))
+  `(lambda (arg &rest _) (interactive "P")
+     (let ((current-prefix-arg (or ,prefix-arg arg)))
+       (,(if args
+             'funcall-interactively
+           'call-interactively)
+        ,command ,@args))))
+
+
 ;;------------------------------------------------------------------------------
 ;; Functions for argument parsing.
 ;;------------------------------------------------------------------------------
