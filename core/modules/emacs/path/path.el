@@ -1187,7 +1187,9 @@ Return:
 
 (defun path:project:root (&optional dir)
   "Return the project root of DIR (default: `default-directory').
-Returns nil if not in a project."
+Return nil if not in a project.
+
+Borrowed from Doom's `doom-project-root' in \"core/autoload/projects.el\"."
   (let ((projectile-project-root
          (unless dir (bound-and-true-p projectile-project-root)))
         projectile-require-project-root)
@@ -1195,7 +1197,10 @@ Returns nil if not in a project."
 
 
 (defun path:project? (&optional dir)
-  "Return t if DIR (default: `default-directory') is a valid project directory."
+  "Return t if DIR (default: `default-directory') is a valid project directory.
+
+
+Borrowed from Doom's `doom-project-p' in \"core/autoload/projects.el\""
   (and (path:project:root dir)
        t))
 
@@ -1216,6 +1221,68 @@ Proudly nicked from Doom's \"modules/config/default/autoload/files.el\"."
          (if arg
              (list (completing-read "Open dired in project: " projectile-known-projects))
            (dired-read-dir-and-switches ""))))
+
+
+;;------------------------------------------------------------------------------
+;; Tramp
+;;------------------------------------------------------------------------------
+
+;; TODO: Make rest of `:path' and `:file' Tramp-aware?
+;;   - remote path part
+;;   - sudo part
+;;   - method part
+;;   - all the parts
+;;   - parsing paths with the tramp junk in 'em...
+;;     - Windows vs Linux Tramp paths...
+(defun path:tramp (path &optional sudo?)
+  "Return a Tramp-style path for PATH.
+
+If SUDO? is non-nil, include 'sudo:root@<host>:' in the returned Tramp path so
+Emacs will, e.g., open as superuser.
+
+Nicked from Doom's `doom--sudo-file-path' in \"core/autoload/files.el\"."
+  (let ((host (or (file-remote-p path 'host) "localhost"))
+        (remote? (file-remote-p path)))
+    (if (or remote? sudo?)
+        ;;------------------------------
+        ;; Path Style: Tramp
+        ;;------------------------------
+        ;; Include at least one Tramp path component.
+        (concat "/"
+
+                ;;---
+                ;; Remote user/host?
+                ;;---
+                (when (file-remote-p path)
+                  (concat (file-remote-p path 'method) ":"
+                          (if-let (user (file-remote-p path 'user))
+                              (concat user "@" host)
+                            host)
+                          "|"))
+
+                ;;---
+                ;; Super user?
+                ;;---
+                (when sudo?
+                  "sudo:root@")
+                (when sudo?
+                  host)
+
+                ":"
+
+                ;;---
+                ;; Actual file path.
+                ;;---
+                (or (file-remote-p path 'localname)
+                    path))
+
+      ;;------------------------------
+      ;; Path Style: Standard
+      ;;------------------------------
+      ;; Not remote; not sudo... just path.
+      path)))
+;; (path:tramp (buffer-file-name))
+;; (path:tramp (buffer-file-name) :sudo)
 
 
 ;;------------------------------------------------------------------------------

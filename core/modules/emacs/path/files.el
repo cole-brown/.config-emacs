@@ -234,7 +234,7 @@ path matching any of the filters will not be included in return values."
 (defun file:update-files (&rest files)
   "Ensure FILES are updated in `recentf', `magit' and `save-place'.
 
-Proudly nicked from Doom's \"core/autoload/files.el\"."
+Proudly nicked from Doom's `doom--update-files' in \"core/autoload/files.el\"."
   (let (toplevels)
     (dolist (file files)
       (when (featurep 'vc)
@@ -263,11 +263,15 @@ Proudly nicked from Doom's \"core/autoload/files.el\"."
       (save-place-forget-unreadable-files))))
 
 
-;;;###autoload
-(defun file:cmd:copy/this-buffer-file (new-path &optional force-p)
-  "Copy current buffer's file to NEW-PATH.
+;;------------------------------------------------------------------------------
+;; Commands
+;;------------------------------------------------------------------------------
 
-If FORCE-P, overwrite the destination file if it exists, without confirmation.
+;;;###autoload
+(defun file:cmd:copy/this-buffer-file (path/new &optional force?)
+  "Copy current buffer's file to PATH/NEW.
+
+If FORCE?, overwrite the destination file if it exists, without confirmation.
 
 Proudly nicked from Doom's \"core/autoload/files.el\"."
   (interactive
@@ -277,28 +281,28 @@ Proudly nicked from Doom's \"core/autoload/files.el\"."
   (unless (and buffer-file-name (file-exists-p buffer-file-name))
     (user-error "Buffer is not visiting any file"))
 
-  (let ((old-path (buffer-file-name (buffer-base-buffer)))
-        (new-path (expand-file-name new-path)))
-    (make-directory (file-name-directory new-path) 't)
-    (copy-file old-path new-path (or force-p 1))
-    (file:update-files old-path new-path)
-    (message "File copied to %S" (abbreviate-file-name new-path))))
+  (let ((path/old (buffer-file-name (buffer-base-buffer)))
+        (path/new (path:canonicalize:absolute path/new)))
+    (make-directory (path:parent path/new) :make-parents)
+    (copy-file path/old path/new (or force? 1))
+    (file:update-files path/old path/new)
+    (message "File copied to %S" (path:abbreviate:file path/new))))
 
 
 ;;;###autoload
-(defun file:cmd:delete (&optional path force-p)
+(defun file:cmd:delete (&optional path force?)
   "Delete PATH, kill its buffers and expunge it from vc/magit cache.
 
 If PATH is not specified, default to the current buffer's file.
 
-If FORCE-P, delete without confirmation.
+If FORCE?, delete without confirmation.
 
 Proudly nicked from Doom's \"core/autoload/files.el\"."
   (interactive (list (buffer-file-name (buffer-base-buffer))
                      current-prefix-arg))
 
   (let* ((path (or path (buffer-file-name (buffer-base-buffer))))
-         (short-path (abbreviate-file-name path)))
+         (path/short (path:abbreviate:file path)))
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
@@ -306,7 +310,7 @@ Proudly nicked from Doom's \"core/autoload/files.el\"."
       (user-error "Buffer is not visiting any file"))
     (unless (file-exists-p path)
       (error "File doesn't exist: %s" path))
-    (unless (or force-p (y-or-n-p (format "Really delete %S?" short-path)))
+    (unless (or force? (y-or-n-p (format "Really delete %S?" path/short)))
       (user-error "Aborted"))
 
     ;;------------------------------
@@ -318,19 +322,167 @@ Proudly nicked from Doom's \"core/autoload/files.el\"."
           (progn (delete-file path :trash) t)
 
         ;; `delete-file' above failed. Do we need to do any clean up?
-        (if (file-exists-p path)
+        (if (path:exists? path)
             ;; Still exists so just complain.
-            (error "Failed to delete %S" short-path)
+            (error "Failed to delete %S" path/short)
           ;; File doesn't exist, so... ¯\_(ツ)_/¯
           (buffer:cmd:kill buf :dont-save)
           (file:update-files path)
-          (message "Deleted %S" short-path))))))
+          (message "Deleted %S" path/short))))))
 
 
 ;; TODO: A `file:delete` function.
 
 ;; TODO: Should I have file ops for `path:` where it makes sense?
 ;; (defalias 'path:cmd:delete 'file:cmd:delete)
+
+
+;;;###autoload
+(defun file:cmd:move/this (path/new &optional force?)
+  "Move current buffer's file to PATH/NEW.
+
+If FORCE?, overwrite the destination file if it exists, without confirmation.
+
+Originally from Doom's `doom/move-this-file' in \"core/autoload/files.el\"."
+  (interactive
+   (list (read-file-name "Move file to: ")
+         current-prefix-arg))
+
+  ;;------------------------------
+  ;; Error Checks
+  ;;------------------------------
+  (unless (and buffer-file-name (file-exists-p buffer-file-name))
+    (user-error "Buffer is not visiting any file"))
+
+  ;;------------------------------
+  ;; Move File
+  ;;------------------------------
+  (let ((path/old (buffer-file-name (buffer-base-buffer)))
+        (path/new (path:canonicalize path/new)))
+    (when (path:directory? path/new)
+      (setq path/new (path:join path/new (file:name path/old))))
+
+    (make-directory (path:parent path/new) :make-parents)
+    (rename-file path/old
+                 path/new
+                 ;; An integer for the third arg means "ask user for confirmation".
+                 (or force? 1))
+    (set-visited-file-name path/new :no-query :along-with-file)
+    (file:update-files path/old path/new)
+    (message "File moved to: %S" (path:abbreviate:file path/new))))
+
+
+;;;###autoload
+(defun file:cmd:find ()
+  "Find a file starting at DIR.
+
+DIR, if nil, will default to `default-directory'.
+
+Uses:
+  - `counsel-find-file' if in `ivy-mode'
+  - `helm-find-file' if in `helm-mode'
+  - `find-file' otherwise"
+  (interactive)
+  (let ((default-directory (if (and (stringp dir)
+                                    (not (string-empty-p dir)))
+                               (file-truename (expand-file-name dir))
+                             default-directory)))
+    (call-interactively
+     ;; What `find-file' function should be used anyways?
+     (cond ((and (bound-and-true-p ivy-mode)
+                 (fboundp 'counsel-find-file))
+            #'counsel-find-file)
+           ((and (bound-and-true-p helm-mode)
+                 (fboundp 'helm-find-files))
+            #'helm-find-files)
+           (#'find-file)))))
+
+
+;;;###autoload
+(defun file:cmd:find/sudo (file)
+  "Find FILE, open as root."
+  (interactive "FOpen file as root: ")
+  (find-file (path:tramp file :sudo)))
+
+
+;;;###autoload
+(defun file:cmd:find/sudo/this ()
+  "Open the current buffer's file/dir as root.
+
+Copy/pasted from Doom's `doom/sudo-this-file' in \"core/autoload/files.el\"."
+  (interactive)
+  (file:cmd:find/sudo (or buffer-file-name
+                          (when (or (derived-mode-p 'dired-mode)
+                                    (derived-mode-p 'wdired-mode))
+                            default-directory))))
+
+
+;; TODO: Make a `:project' module and move there? Make this `project:cmd:find-file'?
+;;;###autoload
+(defun file:cmd:project:find-file (dir)
+  "Jump to a file in DIR (searched recursively).
+
+If DIR is not a project, it will be indexed (but not cached).
+
+On loan from Doom's `doom-project-find-file' in \"core/autoload/projects.el\"."
+  ;;------------------------------
+  ;; Error Checks
+  ;;------------------------------
+  (unless (file-directory-p dir)
+    (error "Directory %S does not exist" dir))
+  (unless (file-readable-p dir)
+    (error "Directory %S isn't readable" dir))
+
+  ;;------------------------------
+  ;; Go to dir using...
+  ;;------------------------------
+  (let* ((default-directory (file-truename dir))
+         (projectile-project-root (path:project:root dir))
+         (projectile-enable-caching projectile-enable-caching))
+
+    ;;---
+    ;; Projectile?
+    ;;---
+    (cond ((and projectile-project-root
+                (file-equal-p projectile-project-root default-directory))
+           (unless (path:project? default-directory)
+             ;; Disable caching if this is not a real project; caching
+             ;; non-projects easily has the potential to inflate the projectile
+             ;; cache beyond reason.
+             (setq projectile-enable-caching nil))
+           (call-interactively
+            ;; Intentionally avoid `helm-projectile-find-file', because it runs
+            ;; asynchronously, and thus doesn't see the lexical
+            ;; `default-directory'
+            (if (and (bound-and-true-p ivy-mode)
+                     (fboundp 'counsel-projectile-find-file))
+                #'counsel-projectile-find-file
+              #'projectile-find-file)))
+
+          ;;---
+          ;; Ivy & Consel?
+          ;;---
+          ((and (bound-and-true-p ivy-mode)
+                (fboundp 'counsel-file-jump))
+           (call-interactively #'counsel-file-jump))
+
+          ;;---
+          ;; Project (not Projectile)?
+          ;;---
+          ((project-current nil dir)
+           (project-find-file-in nil nil dir))
+
+          ;;---
+          ;; Helm?
+          ;;---
+          ((and (bound-and-true-p helm-mode)
+                (fboundp 'helm-find-files))
+           (call-interactively #'helm-find-files))
+
+          ;;---
+          ;; Fallback: Ye olde `find-file'.
+          ;;---
+          ((call-interactively #'find-file)))))
 
 
 ;;------------------------------------------------------------------------------
