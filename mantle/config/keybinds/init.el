@@ -51,6 +51,10 @@
              :path     path/here
              :filename "text")
 
+    (imp:load :feature  '(:mantle config user keybinds file)
+             :path     path/here
+             :filename "file")
+
    ;;------------------------------
    ;; Emacs Keybinds
    ;;------------------------------

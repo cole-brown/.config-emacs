@@ -23,26 +23,28 @@
 ;; NOTE: Keep in alphanumerical order!
 
 (keybind:leader/global:def
- :infix (keybind:infix "i") ;; insert
- ;; Infix Title
- "" '(nil :which-key "Insert..."))
+ :infix (keybind:infix "i")        ; insert
+ "" '(nil :which-key "Insert...")) ; infix's title
 
 
 (keybind:leader/global:def
- :infix (keybind:infix "n") ;; notes
- ;; Infix Title
- "" '(nil :which-key "Notes..."))
+ :infix (keybind:infix "f")      ; files
+ "" '(nil :which-key "File...")) ; infix's title
 
 
 (keybind:leader/global:def
- :infix (keybind:infix "t") ;; text
- ;; Infix Title
- "" '(nil :which-key "Text..."))
+ :infix (keybind:infix "n")       ; notes
+ "" '(nil :which-key "Notes...")) ; infix's title
+
 
 (keybind:leader/global:def
- :infix (keybind:infix "/") ;; search
- ;; Infix Title
- "" '(nil :which-key "Search..."))
+ :infix (keybind:infix "t")      ; text
+ "" '(nil :which-key "Text...")) ; infix's title
+
+
+(keybind:leader/global:def
+ :infix (keybind:infix "/")        ; search
+ "" '(nil :which-key "Search...")) ; infix's title
 
 
 ;;-----------------------------------------------------------------------------
