@@ -1,6 +1,9 @@
 ;;; emacs/buffer/name.el -*- lexical-binding: t; -*-
 
 
+(require 'cl-lib)
+
+
 ;;----------------------------------Buffers------------------------------------
 ;;--                    And Things to Make Them Better.                      --
 ;;-----------------------------------------------------------------------------
@@ -189,8 +192,8 @@ Special buffers are:
 ;;   http://ergoemacs.org/emacs/emacs_copy_file_path.html
 ;; Originally `xah-file-path'. Originally only used `kill-new' - modified to put
 ;; in clipboard too (`clipboard-kill-region').
-(defun buffer:cmd:clipboard:file-or-dir-name (&optional dir-path-only-p)
-  "Copy the 'current' path to `kill-ring'.
+(cl-defun buffer:clipboard:path (&key parent relative)
+  "Copy the buffer's current path to `kill-ring'.
 
 If in a file buffer, copy the file's path.
 
@@ -199,11 +202,15 @@ If in Dired buffer, copy the file/dir cursor is on, or marked files.
 If a buffer is not file and not Dired, copy value of `default-directory' (which
 is usually the \"current\" dir when that buffer was created).
 
-If DIR-PATH-ONLY-P is non-nil (`universal-argument' is called first), copy the
-dir path, not the file path.
+Optional keys:
+  - `:parent' (PARENT)
+    - If non-nil, copy the buffer's parent directory path instead of the
+      buffer's own path.
+  - `:relative' (RELATIVE)
+    - If non-nil, copy the buffer's path relative to the project root instead of
+      the absolute path.
 
-Return an absolute path string."
-  (interactive "P")
+Return a path string."
   (let ((path
          (if (string-equal major-mode 'dired-mode)
              (progn
@@ -222,8 +229,43 @@ Return an absolute path string."
        (progn
          (message "File path copied: 「%s」" path)
          path)))))
-;; (buffer:cmd:clipboard:file-or-dir-name)
-;; (buffer:cmd:clipboard:file-or-dir-name t)
+
+
+(defun buffer:cmd:clipboard:path/absolute (&optional parent)
+  "Copy the buffer's current path to `kill-ring'.
+
+If in a file buffer, copy the file's path.
+
+If in Dired buffer, copy the file/dir cursor is on, or marked files.
+
+If a buffer is not file and not Dired, copy value of `default-directory' (which
+is usually the \"current\" dir when that buffer was created).
+
+If PARENT is non-nil (`universal-argument' is called first), copy the buffer's
+parent directory path instead of the buffer's own path.
+
+Return a path string."
+  (interactive "P")
+  (buffer:clipboard:path :parent parent))
+
+
+(defun buffer:cmd:clipboard:path/relative (&optional parent)
+  "Copy the buffer's current path to `kill-ring'.
+
+If in a file buffer, copy the file's path.
+
+If in Dired buffer, copy the file/dir cursor is on, or marked files.
+
+If a buffer is not file and not Dired, copy value of `default-directory' (which
+is usually the \"current\" dir when that buffer was created).
+
+If PARENT is non-nil (`universal-argument' is called first), copy the buffer's
+parent directory path instead of the buffer's own path.
+
+Return a path string."
+  (interactive "P")
+  (buffer:clipboard:path :parent parent
+                         :relative t))
 
 
 ;;------------------------------------------------------------------------------
