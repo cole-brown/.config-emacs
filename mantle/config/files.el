@@ -217,8 +217,7 @@
   ;; `deadgrep-mode-map' Keybinds
   ;;---
   (:states  'normal
-   :keymaps deadgrep-mode-map ;; TODO: Rebind (more) keybinds from this map!
-   :infix "/"
+   :keymaps 'deadgrep-mode-map ;; TODO: Rebind (more) keybinds from this map!
 
    ;; 'kill-or-quit' instead of 'quit-or-kill'
    "q" (list #'window:kill-or-quit :which-key "Quit or Kill 'deadgrep' Window")

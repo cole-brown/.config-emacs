@@ -329,7 +329,7 @@ If optional JUSTIFY? is non-nil, justify the text filled (see function
 
    "a" (list #'buffer:cmd:align-before :which-key "Align Before")
 
-   "o" (list buffer:cmd:align-after :which-key "Align After")
+   "o" (list #'buffer:cmd:align-after :which-key "Align After")
 
    ";" (list #'align-regexp :which-key "Align Regex")
 
