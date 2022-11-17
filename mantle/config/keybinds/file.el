@@ -49,16 +49,16 @@
    ;;---
    ;; Names / Paths
    ;;---
-   "y" (list #'buffer:cmd:clipboard:path/absolute :which-key "File's Path")
-   "f" (list #'buffer:cmd:clipboard:path/absolute :which-key "File's Path")
+   "y" (list #'buffer:cmd:clipboard:path/absolute :which-key "Copy This File's Path")
+   "f" (list #'buffer:cmd:clipboard:path/absolute :which-key "Copy This File's Path")
 
    "d" (list (elisp:cmd/with-args #'buffer:cmd:clipboard:path/absolute '(4)) ;; Call with simulated C-u prefix arg.
-             :which-key "Parent's Path")
+             :which-key "Copy This File's Parent's Path")
 
-   "r" (list #'buffer:cmd:clipboard:path/relative :which-key "Relative Path")
+   "r" (list #'buffer:cmd:clipboard:path/relative :which-key "Copy This File's Relative Path")
 
    "R" (list (elisp:cmd/with-args #'buffer:cmd:clipboard:path/relative '(4)) ;; Call with simulated C-u prefix arg.
-             :which-key "Parent's Relative Path"))
+             :which-key "Copy This File's Parent's Relative Path"))
 
   ;;------------------------------
   ;; File / Path
@@ -111,7 +111,6 @@
   (when (system:secret:has)
     (keybind:leader/global:def
      :infix (keybind:infix "f .")          ; file -> ...dotfiles?
-     "" '(nil :which-key "File at...") ; infix title
 
      "s" (list (elisp:cmd/with-args #'file:cmd:project:find-file (system:multiplexer:get 'path 'secret 'emacs))
                :which-key "Find file in `.secret.d'...")
