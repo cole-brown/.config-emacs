@@ -17,8 +17,17 @@
 
 
 ;;------------------------------------------------------------------------------
-;; The Very Definition of a Modern Keybind General
+;; General Keybinds Package
 ;;------------------------------------------------------------------------------
+;;              The Very Definition of a Modern Keybind General
+;;                       ------------------------------
+;;
+;; https://github.com/noctuid/general.el
+;;
+;; Used by `evil', `evil-collection', and us to create keybinds a bit
+;; nicer/neater than standard Emacs.
+;;
+;; Adds a `use-package' keyword, `:general', for creating General keybinds.
 
 (imp:use-package general
   :demand t ;; Always load.
@@ -44,17 +53,27 @@
                                   operator
                                   replace))
 
+  ;; Define some leader keys & definers for `:mantle' to use:
+
 
   ;; ;;--------------------
   ;; :config
   ;; ;;--------------------
-  ;;
-  ;; The big/general leader keys & definers defined in:
-  ;;   "mantle/config/keybinds/leaders.el"
-  ;;
+
   ;; Keybinds configured in "mantle/config/keybinds/" files, or nearer to
   ;; (ideally in) their `use-package'.
   )
+
+
+;;------------------------------------------------------------------------------
+;; Core `:keybinds' Module
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:keybind)
+          :path     (imp:path:join innit:path:core/module
+                                   "input"
+                                   "keybind")
+          :filename "init.el")
 
 
 

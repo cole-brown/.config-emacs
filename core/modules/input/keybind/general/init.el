@@ -1,9 +1,9 @@
-;;; modules/keybind/general/init.el --- The General in Your Keybind Army -*- lexical-binding: t; -*-
+;;; core/modules/input/keybind/general/init.el --- The General in Your Keybind Army -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-07-21
-;; Modified:   2022-07-21
+;; Modified:   2022-11-17
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
