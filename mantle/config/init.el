@@ -53,10 +53,6 @@
                                    "hydra")
           :filename "init")
 
-(imp:load :feature  '(:mantle config user general)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "general")
-
 ;; Sets `imp:flag', which is used by `evil' config to figure out which optional
 ;; undo system to use.
 (imp:load :feature  '(:mantle config user undo-tree)

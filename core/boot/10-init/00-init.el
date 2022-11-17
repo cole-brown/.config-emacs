@@ -34,9 +34,13 @@
               :path     (imp:path:current:dir/relative :core)
               :filename "10-settings.el")
 
+    (imp:load :feature  '(:core boot init packages)
+              :path     (imp:path:current:dir/relative :core)
+              :filename "20-packages.el")
+
     (imp:load :feature  '(:core boot init mantle)
               :path     (imp:path:current:dir/relative :core)
-              :filename "20-mantle.el")))
+              :filename "80-mantle.el")))
 
 
 ;;------------------------------------------------------------------------------
