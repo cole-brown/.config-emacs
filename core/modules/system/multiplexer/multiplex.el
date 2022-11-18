@@ -39,7 +39,7 @@
 PLIST is a plist with keys:
   - REQUIRED:
     + `:hash'  - This system's hash string.
-    + `:keys'  - A list of keys to use for storing setting
+    + `:key'   - A quoted symbol or list of symbols to use for storing settings.
                - Will be prepended with `:system hash'.
     + `:value' - The value to store.
   - OPTIONAL:
@@ -50,7 +50,7 @@ Sets value in Jerky under key:
 
   (let ((func/name "system:multiplexer:set")
         (hash   (plist-get plist :hash))
-        (keys   (plist-get plist :keys))
+        (key    (plist-get plist :key))
         (value  (plist-get plist :value))
         (docstr (plist-get plist :docstr)))
 
@@ -59,174 +59,216 @@ Sets value in Jerky under key:
         func/name
         '(:system :multiplex)
       (cons 'hash hash)
-      (cons 'keys keys)
+      (cons 'key  key)
       (cons 'value value)
       (cons 'docstr docstr))
 
-    (nub:debug:func/return
-        :system/multiplexer
-        func/name
-        '(:system :multiplex)
+    ;;------------------------------
+    ;; Check for required plist keys: Part 01
+    ;;------------------------------
+    (unless hash
+      (nub:error
+       :system/multiplexer
+       func/name
+       "Must have a `:hash' in plist params: %S"
+       plist))
+    (unless value
+      (nub:error
+       :system/multiplexer
+       func/name
+       "Must have a `:value' in plist params: %S"
+       plist))
 
-      ;; Check for required plist keys:
-      (cond ((not hash)
+    ;;------------------------------
+    ;; Special Case: `hash' == `value'
+    ;;------------------------------
+    ;; Save value as this system's hash if `hash' and `value' are equal and
+    ;; there are no `key' or `docstr'.
+    (if (and hash
+             value
+             (not key)
+             (not docstr)
+             (stringp hash)
+             (stringp value)
+             (string= hash value))
+        ;; Set the system's hash in Jerky.
+        (progn
+          (int<system/multiplexer>:add hash)
+          (nub:debug
+           :system/multiplexer
+           func/name
+           '(:system :multiplex)
+           "`%S' set to: %S"
+           '(:system :hash)
+           value)
+          (jerky:set 'system 'hash
+                     :value value))
+
+      ;;------------------------------
+      ;; Check for required plist keys: Part 02
+      ;;------------------------------
+      (cond ((not key)
              (nub:error
               :system/multiplexer
               func/name
-              "Must have a `:hash' in plist params: %S"
+              "Must have a `:key' in plist params: %S"
               plist))
-            ((not value)
+
+            ((not (listp key))
              (nub:error
               :system/multiplexer
               func/name
-              "Must have a `:value' in plist params: %S"
-              plist))
+              "`:key' must be a list; got: %S"
+              key))
 
-            ;; Special case: save value as this system's hash if `hash' and
-            ;; `value' are equal and there are no `keys' or `docstr'.
-            ((and hash
-                  value
-                  (not keys)
-                  (not docstr)
-                  (stringp hash)
-                  (stringp value)
-                  (string= hash value))
-             (int<system/multiplexer>:add hash)
-             (nub:debug
-                 :system/multiplexer
-                 func/name
-                 '(:system :multiplex)
-               "`%S' set to: %S"
-               '(:system :hash)
-               value)
-             (jerky:set 'system 'hash
-                        :value value))
+           ((and docstr
+                 (not (stringp docstr)))
+            (nub:error
+             :system/multiplexer
+             func/name
+             "`:docstr' must be a string; got: %S"
+             docstr)))
 
-            ;; Check for required plist keys:
-            ((not keys)
-             (nub:error
-              :system/multiplexer
-              func/name
-              "Must have a `:keys' in plist params: %S"
-              plist))
+      ;;------------------------------
+      ;; Normalize KEY to a list
+      ;;------------------------------
+      (cond ((symbolp key)
+             (setq key (list key)))
 
-            ;; Check validitiy:
-            ((not (listp keys))
-             (nub:error
-              :system/multiplexer
-              func/name
-              "`:keys' must be a list; got: %S"
-              keys))
-            ((and docstr
-                  (not (stringp docstr)))
-             (nub:error
-              :system/multiplexer
-              func/name
-              "`:docstr' must be a string; got: %S"
-              docstr))
+            ((listp key)
+             ;; ok as-is
+             nil)
 
-            ;; Valid - save it.
             (t
-             (int<system/multiplexer>:add hash)
-             (if docstr
-                 (jerky:set 'system hash keys
-                            :value value
-                            :docstr docstr)
-               (jerky:set 'system hash keys
-                          :value value)))))))
-;; (system:multiplexer:set :hash "foo" :keys '(bar) :value 42 :docstr "hello there")
+             (nub:error
+              :system/multiplexer
+              func/name
+              '("KEY must be a single quoted symbol or a list of symbols. "
+                "got %S: %S")
+              (type-of key)
+              key)))
+
+      ;;------------------------------
+      ;; Valid - save it.
+      ;;------------------------------
+      (nub:debug:func/return
+       :system/multiplexer
+       func/name
+       '(:system :multiplex)
+
+       (int<system/multiplexer>:add hash)
+       (if docstr
+           (jerky:set 'system hash key
+                      :value value
+                      :docstr docstr)
+         (jerky:set 'system hash key
+                    :value value))))))
+;; (system:multiplexer:set :hash "foo" :key '(bar) :value 42 :docstr "hello there")
+;; (system:multiplexer:set :hash "foo" :key 'baz :value 43 :docstr "hello there")
 ;; (system:multiplexer:set :hash "jeff" :value "jeff")
 ;; (jerky:get 'system 'hash)
 ;; (system:multiplexer:set :hash "5730ce-91e149" :value "5730ce-91e149")
 ;; (jerky:get 'system 'hash)
 
 
-(defun system:multiplexer:get (hash &rest keys)
+(cl-defun system:multiplexer:get (&key hash key)
   "For getting a system's multiplex settings.
 
-HASH should be a string of the system's hash used when saving the setting,
-or nil.
-  - If both HASH and KEYS are nil, this will return the saved hash for
-    /this/ system.
-  - If HASH is nil, it will use /this/ system's hash.
+HASH should be:
+  - a string of the system's hash used when saving the setting
+  - `this' or `:this' (for \"this system's hash\")
+  - nil (also for \"this system's hash\")
 
-KEYS will be prepended with `:system' and the HASH to match where
-`system:multiplexer:set' sets them in Jerky."
+KEY should be a single symbol or a list of symbols that the setting was saved
+under (which, see function `system:multiplexer:set').
+
+NOTES:
+  - KEY will be prepended with `:system' and the HASH to match where
+    `system:multiplexer:set' sets them in Jerky."
   (let ((func/name "system:multiplexer:get"))
-    ;; Error Case: HASH must be nil or a string.
-    (cond ((and (not (null hash))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    ;; Special Case: `this' system's HASH.
+    (cond ((or (eq hash 'this)
+               (eq hash :this))
+           (setq hash (jerky:get 'system 'hash)))
+
+          ;; Not the special case so HASH must be a valid input value:
+          ;; nil, or a string.
+          ((and (not (null hash))
                 (not (stringp hash)))
            (nub:error
                :system/multiplexer
                func/name
-             "HASH must be nil or a string; got: %S"
+             "HASH must be `this', `:this', nil, or a string; got: %S"
              hash))
 
-          ;; Special Case: get saved hash.
-          ((and (null hash)
-                (null keys))
-           (jerky:get 'system 'hash))
-
-          ;; Check validitiy:
-          ((not keys)
+          ;; Otherwise, need key.
+          ((not key)
            (nub:error
-               :system/multiplexer
-               func/name
-             "Must have `keys' in params; got: %S"
-             keys))
+            :system/multiplexer
+            func/name
+            "Must have `key' in params; got: %S"
+            key))
 
-          ;; Try to get it.
           (t
-           (let ((hash/get (or hash
-                               (jerky:get 'system 'hash))))
-             ;; Check `hash/get' validity, finally.
-             (if (not hash/get)
-                 (nub:error
-                     :system/multiplexer
-                     func/name
-                   '("No hash provided and could "
-                     "not find a saved hash... "
-                     "provided: %S, saved: %S")
-                   hash
-                   (jerky:get 'system 'hash))
-               (jerky:get 'system hash/get keys)))))))
-;; (system:multiplexer:get nil)
-;; (system:multiplexer:get nil 'path 'secret 'emacs)
-;; (system:multiplexer:get (jerky:get 'system 'hash) 'path 'secret 'emacs)
-;; (system:multiplexer:get "foo" 'bar)
-;; (jerky:/parse '(system "foo" (bar)) t)
-;; (jerky:get 'system "foo" '(bar))
+           nil))
+
+    ;;------------------------------
+    ;; Normalization
+    ;;------------------------------
+    ;; Normalize key to a list
+    (cond ((symbolp key)
+           (setq key (list key)))
+
+          ((listp key)
+           ;; ok as-is
+           nil)
+
+          (t
+           (nub:error
+            :system/multiplexer
+            func/name
+            '("KEY must be a single quoted symbol or a list of symbols. "
+              "got %S: %S")
+            (type-of key)
+            key)))
+
+    ;;------------------------------
+    ;; Get Multiplexer Setting from Jerky
+    ;;------------------------------
+    (jerky:get 'system hash key)))
+;; (system:multiplexer:get :hash 'this :key '(path secret emacs))
+;; (system:multiplexer:get :hash (jerky:get 'system 'hash) :key '(path secret emacs))
+;; (system:multiplexer:get :hash "foo" :key 'bar)
 
 
 ;;------------------------------------------------------------------------------
 ;; System UID
 ;;------------------------------------------------------------------------------
 
-(defun system:multiplexer:hash/this ()
+(defun system:multiplexer:hash ()
   "Return /this/ system's hash.
 
-If a system hash has been saved, return the saved hash.
-
-Else, generate a system hash from function `system-name' and
-variable `system-type'."
-  ;; TODO: Why does a system have a different hash at start of init compared
-  ;; to after doom/emacs is running? Is it intentional? Cuz it's confusing to
-  ;; me when adding a new system.
-  ;; (message "system hash for system-name %S system-type %S: %S"
-  ;;          (system-name) system-type
-  ;;          (str:hash:pretty (list (system-name) system-type)))
-  ;;
-  ;; Band-aid solution: check if we've got a saved hash.
-  (if-let ((saved-hash (system:multiplexer:get nil)))
-      saved-hash
+If no system hash is set, first generate this system's hash from function
+`system-name' and variable `system-type'."
+  (if-let ((hash (jerky:get 'system 'hash)))
+      ;; Have hash; return hash.
+      hash
+    ;; No hash. Generate, save, and then return it.
     (let ((hash (str:hash:pretty (list (system-name) system-type))))
-      (system:multiplexer:set :hash hash :value hash)
+      (message "\n\n%1$S\nNo hash! Set hash to: %2$S\n%1$S\n"
+               (make-string 80 ?×)
+               hash)
+      (system:multiplexer:set :hash  hash
+                              :value hash)
       hash)))
-;; (system:multiplexer:hash/this)
+;; (system:multiplexer:hash)
 ;; (str:hash:pretty (list (system-name) system-type))
 
 
-(defun system:multiplexer:hash:uid (domain date name)
+(defun system:multiplexer:uid (domain date name)
   "Generate a system UID from parameters.
 
 DOMAIN, DATE, and NAME should be strings. They can be anything, but are named
@@ -243,7 +285,7 @@ Return a system UID string from the specified DOMAIN, DATE and NAME, with
 function `system-name' and variable `system-type' as additional information."
   (str:hash (list domain date name)
             (list (system-name) system-type)))
-;; (system:multiplexer:hash:uid "jeff" "2020" "compy")
+;; (system:multiplexer:uid "jeff" "2020" "compy")
 
 
 (defun system:multiplexer:path/rel (&optional unique-id)
@@ -251,7 +293,7 @@ function `system-name' and variable `system-type' as additional information."
 
 If UNIQUE-ID is nil, use this system's ID."
   (let ((unique-id (or unique-id
-                       (system:multiplexer:get nil 'id))))
+                       (system:multiplexer:get :hash 'this :key 'id))))
     (replace-regexp-in-string "::" "_"
                               (replace-regexp-in-string "/" "-"
                                                         unique-id))))
@@ -288,9 +330,10 @@ If UNIQUE-ID is nil, use this system's ID."
   "Define a system based on the arguments plist.
 
 HASH - /Must/ be a static string of a system's hash from
-       `system:multiplexer:hash/this', not a return value from dynamically
-       calling `system:multiplexer:hash/this'.
-TODO: Why can't we call `system:multiplexer:hash/this' in the function call?
+       `system:multiplexer:hash', not a return value from dynamically
+       calling `system:multiplexer:hash'.
+       - You're defining systems, some of which aren't /this/ system, so you'll
+         need their hard-coded hashes.
 
 DOMAIN - A string/symbol of \"home\", \"work\", or other domain name.
 
@@ -420,15 +463,15 @@ DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
         ;;------------------------------
 
         (system:multiplexer:set :hash hash
-                                :keys (list 'path 'secret 'root)
+                                :key (list 'path 'secret 'root)
                                 :value path/secret/root
                                 :docstr "Root for .secret.d")
         (system:multiplexer:set :hash hash
-                                :keys (list 'path 'secret 'emacs)
+                                :key (list 'path 'secret 'emacs)
                                 :value path/secret/init.abs
                                 :docstr "Root for Per-Computer Set-Up of Emacs")
         (system:multiplexer:set :hash hash
-                                :keys (list 'id)
+                                :key (list 'id)
                                 :value id
                                 :docstr description)
 
@@ -436,7 +479,7 @@ DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
         ;; on where things can be, and home comps tend to have a random number
         ;; of hard drives just wherever.
         (system:multiplexer:set :hash hash
-                                :keys (list 'path 'secret 'system)
+                                :key (list 'path 'secret 'system)
                                 :value  (system:multiplexer:path/abs path/secret/init.abs id)
                                 :docstr description))
 
@@ -459,13 +502,13 @@ DEBUG - If non-nil, just print out stuff instead of setting it into Jerky."
 (defun int<system/multiplexer>:show (hash buffer)
   "Display system multiplexer info for system identified by HASH in BUFFER.
 
-HASH should be a string from e.g. `system:multiplexer:hash/this'.
+HASH should be a string from e.g. `system:multiplexer:hash'.
 
 BUFFER should be a buffer or buffer name string."
   (with-current-buffer (get-buffer-create buffer)
     (goto-char (point-max))
-    (let* ((current (string= hash (system:multiplexer:hash/this)))
-           (id (system:multiplexer:get hash 'id))
+    (let* ((current (string= hash (system:multiplexer:hash)))
+           (id (system:multiplexer:get :hash hash :key 'id))
            ;; Split ID up into domain, date, and type.
            (prefixes (nth 0 (if id
                                 (str:hash:split id)
@@ -475,8 +518,8 @@ BUFFER should be a buffer or buffer name string."
            (type     (nth 2 prefixes))
            (description (jerky:get 'system hash 'id
                                    :field :docstr))
-           (path/root (system:multiplexer:get hash 'path 'secret 'root))
-           (path/init (system:multiplexer:get hash 'path 'secret 'emacs)))
+           (path/root (system:multiplexer:get :hash hash :key '(path secret root)))
+           (path/init (system:multiplexer:get :hash hash :key '(path secret emacs))))
       (insert
        (format (mapconcat #'identity
                           '("\n"
