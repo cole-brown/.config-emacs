@@ -14,7 +14,7 @@
  (imp:path:current:file/relative :root)
  '(:init :system :multiplexer :secret)
  "This system's hash is: %S (== %S)"
- (system:multiplexer:hash/this)
+ (system:multiplexer:hash)
  (system:secret:hash))
 
 

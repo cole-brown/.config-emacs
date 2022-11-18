@@ -16,8 +16,8 @@
 ;; Or maybe "Who the hell am I?"...
 
 ;; Set our system's hash.
-(system:multiplexer:hash/this)
-;; (system:multiplexer:get)
+(system:multiplexer:hash)
+;; (system:multiplexer:get :hash 'this)
 ;; (jerky:get 'system 'hash)
 
 (nub:debug
@@ -25,7 +25,7 @@
  (imp:path:current:file/relative :root)
  '(:init :system :multiplexer :secret)
  "This system's hash is: %S (== %S)"
- (system:multiplexer:hash/this)
+ (system:multiplexer:hash)
  (system:secret:hash))
 
 

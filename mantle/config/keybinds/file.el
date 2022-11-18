@@ -112,12 +112,14 @@
     (keybind:leader/global:def
      :infix (keybind:infix "f .")          ; file -> ...dotfiles?
 
-     "s" (list (elisp:cmd/with-args #'file:cmd:project:find-file (system:multiplexer:get 'path 'secret 'emacs))
+     "s" (list (elisp:cmd/with-args #'file:cmd:project:find-file
+                                    (system:multiplexer:get :hash 'this
+                                                            :key '(path secret emacs)))
                :which-key "Find file in `.secret.d'...")
-     "S" (list (elisp:cmd/with-args #'file:cmd:find (system:multiplexer:get 'path 'secret 'emacs))
+     "S" (list (elisp:cmd/with-args #'file:cmd:find
+                                    (system:multiplexer:get :hash 'this
+                                                            :key '(path secret emacs)))
                :which-key "Browse `.secret.d'..."))))
-
-
 
 
 ;;------------------------------------------------------------------------------

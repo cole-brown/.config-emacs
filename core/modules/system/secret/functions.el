@@ -20,16 +20,17 @@
 
 (defun system:secret:hash ()
   "Get this system's secret hash, which is the same as the system's hash."
-  (system:multiplexer:hash/this))
+  (system:multiplexer:hash))
 ;; (system:secret:hash)
-;; (string= (system:secret:hash) (system:multiplexer:hash/this))
+;; (string= (system:secret:hash) (system:multiplexer:hash))
 
 
 (defun system:secret:id ()
   "Get this system's secrets ID.
 
 Returns nil if no secrets ID for this system."
-  (system:multiplexer:get (system:multiplexer:hash/this) 'id))
+  (system:multiplexer:get :hash 'this
+                          :key  'id))
 ;; (system:secret:id)
 
 
@@ -39,17 +40,20 @@ Returns nil if no secrets ID for this system."
 
 (defun system:secret:path/root ()
   "Get secrets' root dir for all systems."
-  (system:multiplexer:get nil 'path 'secret 'root))
+  (system:multiplexer:get :hash 'this
+                          :key '(path secret root)))
 
 
 (defun system:secret:path/load ()
   "Get secrets' Emacs Lisp load dir for all systems."
-  (system:multiplexer:get nil 'path 'secret 'emacs))
+  (system:multiplexer:get :hash 'this
+                          :key '(path secret emacs)))
 
 
 (defun system:secret:path/system ()
   "Get this specific system's secrets' load dir."
-  (system:multiplexer:get nil 'path 'secret 'system))
+  (system:multiplexer:get :hash 'this
+                          :key '(path secret system)))
 
 
 ;;------------------------------------------------------------------------------
