@@ -95,26 +95,48 @@ Originaly from `doom-unquote'."
 A factory for quickly producing interaction commands, particularly for keybinds
 or aliases.
 
-Proudly nicked from Doom's core-lib.el."
+Proudly nicked from Doom's `cmd!' in \"core/core-lib.el\"."
   (declare (doc-string 1) (pure t) (side-effect-free t))
   `(lambda (&rest _) (interactive) ,@body))
 
 
-(defmacro elisp:cmd/with-args (command &optional prefix-arg &rest args)
-  "Return a closure that interactively calls COMMAND with ARGS and PREFIX-ARG.
+(defmacro elisp:cmd/prefix (command prefix-param)
+  "Return lambda for calling COMMAND with prefix arg of PREFIX-PARAM.
 
-Like `elisp:cmd', but allows you to change `current-prefix-arg' or pass arguments to
+A factory for quickly producing interaction commands, particularly for keybinds
+or aliases.
+
+Like `elisp:cmd', but allows you to change `current-prefix-arg'arguments to
 COMMAND. This macro is meant to be used as a target for keybinds (e.g. with
 `define-key' or `general-def').
 
-Proudly nicked from Doom's core-lib.el."
+Originally from Doom's `cmd!!' in \"core/core-lib.el\"."
   (declare (doc-string 1) (pure t) (side-effect-free t))
   `(lambda (arg &rest _) (interactive "P")
-     (let ((current-prefix-arg (or ,prefix-arg arg)))
-       (,(if args
-             'funcall-interactively
-           'call-interactively)
-        ,command ,@args))))
+     (let ((current-prefix-arg (or ,prefix-param arg)))
+       (,(if params
+             #'funcall-interactively
+           #'call-interactively)
+        ,command ,@params))))
+
+
+(defmacro elisp:cmd/args (command &rest args)
+  "Return lambda for calling COMMAND with ARGS.
+
+A factory for quickly producing interaction commands, particularly for keybinds
+or aliases.
+
+Like `elisp:cmd', but allows you to pass arguments to COMMAND. This macro is
+meant to be used as a target for keybinds (e.g. with `define-key' or
+`general-def').
+
+Originally from from Doom's `cmd!!' in \"core/core-lib.el\"."
+  (declare (doc-string 1) (pure t) (side-effect-free t))
+  `(lambda (arg &rest _) (interactive)
+     (,(if args
+           #'funcall-interactively
+         #'call-interactively)
+      ,command ,@args)))
 
 
 ;;------------------------------------------------------------------------------
