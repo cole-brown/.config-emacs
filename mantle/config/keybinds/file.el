@@ -52,12 +52,12 @@
    "y" (list #'buffer:cmd:clipboard:path/absolute :which-key "Copy This File's Path")
    "f" (list #'buffer:cmd:clipboard:path/absolute :which-key "Copy This File's Path")
 
-   "d" (list (elisp:cmd/with-args #'buffer:cmd:clipboard:path/absolute '(4)) ;; Call with simulated C-u prefix arg.
+   "d" (list (elisp:cmd/prefix #'buffer:cmd:clipboard:path/absolute '(4)) ;; Call with simulated C-u prefix arg.
              :which-key "Copy This File's Parent's Path")
 
    "r" (list #'buffer:cmd:clipboard:path/relative :which-key "Copy This File's Relative Path")
 
-   "R" (list (elisp:cmd/with-args #'buffer:cmd:clipboard:path/relative '(4)) ;; Call with simulated C-u prefix arg.
+   "R" (list (elisp:cmd/prefix #'buffer:cmd:clipboard:path/relative '(4)) ;; Call with simulated C-u prefix arg.
              :which-key "Copy This File's Parent's Relative Path"))
 
   ;;------------------------------
@@ -102,9 +102,9 @@
    ;; Emacs Config
    ;;---
    ;; .emacs.d aka public config
-   "e" (list (elisp:cmd/with-args #'file:cmd:project:find-file user-emacs-directory)
+   "e" (list (elisp:cmd/args #'file:cmd:project:find-file user-emacs-directory)
              :which-key "Find file in `.emacs.d'...")
-   "E" (list (elisp:cmd/with-args #'file:cmd:find user-emacs-directory)
+   "E" (list (elisp:cmd/args #'file:cmd:find user-emacs-directory)
              :which-key "Browse `.emacs.d'..."))
 
    ;; .secret.d aka private config
@@ -112,13 +112,13 @@
     (keybind:leader/global:def
      :infix (keybind:infix "f .")          ; file -> ...dotfiles?
 
-     "s" (list (elisp:cmd/with-args #'file:cmd:project:find-file
-                                    (system:multiplexer:get :hash 'this
-                                                            :key '(path secret emacs)))
+     "s" (list (elisp:cmd/args #'file:cmd:project:find-file
+                               (system:multiplexer:get :hash 'this
+                                                       :key '(path secret emacs)))
                :which-key "Find file in `.secret.d'...")
-     "S" (list (elisp:cmd/with-args #'file:cmd:find
-                                    (system:multiplexer:get :hash 'this
-                                                            :key '(path secret emacs)))
+     "S" (list (elisp:cmd/args #'file:cmd:find
+                               (system:multiplexer:get :hash 'this
+                                                       :key '(path secret emacs)))
                :which-key "Browse `.secret.d'..."))))
 
 
