@@ -425,6 +425,7 @@ Copy/pasted from Doom's `doom/sudo-this-file' in \"core/autoload/files.el\"."
 If DIR is not a project, it will be indexed (but not cached).
 
 On loan from Doom's `doom-project-find-file' in \"core/autoload/projects.el\"."
+  (interactive "DFind File In Project Directory: ")
   ;;------------------------------
   ;; Error Checks
   ;;------------------------------

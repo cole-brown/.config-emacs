@@ -222,7 +222,7 @@ Return a path string."
                (buffer-file-name)
              (expand-file-name default-directory)))))
     (kill-new
-     (if dir-path-only-p
+     (if parent
          (progn
            (message "Directory path copied: 「%s」" (file-name-directory path))
            (file-name-directory path))
