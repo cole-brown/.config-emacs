@@ -112,7 +112,7 @@ COMMAND. This macro is meant to be used as a target for keybinds (e.g. with
 
 Originally from Doom's `cmd!!' in \"core/core-lib.el\"."
   (declare (doc-string 1) (pure t) (side-effect-free t))
-  `(lambda (arg &rest _) (interactive "P")
+  `(lambda (&optional arg &rest _) (interactive "P")
      (let ((current-prefix-arg (or ,prefix-param arg)))
        (call-interactively
         ,command))))
@@ -130,7 +130,7 @@ meant to be used as a target for keybinds (e.g. with `define-key' or
 
 Originally from from Doom's `cmd!!' in \"core/core-lib.el\"."
   (declare (doc-string 1) (pure t) (side-effect-free t))
-  `(lambda (arg &rest _) (interactive)
+  `(lambda (&rest _) (interactive)
      (,(if args
            #'funcall-interactively
          #'call-interactively)
