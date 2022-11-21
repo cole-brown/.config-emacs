@@ -114,10 +114,8 @@ Originally from Doom's `cmd!!' in \"core/core-lib.el\"."
   (declare (doc-string 1) (pure t) (side-effect-free t))
   `(lambda (arg &rest _) (interactive "P")
      (let ((current-prefix-arg (or ,prefix-param arg)))
-       (,(if params
-             #'funcall-interactively
-           #'call-interactively)
-        ,command ,@params))))
+       (call-interactively
+        ,command))))
 
 
 (defmacro elisp:cmd/args (command &rest args)
