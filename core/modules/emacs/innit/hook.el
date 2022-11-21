@@ -95,26 +95,28 @@ Hook function name returned will be an interned symbol from
   "`defun' a hook function (which will run BODY) and add it to HOOK-VAR.
 
 OPTIONS is a plist of optional vars:
-  :name     - Hook function will be named:
-                (concat innit:hook:func/name:prefix '<hook-name>')
-              - '<hook-name>':
-                - If `:name' is a string, that string.
-                - If `:name' is a symbol (e.g. the hook variable), convert to a
-                  string via `symbol-name'.
-                - Remove \"-hook\" suffix if present.
-                - See: `innit:hook:func/name:string'
+  :name      - Hook function will be named:
+                 (concat innit:hook:func/name:prefix '<hook-name>')
+               - '<hook-name>':
+                 - If `:name' is a string, that string.
+                 - If `:name' is a symbol (e.g. the hook variable), convert to a
+                   string via `symbol-name'.
+                 - Remove \"-hook\" suffix if present.
+                 - See: `innit:hook:func/name:string'
 
-  :quiet    - If non-nil, do not output the 'Running hook [...]' message.
+  :quiet     - If non-nil, do not output the 'Running hook [...]' message.
 
-  :squelch  - If non-nil, wrap BODY in `innit:squelch'.
+  :squelch   - If non-nil, wrap BODY in `innit:squelch'.
 
-  :postpend - Passed on to `add-hook'. If non-nil, hook will be postpended to
-              the list of hooks. If nil, hook will be prepended.
+  :postpend  - Passed on to `add-hook'. If non-nil, hook will be postpended to
+               the list of hooks. If nil, hook will be prepended.
 
-  :file     - Filename where your macro is called from... in case you happen
-              to lose your hook and need to find it.
+  :transient - If non-nil, hook will delete itself after it has run once.
 
-  :docstr   - A string to use as the defined function's docstring."
+  :file      - Filename where your macro is called from... in case you happen
+               to lose your hook and need to find it.
+
+  :docstr    - A string to use as the defined function's docstring."
   (declare (indent 2))
   ;; Eval inputs once.
   (let* ((macro<innit>:hook      hook-var)
@@ -123,6 +125,7 @@ OPTIONS is a plist of optional vars:
          (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
          (macro<innit>:squelch   (plist-get macro<innit>:options :squelch))
          (macro<innit>:postpend  (plist-get macro<innit>:options :postpend))
+         (macro<innit>:transient (plist-get macro<innit>:options :transient))
          (macro<innit>:file      (when (plist-member macro<innit>:options :file)
                                    (path:relative (plist-get macro<innit>:options :file)
                                                   user-emacs-directory)))
@@ -155,7 +158,10 @@ OPTIONS is a plist of optional vars:
                       ,macro<innit>:file
                       "'"))))
          ;; And run the actual hook.
-         ,@body)
+         ,@body
+         ;; If a transient, remove hook now that it's run once.
+         (when ,macro<innit>:transient
+           (remove-hook ',macro<innit>:hook #',macro<innit>:hook-fn)))
        ;; ...add the new hook function to the hook variable.
        (add-hook ',macro<innit>:hook #',macro<innit>:hook-fn ',macro<innit>:postpend))))
 ;; (setq test-hook nil)
@@ -175,23 +181,25 @@ OPTIONS is a plist of optional vars:
   "`defun' a hook function (which will run BODY).
 
 OPTIONS is a plist of optional vars:
-  :name     - Hook function will be named:
-                (concat innit:hook:func/name:prefix '<hook-name>')
-              - '<hook-name>':
-                - If `:name' is a string, that string.
-                - If `:name' is a symbol (e.g. the hook variable), convert to a
-                  string via `symbol-name'.
-                - Remove \"-hook\" suffix if present.
-                - See: `innit:hook:func/name:string'
+  :name      - Hook function will be named:
+                 (concat innit:hook:func/name:prefix '<hook-name>')
+               - '<hook-name>':
+                 - If `:name' is a string, that string.
+                 - If `:name' is a symbol (e.g. the hook variable), convert to a
+                   string via `symbol-name'.
+                 - Remove \"-hook\" suffix if present.
+                 - See: `innit:hook:func/name:string'
 
-  :quiet    - If non-nil, do not output the 'Running hook [...]' message.
+  :quiet     - If non-nil, do not output the 'Running hook [...]' message.
 
-  :squelch  - If non-nil, wrap BODY in `innit:squelch'.
+  :squelch   - If non-nil, wrap BODY in `innit:squelch'.
 
-  :file     - File path string for where your macro is called from... in case
-              you happen to lose your hook and need to find it.
+  :transient - Set to the hook variable and hook will delete itself after it has run once.
 
-  :docstr   - A string to use as the defined function's docstring.
+  :file      - File path string for where your macro is called from... in case
+               you happen to lose your hook and need to find it.
+
+  :docstr    - A string to use as the defined function's docstring.
 
 Use this over `innit:hook:defun-and-add' only in cases where you aren't
 `add-hook'ing directly (e.g. for use-package's ':hook')."
@@ -201,6 +209,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
          (macro<innit>:name      (plist-get macro<innit>:options :name))
          (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
          (macro<innit>:squelch   (plist-get macro<innit>:options :squelch))
+         (macro<innit>:transient (plist-get macro<innit>:options :transient))
          (macro<innit>:file      (when (plist-member macro<innit>:options :file)
                                    (path:relative (plist-get macro<innit>:options :file)
                                                   user-emacs-directory)))
@@ -230,7 +239,10 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
                     ,macro<innit>:file
                     "'"))))
        ;; And run the actual hook.
-       ,@body)))
+       ,@body
+       ;; If a transient, remove hook now that it's run once.
+       (when (bound-and-true-p ,macro<innit>:transient)
+         (remove-hook ',macro<innit>:transient #',macro<innit>:hook-fn)))))
 ;; (setq test-hook nil)
 ;; (makunbound mantle:hook:test)
 ;; (innit:hook:defun '(:name test-hook) (message "Hello there."))
