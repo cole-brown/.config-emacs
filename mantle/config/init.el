@@ -39,6 +39,10 @@
           :path     (imp:path:current:dir/relative :mantle)
           :filename "files")
 
+(imp:load :feature  '(:mantle config user project)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "project")
+
 (imp:load :feature  '(:mantle config user ui)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "ui")
