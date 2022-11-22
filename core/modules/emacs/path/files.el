@@ -445,8 +445,7 @@ On loan from Doom's `doom-project-find-file' in \"core/autoload/projects.el\"."
       ;;---
       ;; Projectile?
       ;;---
-      (cond ((and projectile-project-root
-                  (file-equal-p projectile-project-root default-directory))
+      (cond (projectile-project-root
              (unless (path:project? default-directory)
                ;; Disable caching if this is not a real project; caching
                ;; non-projects easily has the potential to inflate the projectile
@@ -468,11 +467,6 @@ On loan from Doom's `doom-project-find-file' in \"core/autoload/projects.el\"."
                   (fboundp 'counsel-file-jump))
              (call-interactively #'counsel-file-jump))
 
-            ;;---
-            ;; Project (not Projectile)?
-            ;;---
-            ((project-current nil dir)
-             (project-find-file-in nil nil dir))
 
             ;;---
             ;; Helm?
@@ -480,6 +474,22 @@ On loan from Doom's `doom-project-find-file' in \"core/autoload/projects.el\"."
             ((and (bound-and-true-p helm-mode)
                   (fboundp 'helm-find-files))
              (call-interactively #'helm-find-files))
+
+            ;; ;;---
+            ;; ;; Project (not Projectile)?
+            ;; ;;---
+            ;; ((project-current nil dir)
+            ;;  ;;---
+            ;;  ;; ERROR: I'm... not sure how to make this...work?
+            ;;  ;;---
+            ;;  ;; Debugger entered--Lisp error: (cl-no-applicable-method project-root "/home/user/repos/proj-root/some-subdir/")
+            ;;  ;; [...]
+            ;;  ;;   project-root("/home/user/repos/proj-root/some-subdir/")
+            ;;  ;;   #f(compiled-function (project &optional dirs) #<bytecode -0x1ac7ca1e5ef6e4f9>)("/home/user/repos/proj-root/some-subdir/" nil)
+            ;;  ;;   apply(#f(compiled-function (project &optional dirs) #<bytecode -0x1ac7ca1e5ef6e4f9>) "/home/user/repos/proj-root/some-subdir/" nil)
+            ;;  ;;   project-files("/home/user/repos/proj-root/some-subdir/" nil)
+            ;;  ;;   project-find-file-in(nil nil "/home/user/repos/proj-root/some-subdir/")
+            ;;  (project-find-file-in nil nil dir))
 
             ;;---
             ;; Fallback: Ye olde `find-file'.

@@ -114,11 +114,11 @@
 
      "s" (list (elisp:cmd/args #'file:cmd:project:find-file
                                (system:multiplexer:get :hash 'this
-                                                       :key '(path secret root)))
+                                                       :key '(path secret emacs)))
                :which-key "Find file in `.secret.d'...")
      "S" (list (elisp:cmd/args #'file:cmd:find
                                (system:multiplexer:get :hash 'this
-                                                       :key '(path secret root)))
+                                                       :key '(path secret emacs)))
                :which-key "Browse `.secret.d'..."))))
 
 
