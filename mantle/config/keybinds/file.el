@@ -42,23 +42,19 @@
    ;;---
    ;; Buffer / File
    ;;---
-   "Y" (list #'file:cmd:copy/this-buffer-file :which-key "Copy This File")
-   "F" (list #'file:cmd:copy/this-buffer-file :which-key "Copy This File")
-   "X" (list #'file:cmd:delete                :which-key "Delete This File")
+   "C" (list #'file:cmd:copy/this-buffer-file :which-key "File: Copy")
+   "X" (list #'file:cmd:delete                :which-key "File: Delete")
 
    ;;---
    ;; Names / Paths
    ;;---
-   "y" (list #'buffer:cmd:clipboard:path/absolute :which-key "Copy This File's Path")
-   "f" (list #'buffer:cmd:clipboard:path/absolute :which-key "Copy This File's Path")
+   "y" (list #'path:cmd:buffer:copy:absolute :which-key "Path: Copy")
+   "Y" (list (elisp:cmd/prefix #'path:cmd:buffer:copy:absolute '(4)) ;; Call with simulated C-u prefix arg.
+             :which-key "Path: Copy Parent")
 
-   "d" (list (elisp:cmd/prefix #'buffer:cmd:clipboard:path/absolute '(4)) ;; Call with simulated C-u prefix arg.
-             :which-key "Copy This File's Parent's Path")
-
-   "r" (list #'buffer:cmd:clipboard:path/relative :which-key "Copy This File's Relative Path")
-
-   "R" (list (elisp:cmd/prefix #'buffer:cmd:clipboard:path/relative '(4)) ;; Call with simulated C-u prefix arg.
-             :which-key "Copy This File's Parent's Relative Path"))
+   "r" (list #'path:cmd:buffer:copy:relative :which-key "Path, Relative: Copy")
+   "R" (list (elisp:cmd/prefix #'path:cmd:buffer:copy:relative '(4)) ;; Call with simulated C-u prefix arg.
+             :which-key "Path, Relative: Copy Parent"))
 
   ;;------------------------------
   ;; File / Path
