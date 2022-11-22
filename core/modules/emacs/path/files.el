@@ -373,7 +373,7 @@ Originally from Doom's `doom/move-this-file' in \"core/autoload/files.el\"."
 
 
 ;;;###autoload
-(defun file:cmd:find ()
+(defun file:cmd:find (dir)
   "Find a file starting at DIR.
 
 DIR, if nil, will default to `default-directory'.
@@ -382,10 +382,10 @@ Uses:
   - `counsel-find-file' if in `ivy-mode'
   - `helm-find-file' if in `helm-mode'
   - `find-file' otherwise"
-  (interactive)
+  (interactive "DFind File In Directory: ")
   (let ((default-directory (if (and (stringp dir)
                                     (not (string-empty-p dir)))
-                               (file-truename (expand-file-name dir))
+                               (file-truename (path:canonicalize:dir dir))
                              default-directory)))
     (call-interactively
      ;; What `find-file' function should be used anyways?
