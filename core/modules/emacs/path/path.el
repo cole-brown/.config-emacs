@@ -1,6 +1,17 @@
-;; -*- mode: emacs-lisp; lexical-binding: t -*-
+;;; core/modules/emacs/path/path.el --- Path Function -*- mode: emacs-lisp; lexical-binding: t -*-
+;;
+;; Author:     Cole Brown <code@brown.dev>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2020-10-28
+;; Modified:   2022-11-22
+;;
+;;; Commentary:
+;;
+;;  Path Functions
+;;
+;;; Code:
 
-;;-------------------------------------spy--------------------------------------
+;;------------------------------------path--------------------------------------
 ;;--                             Path Functions                               --
 ;;---------------------------------/mnt/hello-----------------------------------
 
@@ -274,9 +285,23 @@ Will convert the paths to absolute/canonical values before comparing."
 ;;------------------------------------------------------------------------------
 
 (defun path:parent (path)
-  "Return the parent directory of PATH."
-  (directory-file-name (file-name-directory path)))
+  "Return the parent directory of PATH.
+
+Special Cases:
+  1. If PATH is the root of the file system, return the root.
+
+  2. If PATH is the top level of a relative path (e.g. \"this-dir\"), return
+     empty string."
+  (directory-file-name
+   ;; `file-name-directory' returns nil for parent of top-level relative path:
+   ;;   (file-name-directory "relative")
+   ;;     -> nil
+   ;; Avoid that; use empty string instead of nil.
+   (or (file-name-directory path)
+       "")))
 ;; (path:parent "relative/path/to/foo.test")
+;; (path:parent "relative")
+;; (path:parent "/")
 
 
 ;; TODO: Move to regex.el?
@@ -1194,6 +1219,7 @@ Borrowed from Doom's `doom-project-root' in \"core/autoload/projects.el\"."
          (unless dir (bound-and-true-p projectile-project-root)))
         projectile-require-project-root)
     (projectile-project-root dir)))
+
 
 
 ;; TODO: move to some `:project' module?
