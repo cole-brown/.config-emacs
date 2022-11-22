@@ -1184,7 +1184,7 @@ Return:
 ;; Project Paths
 ;;------------------------------------------------------------------------------
 
-
+;; TODO: move to some `:project' module?
 (defun path:project:root (&optional dir)
   "Return the project root of DIR (default: `default-directory').
 Return nil if not in a project.
@@ -1196,9 +1196,9 @@ Borrowed from Doom's `doom-project-root' in \"core/autoload/projects.el\"."
     (projectile-project-root dir)))
 
 
+;; TODO: move to some `:project' module?
 (defun path:project? (&optional dir)
   "Return t if DIR (default: `default-directory') is a valid project directory.
-
 
 Borrowed from Doom's `doom-project-p' in \"core/autoload/projects.el\""
   (and (path:project:root dir)
