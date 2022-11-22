@@ -1,17 +1,15 @@
-;;; init.el --- Init for :emacs/path module. -*- lexical-binding: t; -*-
+;;; core/modules/emacs/path/init.el --- Init for `:path' module. -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2020 Cole Brown
-;;
-;; Author: Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created: October 22, 2020
-;; Modified: 2022-04-13 09:13:50
+;; Created:    2020-10-22
+;; Modified:   2022-11-22
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
 ;;; Commentary:
 ;;
-;; Initialize the spy/path module.
+;; Initialize the `:path' module.
 ;;
 ;;; Code:
 
@@ -44,6 +42,9 @@
             :filename "regex")
   (imp:load :feature  '(:path git)
             :filename "git")
+  (imp:load :feature  '(:path buffer)
+            :filename "buffer")
+
 
   ;; End load timing.
   )

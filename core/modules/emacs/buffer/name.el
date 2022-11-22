@@ -1,4 +1,17 @@
-;;; emacs/buffer/name.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/buffer/name.el --- Buffer Name Functions -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <code@brown.dev>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2020-12-04
+;; Modified:   2022-11-22
+;;
+;; This file is not part of GNU Emacs.
+;;
+;;; Commentary:
+;;
+;;  Buffer Name Functions
+;;
+;;; Code:
 
 
 (require 'cl-lib)
@@ -169,103 +182,10 @@ Special buffers are:
 ;;------------------------------------------------------------------------------
 ;; Copy Buffer File/Dir Name Functions
 ;;------------------------------------------------------------------------------
-
-;; This (or similar (prelude-copy-file-name-to-clipboard)) used to be in Prelude
-;; Emacs.
-;;   https://github.com/bbatsov/prelude/issues/764
-(defun buffer:cmd:clipboard:file-name ()
-  "Copy the current buffer's file name to the clipboard."
-  (interactive)
-  (let ((filename (if (equal major-mode 'dired-mode)
-                      default-directory
-                    (buffer-file-name))))
-    (when filename
-      ;; Copy to the clipboard and kill ring so it's available outside Emacs.
-      (with-temp-buffer
-        (insert filename)
-        (clipboard-kill-region (point-min) (point-max)))
-      (message "Copied buffer file name '%s' to the clipboard." filename))))
-
-
-;; This is more complex. Can do buffer file path or dired. C-u for folder
-;; instead of file.
-;;   http://ergoemacs.org/emacs/emacs_copy_file_path.html
-;; Originally `xah-file-path'. Originally only used `kill-new' - modified to put
-;; in clipboard too (`clipboard-kill-region').
-(cl-defun buffer:clipboard:path (&key parent relative)
-  "Copy the buffer's current path to `kill-ring'.
-
-If in a file buffer, copy the file's path.
-
-If in Dired buffer, copy the file/dir cursor is on, or marked files.
-
-If a buffer is not file and not Dired, copy value of `default-directory' (which
-is usually the \"current\" dir when that buffer was created).
-
-Optional keys:
-  - `:parent' (PARENT)
-    - If non-nil, copy the buffer's parent directory path instead of the
-      buffer's own path.
-  - `:relative' (RELATIVE)
-    - If non-nil, copy the buffer's path relative to the project root instead of
-      the absolute path.
-
-Return a path string."
-  (let ((path
-         (if (string-equal major-mode 'dired-mode)
-             (progn
-               (let ((result (mapconcat 'identity (dired-get-marked-files) "\n")))
-                 (if (equal (length result) 0)
-                     (progn default-directory )
-                   (progn result))))
-           (if (buffer-file-name)
-               (buffer-file-name)
-             (expand-file-name default-directory)))))
-    (kill-new
-     (if parent
-         (progn
-           (message "Directory path copied: 「%s」" (file-name-directory path))
-           (file-name-directory path))
-       (progn
-         (message "File path copied: 「%s」" path)
-         path)))))
-
-
-(defun buffer:cmd:clipboard:path/absolute (&optional parent)
-  "Copy the buffer's current path to `kill-ring'.
-
-If in a file buffer, copy the file's path.
-
-If in Dired buffer, copy the file/dir cursor is on, or marked files.
-
-If a buffer is not file and not Dired, copy value of `default-directory' (which
-is usually the \"current\" dir when that buffer was created).
-
-If PARENT is non-nil (`universal-argument' is called first), copy the buffer's
-parent directory path instead of the buffer's own path.
-
-Return a path string."
-  (interactive "P")
-  (buffer:clipboard:path :parent parent))
-
-
-(defun buffer:cmd:clipboard:path/relative (&optional parent)
-  "Copy the buffer's current path to `kill-ring'.
-
-If in a file buffer, copy the file's path.
-
-If in Dired buffer, copy the file/dir cursor is on, or marked files.
-
-If a buffer is not file and not Dired, copy value of `default-directory' (which
-is usually the \"current\" dir when that buffer was created).
-
-If PARENT is non-nil (`universal-argument' is called first), copy the buffer's
-parent directory path instead of the buffer's own path.
-
-Return a path string."
-  (interactive "P")
-  (buffer:clipboard:path :parent parent
-                         :relative t))
+;; See `:path' module functions:
+;;   - `path:buffer:copy'
+;;   - `path:cmd:buffer:copy:absolute'
+;;   - `path:cmd:buffer:copy:relative'
 
 
 ;;------------------------------------------------------------------------------
