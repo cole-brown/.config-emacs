@@ -307,11 +307,11 @@ Proudly nicked from Doom's \"core/autoload/files.el\"."
     ;; Error Checks
     ;;------------------------------
     (unless (and path (file-exists-p path))
-      (user-error "Buffer is not visiting any file"))
+      (user-error "file:cmd:delete: Buffer is not visiting any file"))
     (unless (file-exists-p path)
-      (error "File doesn't exist: %s" path))
+      (error "file:cmd:delete: File doesn't exist: %s" path))
     (unless (or force? (y-or-n-p (format "Really delete %S?" path/short)))
-      (user-error "Aborted"))
+      (user-error "file:cmd:delete: Aborted"))
 
     ;;------------------------------
     ;; Delete File
@@ -324,7 +324,7 @@ Proudly nicked from Doom's \"core/autoload/files.el\"."
         ;; `delete-file' above failed. Do we need to do any clean up?
         (if (path:exists? path)
             ;; Still exists so just complain.
-            (error "Failed to delete %S" path/short)
+            (error "file:cmd:delete: Failed to delete %S" path/short)
           ;; File doesn't exist, so... ¯\_(ツ)_/¯
           (buffer:cmd:kill buf :dont-save)
           (file:update-files path)
@@ -352,7 +352,7 @@ Originally from Doom's `doom/move-this-file' in \"core/autoload/files.el\"."
   ;; Error Checks
   ;;------------------------------
   (unless (and buffer-file-name (file-exists-p buffer-file-name))
-    (user-error "Buffer is not visiting any file"))
+    (user-error "file:cmd:move/this: Buffer is not visiting any file"))
 
   ;;------------------------------
   ;; Move File
@@ -426,64 +426,65 @@ If DIR is not a project, it will be indexed (but not cached).
 
 On loan from Doom's `doom-project-find-file' in \"core/autoload/projects.el\"."
   (interactive "DFind File In Project Directory: ")
-  ;;------------------------------
-  ;; Error Checks
-  ;;------------------------------
-  (unless (file-directory-p dir)
-    (error "Directory %S does not exist" dir))
-  (unless (file-readable-p dir)
-    (error "Directory %S isn't readable" dir))
+  (let ((dir (path:canonicalize:dir dir)))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (unless (file-directory-p dir)
+      (error "file:cmd:project:find-file: Directory does not exist: %S" dir))
+    (unless (file-readable-p dir)
+      (error "file:cmd:project:find-file: Directory isn't readable: %S" dir))
 
-  ;;------------------------------
-  ;; Go to dir using...
-  ;;------------------------------
-  (let* ((default-directory (file-truename dir))
-         (projectile-project-root (path:project:root dir))
-         (projectile-enable-caching projectile-enable-caching))
+    ;;------------------------------
+    ;; Go to dir using...
+    ;;------------------------------
+    (let* ((default-directory (file-truename dir))
+           (projectile-project-root (path:project:root dir))
+           (projectile-enable-caching projectile-enable-caching))
 
-    ;;---
-    ;; Projectile?
-    ;;---
-    (cond ((and projectile-project-root
-                (file-equal-p projectile-project-root default-directory))
-           (unless (path:project? default-directory)
-             ;; Disable caching if this is not a real project; caching
-             ;; non-projects easily has the potential to inflate the projectile
-             ;; cache beyond reason.
-             (setq projectile-enable-caching nil))
-           (call-interactively
-            ;; Intentionally avoid `helm-projectile-find-file', because it runs
-            ;; asynchronously, and thus doesn't see the lexical
-            ;; `default-directory'
-            (if (and (bound-and-true-p ivy-mode)
-                     (fboundp 'counsel-projectile-find-file))
-                #'counsel-projectile-find-file
-              #'projectile-find-file)))
+      ;;---
+      ;; Projectile?
+      ;;---
+      (cond ((and projectile-project-root
+                  (file-equal-p projectile-project-root default-directory))
+             (unless (path:project? default-directory)
+               ;; Disable caching if this is not a real project; caching
+               ;; non-projects easily has the potential to inflate the projectile
+               ;; cache beyond reason.
+               (setq projectile-enable-caching nil))
+             (call-interactively
+              ;; Intentionally avoid `helm-projectile-find-file', because it runs
+              ;; asynchronously, and thus doesn't see the lexical
+              ;; `default-directory'
+              (if (and (bound-and-true-p ivy-mode)
+                       (fboundp 'counsel-projectile-find-file))
+                  #'counsel-projectile-find-file
+                #'projectile-find-file)))
 
-          ;;---
-          ;; Ivy & Consel?
-          ;;---
-          ((and (bound-and-true-p ivy-mode)
-                (fboundp 'counsel-file-jump))
-           (call-interactively #'counsel-file-jump))
+            ;;---
+            ;; Ivy & Consel?
+            ;;---
+            ((and (bound-and-true-p ivy-mode)
+                  (fboundp 'counsel-file-jump))
+             (call-interactively #'counsel-file-jump))
 
-          ;;---
-          ;; Project (not Projectile)?
-          ;;---
-          ((project-current nil dir)
-           (project-find-file-in nil nil dir))
+            ;;---
+            ;; Project (not Projectile)?
+            ;;---
+            ((project-current nil dir)
+             (project-find-file-in nil nil dir))
 
-          ;;---
-          ;; Helm?
-          ;;---
-          ((and (bound-and-true-p helm-mode)
-                (fboundp 'helm-find-files))
-           (call-interactively #'helm-find-files))
+            ;;---
+            ;; Helm?
+            ;;---
+            ((and (bound-and-true-p helm-mode)
+                  (fboundp 'helm-find-files))
+             (call-interactively #'helm-find-files))
 
-          ;;---
-          ;; Fallback: Ye olde `find-file'.
-          ;;---
-          ((call-interactively #'find-file)))))
+            ;;---
+            ;; Fallback: Ye olde `find-file'.
+            ;;---
+            ((call-interactively #'find-file))))))
 
 
 ;;------------------------------------------------------------------------------
