@@ -373,7 +373,7 @@ Originally from Doom's `doom/move-this-file' in \"core/autoload/files.el\"."
 
 
 ;;;###autoload
-(defun file:cmd:find (dir)
+(defun file:cmd:find (&optional dir)
   "Find a file starting at DIR.
 
 DIR, if nil, will default to `default-directory'.
@@ -382,11 +382,11 @@ Uses:
   - `counsel-find-file' if in `ivy-mode'
   - `helm-find-file' if in `helm-mode'
   - `find-file' otherwise"
-  (interactive "DFind File In Directory: ")
-  (let ((default-directory (if (and (stringp dir)
-                                    (not (string-empty-p dir)))
-                               (file-truename (path:canonicalize:dir dir))
-                             default-directory)))
+  (interactive)
+  (let ((default-directory (file-truename (path:canonicalize:dir (if (and (stringp dir)
+                                                                          (not (string-empty-p dir)))
+                                                                     dir
+                                                                   default-directory)))))
     (call-interactively
      ;; What `find-file' function should be used anyways?
      (cond ((and (bound-and-true-p ivy-mode)
@@ -400,8 +400,8 @@ Uses:
 
 ;;;###autoload
 (defun file:cmd:find/sudo (file)
-  "Find FILE, open as root."
-  (interactive "FOpen file as root: ")
+  "Find FILE using a TRAMP 'sudo' path."
+  (interactive "FSudo open file: ")
   (find-file (path:tramp file :sudo)))
 
 
@@ -411,10 +411,13 @@ Uses:
 
 Copy/pasted from Doom's `doom/sudo-this-file' in \"core/autoload/files.el\"."
   (interactive)
-  (file:cmd:find/sudo (or buffer-file-name
-                          (when (or (derived-mode-p 'dired-mode)
-                                    (derived-mode-p 'wdired-mode))
-                            default-directory))))
+  (funcall-interactively #'file:cmd:find/sudo
+                         (or buffer-file-name
+                             (when (or (derived-mode-p 'dired-mode)
+                                       (derived-mode-p 'wdired-mode))
+                               default-directory)))
+
+  )
 
 
 ;; TODO: Make a `:project' module and move there? Make this `project:cmd:find-file'?
