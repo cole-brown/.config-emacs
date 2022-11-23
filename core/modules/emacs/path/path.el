@@ -16,6 +16,7 @@
 ;;---------------------------------/mnt/hello-----------------------------------
 
 (imp:require :str)
+(imp:require :elisp 'utils 'functions)
 
 ;; TODO: defaliases for emacs's path functions?
 ;;   - file-name-as-directory == path->dir ?
@@ -1260,15 +1261,28 @@ Proudly nicked from Doom's \"modules/config/default/autoload/files.el\"."
 ;;   - all the parts
 ;;   - parsing paths with the tramp junk in 'em...
 ;;     - Windows vs Linux Tramp paths...
-(defun path:tramp (path &optional sudo?)
-  "Return a Tramp-style path for PATH.
+(cl-defun path:tramp (&rest args
+                      &key  sudo?
+                            ;; user
+                            ;; host
+                      &allow-other-keys)
+  "Return a Tramp-style path for ARGS & keys.
 
 If SUDO? is non-nil, include 'sudo:root@<host>:' in the returned Tramp path so
-Emacs will, e.g., open as superuser.
+Emacs will, e.g., open as super user.
 
-Nicked from Doom's `doom--sudo-file-path' in \"core/autoload/files.el\"."
-  (let ((host (or (file-remote-p path 'host) "localhost"))
-        (remote? (file-remote-p path)))
+Original from Doom's `doom--sudo-file-path' in \"core/autoload/files.el\"."
+  ;; Must filter keyword args out of ARGS.
+  (let* ((args (elisp/cl:parse:filter-kwargs args
+                                             ;;---
+                                             ;; Expected Tramp Keys
+                                             ;;---
+                                             ;; NOTE: This should be a superset of this function's `&key'!
+                                             :sudo?))
+         (path (path:join args))
+         (user (file-remote-p path 'user))
+         (host (or (file-remote-p path 'host) "localhost"))
+         (remote? (file-remote-p path)))
     (if (or remote? sudo?)
         ;;------------------------------
         ;; Path Style: Tramp
@@ -1279,20 +1293,21 @@ Nicked from Doom's `doom--sudo-file-path' in \"core/autoload/files.el\"."
                 ;;---
                 ;; Remote user/host?
                 ;;---
-                (when (file-remote-p path)
+                (when remote?
                   (concat (file-remote-p path 'method) ":"
-                          (if-let (user (file-remote-p path 'user))
+                          (if user
                               (concat user "@" host)
-                            host)
-                          "|"))
+                            host)))
+
+                (when (and remote? sudo?)
+                  "|")
 
                 ;;---
                 ;; Super user?
                 ;;---
                 (when sudo?
-                  "sudo:root@")
-                (when sudo?
-                  host)
+                  (concat "sudo:root@"
+                          host))
 
                 ":"
 
@@ -1308,7 +1323,7 @@ Nicked from Doom's `doom--sudo-file-path' in \"core/autoload/files.el\"."
       ;; Not remote; not sudo... just path.
       path)))
 ;; (path:tramp (buffer-file-name))
-;; (path:tramp (buffer-file-name) :sudo)
+;; (path:tramp :sudo? t (buffer-file-name))
 
 
 ;;------------------------------------------------------------------------------

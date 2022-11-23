@@ -402,7 +402,7 @@ Uses:
 (defun file:cmd:find/sudo (file)
   "Find FILE using a TRAMP 'sudo' path."
   (interactive "FSudo open file: ")
-  (find-file (path:tramp file :sudo)))
+  (find-file (path:tramp :sudo? t file)))
 
 
 ;;;###autoload
@@ -415,9 +415,7 @@ Copy/pasted from Doom's `doom/sudo-this-file' in \"core/autoload/files.el\"."
                          (or buffer-file-name
                              (when (or (derived-mode-p 'dired-mode)
                                        (derived-mode-p 'wdired-mode))
-                               default-directory)))
-
-  )
+                               default-directory))))
 
 
 ;; TODO: Make a `:project' module and move there? Make this `project:cmd:find-file'?
