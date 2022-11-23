@@ -204,25 +204,41 @@ Return a cons of lists: '(args-list . kwargs-plist)"
 ;; (elisp:parse:args+kwargs '((jeff (jefferson)) :namespace nil :value 42) :namespace :value)
 
 
-(defun elisp/cl:parse:args+kwargs (args &rest claims)
-  "Parse ARGS into keyword args and 'the rest'.
+(defun elisp/cl:parse:filter-kwargs (args &rest claims)
+  "Filter CLAIMS keywords & values out of ARGS and return.
 
 ARGS should be a list.
 
 CLAIMS should be all the keywords that the caller expects. It will be flattened
 to a single list of keywords to look for.
 
-Return a plist:
-  - claimed-keyword-0 : claimed-value-0
-  - ...
-  - claimed-keyword-N : claimed-value-N
-  - `:rest'           : unclaimed values from ARGS"
+Example:
+  (cl-defun example (&rest args &key jeff &allow-other-keys)
+  ...)
+  (example :jeff \"Jeffory Jefferson\"
+          :jill :jack :jim)
+
+`jeff' will be:
+  \"Jeffory Jefferson\"
+
+`args' will be:
+  '(:jeff \"Jeffory Jefferson\" :jill :jack :jim)
+
+So you have `jeff' polluting your args.
+To filter it out:
+  (elisp/cl:parse:filter-kwargs
+   (example :jeff \"Jeffory Jefferson\"
+            :jill :jack :jim)
+   :jeff)
+Return value:
+  '(:jill :jack :jim)"
   ;;------------------------------
   ;; Filter keys from ARGS
   ;;------------------------------
   (let (key
-        rest
-        plist)
+        args/filtered
+        ;; Flatten so callers don't have to use `apply' to get CLAIMS in correct format.
+        (claims (elisp:list:flatten claims)))
     (dolist (arg args)
       ;; If this is one of our keywords, save that fact for the next `arg', which is the value.
       (cond ((memq arg claims)
@@ -230,25 +246,19 @@ Return a plist:
 
             ;; Last `arg' was one of our keywords, so this one is its value.
             (key
-            ;; Save key & value; clear for next `arg'.
-             (push key plist)
-             (push arg plist)
+             ;; We don't care; so just reset for next `arg'.
              (setq key nil))
 
             ;; Just an arg; save to the filtered list.
             (t
-             (push arg rest))))
+             (push arg args/filtered))))
 
     ;;------------------------------
-    ;; Build & Return Plist
+    ;; Build & Return Filtered Args
     ;;------------------------------
-    ;; Put `rest' back to correct order before inserting as a value.
-    (push :rest           plist)
-    (push (nreverse rest) plist)
-
-    (nreverse plist)))
-;; (elisp/cl:parse:args+kwargs '(:sudo? t :a 'a :b "bee" 'rest 'of 'the "args") :sudo?)
-;; (elisp/cl:parse:args+kwargs '(:sudo? t :a 'a :b "bee" 'rest 'of 'the "args") :sudo? :b)
+    (nreverse args/filtered)))
+;; (elisp/cl:parse:filter-kwargs '(:sudo? t :a 'a :b "bee" 'rest 'of 'the "args") :sudo?)
+;; (elisp/cl:parse:filter-kwargs '(:sudo? t :a 'a :b "bee" 'rest 'of 'the "args") :sudo? :b)
 
 
 ;;------------------------------------------------------------------------------
