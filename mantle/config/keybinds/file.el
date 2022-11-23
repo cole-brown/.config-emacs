@@ -43,7 +43,6 @@
    ;; Buffer / File
    ;;---
    "C" (list #'file:cmd:copy/this-buffer-file :which-key "File: Copy")
-   "X" (list #'file:cmd:delete                :which-key "File: Delete")
 
    ;;---
    ;; Names / Paths
@@ -79,6 +78,7 @@
         :which-key "Recent Files")
 
    "R" (list #'file:cmd:move/this :which-key "Rename/Move This File")
+   "X" (list #'file:cmd:delete    :which-key "File: Delete")
 
    "s" (list #'save-buffer :which-key "Save")
    "S" (list #'write-file  :which-key "Save As...")
