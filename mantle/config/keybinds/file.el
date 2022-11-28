@@ -91,11 +91,16 @@
   ;; File / Path (Specific)
   ;;------------------------------
   (keybind:leader/global:def
-   :infix (keybind:infix "f .")          ; file -> ...dotfiles?
+   :infix (keybind:infix "f .")      ; file -> "." (means "this dir" in shell-speak)
    "" '(nil :which-key "File at...") ; infix title
 
    ;;---
-   ;; Emacs Config
+   ;; This Project
+   ;;---
+   "p" (list #'projectile-dired :which-key "Dired: Project Root"
+
+   ;;---
+   ;; Emacs Configs
    ;;---
    ;; .emacs.d aka public config
    "e" (list (elisp:cmd/args #'file:cmd:project:find-file user-emacs-directory)
@@ -106,7 +111,7 @@
    ;; .secret.d aka private config
   (when (system:secret:has)
     (keybind:leader/global:def
-     :infix (keybind:infix "f .")          ; file -> ...dotfiles?
+     :infix (keybind:infix "f .") ; Same menu as above; don't add an infix title or you'll delete above.
 
      "s" (list (elisp:cmd/args #'file:cmd:project:find-file
                                (system:multiplexer:get :hash 'this
