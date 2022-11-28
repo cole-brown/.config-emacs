@@ -53,18 +53,19 @@
 ;; commands in the help-command map.
 (imp:use-package which-key
 
-  ;; ;;--------------------
-  ;; :custom
-  ;; ;;--------------------
+  ;;--------------------
+  :custom
+  ;;--------------------
 
-  ;; These
-  ;; which-key-sort-order 'which-key-key-order-alpha
-  ;; which-key-side-window-max-width 0.33
-  ;; which-key-idle-delay 0.05
+  ;; Sort lower and uppercase keybinds together instead of all lower then all upper.
+  (which-key-sort-order 'which-key-key-order-alpha)
+
+  ;; (which-key-side-window-max-width 0.333) ; Default: 0.333
+  (which-key-idle-delay 0.5)                 ; Default: 1.0 seconds
 
   ;; Which-Key & Evil:
   ;; https://github.com/justbur/emacs-which-key#evil-operators
-  ;;
+  ;; This is done in `:config' so we can check if we have `evil' enabled.
 
   ;;--------------------
   :config
