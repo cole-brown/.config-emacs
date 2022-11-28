@@ -3,6 +3,10 @@
 
 (require 'cl-lib)
 
+
+(imp:require :elisp 'utils 'predicates)
+
+
 ;;------------------------------------------------------------------------------
 ;; Kill Functions
 ;;------------------------------------------------------------------------------
@@ -259,6 +263,48 @@ On loan from Doom's \"core/autoload/buffers.el\"."
   ;; Will ask if they want to delete a modified buffer.
   (buffer:kill:ask buffer
                    :delete-process))
+
+
+;;------------------------------------------------------------------------------
+;; Overwrite Mode
+;;------------------------------------------------------------------------------
+
+(defun buffer:overwrite:toggle ()
+  "Toggle overwrite mode.
+
+Evil-Aware / Evil-Optional
+
+Toggles between 'insert' and 'replace' evil states."
+  ;; TODO: if evil evil-replace else emacs-replace
+  (if (elisp:evil?)
+    (if (evil-replace-state-p)
+        (evil-append 0)
+      (evil-replace-state))
+
+    (overwrite-mode)))
+
+
+(defun buffer:insert-or-overwrite (character)
+  "Insert or overwrite CHARACTER into active buffer at point.
+
+Evil-Aware / Evil-Optional
+
+Need to fix the hydra's deleting before figuring out the integration into
+evil's replace state backspace 'undo' functionality."
+  ;; If overwriting, first delete a character at point so we end up "replacing" it.
+  (if (elisp:evil?)
+      (when (evil-replace-state-p)
+        ;; TODO: Will this let evil's backspace/delete 'undo' functionality work?
+        ;; (evil-replace-pre-command)
+
+        ;; TODO: Will this work on its own to allow evil's 'undo' functionality?
+        (evil-delete-char (point) (1+ (point))))
+
+    (when overwrite-mode
+      (delete-char  (point) (1+ (point)))))
+
+  ;; Now we can "replace" with the new char.
+  (insert character))
 
 
 ;;------------------------------------------------------------------------------
