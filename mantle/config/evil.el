@@ -57,6 +57,16 @@
   (setq evil-want-keybinding  nil
         evil-want-integration t)
 
+
+  ;;--------------------
+  :custom
+  ;;--------------------
+
+  ;; Don't aggregate all actions while in insert state into a single undo action.
+  ;; Act like normal Emacs instead.
+  (evil-want-fine-undo t)
+
+
   ;;--------------------
   :config
   ;;--------------------
