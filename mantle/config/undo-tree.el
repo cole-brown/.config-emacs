@@ -31,9 +31,10 @@
     :init
     ;;--------------------
 
-    ;; Declare that we'll have `undo-tree' available as the `evil' undo feature.
-    ;; https://github.com/emacs-evil/evil#dependencies
-    (imp:flag :evil +undo-tree)
+    ;; Declare that we'll have `undo-tree' available as our undo feature.
+    ;; Evil will need to knaw about it.
+    ;;   https://github.com/emacs-evil/evil#dependencies
+    (imp:flag :emacs +undo-tree)
 
 
     ;;--------------------
