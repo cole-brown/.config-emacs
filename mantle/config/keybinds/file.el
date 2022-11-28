@@ -62,7 +62,7 @@
    :infix (keybind:infix "f") ; file
 
    "d" (list #'path:cmd:dired :which-key "Find Directory")
-   "f" (list #'file:cmd:find :which-key "Find File")
+   "f" (list #'file:cmd:find  :which-key "Find File")
    ;; "F" (list #'file:cmd:find :which-key "Find File Under Here")
 
    "r" (list
@@ -77,14 +77,14 @@
                nil))
         :which-key "Recent Files")
 
-   "R" (list #'file:cmd:move/this :which-key "Rename/Move This File")
-   "X" (list #'file:cmd:delete    :which-key "File: Delete")
+   "R" (list #'file:cmd:move/this      :which-key "Rename/Move This File")
+   "X" (list #'file:cmd:delete         :which-key "File: Delete")
 
-   "s" (list #'save-buffer :which-key "Save")
-   "S" (list #'write-file  :which-key "Save As...")
+   "s" (list #'save-buffer             :which-key "Save")
+   "S" (list #'write-file              :which-key "Save As...")
 
-   "u" (list #'file:cmd:find/sudo :which-key "SUDO: Find File")
-   "U" (list #'file:cmd:find/sudo :which-key "SUDO: This File"))
+   "u" (list #'file:cmd:find/sudo      :which-key "SUDO: Find File")
+   "U" (list #'file:cmd:find/sudo/this :which-key "SUDO: This File"))
 
 
   ;;------------------------------
