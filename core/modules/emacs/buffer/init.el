@@ -30,6 +30,10 @@
     (imp:file:current)
     (imp:path:current:dir)
 
+  ;;------------------------------
+  ;; Required
+  ;;------------------------------
+
   (imp:load :feature  '(:buffer delete)
             :filename "delete")
   (imp:load :feature  '(:buffer eval)
@@ -42,8 +46,23 @@
             :filename "name")
   (imp:load :feature  '(:buffer point)
             :filename "point")
+  (imp:load :feature  '(:buffer region)
+            :filename "region")
   (imp:load :feature  '(:buffer search)
-            :filename "search"))
+            :filename "search")
+
+
+  ;;------------------------------
+  ;; Optional
+  ;;------------------------------
+
+  (unless (imp:flag? :buffer '-commands)
+    (imp:load :feature  '(:buffer +commands)
+              :filename "+commands"))
+
+  (unless (imp:flag? :buffer '-hydra)
+    (imp:load :feature  '(:buffer +hydra +line)
+              :filename "+line-hydra")))
 
 
 ;;------------------------------------------------------------------------------
