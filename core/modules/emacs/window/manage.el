@@ -16,6 +16,11 @@
 ;;
 ;;; Code:
 
+(require 'window)
+
+
+(imp:require :elisp 'utils 'predicates)
+
 
 ;;------------------------------------------------------------------------------
 ;; Kill Functions
