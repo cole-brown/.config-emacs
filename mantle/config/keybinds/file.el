@@ -96,7 +96,7 @@
    ;;---
    ;; This Project
    ;;---
-   "p" (list #'projectile-dired :which-key "Dired: Project Root"
+   "p" (list #'projectile-dired :which-key "Dired: Project Root")
 
    ;;---
    ;; Emacs Configs
