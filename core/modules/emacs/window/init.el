@@ -36,10 +36,7 @@
     (imp:path:current:dir)
 
   (imp:load :feature  '(:window manage)
-            :filename "manage")
-
-  (imp:load :feature  '(:window commands)
-            :filename "commands"))
+            :filename "manage"))
 
 
 ;;------------------------------------------------------------------------------
