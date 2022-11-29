@@ -69,7 +69,12 @@
   ;;------------------------------
   ;; Bookmarks
   ;;------------------------------
-  ;; TODO: Move to a bookmark menu?
+  ;; Not sure if these should be here, in "File..." or in their own keybinds. Doom has
+  ;; them in with the "Buffer..." keybinds but you can't set a bookmark on a
+  ;; buffer with no backing file/directory so that feels like the wrong place
+  ;; other than "b" == "bookmark"?
+  ;;
+  ;; ...On the other hand, "b" == "bookmark" is a decent reason?
   (keybind:leader/global:def
    :infix (keybind:infix "b") ; buffer
 
