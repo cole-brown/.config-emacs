@@ -208,6 +208,26 @@ If optional JUSTIFY? is non-nil, justify the text filled (see function
 
 
 ;;------------------------------------------------------------------------------
+;; Narrow & Widen
+;;------------------------------------------------------------------------------
+
+(defun buffer:cmd:narrow/toggle (beg end)
+  "Narrow the buffer to BEG END. If narrowed, widen it.
+
+Borrowed from Doom's `doom/toggle-narrow-buffer' in \"core/autoload/ui.el\"."
+  (interactive
+   (list (or (bound-and-true-p evil-visual-beginning) (region-beginning))
+         (or (bound-and-true-p evil-visual-end)       (region-end))))
+  (if (buffer-narrowed-p)
+      (widen)
+    (unless (region-active-p)
+      (setq beg (line-beginning-position)
+            end (line-end-position)))
+    (narrow-to-region beg end)))
+
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :buffer '+commands)
