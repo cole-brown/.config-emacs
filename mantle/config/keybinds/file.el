@@ -30,7 +30,6 @@
 ;; TODO: Evil vs Emacs keybinds?
 
 (imp:eval:after (:and evil evil-collection)
-  ;; NOTE: /mantle/config/keyboard.el has the new general defs
 
   ;;------------------------------
   ;; Copy
