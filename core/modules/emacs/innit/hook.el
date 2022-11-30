@@ -85,8 +85,16 @@ Hook function name returned will be an interned symbol from
 `innit:hook:func/name:string' string return."
   (intern (innit:hook:func/name:string (or name
                                            hook-var))))
-;; (innit:hook:func-symbol nil 'test:jeff)
-;; (innit:hook:func-symbol "test:jill" 'test:jeff)
+;; (innit:hook:func/name:symbol nil 'test:jeff)
+;; (innit:hook:func/name:symbol "test:jill" 'test:jeff)
+
+
+(defun innit:cmd:hook:func/name (name)
+  "Create hook function name symbol for NAME and insert at point.
+
+NAME must be nil or a string."
+  (interactive "sSuffix or Hook Var Name: ")
+  (insert (innit:hook:func/name:string name)))
 
 
 ;; Originally from here:
