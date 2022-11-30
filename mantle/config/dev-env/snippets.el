@@ -60,7 +60,7 @@
   ;;--------------------
   :hook
   ;;--------------------
-  (snippet-mode . mantle:hook:yasnippet) ;; (innit:hook:func/name:symbol "yasnippet" nil)
+  (snippet-mode-hook . mantle:hook:yasnippet) ;; (innit:hook:func/name:symbol "yasnippet" nil)
 
 
   ;;--------------------

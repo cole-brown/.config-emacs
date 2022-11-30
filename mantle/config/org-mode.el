@@ -87,8 +87,8 @@
   :hook
   ;;--------------------
 
-  ((org-mode . mantle:hook:org/jump-to-now-target) ;; (innit:hook:func/name:symbol "org/jump-to-now-target" nil)
-   (org-mode . mantle:hook:org/local-settings))    ;; (innit:hook:func/name:symbol "org/local-settings"     nil)
+  ((org-mode-hook . mantle:hook:org/jump-to-now-target) ;; (innit:hook:func/name:symbol "org/jump-to-now-target" nil)
+   (org-mode-hook . mantle:hook:org/local-settings))    ;; (innit:hook:func/name:symbol "org/local-settings"     nil)
 
   ;;--------------------
   :custom

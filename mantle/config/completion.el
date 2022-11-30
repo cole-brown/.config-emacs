@@ -238,7 +238,7 @@
   ;;--------------------
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
-  (completion-list-mode . consult-preview-at-point-mode)
+  (completion-list-mode-hook . consult-preview-at-point-mode)
 
 
   ;;--------------------
@@ -368,7 +368,7 @@
   ;;--------------------
   :hook
   ;;--------------------
-  (embark-collect-mode . consult-preview-at-point-mode))
+  (embark-collect-mode-hook . consult-preview-at-point-mode))
 
 
 ;;------------------------------

@@ -52,11 +52,11 @@
   :hook
   ;;--------------------
 
-  ((org-mode    . mantle:hook:rainbow-mode/enable)
-   (csharp-mode . mantle:hook:rainbow-mode/enable)
-   (css-mode    . mantle:hook:rainbow-mode/enable)
-   (php-mode    . mantle:hook:rainbow-mode/enable)
-   (html-mode   . mantle:hook:rainbow-mode/enable)))
+  ((org-mode-hook    . mantle:hook:rainbow-mode/enable)
+   (csharp-mode-hook . mantle:hook:rainbow-mode/enable)
+   (css-mode-hook   . mantle:hook:rainbow-mode/enable)
+   (php-mode-hook   . mantle:hook:rainbow-mode/enable)
+   (html-mode-hook   . mantle:hook:rainbow-mode/enable)))
 
 
 ;;------------------------------------------------------------------------------

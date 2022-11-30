@@ -190,8 +190,8 @@
   ;;--------------------
   :hook
   ;;--------------------
-  ((org-mode    . mantle:hook:org/whitespace:mode/enter) ;; (innit:hook:func/name:symbol "org/whitespace:mode/enter" nil)
-   (before-save . mantle:hook:org/whitespace:save/pre))  ;; (innit:hook:func/name:symbol "org/whitespace:save/pre" nil)
+  ((org-mode-hook    . mantle:hook:org/whitespace:mode/enter) ;; (innit:hook:func/name:symbol "org/whitespace:mode/enter" nil)
+   (before-save-hook . mantle:hook:org/whitespace:save/pre))  ;; (innit:hook:func/name:symbol "org/whitespace:save/pre" nil)
 
 
   ;;--------------------
