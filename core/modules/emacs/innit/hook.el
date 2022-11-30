@@ -142,7 +142,7 @@ OPTIONS is a plist of optional vars:
 
     `(progn
        ;; Create function...
-       (defun ,macro<innit>:hook-fn ()
+       (defun ,macro<innit>:hook-fn (&rest _)
          ,macro<innit>:docstr
          (unless ,macro<innit>:quiet
            ;; Nice info message maybe?
@@ -223,7 +223,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
               body
             (innit:squelch body)))
 
-    `(defun ,macro<innit>:hook-fn ()
+    `(defun ,macro<innit>:hook-fn (&rest _)
        ,macro<innit>:docstr
        (unless ,macro<innit>:quiet
          ;; Nice info message maybe?
