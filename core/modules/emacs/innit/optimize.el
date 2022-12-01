@@ -140,12 +140,13 @@ Revert when `startup--load-user-init-file' is called (i.e. before 'init.el')."
     ;; the echo area, which in turn triggers a redisplay. Redisplays can have a
     ;; substantial effect on startup times and in this case happens so early that
     ;; Emacs may flash white while starting up.
-    (define-advice load-file (:override (file) innit-mute)
+    (define-advice load-file (:override (file) innit:mute)
       (load file nil 'nomessage))
 
     ;; Undo our `load-file' advice above, to limit the scope of any edge cases it
     ;; may introduce down the road.
-    (define-advice startup--load-user-init-file (:before (&rest _) innit-unmute)
+    (define-advice startup--load-user-init-file (:before (&rest _) innit:unmute)
+      ;; `M-x innit:cmd:advice:func/name' to create & insert name of func that `define-advice' created above.
       (advice-remove #'load-file #'load-file@innit-mute))))
 
 

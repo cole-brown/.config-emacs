@@ -53,6 +53,8 @@
             :filename "squelch")
   (imp:load :feature  '(:innit hook)
             :filename "hook")
+  (imp:load :feature  '(:innit advice)
+            :filename "advice")
   (imp:load :feature  '(:innit theme)
             :filename "theme")
 
