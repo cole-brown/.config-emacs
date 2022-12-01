@@ -1,4 +1,20 @@
-;;; emacs/buffer/manage.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/buffer/manage.el --- Buffer Management -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2021-02-24
+;; Modified:   2022-12-01
+;; URL:        https://github.com/cole-brown/.config-emacs
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;  Buffer Types
+;;
+;;; Code:
 
 
 (require 'cl-lib)

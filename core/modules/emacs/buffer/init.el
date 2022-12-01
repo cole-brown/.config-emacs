@@ -34,6 +34,8 @@
   ;; Required
   ;;------------------------------
 
+  (imp:load :feature  '(:buffer type)
+            :filename "type")
   (imp:load :feature  '(:buffer delete)
             :filename "delete")
   (imp:load :feature  '(:buffer eval)
