@@ -31,10 +31,9 @@
    ;;---
    ;; Change Buffers
    ;;---
-   ;; TODO: We should have the primary (lowercase) for persp-mode buffer switching via
-   ;; `persp-switch-to-buffer', and the alternate for any buffer via `switch-to-buffer'.
-   ;; "b" (list #'persp-switch-to-buffer :which-key "Switch Workspace Buffer")
-   ;; TODO: But no `persp-mode' yet, so just... both the same?
+   ;; NOTE: The primary (lowercase) keybind for buffer switching should be
+   ;; perspective/workspace/whatever-aware. It should be replaced in a
+   ;; `use-package' for e.g. `persp-mode'.
    "b" (list #'switch-to-buffer    :which-key "Switch Buffer")
    "B" (list #'switch-to-buffer    :which-key "Switch Buffer")
 

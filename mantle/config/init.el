@@ -105,6 +105,10 @@
           :path     (imp:path:current:dir/relative :mantle)
           :filename "whitespace")
 
+(imp:load :feature  '(:mantle config user perspective)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "perspective")
+
 
 ;;------------------------------
 ;; Completion Frameworks
