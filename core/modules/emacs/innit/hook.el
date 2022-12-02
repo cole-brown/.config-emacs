@@ -30,7 +30,7 @@
 ;;------------------------------------------------------------------------------
 
 (defcustom innit:hook:func/name:prefix "mantle:hook:"
-  "Prefix to use for hook function names created by `innit:hook/defun-and-hooker'."
+  "Prefix to use for hook function names created by `innit:hook:defun-and-add'."
   :group 'innit:group
   :type  '(string))
 
@@ -112,6 +112,8 @@ OPTIONS is a plist of optional vars:
                  - Remove \"-hook\" suffix if present.
                  - See: `innit:hook:func/name:string'
 
+  :argslist  - If a list, create the hook's `defun' with this list of arguments.
+
   :quiet     - If non-nil, do not output the 'Running hook [...]' message.
 
   :squelch   - If non-nil, wrap BODY in `innit:squelch'.
@@ -130,6 +132,7 @@ OPTIONS is a plist of optional vars:
   (let* ((macro<innit>:hook      hook-var)
          (macro<innit>:options   (eval options))
          (macro<innit>:name      (plist-get macro<innit>:options :name))
+         (macro<innit>:argslist  (plist-get macro<innit>:options :argslist))
          (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
          (macro<innit>:squelch   (plist-get macro<innit>:options :squelch))
          (macro<innit>:postpend  (plist-get macro<innit>:options :postpend))
@@ -150,7 +153,10 @@ OPTIONS is a plist of optional vars:
 
     `(progn
        ;; Create function...
-       (defun ,macro<innit>:hook-fn (&rest _)
+       (defun ,macro<innit>:hook-fn
+           ;; ...with provided args list, or default of "who cares?" args list.
+           (or ,macro<innit>:argslist
+               '(&rest _))
          ,macro<innit>:docstr
          (unless ,macro<innit>:quiet
            ;; Nice info message maybe?
@@ -198,11 +204,14 @@ OPTIONS is a plist of optional vars:
                  - Remove \"-hook\" suffix if present.
                  - See: `innit:hook:func/name:string'
 
+  :argslist  - If a list, create the hook's `defun' with this list of arguments.
+
   :quiet     - If non-nil, do not output the 'Running hook [...]' message.
 
   :squelch   - If non-nil, wrap BODY in `innit:squelch'.
 
-  :transient - Set to the hook variable and hook will delete itself after it has run once.
+  :transient - Set to the hook variable and hook will delete itself after it has
+               run once.
 
   :file      - File path string for where your macro is called from... in case
                you happen to lose your hook and need to find it.
@@ -215,6 +224,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
   ;; Eval inputs once.
   (let* ((macro<innit>:options   (eval options))
          (macro<innit>:name      (plist-get macro<innit>:options :name))
+         (macro<innit>:argslist  (plist-get macro<innit>:options :argslist))
          (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
          (macro<innit>:squelch   (plist-get macro<innit>:options :squelch))
          (macro<innit>:transient (plist-get macro<innit>:options :transient))
@@ -231,7 +241,11 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
               body
             (innit:squelch body)))
 
-    `(defun ,macro<innit>:hook-fn (&rest _)
+    ;; Create function...
+    `(defun ,macro<innit>:hook-fn
+         ;; ...with provided args list, or default of "who cares?" args list.
+         (or ,macro<innit>:argslist
+             '(&rest _))
        ,macro<innit>:docstr
        (unless ,macro<innit>:quiet
          ;; Nice info message maybe?
