@@ -73,12 +73,6 @@
 ;;------------------------------------------------------------------------------
 ;; https://github.com/noctuid/general.el#evil-examples
 
-(defconst keybind:leader/local:key "SPC m"
-  "`kbd' type string to use as the primary keybinds leader key.
-
-Add keybinds to the leader using function `keybind:leader/local'.")
-
-
 ;; This creates the macro `keybind:leader/global:def', which just calls
 ;; `general-def' with the arguments supplied here, which can be overridden by
 ;; callers.
