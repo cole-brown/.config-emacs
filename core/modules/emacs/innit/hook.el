@@ -266,13 +266,15 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
        (when (bound-and-true-p ,macro<innit>:transient)
          (remove-hook ',macro<innit>:transient #',macro<innit>:hook-fn)))))
 ;; (setq test-hook nil)
-;; (makunbound mantle:hook:test)
-;; (innit:hook:defun '(:name test-hook) (message "Hello there."))
+;; (makunbound 'mantle:hook:test)
+;; (fmakunbound 'mantle:hook:test)
+;; (innit:hook:defun '(:name test-hook :quiet t :argslist (&rest ignore)) (message "Hello there."))
 ;; (add-hook 'test-hook 'mantle:hook:test)
 ;; test-hook
 ;; (run-hooks 'test-hook)
 ;; (setq test-hook nil)
-;; (makunbound mantle:hook:captain)
+;; (makunbound 'mantle:hook:captain)
+;; (fmakunbound 'mantle:hook:captain)
 ;; (innit:hook:defun test-hook '(:name "captain-hook" :file "here") (message "hi."))
 ;; (add-hook 'test-hook 'sss:hook/captain)
 ;; test-hook

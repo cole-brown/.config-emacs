@@ -133,6 +133,7 @@ Remove the advice, allowing original func to run, and then run original func."
 
 ;; Increase how much is read from processes in a single chunk .
 ;; This is further increased elsewhere, where needed (like our LSP module).
+;; TODO: Think that's a Doom comment so, do I need to increase that when I do LSP or...
 (setq read-process-output-max (max read-process-output-max ; default:  4kb
                                    (* 64 1024)))           ; minimum: 64kb
 

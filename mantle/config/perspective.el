@@ -172,7 +172,7 @@ the style & disable it occasionally.")
 
   (innit:hook:defun
       (list :name     "persp:buffer:ignore/dead"
-            :argslist '(buffer)
+            :argslist (buffer)
             :file     (path:current:file)
             :docstr   "Don't try to persist dead buffers. They cause errors."
             ;; :squelch  t ;; TODO: Do I need to squelch?
@@ -182,7 +182,7 @@ the style & disable it occasionally.")
 
   (innit:hook:defun
       (list :name     "persp:buffer:ignore/remote"
-            :argslist '(buffer)
+            :argslist (buffer)
             :file     (path:current:file)
             :docstr   "Don't try to persist remote buffers. They are super slow."
             ;; :squelch  t ;; TODO: Do I need to squelch?
@@ -211,8 +211,7 @@ the style & disable it occasionally.")
    (persp-filter-save-buffers-functions . (mantle:hook:persp:buffer:ignore/dead mantle:hook:persp:buffer:ignore/remote))
    ;; Otherwise, buffers opened via bookmarks aren't treated as "real" and are
    ;; excluded from the buffer list.
-   (bookmark-after-jump-hook . mantle:hook:persp:buffer:add-current)
-   )
+   (bookmark-after-jump-hook . mantle:hook:persp:buffer:add-current))
 
 
   ;;--------------------
