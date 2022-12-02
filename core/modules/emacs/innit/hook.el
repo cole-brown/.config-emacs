@@ -132,7 +132,8 @@ OPTIONS is a plist of optional vars:
   (let* ((macro<innit>:hook      hook-var)
          (macro<innit>:options   (eval options))
          (macro<innit>:name      (plist-get macro<innit>:options :name))
-         (macro<innit>:argslist  (plist-get macro<innit>:options :argslist))
+         (macro<innit>:argslist  (or (plist-get macro<innit>:options :argslist)
+                                     '(&rest _)))
          (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
          (macro<innit>:squelch   (plist-get macro<innit>:options :squelch))
          (macro<innit>:postpend  (plist-get macro<innit>:options :postpend))
@@ -155,8 +156,7 @@ OPTIONS is a plist of optional vars:
        ;; Create function...
        (defun ,macro<innit>:hook-fn
            ;; ...with provided args list, or default of "who cares?" args list.
-           (or ,macro<innit>:argslist
-               '(&rest _))
+           ,macro<innit>:argslist
          ,macro<innit>:docstr
          (unless ,macro<innit>:quiet
            ;; Nice info message maybe?
@@ -224,7 +224,8 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
   ;; Eval inputs once.
   (let* ((macro<innit>:options   (eval options))
          (macro<innit>:name      (plist-get macro<innit>:options :name))
-         (macro<innit>:argslist  (plist-get macro<innit>:options :argslist))
+         (macro<innit>:argslist  (or (plist-get macro<innit>:options :argslist)
+                                     '(&rest _)))
          (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
          (macro<innit>:squelch   (plist-get macro<innit>:options :squelch))
          (macro<innit>:transient (plist-get macro<innit>:options :transient))
@@ -244,8 +245,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
     ;; Create function...
     `(defun ,macro<innit>:hook-fn
          ;; ...with provided args list, or default of "who cares?" args list.
-         (or ,macro<innit>:argslist
-             '(&rest _))
+         ,macro<innit>:argslist
        ,macro<innit>:docstr
        (unless ,macro<innit>:quiet
          ;; Nice info message maybe?
@@ -268,6 +268,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
 ;; (setq test-hook nil)
 ;; (makunbound 'mantle:hook:test)
 ;; (fmakunbound 'mantle:hook:test)
+;; (innit:hook:defun '(:name test-hook :quiet t) (message "Hello there."))
 ;; (innit:hook:defun '(:name test-hook :quiet t :argslist (&rest ignore)) (message "Hello there."))
 ;; (add-hook 'test-hook 'mantle:hook:test)
 ;; test-hook
