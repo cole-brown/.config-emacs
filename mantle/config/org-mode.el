@@ -702,7 +702,7 @@ LETTER must be a 1-character string."
 ;;   (prettify-symbols-mode 1))
 
 
-------------------------------
+;;------------------------------
 ;; Pretty List Bullet in Unicode
 ;;------------------------------
 ;;  ;; Show list markers with a middle dot instead of the
