@@ -546,26 +546,5 @@ Return result of evaluating BODY."
 
 
 ;;------------------------------------------------------------------------------
-;; Use-Package & Imp Timing
-;;------------------------------------------------------------------------------
-
-(defmacro imp:use-package (name &rest args)
-  "Wrap `use-package' in imp timing.
-
-NAME and ARGS should be exactly as `use-package' requires.
-
-Expects `use-package' to be loaded already."
-  (declare (indent 1))
-  (let ((feature (list :use-package name)))
-    `(imp:timing
-         (quote ,feature)
-         ,(imp:file:current)
-         ,(imp:path:current:dir)
-       (use-package ,name
-         ,@args))))
-;; (imp:use-package test-foo)
-
-
-;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------

@@ -1,17 +1,46 @@
-;;; emacs/imp/eval.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/imp/eval.el -*- lexical-binding: t; -*-
 
 ;;                                 ──────────                                 ;;
 ;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                                Evaluate                                ║ ;;
+;; ║               Use a Package, Evaluate After a Package...               ║ ;;
 ;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
 ;;                                   ──────                                   ;;
-;;                      Not now though, later... Maybe?                       ;;
+;;                            Free(ish) Shipping!                             ;;
 ;;                                 ──────────                                 ;;
+
 
 (require 'cl-lib)
 
 
-;; TODO: unit test
+;;------------------------------------------------------------------------------
+;; Use-Package
+;;------------------------------------------------------------------------------
+
+(defmacro imp:use-package (name &rest args)
+  "Wrap `use-package' in imp timing.
+
+NAME and ARGS should be exactly as `use-package' requires.
+
+Does not load `use-package'; call should load it prior to using this.
+
+Available macro variables:
+  - `macro<imp>:path/rel'
+  - `macro<imp>:path/dir'
+  - `macro<imp>:path/file'"
+  (declare (indent 1))
+  (let ((macro<imp>:feature (list :use-package name)))
+    `(let ((macro<imp>:path/rel  ,(imp:path:current:file/relative))
+           (macro<imp>:path/dir  ,(imp:path:current:dir))
+           (macro<imp>:path/file ,(imp:file:current)))
+       (imp:timing
+           (quote ,macro<imp>:feature)
+           macro<imp>:path/file
+           macro<imp>:path/dir
+         (use-package ,name
+           ,@args)))))
+;; (imp:use-package test-foo)
+;; (imp:use-package test-foo
+;;   (message "hello %S" macro<imp>:path/rel))
 
 
 ;;------------------------------------------------------------------------------
@@ -120,8 +149,7 @@ This is a wrapper around `eval-after-load' that:
                   `(int<imp>:error "imp:eval:after"
                                    "Unhandled condition `%S' for features: %S"
                                    condition
-                                   feature)))
-           ))))
+                                   feature)))))))
 ;; (imp:eval:after nil (message "hi"))
 ;; (imp:eval:after ':imp (message "hi"))
 ;; (imp:eval:after :imp (message "hi"))
