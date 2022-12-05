@@ -89,6 +89,19 @@ Hook function name returned will be an interned symbol from
 ;; (innit:hook:func/name:symbol "test:jill" 'test:jeff)
 
 
+(defun int<innit>:hook:option (keyword options)
+  "Get KEYWORD from OPTIONS and evaluate if necessary?"
+  (let ((option (plist-get options keyword)))
+    (if (and (listp option)
+             (functionp (car option)))
+        (eval option)
+      option)))
+;; (int<innit>:hook:option :name '(:name "jeff"))
+;; (int<innit>:hook:option :name '(:name jeff))
+;; (int<innit>:hook:option :name '(:name (concat "j" "eff")))
+;; (int<innit>:hook:option :dne '(:name (concat "j" "eff")))
+
+
 (defun innit:cmd:hook:func/name (name)
   "Create hook function name symbol for NAME and insert at point.
 
@@ -128,20 +141,23 @@ OPTIONS is a plist of optional vars:
 
   :docstr    - A string to use as the defined function's docstring."
   (declare (indent 2))
-  ;; Eval inputs once.
+  ;; Try to eval inputs (at most) once.
   (let* ((macro<innit>:hook      hook-var)
-         (macro<innit>:options   (eval options))
-         (macro<innit>:name      (plist-get macro<innit>:options :name))
-         (macro<innit>:argslist  (or (plist-get macro<innit>:options :argslist)
-                                     '(&rest _)))
-         (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
-         (macro<innit>:squelch   (plist-get macro<innit>:options :squelch))
-         (macro<innit>:postpend  (plist-get macro<innit>:options :postpend))
-         (macro<innit>:transient (plist-get macro<innit>:options :transient))
-         (macro<innit>:file      (when (plist-member macro<innit>:options :file)
-                                   (path:relative (plist-get macro<innit>:options :file)
+         (macro<innit>:name      (int<innit>:hook:option :name options))
+
+         (macro<innit>:quiet     (int<innit>:hook:option :quiet options))
+         (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
+         (macro<innit>:postpend  (int<innit>:hook:option :postpend options))
+         (macro<innit>:transient (int<innit>:hook:option :transient options))
+         (macro<innit>:file      (when (plist-member options :file)
+                                   (path:relative (int<innit>:hook:option :file options)
                                                   user-emacs-directory)))
-         (macro<innit>:docstr    (plist-get macro<innit>:options :docstr))
+         (macro<innit>:docstr    (int<innit>:hook:option :docstr options))
+         ;; Do not eval:
+         ;;   - input
+         (macro<innit>:argslist  (or (int<innit>:hook:option :argslist options)
+                                     '(&rest _)))
+         ;;   - derived
          (macro<innit>:hook-name (innit:hook:func/name:string (or macro<innit>:name
                                                                   macro<innit>:hook)))
          (macro<innit>:hook-fn   (intern macro<innit>:hook-name)))
@@ -179,9 +195,12 @@ OPTIONS is a plist of optional vars:
        ;; ...add the new hook function to the hook variable.
        (add-hook ',macro<innit>:hook #',macro<innit>:hook-fn ',macro<innit>:postpend))))
 ;; (setq test-hook nil)
-;; (makunbound mantle:hook:test)
+;; (makunbound 'mantle:hook:test)
+;; (fmakunbound 'mantle:hook:test)
 ;; (innit:hook:defun-and-add test-hook nil (message "Hello there."))
-;; (innit:hook:defun-and-add test-hook nil (message "Hello there."))
+;; (innit:hook:defun-and-add test-hook (:quiet t) (message "Hello there."))
+;; (innit:hook:defun-and-add test-hook (:quiet t :argslist (&rest ignore)) (message "Hello there."))
+;; (innit:hook:defun-and-add test-hook (:file (path:current:file) :docstr "this is a test hook") (message "Hello from a file?"))
 ;; test-hook
 ;; (run-hooks 'test-hook)
 ;; (setq debug-on-error t)
@@ -221,18 +240,21 @@ OPTIONS is a plist of optional vars:
 Use this over `innit:hook:defun-and-add' only in cases where you aren't
 `add-hook'ing directly (e.g. for use-package's ':hook')."
   (declare (indent 1))
-  ;; Eval inputs once.
-  (let* ((macro<innit>:options   (eval options))
-         (macro<innit>:name      (plist-get macro<innit>:options :name))
-         (macro<innit>:argslist  (or (plist-get macro<innit>:options :argslist)
-                                     '(&rest _)))
-         (macro<innit>:quiet     (plist-get macro<innit>:options :quiet))
-         (macro<innit>:squelch   (plist-get macro<innit>:options :squelch))
-         (macro<innit>:transient (plist-get macro<innit>:options :transient))
-         (macro<innit>:file      (when (plist-member macro<innit>:options :file)
-                                   (path:relative (plist-get macro<innit>:options :file)
+  ;; Try to eval inputs (at most) once.
+  (let* ((macro<innit>:name      (int<innit>:hook:option :name options))
+
+         (macro<innit>:quiet     (int<innit>:hook:option :quiet options))
+         (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
+         (macro<innit>:transient (int<innit>:hook:option :transient options))
+         (macro<innit>:file      (when (plist-member options :file)
+                                   (path:relative (int<innit>:hook:option :file options)
                                                   user-emacs-directory)))
-         (macro<innit>:docstr    (plist-get macro<innit>:options :docstr))
+         (macro<innit>:docstr    (int<innit>:hook:option :docstr options))
+         ;; Do not eval:
+         ;;   - input
+         (macro<innit>:argslist  (or (int<innit>:hook:option :argslist options)
+                                     '(&rest _)))
+         ;;   - derived
          (macro<innit>:hook-name (innit:hook:func/name:string macro<innit>:name))
          (macro<innit>:hook-fn   (intern macro<innit>:hook-name)))
 
@@ -268,15 +290,19 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
 ;; (setq test-hook nil)
 ;; (makunbound 'mantle:hook:test)
 ;; (fmakunbound 'mantle:hook:test)
-;; (innit:hook:defun '(:name test-hook :quiet t) (message "Hello there."))
-;; (innit:hook:defun '(:name test-hook :quiet t :argslist (&rest ignore)) (message "Hello there."))
+;; (innit:hook:defun (:name test-hook :quiet t) (message "Hello there."))
+;; (innit:hook:defun (:name "test-hook" :quiet t) (message "Hello there."))
+;; (innit:hook:defun (:name (concat "test" "-" "hook") :quiet t) (message "Hello there."))
+;; (innit:hook:defun (:name test-hook :quiet t :argslist (&rest ignore)) (message "Hello there."))
+;; (innit:hook:defun (:name test-hook :quiet t :argslist (&rest ignore)) (message "Hello there."))
+;; (innit:hook:defun (:name test-hook :file (path:current:file) :docstr "this is a test hook") (message "Hello from a file?"))
 ;; (add-hook 'test-hook 'mantle:hook:test)
 ;; test-hook
 ;; (run-hooks 'test-hook)
 ;; (setq test-hook nil)
 ;; (makunbound 'mantle:hook:captain)
 ;; (fmakunbound 'mantle:hook:captain)
-;; (innit:hook:defun test-hook '(:name "captain-hook" :file "here") (message "hi."))
+;; (innit:hook:defun test-hook (:name "captain-hook" :file "here") (message "hi."))
 ;; (add-hook 'test-hook 'sss:hook/captain)
 ;; test-hook
 ;; (run-hooks 'test-hook)
