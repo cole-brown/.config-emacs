@@ -554,12 +554,13 @@ a directory path.
 ;; (imp:path:current:file)
 
 
-(defun imp:path:current:file/relative (feature/base)
+(defun imp:path:current:file/relative (&optional feature/base)
   "Return the relative path of the file this function is called from.
 
-Path will be relative to FEATURE/BASE.
+Path will be relative to FEATURE/BASE. If FEATURE/BASE is nil, use
+`user-emacs-directory' as the base path.
 
-Will raise an error if FEATURE/BASE does not have a path root.
+Will raise an error if non-nil FEATURE/BASE does not have a path root.
 
 Will raise an error if `imp:path:current:file' (i.e. the absolute path)
 has no relation to FEATURE/BASE's root path.
@@ -569,8 +570,13 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
     (imp:path:current:file)
       -> \"/home/<username>/.config/emacs/foo/bar.el\"
     (imp:path:current:file/relative :dot-emacs)
+      -> \"foo/bar.el\"
+    (imp:path:current:file/relative)
       -> \"foo/bar.el\""
-  (let* ((path/root (file-name-as-directory (int<imp>:path:root/dir feature/base)))
+  (let* ((path/root (file-name-as-directory
+                     (expand-file-name (if feature/base
+                                           (int<imp>:path:root/dir feature/base)
+                                         user-emacs-directory))))
          (path/here (imp:path:current:file))
          ;; Don't like `file-relative-name' as it can return wierd things when it
          ;; goes off looking for actual directories and files...
@@ -595,6 +601,7 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
                       path/relative))
     ;; Return relative path.
     path/relative))
+;; (imp:path:current:file/relative)
 ;; (imp:path:root :test (imp:path:current:dir))
 ;; (imp:path:current:file/relative :test)
 
@@ -614,9 +621,12 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
 (defun imp:path:current:dir/relative (feature/base)
   "Return the relative path from feature's path root to the dir this is called.
 
-Will raise an error if FEATURE/BASE does not have a path root.
+Path will be relative to FEATURE/BASE. If FEATURE/BASE is nil, use
+`user-emacs-directory' as the base path.
 
-Will raise an error if `(imp:path:current:dir)' (i.e. the absolute path)
+Will raise an error if non-nil FEATURE/BASE does not have a path root.
+
+Will raise an error if `imp:path:current:dir' (i.e. the absolute path)
 has no relation to FEATURE/BASE's root path.
 
 Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
@@ -624,9 +634,14 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
     (imp:path:current:dir)
       -> \"/home/<username>/.config/emacs/foo/\"
     (imp:path:current:dir/relative :dot-emacs)
+      -> \"foo\"
+    (imp:path:current:dir/relative)
       -> \"foo\""
   ;; Make sure both paths are equivalent (directory paths) for the regex replace.
-  (let* ((path/root (file-name-as-directory (int<imp>:path:root/dir feature/base)))
+  (let* ((path/root (file-name-as-directory
+                     (expand-file-name (if feature/base
+                                           (int<imp>:path:root/dir feature/base)
+                                         user-emacs-directory))))
          (path/here (file-name-as-directory (imp:path:current:dir)))
          ;; Don't like `file-relative-name' as it can return wierd things when it
          ;; goes off looking for actual directories and files...
