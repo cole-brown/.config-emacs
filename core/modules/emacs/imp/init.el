@@ -92,7 +92,7 @@
 (int<imp>:init:load "provide")
 (int<imp>:init:load "load")
 (int<imp>:init:load "require")
-(int<imp>:init:load "eval")
+(int<imp>:init:load "package")
 (int<imp>:init:load "commands")
 
 

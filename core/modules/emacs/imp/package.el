@@ -1,4 +1,4 @@
-;;; core/modules/emacs/imp/eval.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/imp/package.el -*- lexical-binding: t; -*-
 
 ;;                                 ──────────                                 ;;
 ;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
@@ -154,8 +154,8 @@ This is a wrapper around `eval-after-load' that:
 ;; (imp:eval:after ':imp (message "hi"))
 ;; (imp:eval:after :imp (message "hi"))
 ;; (imp:eval:after imp (message "hi"))
-;; (imp:eval:after (:imp eval) (message "hi"))
-;; (imp:eval:after (:and :imp (imp eval)) (message "hi"))
+;; (imp:eval:after (:imp package) (message "hi"))
+;; (imp:eval:after (:and :imp (imp package)) (message "hi"))
 ;; Incorrect:
 ;;   (imp:eval:after 'zenburn (message "hi"))
 
@@ -163,4 +163,4 @@ This is a wrapper around `eval-after-load' that:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide:with-emacs :imp 'eval)
+(imp:provide:with-emacs :imp 'package)
