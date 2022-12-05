@@ -116,13 +116,13 @@
 
   (innit:hook:defun-and-add
       projectile-relevant-known-projects
-      (list :name    "projectile:known-projects"
-            :file    (path:current:file)
-            :docstr  (concat "Auto-discovery on `projectile-mode' is slow and premature. "
-                             "Let's defer it until it's actually needed. "
-                             "Also clean up non-existing projects too!")
-            ;; :squelch t
-            :quiet   t)
+      (:name    "projectile:known-projects"
+       :file    (path:current:file)
+       :docstr  (concat "Auto-discovery on `projectile-mode' is slow and premature. "
+                        "Let's defer it until it's actually needed. "
+                        "Also clean up non-existing projects too!")
+       ;; :squelch t
+       :quiet   t)
     (projectile-cleanup-known-projects)
     (projectile-discover-projects-in-search-path))
 

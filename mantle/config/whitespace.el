@@ -167,22 +167,22 @@
   :init
   ;;--------------------
   (innit:hook:defun
-      (list :name    "org/whitespace:mode/enter"
-            :file    (path:current:file)
-            :docstr  "I like some whitespace-mode stuff in org-mode, but want less than other modes."
-            :squelch t
-            :quiet   t)
+      (:name    "org/whitespace:mode/enter"
+       :file    (path:current:file)
+       :docstr  "I like some whitespace-mode stuff in org-mode, but want less than other modes."
+       :squelch t
+       :quiet   t)
     ;; Make a local copy of `whitespace-style' we can modify and...
     (set (make-local-variable 'whitespace-style)
          ;; ...set it as old one with removed 'too-long line' highlighting.
          (remove 'lines-tail whitespace-style)))
 
   (innit:hook:defun
-     (list :name    "org/whitespace:save/pre"
-           :file    (path:current:file)
-           :docstr  "Invoke `whitespace-cleanup' if the `ws-butler' feature is not present."
-           :squelch t
-           :quiet   t)
+      (:name    "org/whitespace:save/pre"
+       :file    (path:current:file)
+       :docstr  "Invoke `whitespace-cleanup' if the `ws-butler' feature is not present."
+       :squelch t
+       :quiet   t)
    (unless (featurep 'ws-butler)
      (whitespace-cleanup)))
 

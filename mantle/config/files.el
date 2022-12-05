@@ -46,23 +46,23 @@
   ;; ;; (setq recentf-show-abbreviated t)
   ;;
   ;; (innit:hook:defun
-  ;;  (list :name    "recentf:touch/buffer"
-  ;;        :file    (path:current:file)
-  ;;        :docstr  "Bump file in recent file list when it is switched or written to."
-  ;;        :squelch t
-  ;;        :quiet   t)
-  ;;  (when buffer-file-name
-  ;;    (recentf-add-file buffer-file-name))
-  ;;  ;; Return nil for `write-file-functions'
-  ;;  nil)
+  ;;     (:name    "recentf:touch/buffer"
+  ;;      :file    (path:current:file)
+  ;;      :docstr  "Bump file in recent file list when it is switched or written to."
+  ;;      :squelch t
+  ;;      :quiet   t)
+  ;;   (when buffer-file-name
+  ;;     (recentf-add-file buffer-file-name))
+  ;;   ;; Return nil for `write-file-functions'
+  ;;   nil)
   ;;
   ;; (innit:hook:defun
-  ;;  (list :name    "recentf:touch/dired"
-  ;;        :file    (path:current:file)
-  ;;        :docstr  "Add dired directories to recentf file list."
-  ;;        :squelch t
-  ;;        :quiet   t)
-  ;;  (recentf-add-file default-directory))
+  ;;     (:name    "recentf:touch/dired"
+  ;;      :file    (path:current:file)
+  ;;      :docstr  "Add dired directories to recentf file list."
+  ;;      :squelch t
+  ;;      :quiet   t)
+  ;;   (recentf-add-file default-directory))
   ;;
   ;;
   ;; ;;--------------------

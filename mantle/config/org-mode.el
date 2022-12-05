@@ -65,19 +65,19 @@
   ;; Create Org-Mode Hooks
   ;;---
   (innit:hook:defun
-      (list :name   "org/jump-to-now-target"
-            :file   (path:current:file)
-            :docstr "Jump point to \"now\" link, if it's in the first part of the file."
-            :squelch t
-            :quiet   t)
+      (:name   "org/jump-to-now-target"
+       :file   (path:current:file)
+       :docstr "Jump point to \"now\" link, if it's in the first part of the file."
+       :squelch t
+       :quiet   t)
     (buffer:cmd:search:header "[[--now"))
 
   (innit:hook:defun
-      (list :name   "org/local-settings"
-            :file   (path:current:file)
-            :docstr "Set up buffer local vars."
-            :squelch t
-            :quiet  t)
+      (:name   "org/local-settings"
+       :file   (path:current:file)
+       :docstr "Set up buffer local vars."
+       :squelch t
+       :quiet  t)
     (setq-local yas-indent-line 'auto)
     ;; Automatically becomes buffer local.
     (setq tab-width (jerky:get 'docs 'tab 'short)))
@@ -668,39 +668,41 @@ LETTER must be a 1-character string."
 ;;------------------------------
 ;; Pretty Checkboxes in Unicode
 ;;------------------------------
-;;  ;; Check box visual upgrade.
-;;  ;;   empty, indeterminate, marked: [ ], [-], [X] -> ☐, ▣, ☒
-;;  ;;     aka 'unchecked', 'mixed checked/unchecked children', 'checked'
-;;  ;; Trial: [2019-07-30 Tue]
-;;  ;;   - Con: This doesn't update until point has moved off the line... Possibly
-;;  ;;     interacting with my highlight row thing/mode?
-;;  ;; Nice lil search for symbols: http://www.unicode.org/charts/
-;;  (innit:hook:defun org-mode-hook t
-;;      nil "checkboxes" "init/config/configure-org-mode.el"
-;;    "Beautify Org Checkbox Symbol"
-;;    (setq prettify-symbols-alist
-;;          '(("[ ]" . "☐")
-;;            ;; other options:
-;;            ;;   - ☐ - 2610 ballot box
-;;            ;;     https://www.unicode.org/charts/PDF/U2600.pdf
-;;            ("[X]" . "☒")
-;;            ;; other options:
-;;            ;;   - ☒ - 2612 ballot box with X
-;;            ;;     https://www.unicode.org/charts/PDF/U2600.pdf
-;;            ;;   - ☑ - 2611 ballot box with check
-;;            ("[-]" . "▣")
-;;            ;; other options:
-;;            ;;   - ▣ - 25A3 white square containing black small square
-;;            ;;     https://www.unicode.org/charts/PDF/U25A0.pdf
-;;            ;;   - ❍ - ...idk, what other people used at reddit thread.
-;;            ;;   - ▽ - 25BD white down-pointing triangle
-;;            ;;   - ◎ - 25CE BULLSEYE
-;;            ;;   - ☯ - 262F yin-yang
-;;            ))
-;;    (prettify-symbols-mode 1))
+;; ;; Check box visual upgrade.
+;; ;;   empty, indeterminate, marked: [ ], [-], [X] -> ☐, ▣, ☒
+;; ;;     aka 'unchecked', 'mixed checked/unchecked children', 'checked'
+;; ;; Trial: [2019-07-30 Tue]
+;; ;;   - Con: This doesn't update until point has moved off the line... Possibly
+;; ;;     interacting with my highlight row thing/mode?
+;; ;; Nice lil search for symbols: http://www.unicode.org/charts/
+;; (innit:hook:defun
+;;     (:name   "org/pretty-checkboxes"
+;;      :file   (path:current:file)
+;;      :docstr "Beautify Org's Checkbox Symbols"
+;;      :quiet  t)
+;;   (setq prettify-symbols-alist
+;;         '(("[ ]" . "☐")
+;;           ;; other options:
+;;           ;;   - ☐ - 2610 ballot box
+;;           ;;     https://www.unicode.org/charts/PDF/U2600.pdf
+;;           ("[X]" . "☒")
+;;           ;; other options:
+;;           ;;   - ☒ - 2612 ballot box with X
+;;           ;;     https://www.unicode.org/charts/PDF/U2600.pdf
+;;           ;;   - ☑ - 2611 ballot box with check
+;;           ("[-]" . "▣")
+;;           ;; other options:
+;;           ;;   - ▣ - 25A3 white square containing black small square
+;;           ;;     https://www.unicode.org/charts/PDF/U25A0.pdf
+;;           ;;   - ❍ - ...idk, what other people used at reddit thread.
+;;           ;;   - ▽ - 25BD white down-pointing triangle
+;;           ;;   - ◎ - 25CE BULLSEYE
+;;           ;;   - ☯ - 262F yin-yang
+;;           ))
+;;   (prettify-symbols-mode 1))
 
 
-;;------------------------------
+------------------------------
 ;; Pretty List Bullet in Unicode
 ;;------------------------------
 ;;  ;; Show list markers with a middle dot instead of the

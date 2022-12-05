@@ -46,11 +46,11 @@
   ;;---
 
   (innit:hook:defun
-      (list :name    "yasnippet"
-            :file    (path:current:file)
-            :docstr  "Hook for yasnippet editting."
-            :squelch t
-            :quiet   t)
+      (:name    "yasnippet"
+       :file    (path:current:file)
+       :docstr  "Hook for yasnippet editting."
+       :squelch t
+       :quiet   t)
     ;; Normally we want a final newline in all files, so `require-final-newline'
     ;; is set to t. However, in yasnippet files, that means all snippets will
     ;; insert a "\n", and that's not desired.

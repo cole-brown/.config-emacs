@@ -64,13 +64,13 @@ the style & disable it occasionally.")
   ;; a real persp object, so buffers can't really be assigned to it, among other
   ;; quirks, so... replace it with a "main" perspective.
   (innit:hook:defun
-      (list :name    "persp:replace-nil-perspective"
-            :file    (path:current:file)
-            :docstr  (concat "The default perspective that 'persp-mode' creates is special and doesn't "
-                             "represent a real persp object, so buffers can't really be assigned to "
-                             "it, among other quirks, so... replace it with a \"main\" perspective.")
-            ;; :squelch t ;; TODO: Do I need to squelch?
-            :quiet   t)
+      (:name    "persp:replace-nil-perspective"
+       :file    (path:current:file)
+       :docstr  (concat "The default perspective that 'persp-mode' creates is special and doesn't "
+                        "represent a real persp object, so buffers can't really be assigned to "
+                        "it, among other quirks, so... replace it with a \"main\" perspective.")
+       ;; :squelch t ;; TODO: Do I need to squelch?
+       :quiet   t)
     (when persp-mode
       (dolist (frame (frame-list))
         (when (string= (safe-persp-name (get-current-persp frame)) persp-nil-name)
@@ -80,11 +80,11 @@ the style & disable it occasionally.")
                               frame)))))
 
   (innit:hook:defun
-      (list :name    "persp:init-first-perspective"
-            :file    (path:current:file)
-            :docstr  (concat "Ensure a main perspective exists.")
-            ;; :squelch t ;; TODO: Do I need to squelch?
-            :quiet   t)
+      (:name    "persp:init-first-perspective"
+       :file    (path:current:file)
+       :docstr  (concat "Ensure a main perspective exists.")
+       ;; :squelch t ;; TODO: Do I need to squelch?
+       :quiet   t)
     (when persp-mode
       (let (persp-before-switch-functions)
         ;; Try our best to hide the nil perspective...
@@ -103,11 +103,11 @@ the style & disable it occasionally.")
                                            '((window-height . shrink-window-if-larger-than-buffer))))))))
 
   (innit:hook:defun
-      (list :name    "persp:init:uniquify-hack"
-            :file    (path:current:file)
-            :docstr "Hack around `uniquify' buffer renaming to keep `persp-mode' working."
-            ;; :squelch t ;; TODO: Do I need to squelch?
-            :quiet   t)
+      (:name    "persp:init:uniquify-hack"
+       :file    (path:current:file)
+       :docstr "Hack around `uniquify' buffer renaming to keep `persp-mode' working."
+       ;; :squelch t ;; TODO: Do I need to squelch?
+       :quiet   t)
     ;; `uniquify' breaks persp-mode. It renames old buffers, which causes errors
     ;; when switching between perspective (their buffers are serialized by name
     ;; and persp-mode expects them to have the same name when restored).
@@ -131,11 +131,11 @@ the style & disable it occasionally.")
              (setq uniquify-buffer-name-style mantle:user:perspective:uniquify-style/cache)))))
 
   (innit:hook:defun
-      (list :name    "persp:winner:data/save"
-            :file    (path:current:file)
-            :docstr "Save `winner' perspective data?"
-            ;; :squelch t ;; TODO: Do I need to squelch?
-            :quiet   t)
+      (:name    "persp:winner:data/save"
+       :file    (path:current:file)
+       :docstr "Save `winner' perspective data?"
+       ;; :squelch t ;; TODO: Do I need to squelch?
+       :quiet   t)
     (when (and (bound-and-true-p winner-mode)
                (get-current-persp))
       (set-persp-parameter 'winner-ring (list winner-currents
@@ -143,11 +143,11 @@ the style & disable it occasionally.")
                                               winner-pending-undo-ring))))
 
   (innit:hook:defun
-      (list :name    "persp:winner:data/load"
-            :file    (path:current:file)
-            :docstr "Load `winner' perspective data?"
-            ;; :squelch t ;; TODO: Do I need to squelch?
-            :quiet   t)
+      (:name    "persp:winner:data/load"
+       :file    (path:current:file)
+       :docstr "Load `winner' perspective data?"
+       ;; :squelch t ;; TODO: Do I need to squelch?
+       :quiet   t)
     (when (bound-and-true-p winner-mode)
       (cl-destructuring-bind
           (currents alist pending-undo-ring)
@@ -158,11 +158,11 @@ the style & disable it occasionally.")
               winner-pending-undo-ring pending-undo-ring))))
 
   (innit:hook:defun
-      (list :name    "persp:buffer:add-current"
-            :file    (path:current:file)
-            :docstr "Add current buffer to focused perspective."
-            ;; :squelch t ;; TODO: Do I need to squelch?
-            :quiet   t)
+      (:name    "persp:buffer:add-current"
+       :file    (path:current:file)
+       :docstr "Add current buffer to focused perspective."
+       ;; :squelch t ;; TODO: Do I need to squelch?
+       :quiet   t)
     (or (not (bound-and-true-p persp-mode))
         (persp-buffer-filtered-out-p
          (or (buffer-base-buffer (current-buffer))
@@ -171,22 +171,22 @@ the style & disable it occasionally.")
         (persp-add-buffer (current-buffer) (get-current-persp) nil nil)))
 
   (innit:hook:defun
-      (list :name     "persp:buffer:ignore/dead"
-            :argslist (buffer)
-            :file     (path:current:file)
-            :docstr   "Don't try to persist dead buffers. They cause errors."
-            ;; :squelch  t ;; TODO: Do I need to squelch?
-            :quiet    t)
+      (:name     "persp:buffer:ignore/dead"
+       :argslist (buffer)
+       :file     (path:current:file)
+       :docstr   "Don't try to persist dead buffers. They cause errors."
+       ;; :squelch  t ;; TODO: Do I need to squelch?
+       :quiet    t)
       ;; Fix bug: Ignore dead buffers in `persp-mode' buffer list
       (not (buffer-live-p buffer)))
 
   (innit:hook:defun
-      (list :name     "persp:buffer:ignore/remote"
-            :argslist (buffer)
-            :file     (path:current:file)
-            :docstr   "Don't try to persist remote buffers. They are super slow."
-            ;; :squelch  t ;; TODO: Do I need to squelch?
-            :quiet    t)
+      (:name     "persp:buffer:ignore/remote"
+       :argslist (buffer)
+       :file     (path:current:file)
+       :docstr   "Don't try to persist remote buffers. They are super slow."
+       ;; :squelch  t ;; TODO: Do I need to squelch?
+       :quiet    t)
       ;; Don't save TRAMP buffers; they're super slow to restore.
       (let ((dir (buffer-local-value 'default-directory buffer)))
         (ignore-errors (file-remote-p dir))))
@@ -319,11 +319,11 @@ or on some buffer listing ops."
     (imp:eval:after posframe
       (innit:hook:defun-and-add
           persp-after-load-state-functions
-          (list :name    "persp:state/load"
-                :file    path/this
-                :docstr "Fix bug: Stop session persistence from restoring a broken posframe."
-                ;; :squelch t ;; TODO: Do I need to squelch?
-                :quiet   t)
+          (:name    "persp:state/load"
+           :file    path/this
+           :docstr "Fix bug: Stop session persistence from restoring a broken posframe."
+           ;; :squelch t ;; TODO: Do I need to squelch?
+           :quiet   t)
         (posframe-delete-all))))
 
   ;; Enable `persp-mode'!

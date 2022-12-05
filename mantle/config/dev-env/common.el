@@ -42,10 +42,10 @@
   ;; Creates a func called `mantle:hook:rainbow-mode/enable'.
   ;;   (innit:hook:func/name:symbol "rainbow-mode/enable" nil)
   (innit:hook:defun
-      (list :name "rainbow-mode/enable"
-            :file (path:current:file)
-            :docstr "Enable `rainbow-mode' (colorize color codes) for this buffer."
-            :quiet t)
+      (:name "rainbow-mode/enable"
+       :file (path:current:file)
+       :docstr "Enable `rainbow-mode' (colorize color codes) for this buffer."
+       :quiet t)
     (rainbow-mode +1))
 
   ;;--------------------
