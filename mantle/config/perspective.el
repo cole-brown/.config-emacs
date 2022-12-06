@@ -65,7 +65,7 @@ the style & disable it occasionally.")
   ;; quirks, so... replace it with a "main" perspective.
   (innit:hook:defun
       (:name    "persp:replace-nil-perspective"
-       :file    (path:current:file)
+       :file    macro<imp>:path/file
        :docstr  (concat "The default perspective that 'persp-mode' creates is special and doesn't "
                         "represent a real persp object, so buffers can't really be assigned to "
                         "it, among other quirks, so... replace it with a \"main\" perspective.")
@@ -81,7 +81,7 @@ the style & disable it occasionally.")
 
   (innit:hook:defun
       (:name    "persp:init-first-perspective"
-       :file    (path:current:file)
+       :file    macro<imp>:path/file
        :docstr  (concat "Ensure a main perspective exists.")
        ;; :squelch t ;; TODO: Do I need to squelch?
        :quiet   t)
@@ -104,7 +104,7 @@ the style & disable it occasionally.")
 
   (innit:hook:defun
       (:name    "persp:init:uniquify-hack"
-       :file    (path:current:file)
+       :file    macro<imp>:path/file
        :docstr "Hack around `uniquify' buffer renaming to keep `persp-mode' working."
        ;; :squelch t ;; TODO: Do I need to squelch?
        :quiet   t)
@@ -132,7 +132,7 @@ the style & disable it occasionally.")
 
   (innit:hook:defun
       (:name    "persp:winner:data/save"
-       :file    (path:current:file)
+       :file    macro<imp>:path/file
        :docstr "Save `winner' perspective data?"
        ;; :squelch t ;; TODO: Do I need to squelch?
        :quiet   t)
@@ -144,7 +144,7 @@ the style & disable it occasionally.")
 
   (innit:hook:defun
       (:name    "persp:winner:data/load"
-       :file    (path:current:file)
+       :file    macro<imp>:path/file
        :docstr "Load `winner' perspective data?"
        ;; :squelch t ;; TODO: Do I need to squelch?
        :quiet   t)
@@ -159,7 +159,7 @@ the style & disable it occasionally.")
 
   (innit:hook:defun
       (:name    "persp:buffer:add-current"
-       :file    (path:current:file)
+       :file    macro<imp>:path/file
        :docstr "Add current buffer to focused perspective."
        ;; :squelch t ;; TODO: Do I need to squelch?
        :quiet   t)
@@ -173,7 +173,7 @@ the style & disable it occasionally.")
   (innit:hook:defun
       (:name     "persp:buffer:ignore/dead"
        :argslist (buffer)
-       :file     (path:current:file)
+       :file     macro<imp>:path/file
        :docstr   "Don't try to persist dead buffers. They cause errors."
        ;; :squelch  t ;; TODO: Do I need to squelch?
        :quiet    t)
@@ -183,7 +183,7 @@ the style & disable it occasionally.")
   (innit:hook:defun
       (:name     "persp:buffer:ignore/remote"
        :argslist (buffer)
-       :file     (path:current:file)
+       :file     macro<imp>:path/file
        :docstr   "Don't try to persist remote buffers. They are super slow."
        ;; :squelch  t ;; TODO: Do I need to squelch?
        :quiet    t)
@@ -315,16 +315,15 @@ or on some buffer listing ops."
     t)
 
   ;; Fix bug: Stop session persistence from restoring a broken posframe.
-  (let ((path/this (path:current:file)))
-    (imp:eval:after posframe
-      (innit:hook:defun-and-add
-          persp-after-load-state-functions
-          (:name    "persp:state/load"
-           :file    path/this
-           :docstr "Fix bug: Stop session persistence from restoring a broken posframe."
-           ;; :squelch t ;; TODO: Do I need to squelch?
-           :quiet   t)
-        (posframe-delete-all))))
+  (imp:eval:after posframe
+    (innit:hook:defun-and-add
+        persp-after-load-state-functions
+        (:name    "persp:state/load"
+         :file    macro<imp>:path/file
+         :docstr "Fix bug: Stop session persistence from restoring a broken posframe."
+         ;; :squelch t ;; TODO: Do I need to squelch?
+         :quiet   t)
+      (posframe-delete-all)))
 
   ;; Enable `persp-mode'!
   (persp-mode +1))

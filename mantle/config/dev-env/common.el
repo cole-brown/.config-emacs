@@ -43,7 +43,7 @@
   ;;   (innit:hook:func/name:symbol "rainbow-mode/enable" nil)
   (innit:hook:defun
       (:name "rainbow-mode/enable"
-       :file (path:current:file)
+       :file macro<imp>:path/file
        :docstr "Enable `rainbow-mode' (colorize color codes) for this buffer."
        :quiet t)
     (rainbow-mode +1))

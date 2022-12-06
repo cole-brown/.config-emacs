@@ -47,7 +47,7 @@
 
   (innit:hook:defun
       (:name    "yasnippet"
-       :file    (path:current:file)
+       :file    macro<imp>:path/file
        :docstr  "Hook for yasnippet editting."
        :squelch t
        :quiet   t)

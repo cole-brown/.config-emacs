@@ -168,7 +168,7 @@
   ;;--------------------
   (innit:hook:defun
       (:name    "org/whitespace:mode/enter"
-       :file    (path:current:file)
+       :file    macro<imp>:path/file
        :docstr  "I like some whitespace-mode stuff in org-mode, but want less than other modes."
        :squelch t
        :quiet   t)
@@ -179,7 +179,7 @@
 
   (innit:hook:defun
       (:name    "org/whitespace:save/pre"
-       :file    (path:current:file)
+       :file    macro<imp>:path/file
        :docstr  "Invoke `whitespace-cleanup' if the `ws-butler' feature is not present."
        :squelch t
        :quiet   t)

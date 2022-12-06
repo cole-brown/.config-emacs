@@ -66,7 +66,7 @@
   ;;---
   (innit:hook:defun
       (:name   "org/jump-to-now-target"
-       :file   (path:current:file)
+       :file   macro<imp>:path/file
        :docstr "Jump point to \"now\" link, if it's in the first part of the file."
        :squelch t
        :quiet   t)
@@ -74,7 +74,7 @@
 
   (innit:hook:defun
       (:name   "org/local-settings"
-       :file   (path:current:file)
+       :file   macro<imp>:path/file
        :docstr "Set up buffer local vars."
        :squelch t
        :quiet  t)
@@ -677,7 +677,7 @@ LETTER must be a 1-character string."
 ;; ;; Nice lil search for symbols: http://www.unicode.org/charts/
 ;; (innit:hook:defun
 ;;     (:name   "org/pretty-checkboxes"
-;;      :file   (path:current:file)
+;;      :file   macro<imp>:path/file
 ;;      :docstr "Beautify Org's Checkbox Symbols"
 ;;      :quiet  t)
 ;;   (setq prettify-symbols-alist
