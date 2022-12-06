@@ -157,7 +157,7 @@ Example:
 
 
 ;;------------------------------------------------------------------------------
-;; Canonical Paths
+;; Normalize Paths
 ;;------------------------------------------------------------------------------
 
 (defun imp:path:canonical (path &optional root)
@@ -170,7 +170,7 @@ If ROOT is nil, `default-directory' is used if needed."
 (defun imp:path:join:canonical (&rest path)
   "Combines PATH elements together into an absolute/canonical path.
 
-If PATH is relative, canonicalizes to be under `default-directory'.
+If PATH is relative, canonicalize to be under `default-directory'.
 
 (imp:path:join \"/foo/bar/\" \"jeff\" \"jill.el\")
   ->\"/foo/bar/jeff/jill.el\"
@@ -178,6 +178,13 @@ If PATH is relative, canonicalizes to be under `default-directory'.
 (imp:path:join \"/foo/bar/\" \"jeff\" \"jill.el\" \"..\")
   ->\"/foo/bar/jeff\""
   (imp:path:canonical (apply #'imp:path:join path)))
+
+
+(defun imp:path:abbreviate (&rest path)
+  "Join & canonicalize PATH, then shortened using `directory-abbrev-alist'.
+
+Return an absolute path."
+  (abbreviate-file-name (imp:path:canonical (apply #'imp:path:join path))))
 
 
 ;;------------------------------------------------------------------------------

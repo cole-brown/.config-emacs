@@ -24,14 +24,14 @@ NAME and ARGS should be exactly as `use-package' requires.
 Does not load `use-package'; call should load it prior to using this.
 
 Available macro variables:
-  - `macro<imp>:path/current/rel'
+  - `macro<imp>:path/file'
   - `macro<imp>:path/dir'
-  - `macro<imp>:path/file'"
+  - `macro<imp>:name/file'"
   (declare (indent 1))
   (let ((macro<imp>:feature (list :use-package name)))
-    `(let ((macro<imp>:path/current/rel ,(imp:path:current:file/relative))
-           (macro<imp>:path/dir  ,(imp:path:current:dir))
-           (macro<imp>:path/file ,(imp:file:current)))
+    `(let ((macro<imp>:path/file ,(imp:path:abbreviate (imp:path:current:file)))
+           (macro<imp>:path/dir  ,(imp:path:abbreviate (imp:path:current:dir)))
+           (macro<imp>:name/file ,(imp:file:current)))
        (imp:timing
            (quote ,macro<imp>:feature)
            macro<imp>:path/file
@@ -40,7 +40,8 @@ Available macro variables:
            ,@args)))))
 ;; (imp:use-package test-foo)
 ;; (imp:use-package test-foo
-;;   (message "hello %S" macro<imp>:path/rel))
+;;   :init
+;;   (message "hello %S" macro<imp>:path/file))
 
 
 ;;------------------------------------------------------------------------------
