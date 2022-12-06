@@ -96,6 +96,7 @@ Hook function name returned will be an interned symbol from
              (functionp (car option)))
         (eval option)
       option)))
+;; (int<innit>:hook:option :name '(:name nil))
 ;; (int<innit>:hook:option :name '(:name "jeff"))
 ;; (int<innit>:hook:option :name '(:name jeff))
 ;; (int<innit>:hook:option :name '(:name (concat "j" "eff")))
@@ -149,9 +150,7 @@ OPTIONS is a plist of optional vars:
          (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
          (macro<innit>:postpend  (int<innit>:hook:option :postpend options))
          (macro<innit>:transient (int<innit>:hook:option :transient options))
-         (macro<innit>:file      (when (plist-member options :file)
-                                   (path:relative (int<innit>:hook:option :file options)
-                                                  user-emacs-directory)))
+         (macro<innit>:arg/file  (int<innit>:hook:option :file options)) ;; Not complete yet...
          (macro<innit>:docstr    (int<innit>:hook:option :docstr options))
          ;; Do not eval:
          ;;   - input
@@ -168,7 +167,11 @@ OPTIONS is a plist of optional vars:
               body
             (innit:squelch body)))
 
-    `(progn
+    ;; Finish figuring out file arg.
+    `(let ((macro<innit>:file (when (stringp ,macro<innit>:arg/file)
+                                (path:relative ,macro<innit>:arg/file
+                                               user-emacs-directory))))
+
        ;; Create function...
        (defun ,macro<innit>:hook-fn
            ;; ...with provided args list, or default of "who cares?" args list.
@@ -182,10 +185,10 @@ OPTIONS is a plist of optional vars:
             ,macro<innit>:hook-name
             "Running hook `%s'%s..."
             ,macro<innit>:hook-name
-            (if (not (stringp ,macro<innit>:file))
+            (if (not (stringp macro<innit>:file))
                 ""
               (concat " from '"
-                      ,macro<innit>:file
+                      macro<innit>:file
                       "'"))))
          ;; And run the actual hook.
          ,@body
@@ -242,13 +245,10 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
   (declare (indent 1))
   ;; Try to eval inputs (at most) once.
   (let* ((macro<innit>:name      (int<innit>:hook:option :name options))
-
          (macro<innit>:quiet     (int<innit>:hook:option :quiet options))
          (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
          (macro<innit>:transient (int<innit>:hook:option :transient options))
-         (macro<innit>:file      (when (plist-member options :file)
-                                   (path:relative (int<innit>:hook:option :file options)
-                                                  user-emacs-directory)))
+         (macro<innit>:arg/file  (int<innit>:hook:option :file options)) ;; Not complete yet...
          (macro<innit>:docstr    (int<innit>:hook:option :docstr options))
          ;; Do not eval:
          ;;   - input
@@ -265,28 +265,31 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
             (innit:squelch body)))
 
     ;; Create function...
-    `(defun ,macro<innit>:hook-fn
-         ;; ...with provided args list, or default of "who cares?" args list.
-         ,macro<innit>:argslist
-       ,macro<innit>:docstr
-       (unless ,macro<innit>:quiet
-         ;; Nice info message maybe?
-         (nub:out
+    `(let ((macro<innit>:file (when (stringp ,macro<innit>:arg/file)
+                                (path:relative ,macro<innit>:arg/file
+                                               user-emacs-directory))))
+       (defun ,macro<innit>:hook-fn
+           ;; ...with provided args list, or default of "who cares?" args list.
+           ,macro<innit>:argslist
+         ,macro<innit>:docstr
+         (unless ,macro<innit>:quiet
+           ;; Nice info message maybe?
+           (nub:out
             :innit
             :info
-          ,macro<innit>:hook-name
-          "Running hook `%s'%s..."
-          ,macro<innit>:hook-name
-          (if (not (stringp ,macro<innit>:file))
-              ""
-            (concat " from '"
-                    ,macro<innit>:file
-                    "'"))))
-       ;; And run the actual hook.
-       ,@body
-       ;; If a transient, remove hook now that it's run once.
-       (when (bound-and-true-p ,macro<innit>:transient)
-         (remove-hook ',macro<innit>:transient #',macro<innit>:hook-fn)))))
+            ,macro<innit>:hook-name
+            "Running hook `%s'%s..."
+            ,macro<innit>:hook-name
+            (if (not (stringp macro<innit>:file))
+                ""
+              (concat " from '"
+                      macro<innit>:file
+                      "'"))))
+         ;; And run the actual hook.
+         ,@body
+         ;; If a transient, remove hook now that it's run once.
+         (when (bound-and-true-p ,macro<innit>:transient)
+           (remove-hook ',macro<innit>:transient #',macro<innit>:hook-fn))))))
 ;; (setq test-hook nil)
 ;; (makunbound 'mantle:hook:test)
 ;; (fmakunbound 'mantle:hook:test)
@@ -306,6 +309,16 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
 ;; (add-hook 'test-hook 'sss:hook/captain)
 ;; test-hook
 ;; (run-hooks 'test-hook)
+;;
+;; `macro<imp>:path/file' from `imp:use-package' is a lexical var and must work as `:file'.
+;; (imp:use-package test-foo
+;;   :init
+;;   (innit:hook:defun
+;;       (:name    "test:fooo"
+;;        :file    macro<imp>:path/file
+;;        :quiet   t)
+;;     (message "hi: %S" macro<imp>:path/file)
+;;     ))
 
 
 ;;------------------------------------------------------------------------------
