@@ -64,7 +64,7 @@ the style & disable it occasionally.")
   ;; a real persp object, so buffers can't really be assigned to it, among other
   ;; quirks, so... replace it with a "main" perspective.
   (innit:hook:defun
-      (:name    "persp:replace-nil-perspective"
+      (:name    "persp:perspective:replace-nil"
        :file    macro<imp>:path/file
        :docstr  (concat "The default perspective that 'persp-mode' creates is special and doesn't "
                         "represent a real persp object, so buffers can't really be assigned to "
@@ -80,7 +80,7 @@ the style & disable it occasionally.")
                               frame)))))
 
   (innit:hook:defun
-      (:name    "persp:init-first-perspective"
+      (:name    "persp:perspective:init-first"
        :file    macro<imp>:path/file
        :docstr  (concat "Ensure a main perspective exists.")
        ;; :squelch t ;; TODO: Do I need to squelch?
@@ -103,7 +103,7 @@ the style & disable it occasionally.")
                                            '((window-height . shrink-window-if-larger-than-buffer))))))))
 
   (innit:hook:defun
-      (:name    "persp:init:uniquify-hack"
+      (:name    "persp:uniquify:init-hack"
        :file    macro<imp>:path/file
        :docstr "Hack around `uniquify' buffer renaming to keep `persp-mode' working."
        ;; :squelch t ;; TODO: Do I need to squelch?
@@ -196,10 +196,10 @@ the style & disable it occasionally.")
   :hook
   ;;--------------------
   ;; Note: Use `innit:cmd:hook:func/name' to insert the func names created via the `innit:hook:defun' `:name' field.
-  (((persp-mode-hook persp-after-load-state-functions) . mantle:hook:persp:replace-nil-perspective)
-   (persp-mode-hook . mantle:hook:persp:init:first-perspective)
-   (persp-mode-hook . mantle:hook:persp:init:uniquify-hack)
-   (persp-before-deactivate-functions . mantle:hook:persp:winner:save-data)
+  (((persp-mode-hook persp-after-load-state-functions) . mantle:hook:persp:perspective:replace-nil)
+   (persp-mode-hook . mantle:hook:persp:perspective:init-first)
+   (persp-mode-hook . mantle:hook:persp:uniquify:init-hack)
+   (persp-before-deactivate-functions . mantle:hook:persp:winner:data/save)
    (persp-activated-functions . mantle:hook:persp:winner:data/load)
    ;; `window-buffer-change-functions' doesn't trigger for files visited via the
    ;; server, so also include `server-visit-hook'.
