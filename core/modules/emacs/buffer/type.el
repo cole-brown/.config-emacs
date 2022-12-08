@@ -57,7 +57,7 @@ Functions should accept one argument: the buffer to be tested. E.g.:
 Should any of its function returns non-nil, the rest of the functions are
 ignored and the buffer is considered real.
 
-See `buffer:type:real' for more information.
+See `buffer:type:real?' for more information.
 
 Via Doom's `doom-real-buffer-functions' in \"core/autoload/buffers.el\".")
 
@@ -78,7 +78,7 @@ Functions should accept one argument: the buffer to be tested. E.g.:
 Should any of these functions return non-nil, the rest of the functions are
 ignored and the buffer is considered unreal.
 
-See `buffer:type:real' for more information.
+See `buffer:type:real?' for more information.
 
 Via Doom's `doom-unreal-buffer-functions' in \"core/autoload/buffers.el\".")
 
@@ -220,12 +220,12 @@ If `persp-mode' is enabled, use its list. Else use `buffer-list'."
 
 ;;;###autoload
 (defun buffer:type:real/list (&optional buffer-list)
-  "Return a list of buffers that satisfy `buffer:type:real'.
+  "Return a list of buffers that satisfy `buffer:type:real?'.
 
 If BUFFER-LIST is nil, use return value of `buffer:list'.
 
 Via Doom's `doom-real-buffer-list' in \"core/autoload/buffers.el\"."
-  (cl-remove-if-not #'buffer:type:real (or buffer-list (buffer:list))))
+  (cl-remove-if-not #'buffer:type:real? (or buffer-list (buffer:list))))
 
 
 ;;------------------------------------------------------------------------------
