@@ -21,6 +21,7 @@
 (require 'url)
 
 (imp:require :innit 'debug)
+(imp:require :innit 'vars)
 
 
 ;;------------------------------------------------------------------------------
@@ -250,35 +251,58 @@ this needs to be called during \"init.el\"."
     ;;---
     ;; These must happen _before_ the bootstrap code in order to affect `straight'.
 
-    ;; straight's main directory, containing it's build files and package repos
-    ;; Directory in which the "straight/" subdirectory is created.  (default: `user-emacs-directory')
-    ;; So just use `innit:path:packages' instead of `innit:path:packages:straight'
-    (setq straight-base-dir innit:path:packages)
+    ;; NOTE: Give these all docstrings as we're defining them before they would be defined otherwise.
 
-    ;; The directory in which `straight' packages are built is located at
-    ;; "`straight-base-dir'/build". Changing this variable will change the name of
-    ;; that directory and the name of the build cache file (unless
-    ;; `straight-build-cache-fixed-name' is non-nil).
-    ;;
-    ;; Since byte-code is rarely compatible across different versions of
-    ;; Emacs, it's best we build them in separate directories, per emacs
-    ;; version.
-    (setq straight-build-dir (format "build-%s" emacs-version))
+    (innit:customize-set-variable straight-base-dir innit:path:packages
+                                  '("straight's main directory, containing it's build files and package repos"
+                                    ""
+                                    "Directory in which the \"straight/\" subdirectory is created. (default: `user-emacs-directory')"
+                                    "So just use `innit:path:packages' instead of `innit:path:packages:straight'"))
 
-    ;; This makes start up a few seconds faster by skipping the modification checks, so...
-    ;; Don't modify packages in place?
-    (setq straight-check-for-modifications nil)
+    (innit:customize-set-variable straight-build-dir (format "build-%s" emacs-version)
+                                  '("The directory in which `straight' packages are built."
+                                    ""
+                                    "It is located at \"`straight-base-dir'/build\". Changing this variable will"
+                                    "change the name of that directory and the name of the build cache file (unless"
+                                    "`straight-build-cache-fixed-name' is non-nil)."
+                                    ""
+                                    "Since byte-code is rarely compatible across different versions of"
+                                    "Emacs, it's best we build them in separate directories, per emacs"
+                                    "version."))
 
-    ;; Don't need full history for package repos, so save some
-    ;; time/bandwidth/space by shallow cloning the repos.
-    ;; NOTE: Some packages may break when shallow cloned?! Doom mentions `magit'
-    ;; and `org', so don't use `straight' for those maybe?
-    (setq straight-vc-git-default-clone-depth '(1 single-branch))
+    (innit:customize-set-variable straight-check-for-modifications nil
+                                  '("When to check for package modifications."
+                                    ""
+                                    "Make start-up a few seconds faster by skipping the modification checks, so..."
+                                    "Don't modify any packages in place and it won't be needed."))
 
-    ;; If you use `use-package', then this makes each `use-package' form invoke
-    ;; `straight' to install the package, unless otherwise specified
-    ;; (via `:stright nil').
-    (setq straight-use-package-by-default innit:straight:use-package-default)
+
+    (innit:customize-set-variable straight-vc-git-default-clone-depth '(1 single-branch)
+                                  '("The default value for `:depth' when `:type' is the symbol `git'."
+                                    ""
+                                    "Don't need full history for package repos, so save some time/bandwidth/space by"
+                                    "shallow cloning the repos."
+                                    ""
+                                    "NOTE: Some packages may break when shallow cloned?! Doom mentions `magit' and"
+                                    "`org', so don't use `straight' for those maybe?"))
+
+
+
+    (innit:customize-set-variable straight-use-package-by-default innit:straight:use-package-default
+                                  '("Non-nil means install packages by default in `use-package' forms."
+                                    ""
+                                    "If you use `use-package', then this makes each `use-package' form invoke"
+                                    "`straight' to install the package, unless otherwise specified"
+                                    "(via `:stright nil')."))
+
+
+    (innit:customize-set-variable straight-enable-package-integration t
+                                  '("Whether to enable \"integration\" with package.el."
+                                    ""
+                                    "This means that `package-enable-at-startup' is disabled, and"
+                                    "advices are put on `package--ensure-init-file' and"
+                                    "`package--save-selected-packages' to prevent package.el from"
+                                    "modifying the init-file."))
 
     ;;---
     ;; Bootstrap Code (copy/pasted from README's "Getting Started")
