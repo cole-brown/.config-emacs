@@ -1,4 +1,4 @@
-;;; mantle/config/dev-env.el --- Development Environment -*- lexical-binding: t; -*-
+;;; mantle/config/dev-env/emacs-lisp.el --- Development Environment -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
