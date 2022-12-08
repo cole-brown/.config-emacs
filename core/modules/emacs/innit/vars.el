@@ -127,6 +127,41 @@ bound before running BODY."
 ;; (innit:settings:optional "ignored?" (message "don't print me"))
 
 
+(defmacro innit:customize-set-variable (variable value &optional docstring)
+  "Set VARIABLE to VALUE (with optional DOCSTRING) using `customize-set-variable'.
+
+If DOCSTRING is a string, use as-is.
+
+If DOCSTRING is a list of strings, all strings will be joined together with
+newline separators."
+  (declare (doc-string 3))
+  `(customize-set-variable ',variable ,value
+                           (if (and docstring (listp docstring))
+                               (mapconcat #'identity
+                                          ',docstring
+                                          "\n")
+                             docstring)))
+
+
+(defmacro innit:csetq (variable value)
+  "Set VARIABLE to VALUE via property `custom-set' or function `set-default'.
+
+Like `setq', but uses the `custom-set' property if present. Also basically a
+stripped down `customize-set-variable', so use that or
+`innit:customize-set-variable'?
+
+For packages, try to use the `use-package' `:custom' section before resorting to
+those or this?
+  - https://github.com/jwiegley/use-package#customizing-variables
+
+Originally from: https://opensource.com/article/20/3/variables-emacs"
+  ;; Use the VARIABLE's `custom-set' property if it's defined (via `defcustom'
+  ;; `:set' keyword, most likely). Otherwise just call function `set-default'.
+  `(funcall (or (get ',variable 'custom-set)
+                #'set-default)
+            ',variable ,value))
+
+
 ;;------------------------------------------------------------------------------
 ;; Customs
 ;;------------------------------------------------------------------------------
