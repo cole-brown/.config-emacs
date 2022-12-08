@@ -17,8 +17,10 @@
 ;;; Code:
 
 
-(imp:require :innit 'debug)
 (require 'package)
+(require 'url)
+
+(imp:require :innit 'debug)
 
 
 ;;------------------------------------------------------------------------------
@@ -79,11 +81,13 @@
   :type  'string)
 
 
-;; Can add more for e.g. straight.el, git subtrees, git submodules... whatever.
-;; (defcustom innit:path:packages:manual (path:join innit:path:packages "manual")
-;;   "Directory for ELPA/packages.el packages."
-;;   :group 'innit:group
-;;   :type 'string)
+(defcustom innit:path:packages:straight (path:join innit:path:packages "straight")
+  "Directory for `straight.el' packages.
+
+`straight-base-dir' is actually \"dir in which `straight' will make its
+'straight' base dir\"... so... just use `innit:path:packages' for that."
+  :group 'innit:group
+  :type 'string)
 
 
 (defcustom innit:path:packages:gpg (path:join innit:path:var "packages" "gpg")
@@ -96,6 +100,30 @@
   "Directory for user's personal/custom packages."
   :group 'innit:group
   :type  'string)
+
+
+;;------------------------------------------------------------------------------
+;; Straight
+;;------------------------------------------------------------------------------
+
+(defcustom innit:version-control:required
+  '("git"    ; Git
+    ;; "hg"     ; Mercurial
+    ;; "bzr"    ; Bazaar
+    ;; "fossil" ; Fossil
+    ;; "darcs"  ; Darcs
+    ;; "pijul"  ; Pijul
+    )
+  "All executables listed are checked for during `innit:package:init/standard'."
+  :group 'innit:group
+  :type  '(repeat string))
+
+
+(defcustom innit:straight:use-package-default nil
+  "Should `straight' be the default used by `use-package' to obtain packages?"
+  :group 'innit:group
+  :type  '(choice (const t)
+                  (const nil)))
 
 
 ;;------------------------------------------------------------------------------
@@ -200,6 +228,72 @@ this needs to be called during \"init.el\"."
           func/name
         "Update packages list...")
       (package-refresh-contents))
+
+    ;;------------------------------
+    ;; `straight'
+    ;;------------------------------
+    ;; https://github.com/radian-software/straight.el#getting-started
+    ;; https://github.com/radian-software/straight.el#the-recipe-format
+
+    ;; Make sure we can even get `straight' to function; it needs `git' et al
+    ;; already installed on the system.
+    (dolist (exe innit:version-control:required)
+      (unless (executable-find exe)
+        (nub:error
+           :innit
+           func/name
+         "Required version control system executable `%s' cannot be found by Emacs!"
+         exe)))
+
+    ;;---
+    ;; Pre-Bootstrap
+    ;;---
+    ;; These must happen _before_ the bootstrap code in order to affect `straight'.
+
+    ;; straight's main directory, containing it's build files and package repos
+    ;; Directory in which the "straight/" subdirectory is created.  (default: `user-emacs-directory')
+    ;; So just use `innit:path:packages' instead of `innit:path:packages:straight'
+    (setq straight-base-dir innit:path:packages)
+
+    ;; The directory in which `straight' packages are built is located at
+    ;; "`straight-base-dir'/build". Changing this variable will change the name of
+    ;; that directory and the name of the build cache file (unless
+    ;; `straight-build-cache-fixed-name' is non-nil).
+    ;;
+    ;; Since byte-code is rarely compatible across different versions of
+    ;; Emacs, it's best we build them in separate directories, per emacs
+    ;; version.
+    (setq straight-build-dir (format "build-%s" emacs-version))
+
+    ;; This makes start up a few seconds faster by skipping the modification checks, so...
+    ;; Don't modify packages in place?
+    (setq straight-check-for-modifications nil)
+
+    ;; Don't need full history for package repos, so save some
+    ;; time/bandwidth/space by shallow cloning the repos.
+    ;; NOTE: Some packages may break when shallow cloned?! Doom mentions `magit'
+    ;; and `org', so don't use `straight' for those maybe?
+    (setq straight-vc-git-default-clone-depth '(1 single-branch))
+
+    ;; If you use `use-package', then this makes each `use-package' form invoke
+    ;; `straight' to install the package, unless otherwise specified
+    ;; (via `:stright nil').
+    (setq straight-use-package-by-default innit:straight:use-package-default)
+
+    ;;---
+    ;; Bootstrap Code (copy/pasted from README's "Getting Started")
+    ;;---
+    (defvar bootstrap-version) ;; TODO: Does this have to be def'd as a non-namespaced variable?
+    (let ((bootstrap-file (path:join innit:path:packages:straight "repos/straight.el/bootstrap.el"))
+          (bootstrap-version 6))
+      (unless (file-exists-p bootstrap-file)
+        (with-current-buffer
+            (url-retrieve-synchronously
+             "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+             'silent 'inhibit-cookies)
+          (goto-char (point-max))
+          (eval-print-last-sexp)))
+      (load bootstrap-file nil 'nomessage))
 
     ;;------------------------------
     ;; `use-package'
