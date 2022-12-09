@@ -23,6 +23,7 @@
 (imp:require :nub)
 (imp:require :innit 'error)
 (imp:require :innit 'squelch)
+(imp:require :elisp 'utils 'functions)
 
 
 ;;------------------------------------------------------------------------------
@@ -113,8 +114,11 @@ NAME must be nil or a string."
 
 ;; Originally from here:
 ;; https://www.reddit.com/r/emacs/comments/1m7fqv/avoid_lambda_in_hooks_use_defun_instead/cc83axz/
-(defmacro innit:hook:defun-and-add (hook-var options &rest body)
-  "`defun' a hook function (which will run BODY) and add it to HOOK-VAR.
+(defmacro innit:hook:defun-and-add (hook-vars options &rest body)
+  "`defun' a hook function (which will run BODY) and add it to HOOK-VARS.
+
+HOOK-VARS should be an unquoted hook symbol or a list of such. The hook function
+created will be added to all of these hook variables.
 
 OPTIONS is a plist of optional vars:
   :name      - Hook function will be named:
@@ -132,8 +136,11 @@ OPTIONS is a plist of optional vars:
 
   :squelch   - If non-nil, wrap BODY in `innit:squelch'.
 
-  :postpend  - Passed on to `add-hook'. If non-nil, hook will be postpended to
-               the list of hooks. If nil, hook will be prepended.
+  :depth     - Passed on to `add-hook' as its `depth' argument.
+             - If nil, hook will be prepended.
+             - If non-nil, hook will be added at the depth indicated.
+             - Should be an integer in the range of [-100, 100].
+               - Any non-nil symbol means 90 - see function `add-hook'.
 
   :transient - If non-nil, hook will delete itself after it has run once.
 
@@ -143,12 +150,12 @@ OPTIONS is a plist of optional vars:
   :docstr    - A string to use as the defined function's docstring."
   (declare (indent 2))
   ;; Try to eval inputs (at most) once.
-  (let* ((macro<innit>:hook      hook-var)
+  (let* ((macro<innit>:hooks     (elisp:list:flatten hook-vars)) ;; Normalize into a list.
          (macro<innit>:name      (int<innit>:hook:option :name options))
 
          (macro<innit>:quiet     (int<innit>:hook:option :quiet options))
          (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
-         (macro<innit>:postpend  (int<innit>:hook:option :postpend options))
+         (macro<innit>:depth     (int<innit>:hook:option :depth options))
          (macro<innit>:transient (int<innit>:hook:option :transient options))
          (macro<innit>:arg/file  (int<innit>:hook:option :file options)) ;; Not complete yet...
          (macro<innit>:docstr    (int<innit>:hook:option :docstr options))
@@ -158,8 +165,20 @@ OPTIONS is a plist of optional vars:
                                      '(&rest _)))
          ;;   - derived
          (macro<innit>:hook-name (innit:hook:func/name:string (or macro<innit>:name
-                                                                  macro<innit>:hook)))
+                                                                  (nth 0 macro<innit>:hooks))))
          (macro<innit>:hook-fn   (intern macro<innit>:hook-name)))
+
+    ;; Currently incompatible: `:transient' and multiple hook vars.
+    ;; TODO: Do we want the function to delete itself from all hooks after it's
+    ;; run from any of them for the first time? Or should it run once from each
+    ;; hook?
+    (when (and macro<innit>:transient
+               (> (length macro<innit>:hooks) 1))
+      (nub:error
+         :innit
+         "innit:hook:func/name:string"
+       '("Couldn't be bothered figuring out how to do `:transient' /and/ "
+         "multiple hooks. So now you have to...")))
 
     ;; Should the hook's BODY be squelched?
     (setq body
@@ -194,9 +213,14 @@ OPTIONS is a plist of optional vars:
          ,@body
          ;; If a transient, remove hook now that it's run once.
          (when ,macro<innit>:transient
-           (remove-hook ',macro<innit>:hook #',macro<innit>:hook-fn)))
-       ;; ...add the new hook function to the hook variable.
-       (add-hook ',macro<innit>:hook #',macro<innit>:hook-fn ',macro<innit>:postpend))))
+           ;; Currently should only get here if only 1 hook var, but...
+           ;; ...remove from "all" hooks, to be safe?
+           (dolist (macro<innit>:hook macro<innit>:hooks)
+             (remove-hook ',macro<innit>:hook #',macro<innit>:hook-fn))))
+
+       ;; ...add the new hook function to the hook variable(s).
+       (dolist (macro<innit>:hook macro<innit>:hooks)
+         (add-hook ',macro<innit>:hook #',macro<innit>:hook-fn ',macro<innit>:depth)))))
 ;; (setq test-hook nil)
 ;; (makunbound 'mantle:hook:test)
 ;; (fmakunbound 'mantle:hook:test)
