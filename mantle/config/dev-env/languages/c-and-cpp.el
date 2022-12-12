@@ -2,7 +2,7 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    20
+;; Created:    2021-09-27
 ;; Modified:   2022-12-12
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
@@ -17,15 +17,18 @@
 ;;
 ;;; Code:
 
+
+(imp:require :keybind)
+(imp:require :jerky)
+
+
 ;;------------------------------
 ;; NOTE:
 ;;------
 ;; C and C++ are exactly the same right now... so both are here together.
 ;;
-;; If they start to diverge, split them up into "+c.el" and "+cpp.el".
+;; If they start to diverge, split them up?
 ;;------------------------------
-
-
 
 
 ;;----------------------------------------------------------------------------
@@ -40,27 +43,26 @@
 ;;     + If ARG is positive: set to style block ('/* */').
 ;;     + If ARG is negative: set to line style ('//').
 ;;
-;; If you want to change this, do something about the `sss:hook/align-block-commenting' hook.
+;; If you want to change this, do something about the
+;; `mantle:hook:dev-env:languages/comments:block/align' hook function as well
+;; maybe?
 ;;------------------------------
 
 
 ;; TODO: Check this?
 ;;   https://github.com/dholm/dotemacs/blob/master/.emacs.d/lisp/modes/c-c%2B%2B.el
 ;;   CEDET and stuff...
-(use-package cc-mode
-  ;; Just in case `use-package-always-ensure' is `t'...
-  :ensure nil
+(imp:use-package cc-mode
+  :ensure nil ; This is an Emacs built-in feature.
 
   ;;--------------------
   :init
   ;;--------------------
 
-  (spy:hook/defun c-common-hook
-    '(:name "c-and-cpp/settings"
-      :file ".doom.d/config/code/+c-and-cpp.el"
-      :docstr "Settings for C/C++ mode. Non-LSP stuff."
-      ;; :quiet nil
-      )
+  (innit:hook:defun
+      (:name   'cc:settings
+       :file   macro<imp>:path/file
+       :docstr "Settings for C/C++ mode. Non-LSP stuff.")
 
     ;; Use BSD style in C, C++.
     (c-set-style "bsd")
@@ -79,7 +81,7 @@
     ;;
     ;; See this for visuals: https://en.wikipedia.org/wiki/Indentation_style
 
-    (setq c-basic-offset (jerky/get 'code 'tab 'normal))
+    (setq c-basic-offset (jerky:get 'code 'tab 'normal))
 
     (c-set-offset 'innamespace 0) ; Don't indent namespace - waste of indent level
     (c-set-offset 'case-label '+) ; indent case labels by c-indent-level, too
@@ -94,26 +96,19 @@
   ;;--------------------
   ((c++-mode . sss:hook/c-and-cpp/settings)
    (c-mode . sss:hook/c-and-cpp/settings)
-   (c-mode . sss:hook/align-block-commenting))
+   (c-mode . mantle:hook:dev-env:languages/comments:block/align))
 
   ;;--------------------
   :config
-  ;;--------------------
-
-  ;;--------------------
-  ;; customization: C / C++
-  ;;--------------------
-
-  ;;--------------------
-  ;; configuration: C / C++
   ;;--------------------
 
   (add-to-list 'auto-mode-alist '("\\.cxx$" . c++-mode))
   (add-to-list 'auto-mode-alist '("\\.cpp$" . c++-mode))
 
   ;; Can setup auto-complete, company, flycheck, lots others here.
-  ;; TODO: Lots more here maybe when I do some C/C++ work again.
+  ;; TODO: Lots more here maybe when I do some C/C++ work again?
 
+  ;; TODO-LSP: LSP?
   )
 
 
