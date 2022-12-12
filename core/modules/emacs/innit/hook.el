@@ -132,7 +132,7 @@ OPTIONS is a plist of optional vars:
 
   :argslist  - If a list, create the hook's `defun' with this list of arguments.
 
-  :quiet     - If non-nil, do not output the 'Running hook [...]' message.
+  :announce  - If non-nil, output the 'Running hook [...]' message.
 
   :squelch   - If non-nil, wrap BODY in `innit:squelch'.
 
@@ -153,7 +153,7 @@ OPTIONS is a plist of optional vars:
   (let* ((macro<innit>:hooks     (elisp:list:flatten hook-vars)) ;; Normalize into a list.
          (macro<innit>:name      (int<innit>:hook:option :name options))
 
-         (macro<innit>:quiet     (int<innit>:hook:option :quiet options))
+         (macro<innit>:announce  (int<innit>:hook:option :announce options))
          (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
          (macro<innit>:depth     (int<innit>:hook:option :depth options))
          (macro<innit>:transient (int<innit>:hook:option :transient options))
@@ -196,7 +196,7 @@ OPTIONS is a plist of optional vars:
            ;; ...with provided args list, or default of "who cares?" args list.
            ,macro<innit>:argslist
          ,macro<innit>:docstr
-         (unless ,macro<innit>:quiet
+         (when ,macro<innit>:announce
            ;; Nice info message maybe?
            (nub:out
             :innit
@@ -225,8 +225,8 @@ OPTIONS is a plist of optional vars:
 ;; (makunbound 'mantle:hook:test)
 ;; (fmakunbound 'mantle:hook:test)
 ;; (innit:hook:defun-and-add test-hook nil (message "Hello there."))
-;; (innit:hook:defun-and-add test-hook (:quiet t) (message "Hello there."))
-;; (innit:hook:defun-and-add test-hook (:quiet t :argslist (&rest ignore)) (message "Hello there."))
+;; (innit:hook:defun-and-add test-hook (:announce t) (message "Hello there."))
+;; (innit:hook:defun-and-add test-hook (:announce t :argslist (&rest ignore)) (message "Hello there."))
 ;; (innit:hook:defun-and-add test-hook (:file (path:current:file) :docstr "this is a test hook") (message "Hello from a file?"))
 ;; test-hook
 ;; (run-hooks 'test-hook)
@@ -252,7 +252,7 @@ OPTIONS is a plist of optional vars:
 
   :argslist  - If a list, create the hook's `defun' with this list of arguments.
 
-  :quiet     - If non-nil, do not output the 'Running hook [...]' message.
+  :announce  - If non-nil, do not output the 'Running hook [...]' message.
 
   :squelch   - If non-nil, wrap BODY in `innit:squelch'.
 
@@ -269,7 +269,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
   (declare (indent 1))
   ;; Try to eval inputs (at most) once.
   (let* ((macro<innit>:name      (int<innit>:hook:option :name options))
-         (macro<innit>:quiet     (int<innit>:hook:option :quiet options))
+         (macro<innit>:announce  (int<innit>:hook:option :announce options))
          (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
          (macro<innit>:transient (int<innit>:hook:option :transient options))
          (macro<innit>:arg/file  (int<innit>:hook:option :file options)) ;; Not complete yet...
@@ -296,7 +296,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
            ;; ...with provided args list, or default of "who cares?" args list.
            ,macro<innit>:argslist
          ,macro<innit>:docstr
-         (unless ,macro<innit>:quiet
+         (when ,macro<innit>:announce
            ;; Nice info message maybe?
            (nub:out
             :innit
@@ -317,11 +317,11 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
 ;; (setq test-hook nil)
 ;; (makunbound 'mantle:hook:test)
 ;; (fmakunbound 'mantle:hook:test)
-;; (innit:hook:defun (:name test-hook :quiet t) (message "Hello there."))
-;; (innit:hook:defun (:name "test-hook" :quiet t) (message "Hello there."))
-;; (innit:hook:defun (:name (concat "test" "-" "hook") :quiet t) (message "Hello there."))
-;; (innit:hook:defun (:name test-hook :quiet t :argslist (&rest ignore)) (message "Hello there."))
-;; (innit:hook:defun (:name test-hook :quiet t :argslist (&rest ignore)) (message "Hello there."))
+;; (innit:hook:defun (:name test-hook :announce t) (message "Hello there."))
+;; (innit:hook:defun (:name "test-hook" :announce t) (message "Hello there."))
+;; (innit:hook:defun (:name (concat "test" "-" "hook") :announce t) (message "Hello there."))
+;; (innit:hook:defun (:name test-hook :announce t :argslist (&rest ignore)) (message "Hello there."))
+;; (innit:hook:defun (:name test-hook :announce t :argslist (&rest ignore)) (message "Hello there."))
 ;; (innit:hook:defun (:name test-hook :file (path:current:file) :docstr "this is a test hook") (message "Hello from a file?"))
 ;; (add-hook 'test-hook 'mantle:hook:test)
 ;; test-hook
@@ -338,9 +338,9 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
 ;; (imp:use-package test-foo
 ;;   :init
 ;;   (innit:hook:defun
-;;       (:name    "test:fooo"
-;;        :file    macro<imp>:path/file
-;;        :quiet   t)
+;;       (:name     "test:fooo"
+;;        :file     macro<imp>:path/file
+;;        :announce t)
 ;;     (message "hi: %S" macro<imp>:path/file)
 ;;     ))
 
