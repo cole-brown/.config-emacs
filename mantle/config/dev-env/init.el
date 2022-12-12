@@ -51,21 +51,21 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Lispses
-;;------------------------------------------------------------------------------
-
-(imp:load :feature  '(:mantle config user dev-env emacs-lisp)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "emacs-lisp")
-
-
-;;------------------------------------------------------------------------------
 ;; Databases
 ;;------------------------------------------------------------------------------
 
 (imp:load :feature  '(:mantle config user dev-env databases)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "databases")
+
+
+;;------------------------------------------------------------------------------
+;; Languages
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config user dev-env languages)
+          :path     (imp:path:join (imp:path:current:dir/relative :mantle) "languages")
+          :filename "init")
 
 
 ;;------------------------------------------------------------------------------
