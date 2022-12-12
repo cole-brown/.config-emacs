@@ -49,8 +49,7 @@
   ;;     (:name    "recentf:touch/buffer"
   ;;      :file    macro<imp>:path/file
   ;;      :docstr  "Bump file in recent file list when it is switched or written to."
-  ;;      :squelch t
-  ;;      :quiet   t)
+  ;;      :squelch t)
   ;;   (when buffer-file-name
   ;;     (recentf-add-file buffer-file-name))
   ;;   ;; Return nil for `write-file-functions'
@@ -60,8 +59,7 @@
   ;;     (:name    "recentf:touch/dired"
   ;;      :file    macro<imp>:path/file
   ;;      :docstr  "Add dired directories to recentf file list."
-  ;;      :squelch t
-  ;;      :quiet   t)
+  ;;      :squelch t)
   ;;   (recentf-add-file default-directory))
   ;;
   ;;

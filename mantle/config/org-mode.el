@@ -65,19 +65,17 @@
   ;; Create Org-Mode Hooks
   ;;---
   (innit:hook:defun
-      (:name   "org/jump-to-now-target"
-       :file   macro<imp>:path/file
-       :docstr "Jump point to \"now\" link, if it's in the first part of the file."
-       :squelch t
-       :quiet   t)
+      (:name    "org/jump-to-now-target"
+       :file    macro<imp>:path/file
+       :docstr  "Jump point to \"now\" link, if it's in the first part of the file."
+       :squelch t)
     (buffer:cmd:search:header "[[--now"))
 
   (innit:hook:defun
-      (:name   "org/local-settings"
-       :file   macro<imp>:path/file
-       :docstr "Set up buffer local vars."
-       :squelch t
-       :quiet  t)
+      (:name    "org/local-settings"
+       :file    macro<imp>:path/file
+       :docstr  "Set up buffer local vars."
+       :squelch t)
     (setq-local yas-indent-line 'auto)
     ;; Automatically becomes buffer local.
     (setq tab-width (jerky:get 'docs 'tab 'short)))
@@ -678,8 +676,7 @@ LETTER must be a 1-character string."
 ;; (innit:hook:defun
 ;;     (:name   "org/pretty-checkboxes"
 ;;      :file   macro<imp>:path/file
-;;      :docstr "Beautify Org's Checkbox Symbols"
-;;      :quiet  t)
+;;      :docstr "Beautify Org's Checkbox Symbols")
 ;;   (setq prettify-symbols-alist
 ;;         '(("[ ]" . "☐")
 ;;           ;; other options:
@@ -702,24 +699,27 @@ LETTER must be a 1-character string."
 ;;   (prettify-symbols-mode 1))
 
 
-;;------------------------------
-;; Pretty List Bullet in Unicode
-;;------------------------------
-;;  ;; Show list markers with a middle dot instead of the
-;;  ;; original character.
-;;  (innit:hook:defun org-mode-hook t
-;;      nil "simple-list" "init/config/configure-org-mode.el"
-;;    "Nice up simple lists - replacing hypen with a unicode middle dot."
-;;    (font-lock-add-keywords
-;;     nil ;; 'org-mode - some org-mode stuff (e.g. org-journal) is a derived
-;;         ;; major mode and thus needed either more than just `org-mode', or to
-;;         ;; be `nil' and put in the org-mode hook.
-;;     '(("^ *\\([-]\\) "
-;;        (0 (prog1 () (compose-region (match-beginning 1)
-;;                                     (match-end 1) "•")))))))
+;; ;;------------------------------
+;; ;; Pretty List Bullet in Unicode
+;; ;;------------------------------
+;; ;;  ;; Show list markers with a middle dot instead of the
+;; ;;  ;; original character.
+;; (innit:hook:defun-and-add
+;;     org-mode-hook
+;;     (:name   'org:pretty-checkboxes
+;;      :file   (imp:path:current:file)
+;;      ;; :file   macro<imp>:path/file
+;;      :docstr "Beautify Org's Checkbox Symbols")
+;;   (font-lock-add-keywords
+;;    nil ;; 'org-mode - some org-mode stuff (e.g. org-journal) is a derived
+;;    ;; major mode and thus needed either more than just `org-mode', or to
+;;    ;; be `nil' and put in the org-mode hook.
+;;    '(("^ *\\([-]\\) "
+;;       (0 (prog1 () (compose-region (match-beginning 1)
+;;                                    (match-end 1) "•")))))))
 
 
-;;------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :mantle 'config 'user 'org-mode)

@@ -29,8 +29,7 @@
 (innit:hook:defun
     (:name   'dev-env:languages/comments:block/align
      :file   (path:current:file)
-     :docstr "Set comment style for start/end line comment languages (C, HTML, ...)."
-     :quiet  t)
+     :docstr "Set comment style for start/end line comment languages (C, HTML, ...).")
   ;; `aligned' is like (default) `indent' but also aligns end-of-line comment chars if the language has them.
   (setq 'comment-style 'aligned))
 ;; NOTE: Need to add this hook (`mantle:hook:dev-env:languages/comments:block/align') to whatever modes want it.
@@ -39,7 +38,7 @@
 ;; `html-mode-hook' (HTML mode) or `mhtml-mode-hook' (HTML+ mode (derived from HTML mode))?
 (add-hook 'html-mode-hook 'mantle:hook:comments:block/align)
 
-;; C-mode hook added (or not) in "language/c-and-cpp.el".
+;; NOTE: C-mode hook added (or not) in "language/c-and-cpp.el".
 
 
 ;;------------------------------------------------------------------------------
@@ -49,8 +48,7 @@
 (innit:hook:defun-and-add prog-mode-hook
     '(:name "prog-mode/settings"
       :file (path:current:file)
-      :docstr "Settings for all prog-mode derived modes. Non-LSP stuff."
-      :quiet t)
+      :docstr "Settings for all prog-mode derived modes. Non-LSP stuff.")
 
     ;; My 2560x1440 monitor can display around 152 columns when fullscreen with
     ;; two vertically-split windows, so we'll do 140 as our fill column?

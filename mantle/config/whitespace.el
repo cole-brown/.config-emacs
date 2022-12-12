@@ -170,8 +170,7 @@
       (:name    "org/whitespace:mode/enter"
        :file    macro<imp>:path/file
        :docstr  "I like some whitespace-mode stuff in org-mode, but want less than other modes."
-       :squelch t
-       :quiet   t)
+       :squelch t)
     ;; Make a local copy of `whitespace-style' we can modify and...
     (set (make-local-variable 'whitespace-style)
          ;; ...set it as old one with removed 'too-long line' highlighting.
@@ -181,8 +180,7 @@
       (:name    "org/whitespace:save/pre"
        :file    macro<imp>:path/file
        :docstr  "Invoke `whitespace-cleanup' if the `ws-butler' feature is not present."
-       :squelch t
-       :quiet   t)
+       :squelch t)
    (unless (featurep 'ws-butler)
      (whitespace-cleanup)))
 

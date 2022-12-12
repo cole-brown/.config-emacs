@@ -121,8 +121,9 @@
        :docstr  (concat "Auto-discovery on `projectile-mode' is slow and premature. "
                         "Let's defer it until it's actually needed. "
                         "Also clean up non-existing projects too!")
+       ;; TODO: should I squelch this or no? If no, remove:
        ;; :squelch t
-       :quiet   t)
+       )
     (projectile-cleanup-known-projects)
     (projectile-discover-projects-in-search-path))
 

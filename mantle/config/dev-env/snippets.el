@@ -49,8 +49,7 @@
       (:name    "yasnippet"
        :file    macro<imp>:path/file
        :docstr  "Hook for yasnippet editting."
-       :squelch t
-       :quiet   t)
+       :squelch t)
     ;; Normally we want a final newline in all files, so `require-final-newline'
     ;; is set to t. However, in yasnippet files, that means all snippets will
     ;; insert a "\n", and that's not desired.
