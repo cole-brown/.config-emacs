@@ -32,7 +32,7 @@
 
 
 ;;----------------------------------------------------------------------------
-;; Use-Package
+;; C / C++ Mode
 ;;----------------------------------------------------------------------------
 
 ;;------------------------------
@@ -80,6 +80,9 @@
     ;;   - See `c-style-alist' for supported strings.
     ;;
     ;; See this for visuals: https://en.wikipedia.org/wiki/Indentation_style
+
+    ;; 'wide' is a decent default, probably?
+    (setq fill-column (jerky:set 'fill-column 'wide))
 
     (setq c-basic-offset (jerky:get 'code 'tab 'normal))
 

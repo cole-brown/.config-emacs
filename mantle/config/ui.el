@@ -274,8 +274,7 @@
 
   ;; If theme is already loaded, run the hook.
   (when innit:theme:loaded
-    (mantle:hook:highlight-indent-guides:faces/init))
-  )
+    (mantle:hook:highlight-indent-guides:faces/init)))
 
 
 ;;------------------------------------------------------------------------------
