@@ -45,14 +45,59 @@
 ;; Defaults for All Programming Modes
 ;;------------------------------------------------------------------------------
 
+;;------------------------------
+;; Fill Columns
+;;------------------------------
+;;                                                                             80                                     120                 140       150
+
+(jerky:set 'fill-column 'narrow
+           :namespace :default
+           :value 80
+           :docstr "Ye olde default 80 columns.")
+;; NOTE: Python likes to be weird - it defaults to wanting 79 columns.
+
+
+(jerky:set 'fill-column 'wide
+           :namespace :default
+           :value 120
+           :docstr "Current Year should be able to handle more than 80, right? How about 120 columns?")
+
+
+(jerky:set 'fill-column 'maximized '1080px ; 1920x1080
+           :namespace :default
+           :value 150
+           :docstr "Two side-by-side buffers can handle about 150 columns maximum (w/ current font, gutters, etc).")
+
+
+(jerky:set 'fill-column 'maximized '1440px ; 2560x1440
+           :namespace :default
+           :value 150
+           :docstr "Two side-by-side buffers can handle about 150 columns maximum (w/ current font, gutters, etc).")
+
+
+(jerky:set 'fill-column 'maximized '1920px ; 1080x1920 aka sideways 1920x1080
+           :namespace :default
+           :value 170
+           :docstr "One buffers can handle about 170 columns maximum (w/ current font, gutters, etc).")
+
+
+(jerky:set 'fill-column 'maximized '2560px ; 1440x2560 aka sideways 2560x1440
+           :namespace :default
+           :value 170
+           :docstr "One buffers can handle about 170 columns maximum (w/ current font, gutters, etc).")
+
+
+;; TODO: Set `fill-column' for other modes too...
+;;   Yes: org-mode, org-journal-mode
+;;   No!: magit
+;; Will have to move the `jerky:set' calls to earlier in config.
 (innit:hook:defun-and-add prog-mode-hook
-    '(:name "prog-mode/settings"
+    '(:name 'prog:settings
       :file (path:current:file)
       :docstr "Settings for all prog-mode derived modes. Non-LSP stuff.")
 
-    ;; My 2560x1440 monitor can display around 152 columns when fullscreen with
-    ;; two vertically-split windows, so we'll do 140 as our fill column?
-    (setq fill-column 140))
+    ;; 'wide' is a decent default, probably?
+    (setq fill-column (jerky:set 'fill-column 'wide)))
 
 
 ;;------------------------------------------------------------------------------
