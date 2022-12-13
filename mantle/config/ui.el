@@ -95,6 +95,12 @@
   (doom-modeline-modal-icon t)
 
   ;;---
+  ;; Perspective/Workspace
+  ;;---
+  ;; Add the workspace/perspective name to the modeline.
+  (doom-modeline-persp-name t)
+
+  ;;---
   ;; Buffer Name
   ;;---
   ;; Given ~/Projects/FOSS/emacs/lisp/comint.el
@@ -181,6 +187,95 @@
 ;; Just have it be the same as the `frame-title-format'.
 (customize-set-variable 'icon-title-format frame-title-format)
 
+
+;;------------------------------------------------------------------------------
+;; Cursor
+;;------------------------------------------------------------------------------
+
+(blink-cursor-mode 1)
+(setq blink-cursor-interval 0.75) ; default is 0.5 seconds
+
+
+;;------------------------------------------------------------------------------
+;; Lines
+;;------------------------------------------------------------------------------
+
+;;This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
+(setq display-line-numbers-type t)
+
+
+;;------------------------------------------------------------------------------
+;; Indentation Guide
+;;------------------------------------------------------------------------------
+
+(imp:use-package highlight-indent-guides
+
+  ;;--------------------
+  :init
+  ;;--------------------
+  (innit:hook:defun
+      (:name    'highlight-indent-guides:faces/init
+       :file    macro<imp>:path/file
+       :docstr  (mapconcat #'identity
+                           '("Set indent faces if possible."
+                             ""
+                             "HACK: `highlight-indent-guides' calculates its faces from the current theme, but"
+                             "is unable to do so properly in terminal Emacs, where it only has access to 256"
+                             "colors. So if the user uses a daemon we must wait for the first graphical frame"
+                             "to be available to do.")
+                           "\n")
+       :squelch t)
+      (when (display-graphic-p)
+        (highlight-indent-guides-auto-set-faces)))
+
+  (innit:hook:defun
+      (:name    'highlight-indent-guides:disable-maybe
+       :file    macro<imp>:path/file
+       :docstr  (mapconcat #'identity
+                           '("Disable `highlight-indent-guides' if `org-indent-mode'."
+                             ""
+                             "`highlight-indent-guides' breaks when `org-indent-mode' is active.")
+                           "\n")
+       :squelch t)
+      (and highlight-indent-guides-mode
+           (bound-and-true-p org-indent-mode)
+           (highlight-indent-guides-mode -1)))
+
+
+  ;;--------------------
+  :hook
+  ;;--------------------
+  (((prog-mode-hook text-mode-hook conf-mode-hook) . highlight-indent-guides-mode)
+   (innit:theme:load:hook . mantle:hook:highlight-indent-guides:faces/init)
+   (org-mode-local-vars-hook . mantle:hook:highlight-indent-guides:disable-maybe))
+
+
+  ;;--------------------
+  :custom
+  ;;--------------------
+
+  (highlight-indent-guides-suppress-auto-error t)
+
+  ;; How the indent guides look.
+  ;; https://github.com/DarthFennec/highlight-indent-guides/tree/cf352c85cd15dd18aa096ba9d9ab9b7ab493e8f6#screenshots
+  ;; Doom used `character'; `bitmap' looks neater.
+  ;; ...but `fill' might be best for avoiding the buggy looking indents that `character' gets into.
+  (highlight-indent-guides-method 'fill) ;; 'bitmap)
+
+  (highlight-indent-guides-auto-even-face-perc      4) ;; default: 10
+  (highlight-indent-guides-auto-odd-face-perc       2) ;; default:  5
+  (highlight-indent-guides-auto-character-face-perc 5) ;; default: 10
+
+
+  ;;--------------------
+  :config
+  ;;--------------------
+
+  ;; If theme is already loaded, run the hook.
+  (when innit:theme:loaded
+    (mantle:hook:highlight-indent-guides:faces/init))
+  )
 
 
 ;;------------------------------------------------------------------------------
