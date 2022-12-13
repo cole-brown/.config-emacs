@@ -16,16 +16,6 @@
 ;;
 ;;; Code:
 
-;;; completion.el --- Change basic keybinds. -*- lexical-binding: t; -*-
-;;; general.el --- General Keybinds -*- lexical-binding: t; -*-
-;;
-;;
-;;; Commentary:
-;;
-;; Change basic keybinds.
-;;
-;;; Code:
-
 
 ;;------------------------------------------------------------------------------
 ;; "SMOCE Stack": Selectrum & Friends
@@ -179,7 +169,7 @@
   ;;--------------------
   :bind
   ;;--------------------
-  ;; TODO: Evil Consult Keybinds?
+  ;; TODO: Replace this `:bind' section with a `:general' section.
   ;; Replace bindings. Lazily loaded due by `use-package'.
   (;; C-c bindings (mode-specific-map)
          ("C-c h" . consult-history)

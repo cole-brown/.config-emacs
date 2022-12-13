@@ -92,13 +92,7 @@
   ;;--------------------
   :hook
   ;;--------------------
-  (csharp-mode-hook . mantle:hook:csharp:settings)
-
-  ;;--------------------
-  :config
-  ;;--------------------
-
-  )
+  (csharp-mode-hook . mantle:hook:csharp:settings))
 
 
 ;;------------------------------------------------------------------------------
@@ -133,16 +127,13 @@
   )
 
 
-
-
 ;;------------------------------------------------------------------------------
 ;; `.csproj' Mode
 ;;------------------------------------------------------------------------------
 ;; https://github.com/omajid/csproj-mode
 
-;; Nothing to do... super simple mode.
 (imp:use-package csproj-mode
-
+  ;; Nothing to do... super simple mode.
   )
 
 
@@ -164,4 +155,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :dot-emacs 'config 'code '+c-sharp)
+(imp:provide :dot-emacs 'config 'code 'csharp)
