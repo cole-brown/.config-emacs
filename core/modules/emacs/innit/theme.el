@@ -110,7 +110,9 @@ passed to `load-theme'."
   ;; Load the theme please and yes, I do want to load a theme thank you.
   (load-theme theme :no-confirm)
   ;; Save that theme was loaded.
-  (setq innit:theme:loaded theme))
+  (setq innit:theme:loaded theme)
+  ;; Apply the hook funcs now that the theme is loaded.
+  (innit:hook:run 'innit:theme:load:hook))
 
 
 ;; TODO: Currently doesn't interact with `innit:theme:loaded'. Should it?
