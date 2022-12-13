@@ -44,6 +44,11 @@
           :filename "c-and-cpp")
 
 
+(imp:load :feature  '(:mantle config user dev-env csharp)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "csharp")
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
