@@ -31,6 +31,8 @@
 
 (require 'cl-lib)
 
+(imp:require :elisp 'utils 'function)
+
 
 ;;------------------------------------------------------------------------------
 ;; Variables
@@ -219,13 +221,38 @@ If `persp-mode' is enabled, use its list. Else use `buffer-list'."
 
 
 ;;;###autoload
-(defun buffer:type:real/list (&optional buffer-list)
+(defun buffer:list:type/real (&optional buffer-list)
   "Return a list of buffers that satisfy `buffer:type:real?'.
 
 If BUFFER-LIST is nil, use return value of `buffer:list'.
 
 Via Doom's `doom-real-buffer-list' in \"core/autoload/buffers.el\"."
   (cl-remove-if-not #'buffer:type:real? (or buffer-list (buffer:list))))
+
+
+;;;###autoload
+(defun buffer:list:mode (modes &optional buffer-list derived-p)
+  "Return a list of buffers whose `major-mode' is `eq' to MODES.
+
+MODES must be a symbol or list of symbols.
+
+BUFFER-LIST, if nil, will be return value of function `buffer:list', which is
+perspective-aware if `persp-mode'. For all buffers, use function `buffer-list'
+instead.
+
+If DERIVED-P, test with `derived-mode-p', otherwise use `eq'."
+  (let ((modes (elisp:list:listify modes)))
+    ;; Filter list down to just...
+    (cl-remove-if-not (if derived-p
+                          ;; Mode and derived modes:
+                          (lambda (buffer)
+                            (apply #'provided-mode-derived-p
+                                   (buffer-local-value 'major-mode buffer)
+                                   modes))
+                        ;; Mode exactly:
+                        (lambda (buffer)
+                          (memq (buffer-local-value 'major-mode buffer) modes)))
+                      (or buffer-list (buffer:list)))))
 
 
 ;;------------------------------------------------------------------------------

@@ -310,7 +310,7 @@ or on some buffer listing ops."
 
   (define-advice persp-asave-on-exit (:around (fn &rest args) mantle:user:persp:autosave:real-buffers?)
     "Don't bother auto-saving the session if no real buffers are open."
-    (when (buffer:type:real/list)
+    (when (buffer:list:type/real)
       (apply fn args))
     t)
 
