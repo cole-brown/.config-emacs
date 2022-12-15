@@ -78,15 +78,51 @@
 ;;------------------------------------------------------------------------------
 ;; Modeline
 ;;------------------------------------------------------------------------------
-
 ;; Doom has a really nice looking modeline, so... use it?
+
 (imp:use-package doom-modeline
   ;; Has optional support for `all-the-icons'. So... opt in to that.
   :after (all-the-icons evil)
 
-  ;;--------------------
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (defun mantle:advice:doom-modeline:env:update/all-windows (&rest _)
+    "Update version strings in all buffers."
+    (dolist (window (window-list))
+      (with-selected-window window
+        (when (fboundp 'doom-modeline-update-env)
+          (doom-modeline-update-env))
+        (force-mode-line-update))))
+
+  (defun mantle:advice:doom-modeline:env:clear/all-windows  (&rest _)
+    "Blank out version strings in all buffers."
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (setq doom-modeline-env--version
+              (bound-and-true-p doom-modeline-load-string))))
+    (force-mode-line-update t))
+
+  ;;---
+  ;; Use in other modes in `:config'.
+  ;;---
+  ;; As advice:
+  ;;   (when (functionp #'mantle:advice:doom-modeline:env:update/all-windows)
+  ;;     (advice-add #'pythonic-activate :after-while #'mantle:advice:doom-modeline:env:update/all-windows))
+  ;;   (when (functionp #'mantle:advice:doom-modeline:env:clear/all-windows)
+  ;;     (advice-add #'pythonic-deactivate :after #'mantle:advice:doom-modeline:env:clear/all-windows))
+  ;;
+  ;; Or with hooks:
+  ;;   (when (functionp #'mantle:advice:doom-modeline:env:update/all-windows)
+  ;;     (add-hook 'pyvenv-post-activate-hooks  #'mantle:advice:doom-modeline:env:update/all-windows))
+  ;;   (when (functionp #'mantle:advice:doom-modeline:env:clear/all-windows)
+  ;;     (add-hook 'pyvenv-pre-deactivate-hooks #'mantle:advice:doom-modeline:env:clear/all-windows))
+
+
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
   ;; https://github.com/seagle0128/doom-modeline#customize
 
   ;;---
@@ -160,9 +196,10 @@
   (doom-modeline-irc  nil)
   (doom-modeline-time nil)
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
+
  (doom-modeline-mode 1))
 
 
@@ -211,9 +248,9 @@
 
 (imp:use-package highlight-indent-guides
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
   (innit:hook:defun
       (:name    'highlight-indent-guides:faces/init
        :file    macro<imp>:path/file
@@ -243,17 +280,17 @@
            (highlight-indent-guides-mode -1)))
 
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
+  ;;------------------------------
   (((prog-mode-hook text-mode-hook conf-mode-hook) . highlight-indent-guides-mode)
    (innit:theme:load:hook . mantle:hook:highlight-indent-guides:faces/init)
    (org-mode-local-vars-hook . mantle:hook:highlight-indent-guides:disable-maybe))
 
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   (highlight-indent-guides-suppress-auto-error t)
 
@@ -268,9 +305,9 @@
   (highlight-indent-guides-auto-character-face-perc 5) ;; default: 10
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; If theme is already loaded, run the hook.
   (when innit:theme:loaded

@@ -17,6 +17,9 @@
 ;;; Code:
 
 
+(imp:require :keybind)
+
+
 ;;------------------------------------------------------------------------------
 ;; Global
 ;;------------------------------------------------------------------------------
@@ -50,6 +53,26 @@
 ;;-----------------------------------------------------------------------------
 ;; Local
 ;;-----------------------------------------------------------------------------
+
+;;------------------------------
+;; NOTE:
+;;------------------------------
+;; Local Leaders are often defined closer to where they're used.
+;;
+;; For example, Python buffers have a few menus under the local leader, and they
+;; are defined in: "mantle/config/dev-env/languages/python.el"
+;;
+;; (keybind:leader/local:def
+;;  :keymaps (list 'python-mode-map keybind:leader/global:keymaps)
+;;  :infix (keybind:infix "i")        ; insert
+;;  "" '(nil :which-key "insert...")) ; infix's title
+;;
+;; (keybind:leader/local:def
+;;  :keymaps (list 'python-mode-map keybind:leader/global:keymaps)
+;;  :infix (keybind:infix "t")      ; test
+;;  "" '(nil :which-key "test...")) ; infix's title
+
+
 
 
 

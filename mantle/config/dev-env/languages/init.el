@@ -27,16 +27,7 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Lispses
-;;------------------------------------------------------------------------------
-
-(imp:load :feature  '(:mantle config user dev-env emacs-lisp)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "emacs-lisp")
-
-
-;;------------------------------------------------------------------------------
-;; C and Friends
+;; Languages
 ;;------------------------------------------------------------------------------
 
 (imp:load :feature  '(:mantle config user dev-env c-and-cpp)
@@ -47,6 +38,16 @@
 (imp:load :feature  '(:mantle config user dev-env csharp)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "csharp")
+
+
+(imp:load :feature  '(:mantle config user dev-env emacs-lisp)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "emacs-lisp")
+
+
+(imp:load :feature  '(:mantle config user dev-env python)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "python")
 
 
 ;;------------------------------------------------------------------------------
