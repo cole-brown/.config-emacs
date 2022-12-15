@@ -31,7 +31,7 @@
 
 (require 'cl-lib)
 
-(imp:require :elisp 'utils 'function)
+(imp:require :elisp 'utils 'functions)
 
 
 ;;------------------------------------------------------------------------------
