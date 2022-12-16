@@ -70,7 +70,7 @@ From Doom's `doom-enlist'."
 
 
 ;;------------------------------------------------------------------------------
-;; Unquote List/Function
+;; Ensure Quote/Unquote
 ;;------------------------------------------------------------------------------
 
 (defun elisp:unquote (arg)
@@ -83,6 +83,21 @@ Originaly from `doom-unquote'."
   (while (memq (car-safe arg) '(quote function))
     (setq arg (cadr arg)))
   arg)
+;; (elisp:unquote '''foo)
+
+
+(defun elisp:quote (arg)
+  "Return ARG quoted.
+
+Ensure that ARG is quoted exactly once.
+  ''foo -> 'foo
+  'foo  -> 'foo
+  foo   -> 'foo
+
+Check both `quote' ('foo) and `function' (#'foo) style quoting."
+  (declare (pure t) (side-effect-free t))
+  `(quote ,(elisp:unquote arg)))
+;; (elisp:quote '''foo)
 
 
 ;;------------------------------------------------------------------------------
