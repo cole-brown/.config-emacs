@@ -11,12 +11,10 @@
 ;;
 ;;  With Blackjack!
 ;;
+;; Originally from here:
+;;   https://www.reddit.com/r/emacs/comments/1m7fqv/avoid_lambda_in_hooks_use_defun_instead/cc83axz/
+;;
 ;;; Code:
-
-
-;; Some code on loan from Doom:
-;;   - "core/autoload/themes.el"
-;;   - "core/core-lib.el"
 
 
 (imp:require :path)
@@ -55,7 +53,8 @@ Hook function name returned will be a string:
     (nub:error
        :innit
        "innit:hook:func/name:string"
-     "NAME must be a string or (quote) symbol. Got: %S"
+     "NAME must be a string or (quoted) symbol. Got %S: %S"
+     (type-of name)
      name))
 
   ;;------------------------------
@@ -112,8 +111,6 @@ NAME must be nil or a string."
   (insert (innit:hook:func/name:string name)))
 
 
-;; Originally from here:
-;; https://www.reddit.com/r/emacs/comments/1m7fqv/avoid_lambda_in_hooks_use_defun_instead/cc83axz/
 (defmacro innit:hook:defun-and-add (hook-vars options &rest body)
   "`defun' a hook function (which will run BODY) and add it to HOOK-VARS.
 
@@ -149,24 +146,15 @@ OPTIONS is a plist of optional vars:
 
   :docstr    - A string to use as the defined function's docstring."
   (declare (indent 2))
-  ;; Try to eval inputs (at most) once.
-  (let* ((macro<innit>:hooks     (elisp:list:flatten hook-vars)) ;; Normalize into a list.
-         (macro<innit>:name      (int<innit>:hook:option :name options))
 
-         (macro<innit>:announce  (int<innit>:hook:option :announce options))
-         (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
+  (let* ((macro<innit>:hooks     (elisp:list:flatten hook-vars)) ;; Normalize into a list.
+         ;; Name can come from hook variable if `:name' option not present.
+         (macro<innit>:name      (or (int<innit>:hook:option :name options)
+                                     (nth 0 macro<innit>:hooks)))
+         (macro<innit>:func/sym  (intern (innit:hook:func/name:string macro<innit>:name)))
+         (macro<innit>:options   (plist-put options :name macro<innit>:name))
          (macro<innit>:depth     (int<innit>:hook:option :depth options))
-         (macro<innit>:transient (int<innit>:hook:option :transient options))
-         (macro<innit>:arg/file  (int<innit>:hook:option :file options)) ;; Not complete yet...
-         (macro<innit>:docstr    (int<innit>:hook:option :docstr options))
-         ;; Do not eval:
-         ;;   - input
-         (macro<innit>:argslist  (or (int<innit>:hook:option :argslist options)
-                                     '(&rest _)))
-         ;;   - derived
-         (macro<innit>:hook-name (innit:hook:func/name:string (or macro<innit>:name
-                                                                  (nth 0 macro<innit>:hooks))))
-         (macro<innit>:hook-fn   (intern macro<innit>:hook-name)))
+         (macro<innit>:transient (int<innit>:hook:option :transient options)))
 
     ;; Currently incompatible: `:transient' and multiple hook vars.
     ;; TODO: Do we want the function to delete itself from all hooks after it's
@@ -176,65 +164,22 @@ OPTIONS is a plist of optional vars:
                (> (length macro<innit>:hooks) 1))
       (nub:error
          :innit
-         "innit:hook:func/name:string"
+         "innit:hook:defun-and-add"
        '("Couldn't be bothered figuring out how to do `:transient' /and/ "
          "multiple hooks. So now you have to...")))
 
-    ;; Should the hook's BODY be squelched?
-    (setq body
-          (if (not macro<innit>:squelch)
-              body
-            (innit:squelch body)))
-
-    ;; Finish figuring out file arg.
-    `(let ((macro<innit>:file (when (stringp ,macro<innit>:arg/file)
-                                (path:relative ,macro<innit>:arg/file
-                                               user-emacs-directory))))
-
-       ;; Create function...
-       (defun ,macro<innit>:hook-fn
-           ;; ...with provided args list, or default of "who cares?" args list.
-           ,macro<innit>:argslist
-         ,macro<innit>:docstr
-         (when ,macro<innit>:announce
-           ;; Nice info message maybe?
-           (nub:out
-            :innit
-            :info
-            ,macro<innit>:hook-name
-            "Running hook `%s'%s..."
-            ,macro<innit>:hook-name
-            (if (not (stringp macro<innit>:file))
-                ""
-              (concat " from '"
-                      macro<innit>:file
-                      "'"))))
-         ;; And run the actual hook.
-         ,@body
-         ;; If a transient, remove hook now that it's run once.
-         (when ,macro<innit>:transient
-           ;; Currently should only get here if only 1 hook var, but...
-           ;; ...remove from "all" hooks, to be safe?
-           (dolist (macro<innit>:hook macro<innit>:hooks)
-             (remove-hook ',macro<innit>:hook #',macro<innit>:hook-fn))))
+    ;; Create the hook function.
+    `(innit:hook:defun ,macro<innit>:options
+       ,@body)
 
        ;; ...add the new hook function to the hook variable(s).
-       (dolist (macro<innit>:hook macro<innit>:hooks)
-         (add-hook ',macro<innit>:hook #',macro<innit>:hook-fn ',macro<innit>:depth)))))
+    `(dolist (macro<innit>:hook ',macro<innit>:hooks)
+       (add-hook macro<innit>:hook #',macro<innit>:func/sym ',macro<innit>:depth))))
 ;; (setq test-hook nil)
 ;; (makunbound 'mantle:hook:test)
 ;; (fmakunbound 'mantle:hook:test)
-;; (innit:hook:defun-and-add test-hook nil (message "Hello there."))
-;; (innit:hook:defun-and-add test-hook (:announce t) (message "Hello there."))
-;; (innit:hook:defun-and-add test-hook (:announce t :argslist (&rest ignore)) (message "Hello there."))
-;; (innit:hook:defun-and-add test-hook (:file (path:current:file) :docstr "this is a test hook") (message "Hello from a file?"))
-;; test-hook
-;; (run-hooks 'test-hook)
-;; (setq debug-on-error t)
-;; (setq test-hook nil)
-;; (innit:hook:defun-and-add test-hook '(:name "jeff/mcjefferson" :file (path:current:file) (message "Hello there."))
-;; test-hook
-;; (run-hooks 'test-hook)
+;; (innit:hook:defun-and-add:test test-hook (:name jeff :announce t) (message "Hello there."))
+;; (innit:hook:defun-and-add:test test-hook (:announce t) (message "Hello there."))
 
 
 (defmacro innit:hook:defun (options &rest body)
@@ -268,8 +213,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
 `add-hook'ing directly (e.g. for use-package's ':hook')."
   (declare (indent 1))
   ;; Try to eval inputs (at most) once.
-  (let* ((macro<innit>:name      (int<innit>:hook:option :name options))
-         (macro<innit>:announce  (int<innit>:hook:option :announce options))
+  (let* ((macro<innit>:announce  (int<innit>:hook:option :announce options))
          (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
          (macro<innit>:transient (int<innit>:hook:option :transient options))
          (macro<innit>:arg/file  (int<innit>:hook:option :file options)) ;; Not complete yet...
@@ -279,7 +223,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
          (macro<innit>:argslist  (or (int<innit>:hook:option :argslist options)
                                      '(&rest _)))
          ;;   - derived
-         (macro<innit>:hook-name (innit:hook:func/name:string macro<innit>:name))
+         (macro<innit>:hook-name (innit:hook:func/name:string (int<innit>:hook:option :name options)))
          (macro<innit>:hook-fn   (intern macro<innit>:hook-name)))
 
     ;; Should the hook's BODY be squelched?
