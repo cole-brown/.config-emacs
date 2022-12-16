@@ -341,7 +341,7 @@ MODULE should be a string of the module name."
     :config
     ;;------------------------------
     (pyenv-mode +1)
-    (add-to-list 'exec-path (expand-file-name "shims" (or (getenv "PYENV_ROOT") "~/.pyenv")))))
+     (add-to-list 'exec-path (expand-file-name "shims" (or (getenv "PYENV_ROOT") "~/.pyenv"))))))
 
 
 ;;------------------------------
