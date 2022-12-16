@@ -90,15 +90,16 @@ Hook function name returned will be an interned symbol from
 
 
 (defun int<innit>:hook:option (keyword options)
-  "Get KEYWORD from OPTIONS and evaluate if necessary?"
+  "Get KEYWORD from OPTIONS and evaluate or unquote if necessary?"
   (let ((option (plist-get options keyword)))
     (if (and (listp option)
              (functionp (car option)))
         (eval option)
-      option)))
+      (elisp:unquote option))))
 ;; (int<innit>:hook:option :name '(:name nil))
 ;; (int<innit>:hook:option :name '(:name "jeff"))
 ;; (int<innit>:hook:option :name '(:name jeff))
+;; (int<innit>:hook:option :name '(:name 'jeff))
 ;; (int<innit>:hook:option :name '(:name (concat "j" "eff")))
 ;; (int<innit>:hook:option :dne '(:name (concat "j" "eff")))
 
@@ -263,6 +264,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
 ;; (fmakunbound 'mantle:hook:test)
 ;; (innit:hook:defun (:name test-hook :announce t) (message "Hello there."))
 ;; (innit:hook:defun (:name "test-hook" :announce t) (message "Hello there."))
+;; (innit:hook:defun (:name 'test-hook :announce t) (message "Hello there."))
 ;; (innit:hook:defun (:name (concat "test" "-" "hook") :announce t) (message "Hello there."))
 ;; (innit:hook:defun (:name test-hook :announce t :argslist (&rest ignore)) (message "Hello there."))
 ;; (innit:hook:defun (:name test-hook :announce t :argslist (&rest ignore)) (message "Hello there."))
