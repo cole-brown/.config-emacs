@@ -255,7 +255,6 @@ OPTIONS is a plist of optional vars:
 
   :docstr    - A string to use as the defined function's docstring."
   (declare (indent 2))
-
   (let* ((macro<innit>:hooks     (elisp:list:flatten hook-vars)) ;; Normalize into a list.
          ;; Name can come from hook variable if `:name' option not present.
          (macro<innit>:name      (or (int<innit>:hook:option :name options)
@@ -277,18 +276,23 @@ OPTIONS is a plist of optional vars:
        '("Couldn't be bothered figuring out how to do `:transient' /and/ "
          "multiple hooks. So now you have to...")))
 
+    `(progn
     ;; Create the hook function.
-    `(innit:hook:defun ,macro<innit>:options
+       (innit:hook:defun ,macro<innit>:options
        ,@body)
 
     ;; ...add the new hook function to the hook variable(s).
-    `(dolist (macro<innit>:hook ',macro<innit>:hooks)
-       (add-hook macro<innit>:hook #',macro<innit>:func/sym ',macro<innit>:depth))))
+       (dolist (macro<innit>:hook ',macro<innit>:hooks)
+         (add-hook macro<innit>:hook #',macro<innit>:func/sym ',macro<innit>:depth)))))
 ;; (setq test-hook nil)
+;; (makunbound 'mantle:hook:jeff)
+;; (fmakunbound 'mantle:hook:jeff)
 ;; (makunbound 'mantle:hook:test)
 ;; (fmakunbound 'mantle:hook:test)
-;; (innit:hook:defun-and-add:test test-hook (:name jeff :announce t) (message "Hello there."))
-;; (innit:hook:defun-and-add:test test-hook (:announce t) (message "Hello there."))
+;; (innit:hook:defun-and-add test-hook (:name jeff :announce t) (message "Jeff says hello."))
+;; (innit:hook:defun-and-add test-hook (:announce t) (message "Test hook says hello."))
+;; test-hook
+;; (run-hooks 'test-hook)
 
 
 ;;------------------------------------------------------------------------------
