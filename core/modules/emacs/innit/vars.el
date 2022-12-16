@@ -135,12 +135,21 @@ If DOCSTRING is a string, use as-is.
 If DOCSTRING is a list of strings, all strings will be joined together with
 newline separators."
   (declare (doc-string 3))
-  `(customize-set-variable ',variable ,value
-                           (if (and docstring (listp docstring))
+  (let ((macro<innit>:variable  (make-symbol "macro<innit>:uninterned:variable/tmp"))
+        (macro<innit>:value     (make-symbol "macro<innit>:uninterned:value/tmp"))
+        (macro<innit>:docstring (make-symbol "macro<innit>:uninterned:docstring/tmp")))
+    `(let ((,macro<innit>:variable  ,variable)
+           (,macro<innit>:value     ,value)
+           (,macro<innit>:docstring ,docstring))
+       `(customize-set-variable ,macro<innit>:variable ,macro<innit>:value
+                                (if (and ,macro<innit>:docstring
+                                         (listp ,macro<innit>:docstring))
+                                    ;; Convert a list of strings into a block of text.
                                (mapconcat #'identity
-                                          ',docstring
+                                               ',macro<innit>:docstring
                                           "\n")
-                             docstring)))
+                                  ;; Use string/nil/whatever as-is.
+                                  ,macro<innit>:docstring)))))
 
 
 (defmacro innit:csetq (variable value)
