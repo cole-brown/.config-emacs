@@ -37,12 +37,12 @@
 
   ;; Set to your theme's directory?
   ;; Default is here AKA `innit:theme:path'
-  (customize-set-variable 'innit:theme:path (path:join innit:theme:path
+  (innit:customize-set-variable innit:theme:path (path:join innit:theme:path
                                                        "zenburn"))
 
 
   ;; Set to your theme's filename.
-  (customize-set-variable 'innit:theme:file "init")
+  (innit:customize-set-variable innit:theme:file "init")
 
 
   ;; Set to your theme's `imp' feature name.
@@ -50,8 +50,8 @@
   ;;   - If theme does this:
   ;;     (imp:provide :mantle 'theme 'zenburn)
   ;;   - You should do this:
-  ;;     (customize-set-variable 'mantle:theme:feature '(:mantle theme zenburn))
-  (customize-set-variable 'innit:theme:feature '(:mantle theme zenburn))
+  ;;     (innit:customize-set-variable mantle:theme:feature '(:mantle theme zenburn))
+  (innit:customize-set-variable innit:theme:feature '(:mantle theme zenburn))
 
   ;;---
   ;; </mantle-user-set-up>

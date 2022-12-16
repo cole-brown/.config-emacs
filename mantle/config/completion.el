@@ -69,9 +69,9 @@
 
   ;; Optional performance optimization
   ;; by highlighting only the visible candidates.
-  (customize-set-variable 'orderless-skip-highlighting (lambda () selectrum-is-active))
-  (customize-set-variable 'selectrum-refine-candidates-function    #'orderless-filter)
-  (customize-set-variable 'selectrum-highlight-candidates-function #'orderless-highlight-matches))
+  (innit:customize-set-variable orderless-skip-highlighting             (lambda () selectrum-is-active))
+  (innit:customize-set-variable selectrum-refine-candidates-function    #'orderless-filter)
+  (innit:customize-set-variable selectrum-highlight-candidates-function #'orderless-highlight-matches))
 
 
 ;; TODO: Do I want this:
@@ -87,7 +87,7 @@
 ;; ;;------------------------------
 ;; (imp:eval:after (:and selectrum orderless prescient)
 ;;
-;;   (customize-set-variable 'selectrum-prescient-enable-filtering nil)
+;;   (innit:customize-set-variable selectrum-prescient-enable-filtering nil)
 ;;   (selectrum-prescient-mode +1)
 ;;   (prescient-persist-mode +1))
 

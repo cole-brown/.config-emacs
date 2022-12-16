@@ -136,7 +136,7 @@
 ;;
 ;; Annoying right now since my work monitors aren't big enough to bother getting
 ;; used to more than 2 side-by-sides.
-(customize-set-variable 'split-height-threshold nil)
+(innit:customize-set-variable split-height-threshold nil)
 
 
 ;; For `split-window-sensibly'.
@@ -147,7 +147,7 @@
 ;; Annoying right now since my work monitors aren't big enough to bother getting
 ;; used to more than 2 side-by-sides. 160 is wide enough that it /should/ work
 ;; for most situations.
-(customize-set-variable 'split-width-threshold 160)
+(innit:customize-set-variable split-width-threshold 160)
 
 
 ;;------------------------------------------------------------------------------

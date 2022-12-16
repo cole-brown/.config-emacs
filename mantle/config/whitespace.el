@@ -70,14 +70,14 @@
 ;; https://www.emacswiki.org/emacs/SmartTabs
 
 ;; Always use spaces; never use tabs.
-(customize-set-variable 'indent-tabs-mode nil)
+(innit:customize-set-variable indent-tabs-mode nil)
 
 ;; Set default tab width for all buffers.
-(customize-set-variable 'tab-width (jerky:get 'code 'tab 'standard))
+(innit:customize-set-variable tab-width (jerky:get 'code 'tab 'standard))
 
 ;; Make sure this is at it's default of nil, because:
 ;;   "A value of nil means a tab stop every `tab-width' columns."
-(customize-set-variable 'tab-stop-list nil)
+(innit:customize-set-variable tab-stop-list nil)
 
 ;; NOTE: M-x tabify and M-x untabify exist and work on regions.
 

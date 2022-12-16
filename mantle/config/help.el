@@ -28,7 +28,7 @@
 ;; Can set back to t/'always or try 'other if annoying.
 ;;   - [2019-10-02] sn-002: Changed: t -> nil.
 ;;   - [2020-10-15] sn-003: Doom also has it as nil.
-(customize-set-variable 'help-window-select nil)
+(innit:customize-set-variable help-window-select nil)
 
 
 ;; Got this buffer a few times and don't know why. Auto-complete help should be
@@ -36,7 +36,7 @@
 ;;   - [2019-10-02] sn-002: Can set back to t (needs 1 fail to give help), or try 'lazy (needs 2 fails).
 ;;   - [2020-10-15] sn-003: Doom doesn't change this from the default, t. Hm...
 ;;   - [2022-07-15] sn-004: Comment out to start?
-;; (customize-set-variable 'completion-auto-help nil)
+;; (innit:customize-set-variable completion-auto-help nil)
 
 
 ;;------------------------------------------------------------------------------

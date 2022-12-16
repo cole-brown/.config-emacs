@@ -26,7 +26,7 @@
 ;;   RFC-3339 (human-readable ISO-8601)
 ;; Original value:
 ;;   '(\"%d.%m.%Y %H:%M\" \"%d.%m.%Y %H:%M\"))
-(customize-set-variable 'ls-lisp-format-time-list
+(innit:customize-set-variable ls-lisp-format-time-list
                         (list
                          ;; Recent Time Format:
                          (datetime:format/get 'rfc-3339 'datetime)
@@ -34,7 +34,7 @@
                          (datetime:format/get 'rfc-3339 'datetime)))
 
 ;; Force use of `ls-lisp-format-time-list' regardless of locale.
-(customize-set-variable 'ls-lisp-use-localized-time-format t)
+(innit:customize-set-variable ls-lisp-use-localized-time-format t)
 
 
 ;;------------------------------------------------------------------------------
@@ -210,7 +210,7 @@
 ;; This variable has the same structure as `mode-line-format', except that
 ;; the %c, %C, and %l constructs are ignored.  It is used only on frames for
 ;; which no explicit name has been set (see `modify-frame-parameters').
-(customize-set-variable 'frame-title-format
+(innit:customize-set-variable frame-title-format
                         ;; buffer name
                         '("｢%b｣"
                           ;; system/host name
@@ -222,7 +222,7 @@
 
 ;; This is for the Emacs icon thingy in the OS app list/taskbar.
 ;; Just have it be the same as the `frame-title-format'.
-(customize-set-variable 'icon-title-format frame-title-format)
+(innit:customize-set-variable icon-title-format frame-title-format)
 
 
 ;;------------------------------------------------------------------------------

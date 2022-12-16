@@ -257,7 +257,7 @@
 ;;    ;; after it's loaded, so... use it after 'autogit' is loaded.
 ;;    (imp:eval:after autogit
 ;;    ;; Add more repos to `autogit:repos:path/watch' list.
-;;    (customize-set-variable 'autogit:repos:path/watch
+;;    (innit:customize-set-variable autogit:repos:path/watch
 ;;                            (append autogit:repos:path/watch ;; We want to add, not replace, so append to it.
 ;;                                    ;;---
 ;;                                    ;; Work: all repos in directory

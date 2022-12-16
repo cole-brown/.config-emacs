@@ -192,7 +192,7 @@
   ;;--------------------
 
   (when-let ((agenda-files (jerky:get 'path 'org 'agenda)))
-    (customize-set-variable 'org-agenda-files
+    (innit:customize-set-variable org-agenda-files
                             agenda-files
                             "My paths to search for agenda items."))
 
@@ -546,7 +546,7 @@ LETTER must be a 1-character string."
 ;; ;; Every org file within this directory tree root is part of the org-roam
 ;; ;; ecosystem.
 ;; ;; So: everything in lily.
-;; (customize-set-variable 'org-roam-directory
+;; (innit:customize-set-variable org-roam-directory
 ;;                         (jerky:get 'path 'lily))
 
 
@@ -600,7 +600,7 @@ LETTER must be a 1-character string."
 ;;   ;; buffer" errors every other time it runs `org-roam-build-cache'.
 ;;   (when (eq system-type 'windows-nt)
 ;;     ;; default value: 'idle-timer
-;;     (customize-set-variable 'org-roam-db-update-method 'immediate))
+;;     (innit:customize-set-variable org-roam-db-update-method 'immediate))
 
 ;;   ;;--------------------
 ;;   ;; configuration

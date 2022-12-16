@@ -163,14 +163,14 @@ Can be called earlier too, if you want..."
   ;;---
   (when innit:path:packages:elpa
     ;; `package-user-dir' doesn't get set via `customize-set-variable'?!
-    ;;   (customize-set-variable 'package-user-dir innit:path:packages:elpa)
+    ;;   (innit:customize-set-variable package-user-dir innit:path:packages:elpa)
     ;; So use `setq' instead:
     (setq package-user-dir innit:path:packages:elpa))
   ;; NOTE: Also, this gets wiped out when 'package.el' is loaded? So... Set it
   ;; as much as needed to force Emacs to behave?
 
   (when innit:path:packages:gpg
-    (customize-set-variable 'package-gnupghome-dir innit:path:packages:gpg)))
+    (innit:customize-set-variable package-gnupghome-dir innit:path:packages:gpg)))
 
 
 (defun innit:package:init/early ()
@@ -188,7 +188,7 @@ this needs to be called during \"early-init.el\"."
   ;; Set enabled package archives.
   ;;---
   (when innit:package:archives:enabled
-    (customize-set-variable 'package-archives
+    (innit:customize-set-variable package-archives
                             (mapcar #'innit:package:archive
                                     innit:package:archives:enabled)))
 
@@ -342,7 +342,7 @@ this needs to be called during \"init.el\"."
     ;;   https://github.com/jwiegley/use-package#package-installation
     ;; NOTE: Does not keep anything up-to-date. For that you would use package
     ;; `auto-package-update' or something similar.
-    (customize-set-variable 'use-package-always-ensure t)
+    (innit:customize-set-variable use-package-always-ensure t)
 
     ;; 'When using :hook omit the "-hook" suffix if you specify the hook
     ;; explicitly, as this is appended by default.
@@ -355,7 +355,7 @@ this needs to be called during \"init.el\"."
     ;;
     ;; Need to override this to allow naming hooks something other than
     ;; `*-hook'.
-    (customize-set-variable 'use-package-hook-name-suffix nil)
+    (innit:customize-set-variable use-package-hook-name-suffix nil)
 
     ;;---
     ;; Debugging Settings:

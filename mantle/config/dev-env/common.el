@@ -36,7 +36,7 @@
 
 
 ;; Use spaces instead of tabs.
-(customize-set-variable 'indent-tabs-mode nil)
+(innit:customize-set-variable indent-tabs-mode nil)
 
 
 ;;------------------------------------------------------------------------------
