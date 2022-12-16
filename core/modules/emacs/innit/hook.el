@@ -112,77 +112,6 @@ NAME must be nil or a string."
   (insert (innit:hook:func/name:string name)))
 
 
-(defmacro innit:hook:defun-and-add (hook-vars options &rest body)
-  "`defun' a hook function (which will run BODY) and add it to HOOK-VARS.
-
-HOOK-VARS should be an unquoted hook symbol or a list of such. The hook function
-created will be added to all of these hook variables.
-
-OPTIONS is a plist of optional vars:
-  :name      - Hook function will be named:
-                 (concat innit:hook:func/name:prefix '<hook-name>')
-               - '<hook-name>':
-                 - If `:name' is a string, that string.
-                 - If `:name' is a symbol (e.g. the hook variable), convert to a
-                   string via `symbol-name'.
-                 - Remove \"-hook\" suffix if present.
-                 - See: `innit:hook:func/name:string'
-
-  :argslist  - If a list, create the hook's `defun' with this list of arguments.
-
-  :announce  - If non-nil, output the 'Running hook [...]' message.
-
-  :squelch   - If non-nil, wrap BODY in `innit:squelch'.
-
-  :depth     - Passed on to `add-hook' as its `depth' argument.
-             - If nil, hook will be prepended.
-             - If non-nil, hook will be added at the depth indicated.
-             - Should be an integer in the range of [-100, 100].
-               - Any non-nil symbol means 90 - see function `add-hook'.
-
-  :transient - If non-nil, hook will delete itself after it has run once.
-
-  :file      - Filename where your macro is called from... in case you happen
-               to lose your hook and need to find it.
-
-  :docstr    - A string to use as the defined function's docstring."
-  (declare (indent 2))
-
-  (let* ((macro<innit>:hooks     (elisp:list:flatten hook-vars)) ;; Normalize into a list.
-         ;; Name can come from hook variable if `:name' option not present.
-         (macro<innit>:name      (or (int<innit>:hook:option :name options)
-                                     (nth 0 macro<innit>:hooks)))
-         (macro<innit>:func/sym  (intern (innit:hook:func/name:string macro<innit>:name)))
-         (macro<innit>:options   (plist-put options :name macro<innit>:name))
-         (macro<innit>:depth     (int<innit>:hook:option :depth options))
-         (macro<innit>:transient (int<innit>:hook:option :transient options)))
-
-    ;; Currently incompatible: `:transient' and multiple hook vars.
-    ;; TODO: Do we want the function to delete itself from all hooks after it's
-    ;; run from any of them for the first time? Or should it run once from each
-    ;; hook?
-    (when (and macro<innit>:transient
-               (> (length macro<innit>:hooks) 1))
-      (nub:error
-         :innit
-         "innit:hook:defun-and-add"
-       '("Couldn't be bothered figuring out how to do `:transient' /and/ "
-         "multiple hooks. So now you have to...")))
-
-    ;; Create the hook function.
-    `(innit:hook:defun ,macro<innit>:options
-       ,@body)
-
-       ;; ...add the new hook function to the hook variable(s).
-    `(dolist (macro<innit>:hook ',macro<innit>:hooks)
-       (add-hook macro<innit>:hook #',macro<innit>:func/sym ',macro<innit>:depth))))
-;; (setq test-hook nil)
-;; (makunbound 'mantle:hook:test)
-;; (fmakunbound 'mantle:hook:test)
-;; (innit:hook:defun-and-add:test test-hook (:name jeff :announce t) (message "Hello there."))
-;; (innit:hook:defun-and-add:test test-hook (:announce t) (message "Hello there."))
-
-
 (defmacro innit:hook:defun (options &rest body)
   "`defun' a hook function (which will run BODY).
 
@@ -289,6 +218,77 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
 ;;        :announce t)
 ;;     (message "hi: %S" macro<imp>:path/file)
 ;;     ))
+
+
+(defmacro innit:hook:defun-and-add (hook-vars options &rest body)
+  "`defun' a hook function (which will run BODY) and add it to HOOK-VARS.
+
+HOOK-VARS should be an unquoted hook symbol or a list of such. The hook function
+created will be added to all of these hook variables.
+
+OPTIONS is a plist of optional vars:
+  :name      - Hook function will be named:
+                 (concat innit:hook:func/name:prefix '<hook-name>')
+               - '<hook-name>':
+                 - If `:name' is a string, that string.
+                 - If `:name' is a symbol (e.g. the hook variable), convert to a
+                   string via `symbol-name'.
+                 - Remove \"-hook\" suffix if present.
+                 - See: `innit:hook:func/name:string'
+
+  :argslist  - If a list, create the hook's `defun' with this list of arguments.
+
+  :announce  - If non-nil, output the 'Running hook [...]' message.
+
+  :squelch   - If non-nil, wrap BODY in `innit:squelch'.
+
+  :depth     - Passed on to `add-hook' as its `depth' argument.
+             - If nil, hook will be prepended.
+             - If non-nil, hook will be added at the depth indicated.
+             - Should be an integer in the range of [-100, 100].
+               - Any non-nil symbol means 90 - see function `add-hook'.
+
+  :transient - If non-nil, hook will delete itself after it has run once.
+
+  :file      - Filename where your macro is called from... in case you happen
+               to lose your hook and need to find it.
+
+  :docstr    - A string to use as the defined function's docstring."
+  (declare (indent 2))
+
+  (let* ((macro<innit>:hooks     (elisp:list:flatten hook-vars)) ;; Normalize into a list.
+         ;; Name can come from hook variable if `:name' option not present.
+         (macro<innit>:name      (or (int<innit>:hook:option :name options)
+                                     (nth 0 macro<innit>:hooks)))
+         (macro<innit>:func/sym  (intern (innit:hook:func/name:string macro<innit>:name)))
+         (macro<innit>:options   (plist-put options :name macro<innit>:name))
+         (macro<innit>:depth     (int<innit>:hook:option :depth options))
+         (macro<innit>:transient (int<innit>:hook:option :transient options)))
+
+    ;; Currently incompatible: `:transient' and multiple hook vars.
+    ;; TODO: Do we want the function to delete itself from all hooks after it's
+    ;; run from any of them for the first time? Or should it run once from each
+    ;; hook?
+    (when (and macro<innit>:transient
+               (> (length macro<innit>:hooks) 1))
+      (nub:error
+         :innit
+         "innit:hook:defun-and-add"
+       '("Couldn't be bothered figuring out how to do `:transient' /and/ "
+         "multiple hooks. So now you have to...")))
+
+    ;; Create the hook function.
+    `(innit:hook:defun ,macro<innit>:options
+       ,@body)
+
+    ;; ...add the new hook function to the hook variable(s).
+    `(dolist (macro<innit>:hook ',macro<innit>:hooks)
+       (add-hook macro<innit>:hook #',macro<innit>:func/sym ',macro<innit>:depth))))
+;; (setq test-hook nil)
+;; (makunbound 'mantle:hook:test)
+;; (fmakunbound 'mantle:hook:test)
+;; (innit:hook:defun-and-add:test test-hook (:name jeff :announce t) (message "Hello there."))
+;; (innit:hook:defun-and-add:test test-hook (:announce t) (message "Hello there."))
 
 
 ;;------------------------------------------------------------------------------
