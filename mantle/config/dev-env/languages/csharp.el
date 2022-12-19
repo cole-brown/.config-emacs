@@ -68,7 +68,7 @@
      ;; (c-set-offset 'case-label '+) ; indent case labels by c-indent-level, too
 
      ;; 'wide' is a decent default, probably?
-     (setq fill-column (jerky:set 'fill-column 'wide))
+     (setq fill-column (jerky:get 'fill-column 'wide))
 
      ;; TODO: is this true?
      ;; electric-indent-mode is true and might take care of this?

@@ -69,6 +69,7 @@
 ;; Helper Functions
 ;;------------------------------------------------------------------------------
 
+;; TODO: Move to some elisp module/package?
 (defun python:module:installed? (module)
   "Return non-nil if Python MODULE is installed.
 
@@ -81,12 +82,16 @@ MODULE should be a string of the module name."
      (type-of module)
      module))
 
+  ;; We use this in set-up so `python-shell-interpreter' might not exist yet...
+  (let ((exe/python (or (and (bound-and-true-p python-shell-interpreter)
+                             python-shell-interpreter)
+                        "python")))
   ;; If we can import the module name, it exists.
   ;; If we cannot, it'll have a non-zero exit and we'll translate that to a "no".
-  (= (call-process python-shell-interpreter
+    (= (call-process exe/python
                    nil nil nil
                    "-c" (concat "import " module))
-     0))
+       0)))
 ;; (python:module:installed? "setuptools")
 
 
@@ -112,7 +117,7 @@ MODULE should be a string of the module name."
 
    ;; Python defaults to wanting 79, not 80, width code.
    ;; Otherwise `fill-column wide' is a decent default.
-   (setq fill-column (jerky:set 'fill-column 'wide))
+    (setq fill-column (jerky:get 'fill-column 'wide))
 
    (setq tab-width python-indent-offset)
 
@@ -335,20 +340,26 @@ MODULE should be a string of the module name."
      ;; Doom had `doom-switch-buffer-hook', which just ran on both of these hooks.
      ;; `window-buffer-change-functions' doesn't trigger for files visited via the
      ;; server, so `server-visit-hook' is also used.
-     ((window-buffer-change-functions server-visit-hook) . mantle:hook:python:pyenv:version)
+     ((window-buffer-change-functions server-visit-hook) . mantle:hook:python:pyenv:version))
 
     ;;------------------------------
     :config
     ;;------------------------------
     (pyenv-mode +1)
-     (add-to-list 'exec-path (expand-file-name "shims" (or (getenv "PYENV_ROOT") "~/.pyenv"))))))
+    (add-to-list 'exec-path (expand-file-name "shims" (or (getenv "PYENV_ROOT") "~/.pyenv")))))
 
 
 ;;------------------------------
 ;; Conda
 ;;------------------------------
 
-(imp:use-package conda
+(if (not (executable-find "conda"))
+    (nub:warning
+       :innit
+       (path:current:file)
+     "Need executable `conda' installed in order to use package `conda'.")
+
+  (imp:use-package conda
   :after python
 
   ;;------------------------------
@@ -361,7 +372,7 @@ MODULE should be a string of the module name."
   ;; If none of these work for you, `conda-anaconda-home' must be set
   ;; explicitly. Afterwards, run M-x `conda-env-activate' to switch between
   ;; environments
-  (or (cl-loop for dir in (list conda-anaconda-home
+   (unless (cl-loop for dir in (list conda-anaconda-home
                                 "~/.anaconda"
                                 "~/.miniconda"
                                 "~/.miniconda3"
@@ -378,7 +389,10 @@ MODULE should be a string of the module name."
                if (path:exists? dir :dir)
                return (setq conda-anaconda-home (path:absolute dir)
                             conda-env-home-directory (path:absolute dir)))
-      (message "Cannot find `conda' directory."))
+     (nub:warning
+        :innit
+        (path:current:file)
+      "Cannot find `conda' directory."))
 
   ;; Integration with term/eshell
   (conda-env-initialize-interactive-shells)
@@ -387,15 +401,16 @@ MODULE should be a string of the module name."
 
   (add-to-list 'global-mode-string
                '(conda-env-current-name (" conda:" conda-env-current-name " "))
-               'append))
+                'append)))
 
 
 ;;------------------------------
 ;; Anaconda
 ;;------------------------------
 
-;; `anaconda-mode' requires Python module "setuptools"
-(if (not (python:module:installed? "setuptools"))
+(imp:eval:after python
+ ;; `anaconda-mode' requires Python module "setuptools"
+ (if (not (python:module:installed? "setuptools"))
     (nub:warning
        :innit
        (path:current:file)
@@ -416,7 +431,7 @@ MODULE should be a string of the module name."
     (unless (or (bound-and-true-p lsp-mode)
                 (bound-and-true-p eglot--managed-mode)
                 (bound-and-true-p lsp--buffer-deferred)
-                (not (executable-find python-shell-interpreter t)))
+                  (not (executable-find python-shell-interpreter)))
       (anaconda-mode +1)
       (evil-normalize-keymaps)))
 
@@ -477,7 +492,7 @@ MODULE should be a string of the module name."
    ;;
    ;; TODO: If I add `company':
    ;; (set-company-backend! 'anaconda-mode '(company-anaconda))
-   ))
+    )))
 
 
 ;;------------------------------

@@ -82,7 +82,7 @@
     ;; See this for visuals: https://en.wikipedia.org/wiki/Indentation_style
 
     ;; 'wide' is a decent default, probably?
-    (setq fill-column (jerky:set 'fill-column 'wide))
+    (setq fill-column (jerky:get 'fill-column 'wide))
 
     (setq c-basic-offset (jerky:get 'code 'tab 'normal))
 
