@@ -142,7 +142,7 @@
 ;;------------------------------------------------------------------------------
 ;; https://github.com/sensorflo/sln-mode
 
-(imp:use-package! sln-mode
+(imp:use-package sln-mode
   ;; Not on a package repository so get it from GitHub:
   :straight (:type git
              :host github

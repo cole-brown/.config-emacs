@@ -93,7 +93,7 @@ MODULE should be a string of the module name."
 ;;------------------------------------------------------------------------------
 ;; Python Mode
 ;;------------------------------------------------------------------------------
-;; https://github.com/emacs-csharp/csharp-mode
+;; A built-in module.
 
 (imp:use-package python
   :mode
@@ -104,12 +104,6 @@ MODULE should be a string of the module name."
   ;;------------------------------
   :init
   ;;------------------------------
-
-  ;; Default to Python 3. Prefer the versioned Python binaries since some
-  ;; systems stupidly make the unversioned one point at Python 2.
-  (when (and (executable-find "python3")
-             (string= python-shell-interpreter "python"))
-    (setq python-shell-interpreter "python3"))
 
   (innit:hook:defun
      (:name   'python:settings
@@ -173,6 +167,12 @@ MODULE should be a string of the module name."
   ;;------------------------------
   :config
   ;;------------------------------
+
+  ;; Default to Python 3. Prefer the versioned Python binaries since some
+  ;; systems stupidly make the unversioned one point at Python 2.
+  (when (and (executable-find "python3")
+             (string= python-shell-interpreter "python"))
+    (setq python-shell-interpreter "python3"))
 
   ;; Affects pyenv and conda
   (when (functionp #'mantle:advice:doom-modeline:env:update/all-windows)
