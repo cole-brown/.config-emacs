@@ -115,9 +115,11 @@ MODULE should be a string of the module name."
       :file   macro<imp>:path/file
       :docstr "Settings for Python mode. Non-LSP stuff.")
 
-   ;; Python defaults to wanting 79, not 80, width code.
+    ;; Python (`pycodestyle', technically) defaults to wanting 79, not 80, width code.
    ;; Otherwise `fill-column wide' is a decent default.
-    (setq fill-column (jerky:get 'fill-column 'wide))
+    ;;   (jerky:get 'fill-column 'wide))
+    ;; We'll just try sticking with 79 to start with.
+    (setq fill-column 79)
 
    (setq tab-width python-indent-offset)
 
@@ -150,6 +152,40 @@ MODULE should be a string of the module name."
      (setq-local flycheck-python-pylint-executable "pylint")
      (setq-local flycheck-python-flake8-executable "flake8")))
 
+  ;; TODO-LSP: disable some error messages:
+  ;; ;; Tell some annoying LSP messages to f right off back where
+  ;; ;; they came from...
+  ;; (when (imp:flag :dev-env 'languages 'lsp) ;; TODO-LSP: What is the "are we doing LSP?" check?
+  ;;   (customize-set-variable 'lsp-pyls-plugins-pycodestyle-ignore
+  ;;                           ;; spaces before colon
+  ;;                           ;; I like to line things up.
+  ;;                           '("E203"
+  ;;                             ;; spaces after colon...
+  ;;                             "E241"
+  ;;                             ;; spaces before equals...
+  ;;                             "E221"
+  ;;                             ;; spaces after equals...
+  ;;                             "E222"
+  ;;                             ;; spaces before keyword...
+  ;;                             "E271"
+  ;;                             ;; spaces after keyword...
+  ;;                             "E272"
+  ;;                             ;; Breaking before binary operator
+  ;;                             ;; ...Complains about valid PEP-8 things.
+  ;;                             "W503"
+  ;;                             ;; Breaking after binary operator
+  ;;                             ;; ...Complains about valid PEP-8 things.
+  ;;                             ;; Slightly less valid, still valid.
+  ;;                             "W504"
+  ;;                             ))
+  ;;   ;; §-TODO-§ [2019-10-24]: this doesn't work.
+  ;;   ;; pylint complains at top of file:
+  ;;   ;; "No module named 'disabled=C0326'
+  ;;   ;; (customize-set-variable 'lsp-pyls-plugins-pylint-args
+  ;;   ;;                         ;; spaces before colon... also?
+  ;;   ;;                         ;; I like to line things up.
+  ;;   ;;                         '("disable=C0326"))
+  ;;   )
 
   ;;------------------------------
   :hook
@@ -165,8 +201,9 @@ MODULE should be a string of the module name."
   ;; https://github.com/tkf/emacs-python-environment
   ;; (python-environment-directory doom-cache-dir)
 
-  ;; Squelch the message about not being able to guess indent.
-  (python-indent-guess-indent-offset-verbose nil)
+  (python-indent-guess-indent-offset-verbose nil) ; Squelch the message about not being able to guess indent.
+  (python-indent-offset (jerky:get 'code 'tab 'standard))
+  (python-fill-docstring-style 'symmetric)
 
 
   ;;------------------------------
@@ -538,7 +575,7 @@ MODULE should be a string of the module name."
         "t" (list #'python-pytest-function-dwim :which-key "DWIM: Run tests on function")
         "T" (list #'python-pytest-function :which-key "Run tests on function")
         "r" (list #'python-pytest-repeat :which-key "Repeat tests")
-        "p" (list #'python-pytest-dispatch :which-key "Pytest Popup..."))
+   "p" (list #'python-pytest-dispatch :which-key "Pytest Popup...")))
 
 
 
