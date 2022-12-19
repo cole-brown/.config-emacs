@@ -331,11 +331,11 @@ MODULE should be a string of the module name."
     ;;------------------------------
     :hook
     ;;------------------------------
-    ((python-mode-local-vars-hook . #'mantle:hook:python:pyenv:version)
+    ((python-mode-local-vars-hook . mantle:hook:python:pyenv:version)
      ;; Doom had `doom-switch-buffer-hook', which just ran on both of these hooks.
      ;; `window-buffer-change-functions' doesn't trigger for files visited via the
      ;; server, so `server-visit-hook' is also used.
-     ((window-buffer-change-functions server-visit-hook) . #'mantle:hook:python:pyenv:version)
+     ((window-buffer-change-functions server-visit-hook) . mantle:hook:python:pyenv:version)
 
     ;;------------------------------
     :config
@@ -378,7 +378,7 @@ MODULE should be a string of the module name."
                if (path:exists? dir :dir)
                return (setq conda-anaconda-home (path:absolute dir)
                             conda-env-home-directory (path:absolute dir)))
-      (message "Cannot find Anaconda directory."))
+      (message "Cannot find `conda' directory."))
 
   ;; Integration with term/eshell
   (conda-env-initialize-interactive-shells)
@@ -446,7 +446,7 @@ MODULE should be a string of the module name."
    :hook
    ;;------------------------------
    ((anaconda-mode-hook . anaconda-eldoc-mode)
-    (python-mode-hook . mantle:hook:python:anaconda:enable/maybe)
+    (python-mode-local-vars-hook . mantle:hook:python:anaconda:enable/maybe)
     (python-mode-hook . mantle:hook:python:anaconda:processes:auto-kill/local))
 
 
