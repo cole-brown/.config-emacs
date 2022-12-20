@@ -1,4 +1,27 @@
-;;; emacs/buffer/search.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/buffer/search.el --- Buffer Searching Functions -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2020-12-04
+;; Modified:   2022-12-20
+;; URL:        https://github.com/cole-brown/.config-emacs
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;  Buffer Searching Functions
+;;
+;;; Code:
+
+
+(require 'cl-lib)
+
+
+(imp:require :buffer 'narrow)
+
 
 ;;------------------------------------------------------------------------------
 ;; Constants
@@ -12,16 +35,24 @@
 ;; Buffer Searching Functions
 ;;------------------------------------------------------------------------------
 
-(defun buffer:cmd:search:header (string &optional max-chars)
-  "Searche for STRING in the first MAX-CHARS of the buffer.
+(cl-defun buffer:search:header (string &key max (case :default))
+  "Search for STRING in the first MAX chars of the buffer.
 
-If MAX-CHARS is nil, use `int<buffer>:search:header:max/default'."
+If MAX chars is nil, default to `int<buffer>:search:header:max/default'.
+
+CASE should be:
+  - `:default': Use default/current `case-fold-search'.
+  - nil / non-nil: Set `case-fold-search' to this before searching."
   (interactive "sSearch for: ")
-  (let ((max-chars (or max-chars
+  (let ((case-fold-search (if (eq case :default)
+                              case-fold-search
+                            case))
+        (max-chars (or max
                        int<buffer>:search:header:max/default))
          found-at-point)
-    (save-mark-and-excursion
-      (org-with-wide-buffer
+
+    ;; Like `org-with-wide-buffer' but doesn't depend on `org-mode'.
+    (buffer:with-widened
        (goto-char (point-min))
        (setq found-at-point
              (search-forward
@@ -35,16 +66,29 @@ If MAX-CHARS is nil, use `int<buffer>:search:header:max/default'."
               ;; - nil/default: fail w/ error msg
               ;; -           t: fail w/ nil return value
               ;; -       other: fail w/ nil & move point to boundry/end
-              t))))
+            t)))
 
-    ;; Return whatever we found, and if called interactively, also message it.
-    (when (called-interactively-p)
-        (if found-at-point
-            (message "Found \"%s\" at buffer position: %d"
-                     string found-at-point)
-          (message "No \"%s\" in buffer's first %d chars."
-                   string max-chars)))
+    ;; Return whatever we found.
     found-at-point))
+
+
+;;------------------------------
+;; Command
+;;------------------------------
+
+(defun buffer:cmd:search:header (string)
+  "Search for STRING in the first MAX chars of the buffer."
+  (interactive "sSearch for: ")
+  (let ((found-at-point (buffer:search:header string)))
+    ;; Return whatever we found, and if called interactively, also message it.
+        (if found-at-point
+        (progn
+          (goto-char found-at-point)
+            (message "Found \"%s\" at buffer position: %d"
+                   string found-at-point))
+      (message "No \"%s\" in buffer's first %d characters."
+               string
+               int<buffer>:search:header:max/default))))
 
 
 ;;------------------------------------------------------------------------------
