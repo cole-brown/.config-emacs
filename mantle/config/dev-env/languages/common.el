@@ -145,6 +145,25 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
 
 
 ;;------------------------------------------------------------------------------
+;; Which Function?
+;;------------------------------------------------------------------------------
+
+(imp:use-package which-function-mode
+  ;;------------------------------
+  :config
+  ;;------------------------------
+  ;; Show the current function name in the header line.
+  (which-function-mode)
+  (setq-default header-line-format
+                '((which-func-mode ("" which-func-format " "))))
+
+  (setq mode-line-misc-info
+        ;; Remove the current function name from the mode line, because it's
+        ;; mostly invisible here anyway.
+        (assq-delete-all 'which-func-mode mode-line-misc-info)))
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :mantle 'config 'user 'dev-env 'languages 'common)

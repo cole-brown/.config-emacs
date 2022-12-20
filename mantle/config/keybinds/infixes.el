@@ -63,12 +63,12 @@
 ;; are defined in: "mantle/config/dev-env/languages/python.el"
 ;;
 ;; (keybind:leader/local:def
-;;  :keymaps (list 'python-mode-map keybind:leader/global:keymaps)
+;;  :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
 ;;  :infix (keybind:infix "i")        ; insert
 ;;  "" '(nil :which-key "insert...")) ; infix's title
 ;;
 ;; (keybind:leader/local:def
-;;  :keymaps (list 'python-mode-map keybind:leader/global:keymaps)
+;;  :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
 ;;  :infix (keybind:infix "t")      ; test
 ;;  "" '(nil :which-key "test...")) ; infix's title
 
