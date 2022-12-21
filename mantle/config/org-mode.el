@@ -69,7 +69,8 @@
        :file    macro<imp>:path/file
        :docstr  "Jump point to \"now\" link, if it's in the first part of the file."
        :squelch t)
-    (buffer:cmd:search:header "[[--now"))
+    (when-let ((location (buffer:search:header "[[--now")))
+      (goto-char location)))
 
   (innit:hook:defun
       (:name    "org/local-settings"
