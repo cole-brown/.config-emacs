@@ -279,7 +279,6 @@ the style & disable it occasionally.")
   (when (elisp:evil?)
     (define-advice evil-alternate-buffer (:override (&optional window) mantle:user:persp:alternate-buffer)
       "Make `evil-alternate-buffer' ignore buffers outside the current perspective."
-      :override #'evil-alternate-buffer
       (let* ((prev-buffers
               (if persp-mode
                   (cl-remove-if-not #'persp-contain-buffer-p (window-prev-buffers)
