@@ -276,7 +276,6 @@ this needs to be called during \"init.el\"."
                                     "Make start-up a few seconds faster by skipping the modification checks, so..."
                                     "Don't modify any packages in place and it won't be needed."))
 
-
     (innit:customize-set-variable straight-vc-git-default-clone-depth '(1 single-branch)
                                   '("The default value for `:depth' when `:type' is the symbol `git'."
                                     ""
@@ -286,15 +285,12 @@ this needs to be called during \"init.el\"."
                                     "NOTE: Some packages may break when shallow cloned?! Doom mentions `magit' and"
                                     "`org', so don't use `straight' for those maybe?"))
 
-
-
     (innit:customize-set-variable straight-use-package-by-default innit:straight:use-package-default
                                   '("Non-nil means install packages by default in `use-package' forms."
                                     ""
                                     "If you use `use-package', then this makes each `use-package' form invoke"
                                     "`straight' to install the package, unless otherwise specified"
                                     "(via `:stright nil')."))
-
 
     (innit:customize-set-variable straight-enable-package-integration t
                                   '("Whether to enable \"integration\" with package.el."
@@ -363,8 +359,13 @@ this needs to be called during \"init.el\"."
     (setq use-package-compute-statistics    innit:debug?
           use-package-verbose               innit:debug?
           use-package-minimum-reported-time (if innit:debug? 0 0.1)
-          use-package-expand-minimally      innit:interactive?)))
+          use-package-expand-minimally      innit:interactive?)
 
+    ;;---
+    ;; `auto-minor-mode' for `use-package' keyword `:minor'
+    ;;---
+    ;; https://github.com/joewreschnig/auto-minor-mode
+    (imp:use-package auto-minor-mode)))
 
 
 ;;------------------------------------------------------------------------------
