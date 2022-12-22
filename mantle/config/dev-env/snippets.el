@@ -18,6 +18,89 @@
 
 
 (imp:require :keybind)
+(imp:require :elisp 'utils 'functions)
+
+
+;;------------------------------------------------------------------------------
+;; Snippet Minor Modes
+;;------------------------------------------------------------------------------
+
+(defmacro mantle:user:yasnippet:minor-mode/add (mode &optional hook-var)
+  "Register minor MODE with yasnippet.
+
+Register minor mode that you want to have their own snippets category (if a
+folder exists for them in any of the snippet directories).
+
+MODE should be a mode symbol.
+
+HOOK-VAR should be the mode's hook variable. If nil, '<mode>-hook' will be used.
+
+Originally stolen from Doom's `set-yas-minor-mode!' in
+\"modules/editor/snippets/autoload/settings.el\"."
+  (let ((macro<yasnippet>:func/name "mantle:user:yasnippet:minor-mode/add")
+        (macro<yasnippet>:path/this (path:current:file)))
+
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    ;; MODE must be a symbol (that is not `nil').
+    (unless (and (not (null mode))
+                 (symbolp mode))
+      (nub:error
+         :innit
+         macro<yasnippet>:func/name
+       "MODE must be a symbol; got %S: %S"
+       (type-of mode)
+       mode))
+
+    ;; HOOK-VAR can be nil, else must be a symbol.
+    (cond ((null hook-var)
+           (setq hook-var (intern (format "%s-hook" mode))))
+
+           ((symbolp hook-var)
+            nil)
+
+           (t
+            (nub:error
+               :innit
+               macro<yasnippet>:func/name
+             "MODE must be a symbol; got %S: %S"
+             (type-of mode)
+             mode)))
+
+    ;;------------------------------
+    ;; Add MODE to `yasnippet'.
+    ;;------------------------------
+
+    ;; Debugging and not using `yasnippet'? Complain.
+    (cond ;; ((and (innit:debug?)
+          ;;       (not (featurep 'yasnippet)))
+          ;;  (nub:warning
+          ;;     :innit
+          ;;     macro<yasnippet>:func/name
+          ;;   "`yasnippet' is not loaded; cannot add mode `%S'!"
+          ;;   mode))
+
+          ;; Just ignore if we aren't debugging and aren't using `yasnippet'.
+          ((not (featurep 'yasnippet))
+           nil)
+
+          ;; Add the mode!
+          (t
+           ;; Auto-create HOOK-VAR symbol if not provided.
+           (let ((macro<yasnippet>:hook/name (format "yasnippet:minor-mode/add:%S" mode))
+                 (macro<yasnippet>:docstr    (format "Add minor mode `%S' to `yasnippet'." mode)))
+             `(innit:hook:defun-and-add
+                  ,hook-var
+                  (:name    ,macro<yasnippet>:hook/name
+                   :file    ,macro<yasnippet>:path/this
+                   :docstr  ,macro<yasnippet>:docstr
+                   ;; TODO: should I squelch this or no? If no, remove:
+                   ;; :squelch t
+                   )
+                ;; ...All that for this:
+                (yas-activate-extra-mode ,mode)))))))
+;; (mantle:user:yasnippet:minor-mode/add test-mode)
 
 
 ;;------------------------------------------------------------------------------
