@@ -35,18 +35,24 @@
 ;; Buffer Searching Functions
 ;;------------------------------------------------------------------------------
 
-(cl-defun buffer:search:header (string &key max (case :default))
+(cl-defun buffer:search:header (string &key max (case 'default))
   "Search for STRING in the first MAX chars of the buffer.
 
 If MAX chars is nil, default to `int<buffer>:search:header:max/default'.
 
 CASE should be:
-  - `:default': Use default/current `case-fold-search'.
-  - nil / non-nil: Set `case-fold-search' to this before searching."
+  - `default'                : Use default/current `case-fold-search'.
+  - `ignore' / `insensitive' : Ignore case.
+  - `obey'   / `sensitive'   : Obey case."
   (interactive "sSearch for: ")
-  (let ((case-fold-search (if (eq case :default)
-                              case-fold-search
-                            case))
+  (let ((case-fold-search (cond ((eq case 'default)
+                                 case-fold-search)
+                                ((memq case '(ignore insensitive))
+                                 t)
+                                ((memq case '(obey sensitive))
+                                 nil)
+                                (t
+                                 case)))
         (max-chars (or max
                        int<buffer>:search:header:max/default))
          found-at-point)
@@ -54,14 +60,11 @@ CASE should be:
     ;; Like `org-with-wide-buffer' but doesn't depend on `org-mode'.
     (buffer:with-widened
        (goto-char (point-min))
-       (setq found-at-point
-             (search-forward
+     (setq found-at-point (search-forward
               ;; search string
               string
-
               ;; search boundry (characters/buffer position)
               max-chars
-
               ;; NOERROR:
               ;; - nil/default: fail w/ error msg
               ;; -           t: fail w/ nil return value
