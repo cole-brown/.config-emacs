@@ -163,6 +163,15 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
         (assq-delete-all 'which-func-mode mode-line-misc-info)))
 
 
+;; ;;------------------------------------------------------------------------------
+;; ;; Which Language?
+;; ;;------------------------------------------------------------------------------
+;; Don't technically need this; it's just used by `format-all' and looks useful.
+;; https://github.com/lassik/emacs-language-id
+;; (imp:use-package language-id
+;;   :autoload language-id-buffer)
+
+
 ;;------------------------------------------------------------------------------
 ;; Documentation
 ;;------------------------------------------------------------------------------
@@ -174,6 +183,127 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
   :delight    ; Don't put in the modes in the modeline.
   :hook
   (prog-mode . turn-on-eldoc-mode))
+
+
+;;------------------------------------------------------------------------------
+;; Formatting
+;;------------------------------------------------------------------------------
+
+;; https://github.com/lassik/emacs-format-all-the-code
+;; NOTE: This relies on external programs for the actual formatting (e.g. LSPs,
+;; `rustfmt`, `terraform fmt`...)
+(imp:use-package format-all
+  :delight ; Don't put in the modes in the modeline.
+
+  :autoload format-all--language-id-buffer
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (defcustom mantle:user:format-all:on-save/disabled
+    '("Emacs Lisp"     ; elisp's mechanisms are good enough... but not 100% so auto-format would fuck up shit.
+
+      ;; python-mode   ; Trial [2022-12-22]: Test out the python formatting.    ; Don't even want to know what this would do if it has one.
+      ;; csharp-mode   ; TODO: Should I disable this one (again)?
+      ;; sql-mode      ; Doom says: "sqlformat is currently broken"
+      ;; tex-mode      ; Doom says: "latexindent is broken"
+      ;; latex-mode    ; Doom says: "" (probably just ditto to `tex-mode')
+
+      fundamental-mode) ; Doom hard-coded this one.
+    "Modes/languages for which we do not enable `format-all' on save.
+
+Values in this list should be one of:
+  - major-mode symbols
+  - language strings from `language-id' package
+  - language strings from `format-all' package
+
+For language strings, see:
+  - `format-all-default-formatters' or `format-all--language-id-buffer'
+  - `language-id' package
+    - `language-id--definitions'
+    - https://raw.githubusercontent.com/github/linguist/master/lib/linguist/languages.yml
+
+Originally from Doom's `+format-on-save-enabled-modes' in \"modules/editor/format/config.el\"."
+    :group 'innit:group
+    :type  '(set (string :tag "`language-id' string")
+                 (symbol :tag "`major-mode' symbol")))
+
+  (innit:hook:defun
+      (:name   'format-all:enable?
+       :file   macro<imp>:path/file
+       :docstr "Decide whether or not to enable auto-formatting on save.")
+
+    (let ((language (format-all--language-id-buffer))) ; string, likely from `language-id-buffer'.
+      ;;------------------------------
+      ;; Don't Enable If...
+      ;;------------------------------
+      ;; No known language for buffer.
+      (cond ((null language))
+
+            ;; Explicitly disabled.
+            ((or (seq-contains-p language   mantle:user:format-all:on-save/disabled)
+                 (seq-contains-p major-mode mantle:user:format-all:on-save/disabled)))
+
+            ;; Hidden buffers probably don't need auto-formatting?
+            ((string-prefix-p " " (buffer-name)))
+
+            ;; Can we actually load `format-all'?
+            ((not (require 'format-all nil :no-error)))
+
+            ;; NOTE: Formatting with the LSP vs the `format-all' exe is decided
+            ;; in the `format-all--probe' advice in the `:config' section.
+
+            ;;------------------------------
+            ;; Ok; Enable.
+            ;;------------------------------
+            (t
+             (format-all-mode +1)))))
+
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+  (after-change-major-mode-hook . mantle:hook:format-all:enable?)
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (define-advice format-all--probe (:around (fn &rest args) mantle:user:format-all:use-lsp?)
+    "Get the formatter for the current buffer.
+
+Answer questions like:
+  - Should buffer even be formatted (e.g. read-only buffers)?
+  - Should formatting be done with LSP formatter instead?"
+    ;;------------------------------
+    ;; Never Format
+    ;;------------------------------
+    (cond ((or buffer-read-only (eq +format-with :none))
+           (list nil nil))
+
+          ;;------------------------------
+          ;; Use the LSP?
+          ;;------------------------------
+          ;; Always use the LSP if it has the capability to format?
+          ;; If that's too optimistic, could make another filter var like
+          ;; `mantle:user:format-all:on-save/disabled'.
+          ((and (bound-and-true-p lsp-managed-mode)
+                (lsp-feature? "textDocument/formatting"))
+           (list 'lsp nil))
+
+          ((and (bound-and-true-p eglot--managed-mode)
+                (eglot--server-capable :documentFormattingProvider))
+
+           (list 'eglot nil))
+
+          ;;------------------------------
+          ;; Actually let `format-all' decide:
+          ;;------------------------------
+          ((funcall fn))))
+
+  ;; NOTE: Do not enable `format-all-mode' globally; it's optionally enabled in its hook.
+  )
 
 
 ;;------------------------------------------------------------------------------
