@@ -176,6 +176,7 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
    "b" #'eval-buffer    ; (list #'eval-buffer    :which-key "Eval Buffer")
    "d" #'eval-defun     ; (list #'eval-defun     :which-key "Eval Defun")
    "e" #'eval-last-sexp ; (list #'eval-last-sexp :which-key "Eval Last Sexp")
+   "E" #'pp-eval-last-sexp ; (list #'pp-eval-last-sexp :which-key "Eval Last Sexp: Pretty Print")
    "r" #'eval-region    ; (list #'eval-region    :which-key "Eval Region")
    "l" #'load-library   ; (list #'load-library   :which-key "Load Library")
    )
@@ -189,6 +190,7 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
    ;; TODO: Try these without "Display Names" and see if it actually is better?
    ;; Doom doesn't bother with a pretty name.
    "f" #'find-function
+   "F" #'find-function-at-point
    "v" #'find-variable
    "l" #'find-library)
 
