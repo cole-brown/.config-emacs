@@ -103,8 +103,9 @@ MODULE should be a string of the module name."
 (imp:use-package python
   :mode
   (("[./]flake8\\'" . conf-mode)  ;; "ini format"
-   ;; TODO: This should be TOML mode once I have that.
-   ("/Pipfile\\'"   . conf-mode)) ;; TOML format
+   ;; ;; NOTE: This is actually a TOML file, so set it to use TOML mode instead (in "toml.el").
+   ;; ("/Pipfile\\'"   . conf-mode) ;; TOML format
+   )
 
   ;;------------------------------
   :init

@@ -55,6 +55,11 @@
           :filename "python")
 
 
+(imp:load :feature  '(:mantle config user dev-env toml)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "toml")
+
+
 (imp:load :feature  '(:mantle config user dev-env yaml)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "yaml")
