@@ -45,6 +45,11 @@
           :filename "emacs-lisp")
 
 
+(imp:load :feature  '(:mantle config user dev-env json)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "json")
+
+
 (imp:load :feature  '(:mantle config user dev-env python)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "python")
