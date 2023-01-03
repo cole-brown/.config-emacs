@@ -24,9 +24,9 @@
 ;; JSON Mode
 ;;------------------------------------------------------------------------------
 
+;; https://github.com/joshwnj/json-mode
 (imp:use-package json-mode
   :mode "\\.js\\(?:on\\|[hl]int\\(?:rc\\)?\\)\\'"
-
 
   ;;------------------------------
   :init
@@ -71,6 +71,7 @@
 ;; ;; JSON Paths
 ;; ;;------------------------------------------------------------------------------
 ;;
+;; ;; https://github.com/Sterlingg/json-snatcher
 ;; (imp:use-package json-snatcher
 ;;   ;;------------------------------
 ;;   :general
