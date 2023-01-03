@@ -178,7 +178,7 @@
   ;;
   ;; So yeah, doesn't really matter.
   ;; (org-edit-src-content-indentation
-  ;;  (jerky:get 'code 'tab 'normal)
+  ;;  (jerky:get 'code 'tab 'standard)
   ;;  "Set indent to tab-width.")
 
   (org-src-preserve-indentation t)

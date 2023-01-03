@@ -84,7 +84,7 @@
     ;; 'wide' is a decent default, probably?
     (setq fill-column (jerky:get 'fill-column 'wide))
 
-    (setq c-basic-offset (jerky:get 'code 'tab 'normal))
+    (setq c-basic-offset (jerky:get 'code 'tab 'standard))
 
     (c-set-offset 'innamespace 0) ; Don't indent namespace - waste of indent level
     (c-set-offset 'case-label '+) ; indent case labels by c-indent-level, too
