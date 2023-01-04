@@ -144,7 +144,6 @@
   (:prefix  (keybind:prefix :local "i")
    :states  keybind:leader/local:states
    :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
-   "T" (list #'markdown-toc-generate-toc      :which-key "Table Of Content")
    "i" (list #'markdown-insert-image          :which-key "Image")
    "l" (list #'markdown-insert-link           :which-key "Link")
    "-" (list #'markdown-insert-hr             :which-key "<hr>")
@@ -198,6 +197,24 @@
   ;;        - Which, last update is [2018-07-16], so.
   (define-advice markdown-match-generic-metadata (:override (&rest _) mantle:advice:yaml-fontification/disable)
     (ignore (goto-char (point-max)))))
+
+
+;;------------------------------------------------------------------------------
+;; Markdown Table of Contents
+;;------------------------------------------------------------------------------
+
+;; https://github.com/ardumont/markdown-toc
+(imp:use-package markdown-toc
+  :after markdown-mode
+
+  ;;------------------------------
+  :general
+  ;;------------------------------
+  ;; TODO: is this emacs or evil? ...or both?
+  (:prefix  (keybind:prefix :local "i") ;; Insert...
+   :states  keybind:leader/local:states
+   :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
+   "T" (list #'markdown-toc-generate-toc :which-key "Table Of Content")))
 
 
 ;;------------------------------------------------------------------------------
