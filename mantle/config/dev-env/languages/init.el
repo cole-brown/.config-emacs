@@ -50,6 +50,11 @@
           :filename "json")
 
 
+(imp:load :feature  '(:mantle config user dev-env markdown)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "markdown")
+
+
 (imp:load :feature  '(:mantle config user dev-env python)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "python")
