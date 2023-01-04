@@ -45,6 +45,11 @@
           :filename "emacs-lisp")
 
 
+(imp:load :feature  '(:mantle config user dev-env http)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "http")
+
+
 (imp:load :feature  '(:mantle config user dev-env json)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "json")
