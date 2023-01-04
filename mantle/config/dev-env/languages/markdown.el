@@ -34,6 +34,12 @@
  :infix (keybind:infix "i")        ; insert
  "" '(nil :which-key "insert...")) ; infix's title
 
+(keybind:leader/local:def
+ :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
+ :infix (keybind:infix "p")        ; preview
+ "" '(nil :which-key "preview...")) ; infix's title
+
+
 
 ;;------------------------------------------------------------------------------
 ;; Markdown Mode
@@ -134,7 +140,14 @@
    "'" #'markdown-edit-code-block
    "e" #'markdown-export
    ;; "i" == insert menu
-   "o" #'markdown-open
+   "o" #'markdown-open)
+
+  ;;---
+  ;; Preview...
+  ;;---
+  (:prefix  (keybind:prefix :local "p")
+   :states  keybind:leader/local:states
+   :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
    "p" #'markdown-preview)
 
   ;;---
@@ -260,6 +273,129 @@
    "] p"  #'markdown-demote
    "[ l"  #'markdown-previous-link
    "] l"  #'markdown-next-link))
+
+
+;;------------------------------------------------------------------------------
+;; Live Preview
+;;------------------------------------------------------------------------------
+;; NOTE: There are several alternatives to `impatient-mode' for live previews,
+;; but `impatient-mode' has the distinction of only relying on Emacs packages.
+;; See: https://wikemacs.org/wiki/Markdown#Live_preview_as_you_type
+
+;; TODO: `impatient-mode' is mainly for HTML... move to HTML (or web or
+;; whatever) file when/if it gets one? Or... Keep this one for markdown and make
+;; another for HTML if needed?
+
+;; To get a live preview of a Markdown buffer:
+;;   1. Enable the web server provided by simple-httpd:
+;;      'M-x httpd-start'
+;;
+;;   2. Publish buffers by enabling the minor mode impatient-mode.
+;;      'M-x impatient-mode'
+;;
+;;   3. In a browser:
+;;      1. Go to http://localhost:8080/imp/
+;;      2. Select the Markdown buffer.
+;;      3. Watch your changes appear as you type!
+;;
+;; https://github.com/skeeto/impatient-mode
+(imp:use-package impatient-mode
+  :after markdown-mode
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (defun mantle:user:markdown->html (buffer)
+    "Convert markdown BUFFER to html string.
+
+Should be provided to `impatient-mode' using `imp-set-user-filter'.
+Can be removed via `imp-remove-user-filter'.
+
+https://wikemacs.org/wiki/Markdown#Impatient-mode"
+    (let ((func/name "mantle:user:markdown->html"))
+      (if (featurep 'markdown-mode)
+          ;; Works with `markdown-mode'.
+          (princ
+           (with-temp-buffer
+             (let ((tmpname (buffer-name)))
+               (set-buffer buffer)
+               (set-buffer (markdown tmpname)) ; `markdown' is from `markdown-mode.el'.
+               (buffer-string)))
+           (current-buffer))
+
+        ;; Non-`markdown-mode' version...
+        (princ
+         (with-current-buffer buffer
+           (mapconcat #'identity
+                      (list "<!DOCTYPE html><html><title>Impatient Markdown</title>"
+                            "<xmp theme=\"united\" style=\"display:none;\">"
+                            "\n"
+                            (format "<!-- %s START -->" "mantle:user:markdown->html")
+                            "\n"
+                            (buffer-substring-no-properties (point-min) (point-max))
+                            "\n"
+                            (format "<!-- %s END -->" "mantle:user:markdown->html")
+                            "\n"
+                            "</xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>")
+                      "\n")
+           (current-buffer))))))
+
+
+  (defun mantle:cmd:markdown:preview-live/start ()
+    "View live markdown preview of the current buffer.
+
+This will:
+  1. Enable the web server provided by simple-httpd:
+     'M-x httpd-start'
+
+  2. Publish buffers by enabling the minor mode `impatient-mode'.
+     'M-x impatient-mode'
+
+  3. Open your browser to http://localhost:8080/imp/
+
+You can then:
+  1. Select the buffer in the browser.
+  2. Watch your changes appear as you type!"
+    (interactive)
+    (if (not markdown-mode)
+        (message "%s is not a `markdown-mode' buffer!"
+                 (buffer-name))
+
+      (funcall-interactively #'httpd-start)
+      (impatient-mode +1)
+      (imp-set-user-filter #'mantle:user:markdown->html)
+      (browse-url "http://localhost:8080/imp/")
+      (message "Select this buffer in the browser to see changes live!")))
+
+
+  (defun mantle:cmd:markdown:preview-live/stop ()
+      "Stop/kill/whatever the live markdown preview of the current buffer."
+      (interactive)
+      (cond ((not markdown-mode)
+             (message "%s is not a `markdown-mode' buffer!"
+                      (buffer-name)))
+            ((not impatient-mode)
+             (message "%s is not an `impatient-mode' (live preview) buffer!"
+                      (buffer-name)))
+            (t
+             (imp-remove-user-filter)
+             (impatient-mode -1)
+             (funcall-interactively #'httpd-stop))))
+
+
+  ;;------------------------------
+  :general
+  ;;------------------------------
+  ;; TODO: is this emacs or evil? ...or both?
+  (:prefix  (keybind:prefix :local "p")
+   :states  keybind:leader/local:states
+   :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
+   ;; `markdown-mode' puts `markdown-preview' as "p".
+   ;; Steal "p", but add `markdown-preview' back somewhere else.
+   "p" (list #'mantle:cmd:markdown:preview-live/start :which-key "Preview (Live)")
+   "P" (list #'markdown-preview                       :which-key "Preview (Static)")
+   "s" (list #'mantle:cmd:markdown:preview-live/stop  :which-key "Stop Preview (Live)")))
 
 
 ;;------------------------------------------------------------------------------
