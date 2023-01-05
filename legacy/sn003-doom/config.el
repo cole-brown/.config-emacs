@@ -219,10 +219,6 @@
 ;; Programming & Stuff
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:dot-emacs config code)
-          :path     (imp:path:join dot-emacs:path:config "code")
-          :filename "config")
-
 (imp:load :feature  '(:dot-emacs config docker)
           :path     dot-emacs:path:config
           :filename "docker")
