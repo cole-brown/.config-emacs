@@ -55,9 +55,16 @@
 (imp:use-package cc-mode
   :ensure nil ; This is an Emacs built-in feature.
 
-  ;;--------------------
+  ;;------------------------------
+  :mode
+  ;;------------------------------
+  (("\\.cxx$" . c++-mode)
+   ("\\.cpp$" . c++-mode))
+
+
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   (innit:hook:defun
       (:name   'cc:settings
@@ -94,24 +101,20 @@
     ;; Too much work for forwards/back normally. Easy toggle would be nice?
     )
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
-  ((c++-mode . sss:hook/c-and-cpp/settings)
-   (c-mode . sss:hook/c-and-cpp/settings)
-   (c-mode . mantle:hook:dev-env:languages/comments:block/align))
+  ;;------------------------------
+  ((c++-mode . mantle:hook:cc:settings)
+   (c-mode   . mantle:hook:cc:settings))
 
-  ;;--------------------
-  :config
-  ;;--------------------
-
-  (add-to-list 'auto-mode-alist '("\\.cxx$" . c++-mode))
-  (add-to-list 'auto-mode-alist '("\\.cpp$" . c++-mode))
-
-  ;; Can setup auto-complete, company, flycheck, lots others here.
-  ;; TODO: Lots more here maybe when I do some C/C++ work again?
-
-  ;; TODO-LSP: LSP?
+  ;; ;;------------------------------
+  ;; :config
+  ;; ;;------------------------------
+  ;;
+  ;; ;; Can setup auto-complete, company, flycheck, lots others here.
+  ;; ;; TODO: Lots more here maybe when I do some C/C++ work again?
+  ;;
+  ;; ;; TODO-LSP: LSP?
   )
 
 
