@@ -300,6 +300,16 @@ this needs to be called during \"init.el\"."
                                     "`package--save-selected-packages' to prevent package.el from"
                                     "modifying the init-file."))
 
+    ;; Alist mapping forge `:host' symbols to username strings. Used to compute
+    ;; the repo URL when the `:fork' keyword is used in a recipe.
+    ;;   https://github.com/radian-software/straight.el#but-what-about-my-fork-of-obscure-el-package
+    (innit:customize-set-variable straight-host-usernames '((github . "cole-brown")
+                                                            ;; (gitlab . "cole-brown")
+                                                            ;; (codeberg . "cole-brown")
+                                                            ;; (sourcehut . "cole-brown")
+                                                            ;; (bitbucket . "cole-brown")
+                                                            ))
+
     ;;---
     ;; Bootstrap Code (copy/pasted from README's "Getting Started")
     ;;---

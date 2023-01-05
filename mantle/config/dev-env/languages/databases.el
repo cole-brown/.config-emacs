@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-12-08
-;; Modified:   2022-12-08
+;; Modified:   2023-01-05
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -18,7 +18,7 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Microsoft Azure Cloud
+;; Kusto (Microsoft Azure Cloud)
 ;;------------------------------------------------------------------------------
 
 ;; Query language for Application Insights is called `kusto':
@@ -29,21 +29,7 @@
 (imp:use-package kusto-mode
   :straight (:type git
              :host github
-             :repo "ration/kusto-mode.el")
-
-  ;;--------------------
-  :custom
-  ;;--------------------
-
-  ;; Alist mapping forge `:host' symbols to username strings. Used to compute
-  ;; the repo URL when the `:fork' keyword is used in a recipe.
-  ;;   https://github.com/radian-software/straight.el#but-what-about-my-fork-of-obscure-el-package
-  (straight-host-usernames '((github . "cole-brown")
-                             ;; (gitlab . "cole-brown")
-                             ;; (codeberg . "cole-brown")
-                             ;; (sourcehut . "cole-brown")
-                             ;; (bitbucket . "cole-brown")
-                             )))
+             :repo "ration/kusto-mode.el"))
 
 
 ;;------------------------------------------------------------------------------
