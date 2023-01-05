@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-12-12
-;; Modified:   2022-12-12
+;; Modified:   2023-01-05
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -27,7 +27,7 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Languages
+;; Programming Languages
 ;;------------------------------------------------------------------------------
 
 (imp:load :feature  '(:mantle config user dev-env c-and-cpp)
@@ -45,10 +45,14 @@
           :filename "emacs-lisp")
 
 
-(imp:load :feature  '(:mantle config user dev-env http)
+(imp:load :feature  '(:mantle config user dev-env python)
           :path     (imp:path:current:dir/relative :mantle)
-          :filename "http")
+          :filename "python")
 
+
+;;------------------------------------------------------------------------------
+;; Markup Languages
+;;------------------------------------------------------------------------------
 
 (imp:load :feature  '(:mantle config user dev-env json)
           :path     (imp:path:current:dir/relative :mantle)
@@ -58,11 +62,6 @@
 (imp:load :feature  '(:mantle config user dev-env markdown)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "markdown")
-
-
-(imp:load :feature  '(:mantle config user dev-env python)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "python")
 
 
 (imp:load :feature  '(:mantle config user dev-env toml)
@@ -76,12 +75,21 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Databases
+;; Database Languages
 ;;------------------------------------------------------------------------------
 
 (imp:load :feature  '(:mantle config user dev-env databases)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "databases")
+
+
+;;------------------------------------------------------------------------------
+;; Web
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config user dev-env http)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "http")
 
 
 ;;------------------------------------------------------------------------------
