@@ -54,9 +54,9 @@
 ;; https://elpa.gnu.org/packages/rainbow-mode.html
 (imp:use-package rainbow-mode
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   ;;---
   ;; Create a hook for enabling this minor mode.
@@ -69,9 +69,9 @@
        :docstr "Enable `rainbow-mode' (colorize color codes) for this buffer.")
     (rainbow-mode +1))
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
+  ;;------------------------------
 
   ((org-mode-hook    . mantle:hook:rainbow-mode/enable)
    (csharp-mode-hook . mantle:hook:rainbow-mode/enable)
@@ -90,9 +90,9 @@
 
 (imp:use-package ediff
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   (defvar mantle:user:ediff:window/cache nil
     "Cache of window config so it can be restored after quitting `ediff'.")
@@ -108,16 +108,16 @@
   ;; section. So that one is in the `:config'.
 
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
+  ;;------------------------------
   ;; Note: Use `innit:cmd:hook:func/name' to insert the func names created via the `innit:hook:defun' `:name' field.
   ((ediff-before-setup-hook . mantle:hook:ediff:window/save))
 
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; Ignore whitespace.
   (ediff-diff-options "-w")
@@ -132,9 +132,9 @@
   (ediff-split-window-function 'split-window-horizontally)
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   (innit:hook:defun-and-add
       (ediff-quit-hook ediff-suspend-hook)
