@@ -55,4 +55,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'toml)
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'toml)

@@ -155,4 +155,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'csharp)
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'csharp)

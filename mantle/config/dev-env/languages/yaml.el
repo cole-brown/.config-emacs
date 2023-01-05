@@ -63,4 +63,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'yaml)
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'yaml)

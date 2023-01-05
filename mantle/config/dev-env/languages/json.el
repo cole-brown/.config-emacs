@@ -87,4 +87,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'json)
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'json)

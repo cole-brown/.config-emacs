@@ -121,4 +121,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'c-and-cpp)
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'c-and-cpp)

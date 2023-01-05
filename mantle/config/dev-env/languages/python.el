@@ -583,4 +583,4 @@ MODULE should be a string of the module name."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'python)
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'python)

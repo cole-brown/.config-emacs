@@ -47,4 +47,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'databases)
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'databases)

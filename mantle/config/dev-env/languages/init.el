@@ -30,22 +30,22 @@
 ;; Programming Languages
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user dev-env c-and-cpp)
+(imp:load :feature  '(:mantle config user dev-env languages c-and-cpp)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "c-and-cpp")
 
 
-(imp:load :feature  '(:mantle config user dev-env csharp)
+(imp:load :feature  '(:mantle config user dev-env languages csharp)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "csharp")
 
 
-(imp:load :feature  '(:mantle config user dev-env emacs-lisp)
+(imp:load :feature  '(:mantle config user dev-env languages emacs-lisp)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "emacs-lisp")
 
 
-(imp:load :feature  '(:mantle config user dev-env python)
+(imp:load :feature  '(:mantle config user dev-env languages python)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "python")
 
@@ -54,22 +54,22 @@
 ;; Markup Languages
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user dev-env json)
+(imp:load :feature  '(:mantle config user dev-env languages json)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "json")
 
 
-(imp:load :feature  '(:mantle config user dev-env markdown)
+(imp:load :feature  '(:mantle config user dev-env languages markdown)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "markdown")
 
 
-(imp:load :feature  '(:mantle config user dev-env toml)
+(imp:load :feature  '(:mantle config user dev-env languages toml)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "toml")
 
 
-(imp:load :feature  '(:mantle config user dev-env yaml)
+(imp:load :feature  '(:mantle config user dev-env languages yaml)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "yaml")
 
@@ -78,7 +78,7 @@
 ;; Database Languages
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user dev-env databases)
+(imp:load :feature  '(:mantle config user dev-env languages databases)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "databases")
 
@@ -87,7 +87,7 @@
 ;; Web
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user dev-env http)
+(imp:load :feature  '(:mantle config user dev-env languages http)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "http")
 

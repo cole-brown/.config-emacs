@@ -401,4 +401,4 @@ You can then:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'markdown)
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'markdown)

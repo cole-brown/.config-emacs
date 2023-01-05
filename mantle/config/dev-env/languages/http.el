@@ -107,4 +107,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'http)
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'http)

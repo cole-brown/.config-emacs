@@ -519,4 +519,4 @@ or anything is done."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'emacs-lisp)
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'emacs-lisp)
