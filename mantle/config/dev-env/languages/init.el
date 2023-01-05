@@ -50,6 +50,11 @@
           :filename "python")
 
 
+(imp:load :feature  '(:mantle config user dev-env languages shell)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "shell")
+
+
 ;;------------------------------------------------------------------------------
 ;; Markup Languages
 ;;------------------------------------------------------------------------------
