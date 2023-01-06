@@ -97,7 +97,9 @@
       :docstr "Settings for all prog-mode derived modes. Non-LSP stuff.")
 
     ;; 'wide' is a decent default, probably?
-  (setq fill-column (jerky:get 'fill-column 'wide)))
+  (setq fill-column (jerky:get 'fill-column 'wide))
+
+  (setq tab-width (jerky:get 'code 'tab 'standard)))
 
 
 ;;------------------------------------------------------------------------------

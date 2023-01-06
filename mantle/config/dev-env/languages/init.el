@@ -45,6 +45,11 @@
           :filename "emacs-lisp")
 
 
+(imp:load :feature  '(:mantle config user dev-env languages javascript)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "javascript")
+
+
 (imp:load :feature  '(:mantle config user dev-env languages python)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "python")
