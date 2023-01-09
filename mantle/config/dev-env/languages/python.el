@@ -20,6 +20,7 @@
 (imp:require :keybind)
 (imp:require :jerky)
 (imp:require :buffer 'type)
+(imp:require :path)
 
 
 ;;------------------------------------------------------------------------------

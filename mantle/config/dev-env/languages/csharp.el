@@ -17,8 +17,9 @@
 ;;; Code:
 
 
-(imp:require :keybind)
 (imp:require :jerky)
+(imp:require :keybind)
+(imp:require :path)
 
 
 ;;------------------------------------------------------------------------------
