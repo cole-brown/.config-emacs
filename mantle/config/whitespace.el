@@ -44,7 +44,7 @@
 
 
 ;;------------------------------
-;; Widths: Code
+;; Indents: Code
 ;;------------------------------
 
 (jerky:set 'code 'tab 'short
@@ -56,6 +56,9 @@
            :namespace :default
            :value 4
            :docstr "Standard tab width is 4 spaces.")
+
+;; Set Emacs' standard to our's.
+(innit:customize-set-variable standard-indent (jerky:get 'code 'tab 'standard))
 
 ;; Long would be... 8, I think? But that's ridiculous and I don't like it so
 ;; it's not here until it's needed.
