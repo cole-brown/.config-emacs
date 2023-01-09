@@ -163,7 +163,7 @@
 ;;------------------------------------------------------------------------------
 
 (imp:use-package whitespace
-  :ensure nil
+  :ensure nil ; This is an Emacs built-in feature.
   :demand t
 
   ;;--------------------

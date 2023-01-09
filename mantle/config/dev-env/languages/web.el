@@ -1,4 +1,4 @@
-;;; mantle/config/dev-env/web.el --- Development Environment -*- lexical-binding: t; -*-
+;;; mantle/config/dev-env/web.el --- Spider Web Development? -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Development Environment
+;;  Spider Web Development?
 ;;
 ;;; Code:
 
@@ -72,7 +72,6 @@
 ;;------------------------------------------------------------------------------
 
 (imp:use-package web-mode
-  :ensure nil ; This is an Emacs built-in feature.
 
   :mode "\\.[px]?html?\\'" ; Will make `web-mode' responsible for normal "*.html"/"*.htm" files
   :mode "\\.\\(?:tpl\\|blade\\)\\(?:\\.php\\)?\\'"

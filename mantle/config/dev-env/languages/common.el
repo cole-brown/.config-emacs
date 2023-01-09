@@ -181,7 +181,7 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
 ;; Turn on the online documentation mode for all programming modes (not all of
 ;; them support it).
 (imp:use-package eldoc
-  :ensure nil ; This is part of emacs; don't install.
+  :ensure nil ; This is an Emacs built-in feature.
   :delight    ; Don't put in the modes in the modeline.
   :hook
   (prog-mode . turn-on-eldoc-mode))

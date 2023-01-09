@@ -616,8 +616,8 @@ LETTER must be a 1-character string."
 ;;------------------------------
 ;; (imp:use-package org-contacts
 ;;   :after org
-;;   :disabled ;; is this making things slow?
-;;   :ensure nil
+;;   :disabled   ; is this making things slow?
+;;   :ensure nil ; auto-install?
 ;;   :demand t
 ;;
 ;;   :custom

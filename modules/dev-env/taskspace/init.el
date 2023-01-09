@@ -102,9 +102,6 @@
 ;;------------------------------
 ;;
 ;; (use-package taskspace
-;;   ;; My own personal package - do not package manager it.
-;;   :ensure nil
-;;
 ;;   ;;------------------------------
 ;;   :init
 ;;   ;;------------------------------

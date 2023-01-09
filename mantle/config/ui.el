@@ -42,7 +42,7 @@
 ;;------------------------------------------------------------------------------
 
 (imp:use-package uniquify
-  :ensure nil ;; This is part of emacs; don't install.
+  :ensure nil ; This is an Emacs built-in feature.
 
   ;;--------------------
   :custom
