@@ -102,6 +102,11 @@
           :filename "http")
 
 
+(imp:load :feature  '(:mantle config user dev-env languages web)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "web")
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
