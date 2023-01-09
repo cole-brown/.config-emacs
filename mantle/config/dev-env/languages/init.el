@@ -97,6 +97,11 @@
 ;; Web
 ;;------------------------------------------------------------------------------
 
+(imp:load :feature  '(:mantle config user dev-env languages css)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "css")
+
+
 (imp:load :feature  '(:mantle config user dev-env languages http)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "http")
