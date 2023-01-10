@@ -150,12 +150,18 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
 ;; Which Function?
 ;;------------------------------------------------------------------------------
 
-(imp:use-package which-function-mode
+(imp:use-package which-func
+  :ensure  nil ; This is an Emacs built-in feature.
+
   ;;------------------------------
   :config
   ;;------------------------------
-  ;; Show the current function name in the header line.
-  (which-function-mode)
+
+  ;; Enable `which-function-mode', which will enable the function info for
+  ;; whatever modes it supports.
+  (which-function-mode +1)
+
+  ;; Display which-function info in a header line instead of in the mode line.
   (setq-default header-line-format
                 '((which-func-mode ("" which-func-format " "))))
 
