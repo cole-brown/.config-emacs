@@ -177,6 +177,9 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
 ;; Don't technically need this; it's just used by `format-all' and looks useful.
 ;; https://github.com/lassik/emacs-language-id
 ;; (imp:use-package language-id
+;;   ;; TODO: Erm... why does my `use-package' not have the `:autoload' keyword in `use-package-keywords`?!
+;;   ;; It exists in latest `use-package':
+;;   ;;   https://github.com/jwiegley/use-package/blob/bcf0984cf55b70fe6896c6a15f61df92b24f8ffd/use-package-core.el#L71
 ;;   :autoload language-id-buffer)
 
 
@@ -203,7 +206,10 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
 (imp:use-package format-all
   :delight ; Don't put in the modes in the modeline.
 
-  :autoload format-all--language-id-buffer
+  ;; TODO: Erm... why does my `use-package' not have the `:autoload' keyword in `use-package-keywords`?!
+  ;; It exists in latest `use-package':
+  ;;   https://github.com/jwiegley/use-package/blob/bcf0984cf55b70fe6896c6a15f61df92b24f8ffd/use-package-core.el#L71
+  ;; :autoload format-all--language-id-buffer
 
   ;;------------------------------
   :init
