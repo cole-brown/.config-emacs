@@ -309,6 +309,33 @@ Answer questions like:
 
 
 ;;------------------------------------------------------------------------------
+;; <{[( Rainbow Delimiters )]}>
+;;------------------------------------------------------------------------------
+
+;; https://github.com/Fanael/rainbow-delimiters
+(imp:use-package rainbow-delimiters
+
+  ;;------------------------------
+  ;; NOTE: Usage
+  ;;------------------------------
+  ;; Enable on a per-major-mode basis in a hook.
+  ;; `use-package' Example:
+  ;;   ;;------------------------------
+  ;;   :hook
+  ;;   ;;------------------------------
+  ;;   (js-mode-hook . rainbow-delimiters-mode)
+
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+
+  ;; Helps us distinguish stacked delimiter pairs, especially in parentheses-drunk
+  ;; languages like Lisp (default: 9).
+  (rainbow-delimiters-max-face-count 4))
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :mantle 'config 'user 'dev-env 'languages 'common)

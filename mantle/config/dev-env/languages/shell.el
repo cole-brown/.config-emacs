@@ -116,7 +116,8 @@ in \"modules/lang/sh/autoload.el\"."
   :hook
   ;;------------------------------
   ((sh-mode-hook . mantle:hook:shell:keywords/add)
-   (sh-mode-hook . mantle:hook:shell:settings))
+   (sh-mode-hook . mantle:hook:shell:settings)
+   (sh-mode-hook . rainbow-delimiters-mode))
 
 
   ;;------------------------------
@@ -166,7 +167,8 @@ in \"modules/lang/sh/autoload.el\"."
   ;;------------------------------
   :hook
   ;;------------------------------
-  (powershell-mode-hook . mantle:hook:powershell:settings)
+  ((powershell-mode-hook . mantle:hook:powershell:settings)
+   (powershell-mode-hook . rainbow-delimiters-mode))
 
 
   ;;------------------------------
@@ -204,7 +206,8 @@ in \"modules/lang/sh/autoload.el\"."
 ;;   :hook
 ;;   ;;------------------------------
 ;;   ((fish-mode-hook  . mantle:hook:fish:settings)
-;;    (before-save-hook . fish_indent-before-save)) ; Auto-format: Run `fish_indent' before saving.
+;;    (before-save-hook . fish_indent-before-save) ; Auto-format: Run `fish_indent' before saving.
+;;    (fish-mode-hook . rainbow-delimiters-mode))
 ;;
 ;;
 ;;   ;;------------------------------

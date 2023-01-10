@@ -150,6 +150,7 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
    ;; ;; emacs configs, so we disable `emacs-lisp-checkdoc' and reduce the
    ;; ;; `emacs-lisp' checker's verbosity.
    ;; (flycheck-mode-hook #'+emacs-lisp-reduce-flycheck-errors-in-emacs-config-h)
+   (emacs-lisp-mode-hook . rainbow-delimiters-mode)
    )
 
 

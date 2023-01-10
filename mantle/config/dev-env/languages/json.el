@@ -47,8 +47,8 @@
   ;;------------------------------
   :hook
   ;;------------------------------
-  (json-mode-hook . mantle:hook:json:settings)
-
+  ((json-mode-hook . mantle:hook:json:settings)
+   (json-mode-hook . rainbow-delimiters-mode))
 
   ;;------------------------------
   :general

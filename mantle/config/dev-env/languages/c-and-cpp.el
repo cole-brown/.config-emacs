@@ -105,7 +105,8 @@
   :hook
   ;;------------------------------
   ((c++-mode . mantle:hook:cc:settings)
-   (c-mode   . mantle:hook:cc:settings))
+   (c-mode   . mantle:hook:cc:settings)
+   ((c-mode c++-mode) . rainbow-delimiters-mode))
 
   ;; ;;------------------------------
   ;; :config

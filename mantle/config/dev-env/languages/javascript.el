@@ -108,8 +108,7 @@
   :hook
   ;;------------------------------
   ((js-mode-hook . mantle:hook:javascript:settings)
-   ;; (js-mode-hook . rainbow-delimiters-mode)
-   )
+   (js-mode-hook . rainbow-delimiters-mode))
 
   ;;------------------------------
   :custom
@@ -221,9 +220,8 @@
   :hook
   ;;------------------------------
   ((typescript-mode-hook . mantle:hook:typescript:settings)
-   ;; (typescript-mode-hook . rainbow-delimiters-mode)
-   ;;  (typescript-tsx-mode-hook . rainbow-delimiters-mode))
-   )
+   (typescript-mode-hook . rainbow-delimiters-mode)
+   (typescript-tsx-mode-hook . rainbow-delimiters-mode))
 
 
   ;;------------------------------

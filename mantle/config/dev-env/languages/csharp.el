@@ -93,7 +93,8 @@
   ;;--------------------
   :hook
   ;;--------------------
-  (csharp-mode-hook . mantle:hook:csharp:settings))
+  ((csharp-mode-hook . mantle:hook:csharp:settings)
+   (csharp-mode-hook . rainbow-delimiters-mode)))
 
 
 ;;------------------------------------------------------------------------------
