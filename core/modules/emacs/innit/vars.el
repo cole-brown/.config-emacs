@@ -142,14 +142,14 @@ newline separators."
            (,macro<innit>:value     ,value)
            (,macro<innit>:docstring ,docstring))
        (customize-set-variable ,macro<innit>:variable ,macro<innit>:value
-                                (if (and ,macro<innit>:docstring
-                                         (listp ,macro<innit>:docstring))
-                                    ;; Convert a list of strings into a block of text.
-                               (mapconcat #'identity
+                               (if (and ,macro<innit>:docstring
+                                        (listp ,macro<innit>:docstring))
+                                   ;; Convert a list of strings into a block of text.
+                                   (mapconcat #'identity
                                               ,macro<innit>:docstring
-                                          "\n")
-                                  ;; Use string/nil/whatever as-is.
-                                  ,macro<innit>:docstring)))))
+                                              "\n")
+                                 ;; Use string/nil/whatever as-is.
+                                 ,macro<innit>:docstring)))))
 
 
 (defmacro innit:csetq (variable value)

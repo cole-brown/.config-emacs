@@ -189,8 +189,8 @@ this needs to be called during \"early-init.el\"."
   ;;---
   (when innit:package:archives:enabled
     (innit:customize-set-variable package-archives
-                            (mapcar #'innit:package:archive
-                                    innit:package:archives:enabled)))
+                                  (mapcar #'innit:package:archive
+                                          innit:package:archives:enabled)))
 
   ;;---
   ;; Set path packages are saved to.

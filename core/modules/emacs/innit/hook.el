@@ -277,11 +277,11 @@ OPTIONS is a plist of optional vars:
          "multiple hooks. So now you have to...")))
 
     `(progn
-    ;; Create the hook function.
+      ;; Create the hook function.
        (innit:hook:defun ,macro<innit>:options
-       ,@body)
+         ,@body)
 
-    ;; ...add the new hook function to the hook variable(s).
+       ;; ...add the new hook function to the hook variable(s).
        (dolist (macro<innit>:hook ',macro<innit>:hooks)
          (add-hook macro<innit>:hook #',macro<innit>:func/sym ',macro<innit>:depth)))))
 ;; (setq test-hook nil)

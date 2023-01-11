@@ -27,11 +27,11 @@
 ;; Original value:
 ;;   '(\"%d.%m.%Y %H:%M\" \"%d.%m.%Y %H:%M\"))
 (innit:customize-set-variable ls-lisp-format-time-list
-                        (list
-                         ;; Recent Time Format:
-                         (datetime:format/get 'rfc-3339 'datetime)
-                         ;; Not-Recent Time Format:
-                         (datetime:format/get 'rfc-3339 'datetime)))
+                              (list
+                               ;; Recent Time Format:
+                               (datetime:format/get 'rfc-3339 'datetime)
+                               ;; Not-Recent Time Format:
+                               (datetime:format/get 'rfc-3339 'datetime)))
 
 ;; Force use of `ls-lisp-format-time-list' regardless of locale.
 (innit:customize-set-variable ls-lisp-use-localized-time-format t)
@@ -200,7 +200,7 @@
   :config
   ;;------------------------------
 
- (doom-modeline-mode 1))
+  (doom-modeline-mode 1))
 
 
 ;;------------------------------------------------------------------------------
@@ -211,14 +211,14 @@
 ;; the %c, %C, and %l constructs are ignored.  It is used only on frames for
 ;; which no explicit name has been set (see `modify-frame-parameters').
 (innit:customize-set-variable frame-title-format
-                        ;; buffer name
-                        '("｢%b｣"
-                          ;; system/host name
-                          " @"
-                          (:eval (or (file-remote-p default-directory 'host) system-name))
-                          ;; And I guess we should say what we are...
-                          " — Emacs "
-                          emacs-version))
+                              ;; buffer name
+                              '("｢%b｣"
+                                ;; system/host name
+                                " @"
+                                (:eval (or (file-remote-p default-directory 'host) system-name))
+                                ;; And I guess we should say what we are...
+                                " — Emacs "
+                                emacs-version))
 
 ;; This is for the Emacs icon thingy in the OS app list/taskbar.
 ;; Just have it be the same as the `frame-title-format'.

@@ -81,7 +81,7 @@
    ;;---
    ;; Magit Keybinds
    ;;---
-   "g" (list #'magit-status                           :which-key "Status")
+   "g" (list #'magit-status                  :which-key "Status")
    "q" (list #'mantle:user:magit:buffer:kill :which-key "Kill All 'magit' Buffers")
 
    ;; TODO: More keybinds!
@@ -267,11 +267,11 @@
 ;;    (imp:eval:after autogit
 ;;    ;; Add more repos to `autogit:repos:path/watch' list.
 ;;    (innit:customize-set-variable autogit:repos:path/watch
-;;                            (append autogit:repos:path/watch ;; We want to add, not replace, so append to it.
-;;                                    ;;---
-;;                                    ;; Work: all repos in directory
-;;                                    ;;---
-;;                                    (autogit:repos:list "~/path/to/repositories"))))
+;;                                  (append autogit:repos:path/watch ;; We want to add, not replace, so append to it.
+;;                                          ;;---
+;;                                          ;; Work: all repos in directory
+;;                                          ;;---
+;;                                          (autogit:repos:list "~/path/to/repositories"))))
 
 
 ;;------------------------------

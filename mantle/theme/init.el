@@ -38,7 +38,7 @@
   ;; Set to your theme's directory?
   ;; Default is here AKA `innit:theme:path'
   (innit:customize-set-variable innit:theme:path (path:join innit:theme:path
-                                                       "zenburn"))
+                                                            "zenburn"))
 
 
   ;; Set to your theme's filename.

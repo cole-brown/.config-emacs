@@ -59,17 +59,17 @@ CASE should be:
 
     ;; Like `org-with-wide-buffer' but doesn't depend on `org-mode'.
     (buffer:with-widened
-       (goto-char (point-min))
+     (goto-char (point-min))
      (setq found-at-point (search-forward
-              ;; search string
-              string
-              ;; search boundry (characters/buffer position)
-              max-chars
-              ;; NOERROR:
-              ;; - nil/default: fail w/ error msg
-              ;; -           t: fail w/ nil return value
-              ;; -       other: fail w/ nil & move point to boundry/end
-            t)))
+                           ;; search string
+                           string
+                           ;; search boundry (characters/buffer position)
+                           max-chars
+                           ;; NOERROR:
+                           ;; - nil/default: fail w/ error msg
+                           ;; -           t: fail w/ nil return value
+                           ;; -       other: fail w/ nil & move point to boundry/end
+                           t)))
 
     ;; Return whatever we found.
     found-at-point))
@@ -84,10 +84,10 @@ CASE should be:
   (interactive "sSearch for: ")
   (let ((found-at-point (buffer:search:header string)))
     ;; Return whatever we found, and if called interactively, also message it.
-        (if found-at-point
+    (if found-at-point
         (progn
           (goto-char found-at-point)
-            (message "Found \"%s\" at buffer position: %d"
+          (message "Found \"%s\" at buffer position: %d"
                    string found-at-point))
       (message "No \"%s\" in buffer's first %d characters."
                string

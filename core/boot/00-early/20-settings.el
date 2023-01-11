@@ -153,8 +153,8 @@ Remove the advice, allowing original func to run, and then run original func."
 ;; NOTE: EPA/EPG needs to be set up for Emacs to be able to automatically open
 ;; auth sources with filenames ending in ".gpg".
 (innit:customize-set-variable auth-sources (list (path:join innit:path:etc "authinfo.gpg")
-                                            "~/.config/authinfo.gpg"
-                                            "~/.authinfo.gpg"))
+                                                 "~/.config/authinfo.gpg"
+                                                 "~/.authinfo.gpg"))
 ;; Default is:
 ;;   auth-sources
 ;;     -> ("~/.authinfo" "~/.authinfo.gpg" "~/.netrc")

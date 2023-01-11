@@ -93,10 +93,10 @@
 ;; Will have to move the `jerky:set' calls to earlier in config.
 (innit:hook:defun-and-add prog-mode-hook
     (:name 'prog:settings
-      :file (path:current:file)
-      :docstr "Settings for all prog-mode derived modes. Non-LSP stuff.")
+     :file (path:current:file)
+     :docstr "Settings for all prog-mode derived modes. Non-LSP stuff.")
 
-    ;; 'wide' is a decent default, probably?
+  ;; 'wide' is a decent default, probably?
   (setq fill-column (jerky:get 'fill-column 'wide))
 
   (setq tab-width (jerky:get 'code 'tab 'standard)))
