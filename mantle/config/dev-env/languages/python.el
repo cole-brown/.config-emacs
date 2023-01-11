@@ -43,27 +43,21 @@
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
 (keybind:leader/local:def
- :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
- :infix (keybind:infix "i")        ; insert
+ :keymaps 'python-mode-map
+ :infix   "i"                      ; insert
  "" '(nil :which-key "insert...")) ; infix's title
 
 
 (keybind:leader/local:def
- :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
- :infix (keybind:infix "t")      ; test
+ :keymaps 'python-mode-map
+ :infix   "t"                    ; test
  "" '(nil :which-key "test...")) ; infix's title
 
 
 (keybind:leader/local:def
- :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
- :infix (keybind:infix "e")             ; pipenv/conda/etc
+ :keymaps 'python-mode-map
+ :infix   "e"                           ; pipenv/conda/etc
  "" '(nil :which-key "environment...")) ; infix's title
-
-
-(keybind:leader/local:def
- :keymaps (list 'anaconda-mode-map keybind:leader/local:keymaps)
- :infix (keybind:infix "g")      ; "goto"?
- "" '(nil :which-key "goto...")) ; infix's title
 
 
 ;;------------------------------------------------------------------------------
@@ -237,7 +231,7 @@ MODULE should be a string of the module name."
   ;;------------------------------
   (:prefix  (keybind:prefix :local "i")
    :states  keybind:leader/local:states
-   :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
+   :keymaps 'python-mode-map
    "i" (list #'pyimport-insert-missing :which-key "Insert missing imports")
    "r" (list #'pyimport-remove-unused :which-key "Remove unused imports")
    "o" (list #'+python/optimize-imports :which-key "Optimize imports")))
@@ -251,7 +245,7 @@ MODULE should be a string of the module name."
   ;;------------------------------
   (:prefix  (keybind:prefix :local "i")
    :states  keybind:leader/local:states
-   :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
+   :keymaps 'python-mode-map
    "s" (list #'py-isort-buffer :which-key "Sort imports")
    "r" (list #'py-isort-region :which-key "Sort region")))
 
@@ -289,7 +283,7 @@ MODULE should be a string of the module name."
   ;;------------------------------
   (:prefix  (keybind:prefix :local "e")
    :states  keybind:leader/local:states
-   :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
+   :keymaps 'python-mode-map
    "a" (list #'pipenv-activate   :which-key "activate")
    "d" (list #'pipenv-deactivate :which-key "deactivate")
    "i" (list #'pipenv-install    :which-key "install")
@@ -517,7 +511,9 @@ MODULE should be a string of the module name."
    ;;------------------------------
    (:prefix  (keybind:prefix :local "g")
     :states  keybind:leader/local:states
-    :keymaps (list 'anaconda-mode-map keybind:leader/local:keymaps)
+     :keymaps 'anaconda-mode-map
+     "" '(nil :which-key "goto...") ; infix's title
+
     "d" (list #'anaconda-mode-find-definitions :which-key "Find Definitions")
     "h" (list #'anaconda-mode-show-doc         :which-key "Show Doc")
     "a" (list #'anaconda-mode-find-assignments :which-key "Find Assignments")
@@ -570,7 +566,7 @@ MODULE should be a string of the module name."
   ;;------------------------------
   (:prefix  (keybind:prefix :local "t")
    :states  keybind:leader/local:states
-   :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
+   :keymaps 'python-mode-map
         "a" (list #'python-pytest :which-key "Run all tests")
         "f" (list #'python-pytest-file-dwim :which-key "DWIM: Run tests on file")
         "F" (list #'python-pytest-file :which-key "Run tests on file")

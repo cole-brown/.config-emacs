@@ -107,10 +107,8 @@
   ;;--------------------
   :general
   ;;--------------------
-  (:prefix  (keybind:prefix :local) ;; "compile"?
-   :states  keybind:leader/local:states
-   :keymaps keybind:leader/local:keymaps
-
+  (keybind:leader/local:def
+   ;; TODO: "compile" or some such infix?
    ;; `sharper-main-transient' is the entrypoint.
    "c" '(sharper-main-transient :which-key "`dotnet' CLI..."))
 

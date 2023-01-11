@@ -30,13 +30,13 @@
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
 (keybind:leader/local:def
- :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
- :infix (keybind:infix "i")        ; insert
+ :keymaps 'markdown-mode-map
+ :infix   "i"                      ; insert
  "" '(nil :which-key "insert...")) ; infix's title
 
 (keybind:leader/local:def
- :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
- :infix (keybind:infix "p")        ; preview
+ :keymaps 'markdown-mode-map
+ :infix "p"                         ; preview
  "" '(nil :which-key "preview...")) ; infix's title
 
 
@@ -136,7 +136,7 @@
   ;; TODO: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local)
    :states  keybind:leader/local:states
-   :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
+   :keymaps 'markdown-mode-map
    "'" #'markdown-edit-code-block
    "e" #'markdown-export
    ;; "i" == insert menu
@@ -147,7 +147,7 @@
   ;;---
   (:prefix  (keybind:prefix :local "p")
    :states  keybind:leader/local:states
-   :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
+   :keymaps 'markdown-mode-map
    "p" #'markdown-preview)
 
   ;;---
@@ -156,7 +156,7 @@
   ;; TODO: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local "i")
    :states  keybind:leader/local:states
-   :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
+   :keymaps 'markdown-mode-map
    "i" (list #'markdown-insert-image          :which-key "Image")
    "l" (list #'markdown-insert-link           :which-key "Link")
    "-" (list #'markdown-insert-hr             :which-key "<hr>")
@@ -226,7 +226,7 @@
   ;; TODO: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local "i") ;; Insert...
    :states  keybind:leader/local:states
-   :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
+   :keymaps 'markdown-mode-map
    "T" (list #'markdown-toc-generate-toc :which-key "Table Of Content")))
 
 
@@ -249,7 +249,7 @@
   ;; TODO: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local)
    :states  'normal
-   :keymaps (list 'evil-markdown-mode-map keybind:leader/local:keymaps)
+   :keymaps 'evil-markdown-mode-map
    "TAB"     #'markdown-cycle
    [backtab] #'markdown-shifttab
    "M-r"     #'browse-url-of-file)
@@ -266,7 +266,7 @@
 
   (:prefix  (keybind:prefix :local)
    :states  'motion
-   :keymaps (list 'evil-markdown-mode-map keybind:leader/local:keymaps)
+   :keymaps 'evil-markdown-mode-map
    "] h"  #'markdown-next-visible-heading
    "[ h"  #'markdown-previous-visible-heading
    "[ p"  #'markdown-promote
@@ -390,7 +390,7 @@ You can then:
   ;; TODO: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local "p")
    :states  keybind:leader/local:states
-   :keymaps (list 'markdown-mode-map keybind:leader/local:keymaps)
+   :keymaps 'markdown-mode-map
    ;; `markdown-mode' puts `markdown-preview' as "p".
    ;; Steal "p", but add `markdown-preview' back somewhere else.
    "p" (list #'mantle:cmd:markdown:preview-live/start :which-key "Preview (Live)")

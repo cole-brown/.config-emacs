@@ -48,6 +48,16 @@
 (imp:require :keybind 'general 'constants)
 
 
+;; TODO: Do we want a different leader for "non-normal" Evil modes?
+;; See: https://github.com/noctuid/general.el#keyword-arguments
+;; Example:
+;;   (general-define-key
+;;    :keymaps '(normal insert emacs)
+;;    :prefix "SPC"
+;;    :non-normal-prefix "M-SPC"
+;;    "/" 'swiper)
+
+
 ;;------------------------------------------------------------------------------
 ;; Leaderless
 ;;------------------------------------------------------------------------------

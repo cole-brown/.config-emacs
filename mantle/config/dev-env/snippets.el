@@ -180,9 +180,8 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
   ;;--------------------
   ;; Snippets are quite common - put them outside the leader key.
   ;;---
-  (:prefix  "b"
-   :states  '(normal visual motion)
-   :keymaps 'override
+  (keybind:global:def
+   :infix  "b"
    ;; Title
    "" '(nil :which-key "Snippets")
 

@@ -30,31 +30,31 @@
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
 (keybind:leader/local:def
- :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+ :keymaps 'web-mode-map
  :infix (keybind:infix "a")
  "" '(nil :which-key "attribute..."))
 
 
 (keybind:leader/local:def
- :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+ :keymaps 'web-mode-map
  :infix (keybind:infix "b")
  "" '(nil :which-key "block..."))
 
 
 (keybind:leader/local:def
- :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+ :keymaps 'web-mode-map
  :infix (keybind:infix "d")
  "" '(nil :which-key "dom..."))
 
 
 (keybind:leader/local:def
- :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+ :keymaps 'web-mode-map
  :infix (keybind:infix "e")
  "" '(nil :which-key "element..."))
 
 
 (keybind:leader/local:def
- :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+ :keymaps 'web-mode-map
  :infix (keybind:infix "t")
  "" '(nil :which-key "tag..."))
 
@@ -157,7 +157,7 @@
   ;;---
   (:prefix  (keybind:prefix :local "a")
    :states  keybind:leader/local:states
-   :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+   :keymaps 'web-mode-map
    "b" (list #'web-mode-attribute-beginning :which-key "Beginning")
    "e" (list #'web-mode-attribute-end       :which-key "End")
    "i" (list #'web-mode-attribute-insert    :which-key "Insert")
@@ -172,7 +172,7 @@
   ;;---
   (:prefix  (keybind:prefix :local "b")
    :states  keybind:leader/local:states
-   :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+   :keymaps 'web-mode-map
    "b" (list #'web-mode-block-beginning :which-key "Beginning")
    "c" (list #'web-mode-block-close     :which-key "Close")
    "e" (list #'web-mode-block-end       :which-key "End")
@@ -186,7 +186,7 @@
   ;;---
   (:prefix  (keybind:prefix :local "d")
    :states  keybind:leader/local:states
-   :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+   :keymaps 'web-mode-map
    "a" (list #'web-mode-dom-apostrophes-replace :which-key "Replace Apostrophies")
    "d" (list #'web-mode-dom-errors-show         :which-key "Show Errors")
    "e" (list #'web-mode-dom-entities-encode     :which-key "Encode Entities")
@@ -200,7 +200,7 @@
   ;;---
   (:prefix  (keybind:prefix :local "e")
    :states  keybind:leader/local:states
-   :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+   :keymaps 'web-mode-map
     "/" (list #'web-mode-element-close                   :which-key "Close")
     "a" (list #'web-mode-element-content-select          :which-key "Select Content")
     "b" (list #'web-mode-element-beginning               :which-key "Beginning")
@@ -225,7 +225,7 @@
   ;;---
   (:prefix  (keybind:prefix :local "t")
    :states  keybind:leader/local:states
-   :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+   :keymaps 'web-mode-map
    "a" (list #'web-mode-tag-attributes-sort :which-key "Sort Attributes")
    "b" (list #'web-mode-tag-beginning       :which-key "Beginning")
    "e" (list #'web-mode-tag-end             :which-key "End")
@@ -239,7 +239,7 @@
   ;;---
   (:prefix  (keybind:prefix :local)
    :states  keybind:leader/local:states
-   :keymaps (list 'web-mode-map keybind:leader/local:keymaps)
+   :keymaps 'web-mode-map
 
    "h" (list #'web-mode-reload        :which-key "Rehighlight Buffer")
    "i" (list #'web-mode-buffer-indent :which-key "Indent Buffer"))
@@ -248,19 +248,19 @@
   ;; Leaderless
   ;;---
   (:states '(global)
-   :keymaps (list 'web-mode-map keybind:leader/global:keymaps)
+   :keymaps 'web-mode-map
    (list "M-/" #'web-mode-comment-or-uncomment :which-key "Comment/Uncomment"))
 
   (:states '(insert)
-   :keymaps (list 'web-mode-map keybind:leader/global:keymaps)
+   :keymaps 'web-mode-map
    "SPC" #'self-insert-command)
 
   (:states '(normal)
-   :keymaps (list 'web-mode-map keybind:leader/global:keymaps)
+   :keymaps 'web-mode-map
    (list "za"  #'web-mode-fold-or-unfold :which-key "Fold/Unfold"))
 
   (:states '(normal visual)
-   :keymaps (list 'web-mode-map keybind:leader/global:keymaps)
+   :keymaps 'web-mode-map
    (list "]a"  #'web-mode-attribute-next     :which-key "Attribute: Next")
    (list "[a"  #'web-mode-attribute-previous :which-key "Attribute: Previous")
    (list "]t"  #'web-mode-tag-next           :which-key "Tag: Next")

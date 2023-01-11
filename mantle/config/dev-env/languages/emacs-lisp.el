@@ -27,25 +27,25 @@
 
 
 (keybind:leader/local:def
- :keymaps (list 'emacs-lisp-mode-map 'lisp-interaction-mode-map keybind:leader/local:keymaps)
+ :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
  :infix   (keybind:infix "d")     ; debug
  "" '(nil :which-key "debug...")) ; infix's title
 
 
 (keybind:leader/local:def
- :keymaps (list 'emacs-lisp-mode-map 'lisp-interaction-mode-map keybind:leader/local:keymaps)
+ :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
  :infix   (keybind:infix "e")    ; eval
  "" '(nil :which-key "eval...")) ; infix's title
 
 
 (keybind:leader/local:def
- :keymaps (list 'emacs-lisp-mode-map 'lisp-interaction-mode-map keybind:leader/local:keymaps)
+ :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
  :infix   (keybind:infix "g")    ; goto
  "" '(nil :which-key "goto...")) ; infix's title
 
 
 (keybind:leader/local:def
- :keymaps (list 'buttercup-minor-mode-map keybind:leader/local:keymaps)
+ :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
  :infix   (keybind:infix "t")    ; test
  "" '(nil :which-key "test...")) ; infix's title
 
@@ -162,18 +162,16 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   ;;---
   ;; Debug...
   ;;---
-  (:prefix  (keybind:prefix :local "d")
-   :states  keybind:leader/local:states
-   :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map keybind:leader/local:keymaps)
+  (keybind:leader/local:def
+   :infix "d"
    "f" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/on :which-key "`edebug' instrument enable")
    "F" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/off :which-key "`edebug' instrument disable"))
 
   ;;---
   ;; Eval...
   ;;---
-  (:prefix  (keybind:prefix :local "e")
-   :states  keybind:leader/local:states
-   :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map keybind:leader/local:keymaps)
+  (keybind:leader/local:def
+   :infix "e"
    ;; TODO: Try these without "Display Names" and see if it actually is better?
    ;; Doom doesn't bother with a pretty name.
    "b" #'eval-buffer    ; (list #'eval-buffer    :which-key "Eval Buffer")
@@ -187,9 +185,8 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   ;;---
   ;; "Go To Considered Harmful"
   ;;---
-  (:prefix  (keybind:prefix :local "g")
-   :states  keybind:leader/local:states
-   :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map keybind:leader/local:keymaps)
+  (keybind:leader/local:def
+   :infix "g"
    ;; TODO: Try these without "Display Names" and see if it actually is better?
    ;; Doom doesn't bother with a pretty name.
    "f" #'find-function
@@ -371,7 +368,7 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
   ;;------------------------------
   (:prefix  (keybind:prefix :local "t") ; test
    :states  keybind:leader/local:states
-   :keymaps '(buttercup-minor-mode-map keybind:leader/local:keymaps)
+   :keymaps 'buttercup-minor-mode-map
    "t" (list #'mantle:user:emacs-lisp:buttercup:run-file :which-key "buttercup: run file")
    "a" (list #'mantle:user:emacs-lisp:buttercup:run-project :which-key "buttercup: run project")
    "s" (list #'buttercup-run-at-point :which-key "buttercup: run at point"))
@@ -400,10 +397,10 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
   ;;--------------------
   :general
   ;;--------------------
-  (:prefix  (keybind:prefix :local "")
+  (:prefix  (keybind:prefix :local)
    :states  keybind:leader/local:states
-   :keymaps '(emacs-lisp-mode-map keybind:leader/local:keymaps)
-   "m" '(macrostep-expand :which-key "Expand Macro")))
+   :keymaps 'emacs-lisp-mode-map
+   "m" (list #'macrostep-expand :which-key "Expand Macro")))
 
 
 ;; TODO: General Flycheck set-up in "common.el"? Steal from Doom?

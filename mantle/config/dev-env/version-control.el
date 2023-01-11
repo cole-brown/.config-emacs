@@ -33,6 +33,20 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Keybinds: General Infixes
+;;------------------------------------------------------------------------------
+;; Define the infix with the title here so we don't have to worry about what's
+;; defined in what order since you can only define the title once or else things
+;; overwrite each other?
+;;
+;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
+
+(keybind:leader/global:def
+ :prefix  "g"
+ "" '(nil :which-key "Magit / Version Control"))
+
+
+;;------------------------------------------------------------------------------
 ;; Magit: Git Front-End (Porcelain)
 ;;------------------------------------------------------------------------------
 ;; The best Git Porcelain.
@@ -61,17 +75,14 @@
   ;;--------------------
   ;; Put Magit Leader under the Global Leader
   ;;---
-  (:prefix  (keybind:prefix :global "g")
-   :states  keybind:leader/global:states
-   :keymaps keybind:leader/global:keymaps
-   ;; Title
-   "" '(nil :which-key "Magit / Version Control")
+  (keybind:leader/global:def
+   :infix  "g"
 
    ;;---
    ;; Magit Keybinds
    ;;---
    "g" (list #'magit-status                           :which-key "Status")
-   "q" (list #'mantle:user:deadgrep:default-directory :which-key "Kill All 'deadgrep' Buffers")
+   "q" (list #'mantle:user:magit:buffer:kill :which-key "Kill All 'magit' Buffers")
 
    ;; TODO: More keybinds!
    ;; TODO: And use `:repeat' / `:jump'?
@@ -147,10 +158,8 @@
   ;;--------------------
   :general
   ;;--------------------
-  (:prefix  (keybind:prefix :global "g")
-   :states  keybind:leader/global:states
-   :keymaps keybind:leader/global:keymaps
-
+  (keybind:leader/global:def
+   :infix  "g"
    ;;---
    ;; Magit-Todos Keybinds
    ;;---

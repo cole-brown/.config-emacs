@@ -139,7 +139,7 @@
   ;;------------------------------
   (:prefix  (keybind:prefix :local)
    :states  keybind:leader/local:states
-   :keymaps (list 'npm-mode-keymap keybind:leader/local:keymaps)
+   :keymaps 'npm-mode-keymap
    ;; TODO: ...Does this work? Binding a whole keymap to a key?
    "n" npm-mode-command-keymap))
 

@@ -55,7 +55,7 @@
   ;;------------------------------
   (:prefix  (keybind:prefix :local)
    :states  keybind:leader/local:states
-   :keymaps (list 'json-mode-map keybind:leader/local:keymaps)
+   :keymaps 'json-mode-map
 
    "p" (list #'json-mode-show-path :which-key "Copy JSON Path")
    "d" (list #'json-mode-kill-path :which-key "Kill JSON Path")
