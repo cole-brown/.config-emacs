@@ -54,7 +54,9 @@
 ;; Emacs Lisp
 ;;------------------------------------------------------------------------------
 
-(imp:use-package emacs-lisp-mode
+(imp:use-package elisp-mode
+  :ensure nil ; This is an Emacs built-in feature.
+
   ;; TODO: Add cask?
   ;; https://github.com/cask/cask
   ;; :mode ("\\.Cask\\'" . emacs-lisp-mode)
