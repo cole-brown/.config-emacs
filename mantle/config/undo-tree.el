@@ -60,7 +60,7 @@
     ;;--------------------
     ;; No prefix. Used very frequently.
     (:states  'normal
-     :keymaps keybind:override:keymaps
+     :keymaps 'override
      "h" (list #'undo-tree-undo :which-key "undo")
      "n" (list #'undo-tree-redo :which-key "redo")
      "t" (list #'undo-tree-visualize :which-key "visualize")

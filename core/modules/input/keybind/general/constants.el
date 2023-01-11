@@ -21,8 +21,16 @@
 ;; General Constants
 ;;------------------------------------------------------------------------------
 
-(defconst keybind:override:keymaps 'override
-  "`kbd' type string to use as the primary keybinds leader key.")
+(defconst keybind:keymaps:override 'override
+  "Keymap to use so that (non-local-leader) keybinds override others.
+
+They will always take precedence over keys bound in other minor mode maps.
+
+NOTE: Cannot use in `use-package' macro's `:general' sections! It doesn't get
+replaced (soon enough) with whatever magic `general' does and then `override'
+gets flagged as an invalid/non-existant keymap.
+
+See: https://github.com/noctuid/general.el#override-keymaps-and-buffer-local-keybindings")
 
 
 ;;------------------------------------------------------------------------------
@@ -42,10 +50,14 @@ Add keybinds to the leader using function `keybind:leader/global'.")
 Add keybinds to the leader using function `keybind:leader/global'.")
 
 
-(defconst keybind:leader/global:keymaps keybind:override:keymaps
-  "`kbd' type string to use as the primary keybinds leader key.
+(defconst keybind:leader/global:keymaps keybind:keymaps:override
+  "Magic value to use to prevent anyone else from overriding our keybind.
 
-Add keybinds to the leader using function `keybind:leader/global'.")
+NOTE: Cannot use in `use-package' macro's `:general' sections! It doesn't get
+replaced (soon enough) with whatever magic `general' does and then `override'
+gets flagged as an invalid/non-existant keymap.
+
+https://github.com/noctuid/general.el#override-keymaps-and-buffer-local-keybindings")
 
 
 ;;------------------------------------------------------------------------------
@@ -65,10 +77,18 @@ Add keybinds to the leader using function `keybind:leader/local'.")
 Add keybinds to the leader using function `keybind:leader/local'.")
 
 
-(defconst keybind:leader/local:keymaps keybind:override:keymaps
-  "`kbd' type string to use as the primary keybinds leader key.
+(defconst keybind:leader/local:keymaps keybind:keymaps:override
+  "Magic value to use to prevent anyone else from overriding our keybind.
 
-Add keybinds to the leader using function `keybind:leader/local'.")
+NOTE: Cannot use in `use-package' macro's `:general' sections! It doesn't get
+replaced with whatever magic `general' does and then gets flagged as an
+invalid/non-existant keymap.
+
+NOTE: `:keymaps' also has the special `local' argument, but I don't grok that at
+all. Think you have to use it in, like, mode hooks or something? It's lacking in
+useful examples...
+
+https://github.com/noctuid/general.el#override-keymaps-and-buffer-local-keybindings")
 
 
 ;;------------------------------------------------------------------------------

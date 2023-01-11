@@ -133,7 +133,7 @@
 ;;       further, to the beginning of the previous word.
 
 (general-define-key
- :keymaps keybind:override:keymaps
+ :keymaps keybind:keymaps:override
  :states '(motion visual normal)
  ;; ──┬────────────────
  ;;   │ ↑ ↓ ← →
@@ -144,7 +144,7 @@
  "u" #'evil-forward-char)
 
 (general-define-key
- :keymaps keybind:override:keymaps
+ :keymaps keybind:keymaps:override
  :states 'motion
 
  ;; ──┬────────────────
@@ -201,7 +201,7 @@
 ;; H & ; (Dvorak D & S) are "extra left" and "extra right", basically.
 
 (general-define-key
- :keymaps keybind:override:keymaps
+ :keymaps keybind:keymaps:override
  :states 'normal
  :prefix "s"
  "" (list :ignore t
@@ -216,14 +216,14 @@
  "T" #'evil-replace-state)
 
 (general-define-key
- :keymaps keybind:override:keymaps
+ :keymaps keybind:keymaps:override
  :states 'visual
  :prefix "s"
  "h" #'evil-insert
  "n" #'evil-append)
 
 (general-define-key
- :keymaps keybind:override:keymaps
+ :keymaps keybind:keymaps:override
  :states 'motion
  :prefix "s"
  ;; TODO: Leave original Qwerty 'v' as Dvorak 'v' or change?

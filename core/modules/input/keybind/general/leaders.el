@@ -49,6 +49,19 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Leaderless
+;;------------------------------------------------------------------------------
+;; https://github.com/noctuid/general.el#evil-examples
+
+;; This creates the macro `keybind:leader/global:def', which just calls
+;; `general-def' with the arguments supplied here, which can be overridden by
+;; callers.
+(general-create-definer keybind:global:def
+  :states  keybind:leader/global:states
+  :keymaps keybind:leader/global:keymaps)
+
+
+;;------------------------------------------------------------------------------
 ;; Global Leader
 ;;------------------------------------------------------------------------------
 ;; https://github.com/noctuid/general.el#evil-examples

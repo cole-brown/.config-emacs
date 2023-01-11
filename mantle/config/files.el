@@ -19,6 +19,7 @@
 
 (imp:require :datetime)
 (imp:require :buffer)
+(imp:require :keybind)
 
 
 ;;------------------------------------------------------------------------------
@@ -201,7 +202,7 @@
   ;; Global Keybinds
   ;;---
   (:states  'normal
-   :keymaps keybind:override:keymaps
+   :keymaps 'override
    :infix "/"
 
    "/" (list #'deadgrep                               :which-key "`rg' @ project root")
@@ -215,7 +216,7 @@
   ;; `deadgrep-mode-map' Keybinds
   ;;---
   (:states  'normal
-   :keymaps 'deadgrep-mode-map ;; TODO: Rebind (more) keybinds from this map!
+   :keymaps 'deadgrep-mode-map ; TODO: Rebind (more) keybinds from this map!
 
    ;; 'kill-or-quit' instead of 'quit-or-kill'
    "q" (list #'window:kill-or-quit :which-key "Quit or Kill 'deadgrep' Window")

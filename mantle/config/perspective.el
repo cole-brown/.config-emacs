@@ -23,6 +23,7 @@
 
 (imp:require :buffer 'type)
 (imp:require :elisp  'utils 'predicates)
+(imp:require :keybind)
 
 
 ;;------------------------------------------------------------------------------
@@ -262,9 +263,8 @@ the style & disable it occasionally.")
   ;;---
   ;; Global Keybinds
   ;;---
-  (:states  keybind:leader/global:states
-   :keymaps keybind:override:keymaps
-   :infix   (keybind:infix keybind:leader/global:prefix "b")
+  (keybind:leader/global:def
+   :infix   "b"
    "b" (list #'persp-switch-to-buffer :which-key "Switch Perspective Buffer"))
 
 
