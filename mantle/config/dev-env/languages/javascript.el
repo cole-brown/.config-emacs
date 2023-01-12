@@ -141,7 +141,9 @@
    :states  keybind:leader/local:states
    :keymaps 'npm-mode-keymap
    ;; TODO: ...Does this work? Binding a whole keymap to a key?
-   "n" npm-mode-command-keymap))
+   ;; It... should? General says it can be "a drop-in replacement to
+   ;; `define-key'", which can accept keymaps as what a key is for.
+   "n" 'npm-mode-command-keymap))
 
 
 ;; TODO: A Node.js REPL? https://github.com/abicky/nodejs-repl.el
