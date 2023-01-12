@@ -387,7 +387,7 @@ MODULE should be a string of the module name."
 ;;------------------------------
 
 (if (not (executable-find "conda"))
-    (nub:warning
+    (nub:info
        :innit
        (path:current:file)
      "Need executable `conda' installed in order to use package `conda'.")
