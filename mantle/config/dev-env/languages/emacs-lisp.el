@@ -283,13 +283,16 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
 ;; Tests
 ;;------------------------------------------------------------------------------
 
+;;------------------------------
+;; Overseer
+;;------------------------------
 ;; https://github.com/tonini/overseer.el
 (imp:use-package overseer
   ;;------------------------------
   :config
   ;;------------------------------
 
-  (define-advice overseer--current-buffer-test-file-p (:override (fn sym) mantle:advice:content-not-filename)
+  (define-advice overseer--current-buffer-test-file-p (:override (&rest _) mantle:advice:content-not-filename)
     "Test files are test files because of their contents, not their filename?
 
 `overseer' only checks if the filenam ends in \"-test.el\" exactly. That's too
@@ -298,6 +301,9 @@ restrictive. Instead, check if the word \"test\" is in the start of the file."
     (buffer:search:header "test" :case 'ignore)))
 
 
+;;------------------------------
+;; Buttercup
+;;------------------------------
 ;; https://github.com/jorgenschaefer/emacs-buttercup
 (imp:use-package buttercup
   :defer t
