@@ -26,27 +26,27 @@
 ;; NOTE: Keep in alphanumerical order!
 
 (keybind:leader/global:def
- :infix (keybind:infix "i")        ; insert
+ :infix "i"                        ; insert
  "" '(nil :which-key "Insert...")) ; infix's title
 
 
 (keybind:leader/global:def
- :infix (keybind:infix "f")      ; files
+ :infix "f"                      ; files
  "" '(nil :which-key "File...")) ; infix's title
 
 
 (keybind:leader/global:def
- :infix (keybind:infix "n")       ; notes
+ :infix "n"                       ; notes
  "" '(nil :which-key "Notes...")) ; infix's title
 
 
 (keybind:leader/global:def
- :infix (keybind:infix "t")      ; text
+ :infix "t"                      ; text
  "" '(nil :which-key "Text...")) ; infix's title
 
 
 (keybind:leader/global:def
- :infix (keybind:infix "/")        ; search
+ :infix "/"                        ; search
  "" '(nil :which-key "Search...")) ; infix's title
 
 
@@ -64,12 +64,12 @@
 ;;
 ;; (keybind:leader/local:def
 ;;  :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
-;;  :infix (keybind:infix "i")        ; insert
+;;  :infix "i"                        ; insert
 ;;  "" '(nil :which-key "insert...")) ; infix's title
 ;;
 ;; (keybind:leader/local:def
 ;;  :keymaps (list 'python-mode-map keybind:leader/local:keymaps)
-;;  :infix (keybind:infix "t")      ; test
+;;  :infix "t"                      ; test
 ;;  "" '(nil :which-key "test...")) ; infix's title
 
 

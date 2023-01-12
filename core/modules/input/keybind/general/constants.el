@@ -139,7 +139,7 @@ See also function `keybind:infix'."
 
 For example:
   (keybind:leader/global:def
-   :infix (keybind:infix \"i\" \"s\") ;; insert -> signature
+   :infix (keybind:infix \"i\" \"s\") ; insert -> signature
    [...]"
   (dolist (i infix)
     (unless (stringp i)

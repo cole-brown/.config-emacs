@@ -41,12 +41,15 @@
 ;; └────────────────────────────────┘
 ;; Undefine some keys so we can redefine them later.
 ;;
-;; NOTE: Use `override' keymap (see also `keybind:leader/global:keymaps' or
-;; `keybind:leader/local:keymaps') and you won't have to undefine keys.
-;;   TODO: Is that true?
+;; NOTE: Use `override' keymap and you won't have to undefine keys. TODO: Is that true?
+;; See also:
+;;   - `keybind:keymaps:override'
+;;   - `keybind:leader/global:keymaps'
+;;   - `keybind:leader/local:keymaps'
 ;; Or better, use one of the definers:
 ;;   - `keybind:leader/global:def'
 ;;   - `keybind:leader/local:def'
+;;   - `keybind:global:def'
 
 ;; TODO: Are these ok not being undefined now that I'm using 'override' keymap?
 ;; ;;

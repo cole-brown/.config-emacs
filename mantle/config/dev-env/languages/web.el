@@ -31,31 +31,31 @@
 
 (keybind:leader/local:def
  :keymaps 'web-mode-map
- :infix (keybind:infix "a")
+ :infix "a"
  "" '(nil :which-key "attribute..."))
 
 
 (keybind:leader/local:def
  :keymaps 'web-mode-map
- :infix (keybind:infix "b")
+ :infix "b"
  "" '(nil :which-key "block..."))
 
 
 (keybind:leader/local:def
  :keymaps 'web-mode-map
- :infix (keybind:infix "d")
+ :infix "d"
  "" '(nil :which-key "dom..."))
 
 
 (keybind:leader/local:def
  :keymaps 'web-mode-map
- :infix (keybind:infix "e")
+ :infix "e"
  "" '(nil :which-key "element..."))
 
 
 (keybind:leader/local:def
  :keymaps 'web-mode-map
- :infix (keybind:infix "t")
+ :infix "t"
  "" '(nil :which-key "tag..."))
 
 

@@ -25,28 +25,27 @@
 ;; Keybind Prefixes
 ;;------------------------------------------------------------------------------
 
-
 (keybind:leader/local:def
  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
- :infix   (keybind:infix "d")     ; debug
+ :infix   "d"                     ; debug
  "" '(nil :which-key "debug...")) ; infix's title
 
 
 (keybind:leader/local:def
  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
- :infix   (keybind:infix "e")    ; eval
+ :infix   "e"                    ; eval
  "" '(nil :which-key "eval...")) ; infix's title
 
 
 (keybind:leader/local:def
  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
- :infix   (keybind:infix "g")    ; goto
+ :infix   "g"                    ; goto
  "" '(nil :which-key "goto...")) ; infix's title
 
 
 (keybind:leader/local:def
  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
- :infix   (keybind:infix "t")    ; test
+ :infix   "t"                    ; test
  "" '(nil :which-key "test...")) ; infix's title
 
 

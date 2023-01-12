@@ -13,6 +13,9 @@
 ;;; Code:
 
 
+(imp:require :keybind)
+
+
 ;;------------------------------------------------------------------------------
 ;; Keybinds
 ;;------------------------------------------------------------------------------
@@ -25,7 +28,7 @@
   ;; Buffer
   ;;------------------------------
   (keybind:leader/global:def
-   :infix (keybind:infix "b")       ; buffer
+   :infix "b"                       ; buffer
    "" '(nil :which-key "Buffer...") ; infix title
 
    ;;---
@@ -75,7 +78,7 @@
   ;;
   ;; ...On the other hand, "b" == "bookmark" is a decent reason?
   (keybind:leader/global:def
-   :infix (keybind:infix "b") ; buffer
+   :infix "b"                 ; buffer
 
    "m" (list #'bookmark-set    :which-key "Set Bookmark")
    "M" (list #'bookmark-delete :which-key "Delete Bookmark")

@@ -35,7 +35,7 @@
   ;; Copy
   ;;------------------------------
   (keybind:leader/global:def
-   :infix (keybind:infix "f y")          ; file -> yank
+   :infix (keybind:infix "f" "y")        ; file -> yank
    "" '(nil :which-key "Yank / Copy...") ; infix title
 
    ;;---

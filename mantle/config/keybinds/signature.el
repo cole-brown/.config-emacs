@@ -14,7 +14,7 @@
 
 (imp:require :elisp 'utils 'functions)
 (imp:require :tools 'signature)
-
+(imp:require :keybind)
 
 
 ;;------------------------------------------------------------------------------
