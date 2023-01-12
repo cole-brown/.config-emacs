@@ -247,10 +247,11 @@
                       evil-collection
                       org
                       evil-org)
+  ;; Override the usual `evil-open-below' with a Special Org Version.
+  ;; See "mantle/config/keybinds/evil/evil.el" for the usual evil state keybinds.
   (general-define-key
    :states 'normal
    :keymaps '(evil-org-mode-map)
-   ;; Special Org Version of `evil-open-below'.
    :prefix "s"
    "t" #'evil-org-open-below))
 
