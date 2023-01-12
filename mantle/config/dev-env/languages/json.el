@@ -78,7 +78,7 @@
 ;;   ;;------------------------------
 ;;   (:prefix  (keybind:prefix :local)
 ;;    :states  keybind:leader/local:states
-;;    :keymaps (list 'json-mode-map keybind:leader/local:keymaps)
+;;    :keymaps 'json-mode-map
 ;;
 ;;    ;; TODO: Replace `json-mode-show-path'?
 ;;    "p" (list #'jsons-print-path :which-key "JSON Path")))

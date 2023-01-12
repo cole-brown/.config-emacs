@@ -257,7 +257,7 @@
   ;; TODO: Add back in when I finally learn the secrets of VIM movement?
   ;; (:prefix  (keybind:prefix :local)
   ;;  :states  'insert
-  ;;  :keymaps (list 'evil-markdown-mode-map keybind:leader/local:keymaps)
+  ;;  :keymaps 'evil-markdown-mode-map
   ;;  "M-*" #'markdown-insert-list-item
   ;;  "M-b" #'markdown-insert-bold
   ;;  "M-i" #'markdown-insert-italic
