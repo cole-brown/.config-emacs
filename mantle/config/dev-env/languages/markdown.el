@@ -236,6 +236,10 @@
 
 (imp:use-package evil-markdown
   :when (imp:feature? 'evil)
+  ;; Not on a package repository so get it from GitHub:
+  :straight (:type git
+             :host github
+             :repo "Somelauw/evil-markdown")
 
   ;;------------------------------
   :hook
