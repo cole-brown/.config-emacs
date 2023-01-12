@@ -249,24 +249,25 @@
   ;;---
   (:states '(global)
    :keymaps 'web-mode-map
-   (list "M-/" #'web-mode-comment-or-uncomment :which-key "Comment/Uncomment"))
+   "M-/" (list #'web-mode-comment-or-uncomment :which-key "Comment/Uncomment"))
 
-  (:states '(insert)
-   :keymaps 'web-mode-map
-   "SPC" #'self-insert-command)
+  ;; TODO: Does this really need to be bound?!
+  ;; (:states '(insert)
+  ;;  :keymaps 'web-mode-map
+  ;;  "SPC" #'self-insert-command)
 
   (:states '(normal)
    :keymaps 'web-mode-map
-   (list "za"  #'web-mode-fold-or-unfold :which-key "Fold/Unfold"))
+   "za" (list #'web-mode-fold-or-unfold :which-key "Fold/Unfold"))
 
   (:states '(normal visual)
    :keymaps 'web-mode-map
-   (list "]a"  #'web-mode-attribute-next     :which-key "Attribute: Next")
-   (list "[a"  #'web-mode-attribute-previous :which-key "Attribute: Previous")
-   (list "]t"  #'web-mode-tag-next           :which-key "Tag: Next")
-   (list "[t"  #'web-mode-tag-previous       :which-key "Tag: Previous")
-   (list "]T"  #'web-mode-element-child      :which-key "Child: Next")
-   (list "[T"  #'web-mode-element-parent     :which-key "Child: Previous"))
+   "]a" (list #'web-mode-attribute-next     :which-key "Attribute: Next")
+   "[a" (list #'web-mode-attribute-previous :which-key "Attribute: Previous")
+   "]t" (list #'web-mode-tag-next           :which-key "Tag: Next")
+   "[t" (list #'web-mode-tag-previous       :which-key "Tag: Previous")
+   "]T" (list #'web-mode-element-child      :which-key "Child: Next")
+   "[T" (list #'web-mode-element-parent     :which-key "Child: Previous"))
 
 
   ;;------------------------------
