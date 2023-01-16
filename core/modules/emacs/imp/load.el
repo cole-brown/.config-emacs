@@ -107,7 +107,7 @@ Let `feature:rest' be nil (if FEATURE is just a keyword), or `(cdr FEATURE)'.
 
 For Example:
   When:
-    (imp:path:root :imp \"/path/to/imp-root\")
+    (imp:path:root/set :imp \"/path/to/imp-root\")
     (imp:feature:at :imp
                     '((:imp           \"init.el\")
                       ((:imp provide) \"provide.el\")

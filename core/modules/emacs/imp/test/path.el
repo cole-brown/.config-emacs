@@ -773,7 +773,7 @@ to a path properly."
 
 
 ;;------------------------------
-;; imp:path:root
+;; imp:path:root/set
 ;;------------------------------
 
 (ert-deftest test<imp/path>::imp:path:root ()
@@ -799,17 +799,17 @@ to a path properly."
 
     ;; Must not allow overwriting a feature root.
     (should (int<imp>:path:root/contains? :loading))
-    (should-error (imp:path:root :loading test<imp>:path:root:test))
+    (should-error (imp:path:root/set :loading test<imp>:path:root:test))
 
     ;; Root must be a keyword.
-    (should-error (imp:path:root 'foo "."))
-    (should-error (imp:path:root "foo" "."))
-    (should-error (imp:path:root "/foo" "."))
+    (should-error (imp:path:root/set 'foo "."))
+    (should-error (imp:path:root/set "foo" "."))
+    (should-error (imp:path:root/set "/foo" "."))
 
     ;; Dir must exist.
     (should-error (int<imp>:path:root/valid? test-name
                                              "/foo"))
-    (should-error (imp:path:root :foo "/foo"))
+    (should-error (imp:path:root/set :foo "/foo"))
 
     ;;------------------------------
     ;; Valid:
@@ -818,7 +818,7 @@ to a path properly."
     ;; Returns new `imp:path:roots', so check for the thing we're adding.
     (let* ((feature :foo)
            (path    "../test")
-           (result  (imp:path:root feature path)))
+           (result  (imp:path:root/set feature path)))
       (should result)
       (should (int<imp>:alist:get/value feature result))
       ;; Dir
@@ -834,7 +834,7 @@ to a path properly."
     (let* ((feature :bar)
            (path    test<imp>:path:root:test)
            (file    test<imp/path>:path/file:this)
-           (result  (imp:path:root feature path file)))
+           (result  (imp:path:root/set feature path file)))
       (should result)
       (should (int<imp>:alist:get/value feature result))
       ;; Dir

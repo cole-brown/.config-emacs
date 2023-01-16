@@ -277,7 +277,7 @@ Search for \"[MARK-\[0-9\]+]:\"."
   ;; Need to have 'imp/path.el' functions, obviously, so do not use in tests
   ;; before 'imp/path.el' has been tested.
   (test<imp>:init:load "../path")
-  (imp:path:root test<imp>:feature:loading
+  (imp:path:root/set test<imp>:feature:loading
                  test<imp>:path:root:loading
                  test<imp>:file:loading:init
                  test<imp>:file:loading:features))

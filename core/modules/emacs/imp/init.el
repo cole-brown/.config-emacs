@@ -31,7 +31,7 @@
 ;;------------------------------
 ;; (Optional) Set-Up:
 ;; ------
-;; (imp:path:root <symbol/keyword0>
+;; (imp:path:root/set <symbol/keyword0>
 ;;                <path-to-root-dir-absolute>
 ;;                &optional <path-to-root-file-relative-or-absolute>)
 ;;   - Setting a root for <symbol/keyword0> allows later `imp:require' calls to

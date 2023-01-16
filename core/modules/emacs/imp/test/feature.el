@@ -286,14 +286,14 @@ Example:
     ;;------------------------------
     ;; Register root.
     ;;------------------------------
-    (test<imp>:should:marker:small (format "`(imp:path:root %S %s)'..."
+    (test<imp>:should:marker:small (format "`(imp:path:root/set %S %s)'..."
                                            feature:base
                                            path:root))
     (setq test<imp/feature/at>:features:root path:root)
     (message "path:root:                          %s" path:root)
     (message "test<imp/feature/at>:features:root: %s" test<imp/feature/at>:features:root)
 
-    (should (imp:path:root feature:base path:root))
+    (should (imp:path:root/set feature:base path:root))
 
     ;;------------------------------
     ;; Register with `imp:feature:at'.

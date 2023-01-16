@@ -191,15 +191,15 @@ Return an absolute path."
 ;; `imp:path:roots' Getters
 ;;------------------------------------------------------------------------------
 
-(defun int<imp>:path:root/dir (feature:base &optional no-error)
+(defun int<imp>:path:root/dir (feature:base &optional no-error?)
   "Get the root directory from `imp:path:roots' for FEATURE:BASE.
 
-If NO-ERROR is nil and FEATURE:BASE is not in `imp:path:roots',
+If NO-ERROR? is nil and FEATURE:BASE is not in `imp:path:roots',
 signals an error."
   (if-let ((dir (nth 0 (int<imp>:alist:get/value feature:base
                                                  imp:path:roots))))
       (imp:path:canonical "" dir)
-    (if no-error
+    (if no-error?
         nil
       (int<imp>:error "int<imp>:path:root/dir"
                       "FEATURE:BASE '%S' unknown."
@@ -609,7 +609,7 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
     ;; Return relative path.
     path/relative))
 ;; (imp:path:current:file/relative)
-;; (imp:path:root :test (imp:path:current:dir))
+;; (imp:path:root/set :test (imp:path:current:dir))
 ;; (imp:path:current:file/relative :test)
 
 
@@ -958,7 +958,7 @@ Returns normalized path."
 ;; Public API: Feature Root Directories
 ;;------------------------------------------------------------------------------
 
-(defun imp:path:root (feature:base path:dir:root &optional path:file:init path:file:features)
+(defun imp:path:root/set (feature:base path:dir:root &optional path:file:init path:file:features)
   "Set the root path(s) of FEATURE:BASE for future `imp:require' calls.
 
 PATH:DIR:ROOT is the directory under which all of FEATURE:BASE's features exist.
@@ -1001,6 +1001,16 @@ PATH:FILE:FEATURES is nil or a minimal file with a call to `imp:feature:at'.
                imp:path:roots))))
 
 
+(defun imp:path:root/get (feature:base &optional no-error?)
+  "Get the root directory from `imp:path:roots' for FEATURE:BASE.
+
+If NO-ERROR? is nil and FEATURE:BASE is not in `imp:path:roots',
+signals an error.
+
+Return path string from `imp:path:roots' or nil."
+  (int<imp>:path:root/dir feature:base no-error?))
+
+
 ;;------------------------------------------------------------------------------
 ;; Internal API: Initialization
 ;;------------------------------------------------------------------------------
@@ -1023,7 +1033,7 @@ Must be called after 'provide.el' is loaded."
   ;; Set `imp' root.
   ;;   - Might as well automatically fill ourself in.
   ;;---
-  (imp:path:root :imp
+  (imp:path:root/set :imp
                  ;; root dir
                  (file-name-directory (if load-in-progress
                                           load-file-name

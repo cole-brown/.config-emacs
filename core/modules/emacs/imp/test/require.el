@@ -76,7 +76,7 @@
     ;; Supply a root:
     ;;---
     ;; For testing that it can load something it knows about but that hasn't been required.
-    (imp:path:root test<imp>:feature:loading
+    (imp:path:root/set test<imp>:feature:loading
                    test<imp>:path:root:loading)
 
     ;;---
