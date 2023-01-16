@@ -5,7 +5,7 @@
 ;; Set-Up.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :datetime
+(imp:path:root/set :datetime
                (imp:path:current:dir)
                (imp:file:current))
 

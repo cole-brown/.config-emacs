@@ -21,7 +21,7 @@
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :innit
+(imp:path:root/set :innit
                (imp:path:current:dir)
                "init.el")
 

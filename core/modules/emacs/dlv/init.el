@@ -43,7 +43,7 @@
 ;; Set-Up.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :dlv
+(imp:path:root/set :dlv
                (imp:path:current:dir)
                (imp:file:current))
 

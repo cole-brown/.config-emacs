@@ -26,7 +26,7 @@
 ;; Set imp Root
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :nub
+(imp:path:root/set :nub
                (imp:path:current:dir)
                "init.el")
 

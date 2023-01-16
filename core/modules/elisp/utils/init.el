@@ -5,7 +5,7 @@
 ;;------------------------------------------------------------------------------
 
 
-(imp:path:root :elisp
+(imp:path:root/set :elisp
                (imp:path:parent (imp:path:current:dir))
                (imp:file:current))
 

@@ -95,23 +95,23 @@
 ;; `imp' is now loaded, so we can set ourselves up to use it.
 
 ;; 'early-init.el' and 'init.el' only, probably...
-(imp:path:root :root
+(imp:path:root/set :root
                user-emacs-directory)
 
 ;; Core elisp for `innit' to invoke during start-up.
-(imp:path:root :core
+(imp:path:root/set :core
                innit:path:core/boot)
 
 ;; NOTE: 'mantle/' directory is available/encouraged for users to put their
 ;; Emacs init stuff in. `innit' will call 'mantle/init.el' during one phase of
 ;; 'init.el', and then will call 'mantle/config.el' during a later phase of
 ;; 'init.el'.
-(imp:path:root :mantle
+(imp:path:root/set :mantle
                (imp:path:join user-emacs-directory "mantle")
                "init.el")
 
 ;; User's modules; not our "core/modules/" directory.
-(imp:path:root :module innit:path:module)
+(imp:path:root/set :module innit:path:module)
 
 
 (let ((file/this (imp:file:current))
@@ -122,7 +122,7 @@
 
   ;; Load these settings first so they can override any `defvar' and be prepared
   ;; for wherever they're needed in the init sequence.
-  (imp:path:root :settings user-emacs-directory)
+  (imp:path:root/set :settings user-emacs-directory)
   ;; Don't want to error if file isn't there, but do want to error if loading the
   ;; file causes an error, so `:optional t` should be perfect.
   (imp:load :feature  '(:settings)

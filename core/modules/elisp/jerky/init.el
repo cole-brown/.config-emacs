@@ -24,7 +24,7 @@
 ;; Set-Up.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :jerky
+(imp:path:root/set :jerky
                (imp:path:current:dir)
                (imp:file:current))
 

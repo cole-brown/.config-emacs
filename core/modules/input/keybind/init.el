@@ -21,7 +21,7 @@
 ;; Set imp Root.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :keybind
+(imp:path:root/set :keybind
                (imp:path:current:dir)
                "init.el")
 

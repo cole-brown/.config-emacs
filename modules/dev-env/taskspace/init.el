@@ -198,7 +198,7 @@
 ;; Set imp Root.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :taskspace
+(imp:path:root/set :taskspace
                (imp:path:current:dir)
                "init.el")
 

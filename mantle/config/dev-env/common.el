@@ -144,8 +144,7 @@
        :depth  'append)
     (when (window-configuration-p mantle:user:ediff:window/cache)
       (set-window-configuration mantle:user:ediff:window/cache))
-    (setq mantle:user:ediff:window/cache nil))
-  )
+    (setq mantle:user:ediff:window/cache nil)))
 
 
 ;;------------------------------------------------------------------------------

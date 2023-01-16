@@ -20,7 +20,7 @@
 ;; Set-Up.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :input
+(imp:path:root/set :input
                (imp:path:current:dir))
 
 

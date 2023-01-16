@@ -5,7 +5,7 @@
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :buffer
+(imp:path:root/set :buffer
                (imp:path:current:dir)
                "init.el")
 

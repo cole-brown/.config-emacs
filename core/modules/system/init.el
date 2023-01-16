@@ -20,7 +20,7 @@
 ;; Set-Up.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :system
+(imp:path:root/set :system
                (imp:path:current:dir))
 
 

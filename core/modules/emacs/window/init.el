@@ -21,7 +21,7 @@
 ;; Set up imp.
 ;;------------------------------------------------------------------------------
 
-(imp:path:root :window
+(imp:path:root/set :window
                (imp:path:current:dir)
                "init.el")
 
