@@ -449,7 +449,7 @@ Will only upgrade the first MAX if MAX is numberp or can be converted by
   (when (listp max)
     (setq max (nth 0 max)))
 
-  (let* ((func/name "innit:package:init/standard")
+  (let* ((func/name "innit:package:upgrade")
          ; (func/tags '(:innit :package))
          (packages/max (cond ((null max)
                               nil)
