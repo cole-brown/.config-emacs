@@ -30,9 +30,9 @@
   (imp:use-package undo-tree
     :demand t ;; Always load.
 
-    ;;--------------------
+    ;;------------------------------
     :init
-    ;;--------------------
+    ;;------------------------------
 
     ;; Declare that we'll have `undo-tree' available as our undo feature.
     ;; Evil will need to knaw about it.
@@ -40,9 +40,9 @@
     (imp:flag :emacs +undo-tree)
 
 
-    ;;--------------------
+    ;;------------------------------
     :custom
-    ;;--------------------
+    ;;------------------------------
 
     (undo-tree-visualizer-diff t)
     (undo-tree-auto-save-history t)
@@ -58,9 +58,9 @@
     (undo-outer-limit  (* 256 1024 1024)) ; 256mb (default is 24mb)
 
 
-    ;;--------------------
+    ;;------------------------------
     :general
-    ;;--------------------
+    ;;------------------------------
     ;; No prefix. Used very frequently.
     (:states  'normal
      :keymaps 'override
@@ -75,9 +75,9 @@
      )
 
 
-    ;;--------------------
+    ;;------------------------------
     :config
-    ;;--------------------
+    ;;------------------------------
 
     ;; Prefer `zstd' for compressing history files.
     (cond ((executable-find "zstd")

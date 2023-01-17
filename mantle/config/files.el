@@ -31,9 +31,9 @@
   :demand t
 
   ;; TODO: Do I want this functionality from Doom or no? It has errors, currently, if not '--debug-init'.
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;; :init
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;;
   ;; (defun mantle:recentf:file/truename (file)
   ;;   "Proudly nicked from Doom's 'core/core-editor.el'."
@@ -64,9 +64,9 @@
   ;;   (recentf-add-file default-directory))
   ;;
   ;;
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;; :hook
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;;
   ;; (((window-selection-change-functions
   ;;    write-file-functions)
@@ -74,9 +74,9 @@
   ;;  (dired-mode-hook . mantle:hook:recentf:touch/dired)) ;; (innit:hook:func/name:symbol "recentf:touch/dired" nil)
 
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; Clean up the recent list when Emacs has been idle for over 30 seconds.
   (recentf-auto-cleanup    30)
@@ -88,9 +88,9 @@
   (recentf-max-menu-items  20)
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; Resolve symlinks, strip out the /sudo:X@ prefix in local tramp paths, and
   ;; abbreviate $HOME -> ~ in filepaths (more portable, more readable, & saves
@@ -171,9 +171,9 @@
 (imp:use-package deadgrep
   :demand t
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   (defun mantle:user:deadgrep:default-directory (search-term)
     "Search for SEARCH-TERM with `deadgrep' at `default-directory'."
@@ -194,9 +194,9 @@
                               :process))
 
 
-  ;;--------------------
+  ;;------------------------------
   :general
-  ;;--------------------
+  ;;------------------------------
 
   ;;---
   ;; Global Keybinds
@@ -230,9 +230,9 @@
    "g r" (list #'deadgrep-restart :which-key "↺ Refresh"))
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;;---
   ;; Project Root Overrides

@@ -110,9 +110,9 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
 (imp:use-package yasnippet
   :demand t
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   ;;---
   ;; Default Snippets Location
@@ -139,15 +139,15 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
     (setq require-final-newline nil))
 
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
+  ;;------------------------------
   (snippet-mode-hook . mantle:hook:yasnippet) ;; (innit:hook:func/name:symbol "yasnippet" nil)
 
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; Allow snippetception: snippets inside of snippets.
   (yas-triggers-in-field t)
@@ -175,9 +175,9 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
   ;; (yas-key-syntaxes '("w_" "w_." "^ "))
 
 
-  ;;--------------------
+  ;;------------------------------
   :general
-  ;;--------------------
+  ;;------------------------------
   ;; Snippets are quite common - put them outside the leader key.
   ;;---
   (keybind:global:def
@@ -202,9 +202,9 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
   ;; (unbind-key "<tab>" yas-minor-mode-map)
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;;---
   ;; Snippet Paths

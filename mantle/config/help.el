@@ -53,9 +53,9 @@
 ;; commands in the help-command map.
 (imp:use-package which-key
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; Sort lower and uppercase keybinds together instead of all upper then all lower.
   ;; And lowercase goes first.
@@ -69,9 +69,9 @@
   ;;   https://github.com/justbur/emacs-which-key#evil-operators
   ;;   This is done in `:config' so we can check if we have `evil' enabled.
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; Can change where the which-key windows shows up with one of these:
   ;;   (which-key-setup-side-window-bottom) ;; This is the default.
@@ -144,9 +144,9 @@
   ;;------------------------------
   ;; Normal Emacs (Non-Evil) Keybinds
   ;;------------------------------
-  ;;--------------------
+  ;;------------------------------
   :bind ;; global
-  ;;--------------------
+  ;;------------------------------
   (("C-h f" . helpful-callable)
    ("C-h v" . helpful-variable)
    ("C-h k" . helpful-key)
@@ -156,9 +156,9 @@
    ;; replaces `describe-coding-system' but I've never used that...
    ("C-h C" . helpful-command))
 
-  ;;--------------------
+  ;;------------------------------
   :bind ;; helpful-mode-map
-  ;;--------------------
+  ;;------------------------------
   (:map helpful-mode-map
         ;; kill-this-buffer instead of quit (bury)
         ;; TRIAL: [2019-10-28]
@@ -167,9 +167,9 @@
         ("q" . window:kill-or-quit))
 
 
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;; :custom
-  ;; ;;--------------------
+  ;; ;;------------------------------
 
   ;; ;; Default is 5. Can change if desired, but I tried 2 and went back to 5.
   ;; ;; [2019-10-28]: 2->5
@@ -177,9 +177,9 @@
   ;; ;;   "If this or more, kill oldest when opening another.")
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; Set up Ivy to use Helpful:
   (when (imp:feature? 'ivy)

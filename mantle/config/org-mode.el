@@ -40,9 +40,9 @@
 ;;------------------------------------------------------------------------------
 
 ;; TODO: delete this lil block:
-;; ;;--------------------
+;; ;;------------------------------
 ;; ;; MUST PROCEED ORG SETUP?
-;; ;;--------------------
+;; ;;------------------------------
 ;;
 ;; ;; DOOM-NOTE:
 ;; ;; If you use `org' and don't want your org files in the default location below,
@@ -54,13 +54,13 @@
 ;;   (setq org-directory "~/org/"))
 
 
-;;--------------------
+;;------------------------------
 ;; Org-Mode Set-Up
-;;--------------------
+;;------------------------------
 (imp:use-package org
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   ;;---
   ;; Create Org-Mode Hooks
@@ -83,16 +83,16 @@
     (setq tab-width (jerky:get 'docs 'tab 'short)))
 
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
+  ;;------------------------------
 
   ((org-mode-hook . mantle:hook:org/jump-to-now-target) ;; (innit:hook:func/name:symbol "org/jump-to-now-target" nil)
    (org-mode-hook . mantle:hook:org/local-settings))    ;; (innit:hook:func/name:symbol "org/local-settings"     nil)
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; Doom or someone already sets this to org-directory/"notes.org".
   ;; (org-default-notes-file (path:abs:file org-directory "notes.org"))
@@ -185,22 +185,22 @@
   (org-src-preserve-indentation t)
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
-  ;;--------------------
+  ;;------------------------------
   ;; conditional customization: org-agenda
-  ;;--------------------
+  ;;------------------------------
 
   (when-let ((agenda-files (jerky:get 'path 'org 'agenda)))
     (innit:customize-set-variable org-agenda-files
                             agenda-files
                             "My paths to search for agenda items."))
 
-  ;;--------------------
+  ;;------------------------------
   ;; configuration
-  ;;--------------------
+  ;;------------------------------
 
   ;; NOTE: Keybinds are in: TODO: WHERE ARE KEYBINDS IN sn-004??? Previously: config/keybinds/org-mode.el
 
@@ -298,9 +298,9 @@
 (imp:use-package org-journal
   :after org
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   ;;---
   ;; "Home" Domain
@@ -397,9 +397,9 @@ LETTER must be a 1-character string."
                                                            nil))
                    :which-key (format "`%S' - Search Journal" namespace))))))
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   (org-journal-dir (jerky:get 'path 'org 'journal
                               :namespace (jerky:get 'namespace 'system)))
@@ -428,13 +428,13 @@ LETTER must be a 1-character string."
                                       :namespace (jerky:get 'namespace 'system)))
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
-  ;;--------------------
+  ;;------------------------------
   ;; customization
-  ;;--------------------
+  ;;------------------------------
 
   ;; This is only the path to the default namespace, so multi-namespace
   ;; shenanigans have to constantly mess with this, I think?
@@ -443,9 +443,9 @@ LETTER must be a 1-character string."
     (dlv:var:safe/predicate 'org-journal-dir #'file-directory-p :quiet))
 
 
-  ;;--------------------
+  ;;------------------------------
   ;; configuration
-  ;;--------------------
+  ;;------------------------------
 
   ;; Insert dir local variable(s) for namespaces.
   (dolist (namespace '(:work :home))
@@ -559,9 +559,9 @@ LETTER must be a 1-character string."
 ;; (imp:use-package org-roam
 ;;   :after org
 
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   :custom
-;;   ;;--------------------
+;;   ;;------------------------------
 
 ;;   (org-roam-buffer (buffer:name:special "lily" nil :info))
 
@@ -591,13 +591,13 @@ LETTER must be a 1-character string."
 ;;   (org-roam-buffer-position 'bottom)
 
 
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   :config
-;;   ;;--------------------
+;;   ;;------------------------------
 
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   ;; conditional customization
-;;   ;;--------------------
+;;   ;;------------------------------
 
 ;;   ;; Mitigate annoyance of org-roam (on Windows) throwing "Selecting deleted
 ;;   ;; buffer" errors every other time it runs `org-roam-build-cache'.
@@ -605,9 +605,9 @@ LETTER must be a 1-character string."
 ;;     ;; default value: 'idle-timer
 ;;     (innit:customize-set-variable org-roam-db-update-method 'immediate))
 
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   ;; configuration
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   ;; none
 ;;   )
 

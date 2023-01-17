@@ -96,9 +96,9 @@ It will, for each directory in ~autogit:repos:path/watch~:
 #+begin_src emacs-lisp
 (use-package autogit
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; List of Repos for Commit Command:
   (autogit:repos:path/commit (list

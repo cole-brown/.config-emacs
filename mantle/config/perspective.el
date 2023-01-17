@@ -54,9 +54,9 @@ the style & disable it occasionally.")
   :unless noninteractive
   :commands persp-switch-to-buffer
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   ;;---
   ;; Create Main Perspective
@@ -193,9 +193,9 @@ the style & disable it occasionally.")
         (ignore-errors (file-remote-p dir))))
 
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
+  ;;------------------------------
   ;; Note: Use `innit:cmd:hook:func/name' to insert the func names created via the `innit:hook:defun' `:name' field.
   (((persp-mode-hook persp-after-load-state-functions) . mantle:hook:persp:perspective:replace-nil)
    (persp-mode-hook . mantle:hook:persp:perspective:init-first)
@@ -215,9 +215,9 @@ the style & disable it occasionally.")
    (bookmark-after-jump-hook . mantle:hook:persp:buffer:add-current))
 
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; `persp-save-dir': Set by `no-littering'.
 
@@ -256,9 +256,9 @@ the style & disable it occasionally.")
   (persp-init-new-frame-behaviour-override nil) ; "do not restore window configuration"
 
 
-  ;;--------------------
+  ;;------------------------------
   :general
-  ;;--------------------
+  ;;------------------------------
 
   ;;---
   ;; Global Keybinds
@@ -268,9 +268,9 @@ the style & disable it occasionally.")
    "b" (list #'persp-switch-to-buffer :which-key "Switch Perspective Buffer"))
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; Per-perspective `winner-mode' history
   (add-to-list 'window-persistent-parameters '(winner-ring . t))

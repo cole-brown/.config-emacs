@@ -44,9 +44,9 @@
 (imp:use-package uniquify
   :ensure nil ; This is an Emacs built-in feature.
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;;---
   ;; Buffer Name

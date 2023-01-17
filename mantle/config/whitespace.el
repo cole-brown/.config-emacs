@@ -98,18 +98,18 @@
 (imp:use-package ws-butler
   :demand t
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   (ws-butler-convert-leading-tabs-or-spaces t)
 
   ;; NOTE: If modes need to be excluded, customize the variable `ws-butler-global-exempt-modes'.
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;;------------------------------
   ;; TODO: Does this bug still exist? This was from a few years ago in sn-002 config.
@@ -166,9 +166,9 @@
   :ensure nil ; This is an Emacs built-in feature.
   :demand t
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
   (innit:hook:defun
       (:name    "org/whitespace:mode/enter"
        :file    macro<imp>:path/file
@@ -188,16 +188,16 @@
      (whitespace-cleanup)))
 
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
+  ;;------------------------------
   ((org-mode-hook    . mantle:hook:org/whitespace:mode/enter) ;; (innit:hook:func/name:symbol "org/whitespace:mode/enter" nil)
    (before-save-hook . mantle:hook:org/whitespace:save/pre))  ;; (innit:hook:func/name:symbol "org/whitespace:save/pre" nil)
 
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; Set 'lines-tail/'lines in `whitespace-style' to base off of `fill-column' instead of just hard-coded `80'.
   (whitespace-line-column nil)
@@ -239,9 +239,9 @@
      space-mark tab-mark newline-mark)))
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; NOTE: See thime's tweaks (e.g. "mantle/theme/zenburn/whitespace.el") for
   ;; changes to face attributes.

@@ -105,14 +105,14 @@
 ;; very annoying and not easy to fix on the spot? Skip using it while I think
 ;; about it.
 ;; (imp:use-package hydra-posframe
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   :hook
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   (after-init . hydra-posframe-enable)
 ;;
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   :custom
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   ;; Defaults to centered, which is a bit far from any feedback printed into the minibuffer...
 ;;   (hydra-posframe-poshandler 'posframe-poshandler-frame-center)
 ;;   ;; TODO: If center is no good, try one of these:

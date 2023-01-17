@@ -29,9 +29,9 @@
 
   ;; TODO: keybinds!
   ;; TODO: Doom made it lazy/auto-load based on these commands. Do I want that or to let use-package do whatever it does normally?
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;; :commands
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;;
   ;; (projectile-project-root
   ;;  projectile-project-name
@@ -40,9 +40,9 @@
   ;;  projectile-relevant-known-projects)
 
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   (defun mantle:user:projectile:ignore? (project-root)
     "Return non-nil if temporary file or a `no-littering' directory."
@@ -59,9 +59,9 @@
             (file-in-directory-p project-root no-littering-var-directory)))))
 
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; `no-littering' puts these into "`user-emacs-directory'/var/..." for us.
   ;;   - `projectile-cache-file'
@@ -98,9 +98,9 @@
   (compilation-save-buffers-predicate #'projectile-current-project-buffer-p)
 
 
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;; :general ;; TODO: Or maybe put in `:config'? Or both?
-  ;; ;;--------------------
+  ;; ;;------------------------------
 
   ;; TODO: keybinds!
   ;; ;; Recommended keymap prefix on Windows/Linux
@@ -110,9 +110,9 @@
   ;; (global-set-key [remap find-tag]         #'projectile-find-tag)
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   (innit:hook:defun-and-add
       projectile-relevant-known-projects

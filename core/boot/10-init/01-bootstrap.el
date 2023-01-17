@@ -50,17 +50,17 @@
   :demand t
 
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
   ;; Set the `no-littering' directory paths.
   (no-littering-etc-directory innit:path:etc)
   (no-littering-var-directory innit:path:var)
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
   ;; Suggested settings: https://github.com/emacscollective/no-littering#suggested-settings
 
   ;; `recentf' should ignore the files in the `no-littering' dirs.
@@ -192,9 +192,9 @@
 ;; not be using `gcmh' at all.
 (imp:use-package gcmh
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
   (gcmh-idle-delay 'auto)  ; default is 15s
   (gcmh-auto-idle-delay-factor 10)
   ;; GCMH default:  1 MB
@@ -202,9 +202,9 @@
   ;; I have 32 or 64 GB of ram, depending on computer, so higher?
   (gcmh-high-cons-threshold (* 32 1024 1024))
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
   (gcmh-mode 1))
 
 
@@ -223,9 +223,9 @@
   ;;   2) Here's where it is; add this dir to the `load-path'.
   :load-path innit:path:package:mis
 
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;; :custom
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;;
   ;; mis:buffer:name
   ;; mis:buffer:default

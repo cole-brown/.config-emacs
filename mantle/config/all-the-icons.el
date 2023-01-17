@@ -33,9 +33,9 @@
   ;; Only use `all-the-icons' when we have a GUI.
   :if (display-graphic-p)
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; Try to automatically install the fonts if they're not present.
   ;; Closest I can get for now is this, I think.

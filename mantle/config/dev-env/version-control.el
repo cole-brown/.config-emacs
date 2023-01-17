@@ -55,9 +55,9 @@
 
 (imp:use-package magit
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   (defun mantle:user:magit:buffer:kill ()
     "Kill all magit buffers."
@@ -70,9 +70,9 @@
                           :process))
 
 
-  ;;--------------------
+  ;;------------------------------
   :general
-  ;;--------------------
+  ;;------------------------------
   ;; Put Magit Leader under the Global Leader
   ;;---
   (keybind:leader/global:def
@@ -155,9 +155,9 @@
 (imp:use-package magit-todos
   :after magit
 
-  ;;--------------------
+  ;;------------------------------
   :general
-  ;;--------------------
+  ;;------------------------------
   (keybind:leader/global:def
    :infix  "g"
    ;;---
@@ -166,9 +166,9 @@
    "t" '(magit-todos-list :which-key "Magit TODOs list buffer"))
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
   (magit-todos-mode +1))
 
 
@@ -182,9 +182,9 @@
   ;; needed there.
   :when (display-graphic-p)
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
   (global-git-gutter-mode +1))
 
 
@@ -196,9 +196,9 @@
 (imp:use-package git-modes
   :defer t
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; Docker's ignore file is basically the same format as .gitignore, so use the
   ;; `gitignore-mode' for it.
@@ -219,9 +219,9 @@
 ;;    ;;   2) Here's where it is; add this dir to the `load-path'.
 ;;    :load-path (path:join innit:path:packages:user "autogit")
 ;;
-;;    ;;--------------------
+;;    ;;------------------------------
 ;;    :custom
-;;    ;;--------------------
+;;    ;;------------------------------
 ;;
 ;;    ;; Repos: Autocommit:
 ;;    (autogit:repos:path/commit (list

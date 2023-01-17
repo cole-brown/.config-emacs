@@ -48,9 +48,9 @@
                                (t                             nil)))
 
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   ;; Initialize Evil for integrating Evil Collection keybinds.
   ;; NOTE: _MUST_ be set /before/ evil loads!
@@ -58,18 +58,18 @@
         evil-want-integration t)
 
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; Don't aggregate all actions while in insert state into a single undo action.
   ;; Act like normal Emacs instead.
   (evil-want-fine-undo t)
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; And, of course, be evil in all buffers.
   (evil-mode 1))
@@ -84,9 +84,9 @@
   :demand t ;; Always load.
   :after  (evil)
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
   ;; https://github.com/emacs-evil/evil-collection#configuration
 
   ;; Set up Org functions in calendar keymap.
@@ -119,9 +119,9 @@
   ;; (evil-collection-config '(mode-that-takes-too-long-I-guess ...))
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; Register the keybinds all at once.
   ;; NOTE: Could register one-by-one if we want them delayed?
