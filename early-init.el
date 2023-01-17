@@ -96,19 +96,19 @@
 
 ;; 'early-init.el' and 'init.el' only, probably...
 (imp:path:root/set :root
-               user-emacs-directory)
+                   user-emacs-directory)
 
 ;; Core elisp for `innit' to invoke during start-up.
 (imp:path:root/set :core
-               innit:path:core/boot)
+                   innit:path:core/boot)
 
 ;; NOTE: 'mantle/' directory is available/encouraged for users to put their
 ;; Emacs init stuff in. `innit' will call 'mantle/init.el' during one phase of
 ;; 'init.el', and then will call 'mantle/config.el' during a later phase of
 ;; 'init.el'.
 (imp:path:root/set :mantle
-               (imp:path:join user-emacs-directory "mantle")
-               "init.el")
+                   (imp:path:join user-emacs-directory "mantle")
+                   "init.el")
 
 ;; User's modules; not our "core/modules/" directory.
 (imp:path:root/set :module innit:path:module)

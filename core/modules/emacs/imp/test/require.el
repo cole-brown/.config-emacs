@@ -77,7 +77,7 @@
     ;;---
     ;; For testing that it can load something it knows about but that hasn't been required.
     (imp:path:root/set test<imp>:feature:loading
-                   test<imp>:path:root:loading)
+                       test<imp>:path:root:loading)
 
     ;;---
     ;; Require a feature:

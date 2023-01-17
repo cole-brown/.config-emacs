@@ -374,9 +374,9 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
   (:prefix  (keybind:prefix :local "t") ; test
    :states  keybind:leader/local:states
    :keymaps 'buttercup-minor-mode-map
-   "t" (list #'mantle:user:emacs-lisp:buttercup:run-file :which-key "buttercup: run file")
+   "t" (list #'mantle:user:emacs-lisp:buttercup:run-file    :which-key "buttercup: run file")
    "a" (list #'mantle:user:emacs-lisp:buttercup:run-project :which-key "buttercup: run project")
-   "s" (list #'buttercup-run-at-point :which-key "buttercup: run at point"))
+   "s" (list #'buttercup-run-at-point                       :which-key "buttercup: run at point"))
 
 
   ;;------------------------------

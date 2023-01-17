@@ -76,14 +76,14 @@
    "" '(nil :which-key "Alignment...") ; Infix Title
 
    "a" (list #'buffer:cmd:align-before :which-key "Align Before")
-   "o" (list #'buffer:cmd:align-after :which-key "Align After")
-   ";" (list #'align-regexp :which-key "Align Regex")
+   "o" (list #'buffer:cmd:align-after  :which-key "Align After")
+   ";" (list #'align-regexp            :which-key "Align Regex")
    "q" (list (elisp:cmd
               (setq current-prefix-arg '(4))
               (call-interactively #'align-regexp))
              :which-key "C-u Align Regex")
-   "'" (list #'align :which-key "Align")
-   "," (list #'align-current :which-key "Align Current"))
+   "'" (list #'align                   :which-key "Align")
+   "," (list #'align-current           :which-key "Align Current"))
 
 
   ;;------------------------------
@@ -98,8 +98,8 @@
    "" '(nil :which-key "Centering...") ; Infix Title
 
    "c" (list (elisp:cmd (buffer:cmd:center/width 80)) :which-key "Center at 40 (80 width)")
-   "t" (list #'buffer:cmd:center/to :which-key "Center to Column...")
-   "w" (list #'buffer:cmd:center/width :which-key "Center at Width..."))
+   "t" (list #'buffer:cmd:center/to                   :which-key "Center to Column...")
+   "w" (list #'buffer:cmd:center/width                :which-key "Center at Width..."))
 
 
   ;;------------------------------

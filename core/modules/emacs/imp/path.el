@@ -1034,12 +1034,12 @@ Must be called after 'provide.el' is loaded."
   ;;   - Might as well automatically fill ourself in.
   ;;---
   (imp:path:root/set :imp
-                 ;; root dir
-                 (file-name-directory (if load-in-progress
-                                          load-file-name
-                                        (buffer-file-name)))
-                 ;; root file - just provide relative to dir/imp
-                 "init.el")
+                     ;; root dir
+                     (file-name-directory (if load-in-progress
+                                              load-file-name
+                                            (buffer-file-name)))
+                     ;; root file - just provide relative to dir/imp
+                     "init.el")
 
   ;;---
   ;; Provide feature symbol for 'path.el'.

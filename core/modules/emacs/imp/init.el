@@ -32,8 +32,8 @@
 ;; (Optional) Set-Up:
 ;; ------
 ;; (imp:path:root/set <symbol/keyword0>
-;;                <path-to-root-dir-absolute>
-;;                &optional <path-to-root-file-relative-or-absolute>)
+;;                    <path-to-root-dir-absolute>
+;;                    &optional <path-to-root-file-relative-or-absolute>)
 ;;   - Setting a root for <symbol/keyword0> allows later `imp:require' calls to
 ;;     try to find the file if not already provided.
 ;;------------------------------
