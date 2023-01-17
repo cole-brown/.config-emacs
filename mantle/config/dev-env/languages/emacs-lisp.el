@@ -455,8 +455,6 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
 ;; https://github.com/xuchunyang/elisp-demos
 
 (imp:use-package elisp-demos
-  :defer t
-
   ;;------------------------------
   :init
   ;;------------------------------
@@ -484,8 +482,9 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
     (let ((filename "elisp-demos.org")
           ;; TODO: Make demos for all of my shit, and add them in here?
           ;; See Doom's 'demos.org' file: "modules/lang/emacs-lisp/demos.org"
-          (paths (list (imp:path:root :mis)
-                       (imp:path:root :datetime)))
+          ;; NOTE: Raise error if one of our packages/modules goes AWOL.
+          (paths (list (imp:path:root/get :mis      :error)
+                       (imp:path:root/get :datetime :error)))
           demo)
       ;;------------------------------
       ;; Search each path.

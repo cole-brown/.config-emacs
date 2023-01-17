@@ -206,10 +206,7 @@ See: http://www.catb.org/jargon/html/M/metasyntactic-variable.html")
 (imp:use-package format-all
   :delight ; Don't put in the modes in the modeline.
 
-  ;; TODO: Erm... why does my `use-package' not have the `:autoload' keyword in `use-package-keywords`?!
-  ;; It exists in latest `use-package':
-  ;;   https://github.com/jwiegley/use-package/blob/bcf0984cf55b70fe6896c6a15f61df92b24f8ffd/use-package-core.el#L71
-  ;; :autoload format-all--language-id-buffer
+  :autoload format-all--language-id-buffer
 
   ;;------------------------------
   :init
@@ -256,8 +253,8 @@ Originally from Doom's `+format-on-save-enabled-modes' in \"modules/editor/forma
       (cond ((null language))
 
             ;; Explicitly disabled.
-            ((or (seq-contains-p language   mantle:user:format-all:on-save/disabled)
-                 (seq-contains-p major-mode mantle:user:format-all:on-save/disabled)))
+            ((or (seq-contains-p mantle:user:format-all:on-save/disabled language)
+                 (seq-contains-p mantle:user:format-all:on-save/disabled major-mode)))
 
             ;; Hidden buffers probably don't need auto-formatting?
             ((string-prefix-p " " (buffer-name)))
