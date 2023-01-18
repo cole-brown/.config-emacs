@@ -37,34 +37,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Minibuffer
-;;------------------------------------------------------------------------------
-
-;; Allow for minibuffer-ception. Sometimes we need another minibuffer command
-;; while we're in the minibuffer.
-(innit:customize-set-variable enable-recursive-minibuffers t)
-
-;; Show current key-sequence in minibuffer ala 'set showcmd' in vim. Any
-;; feedback after typing is better UX than no feedback at all.
-(innit:customize-set-variable echo-keystrokes 0.02)
-
-;; Expand the minibuffer to fit multi-line text displayed in the echo-area. This
-;; doesn't look too great with direnv, however...
-(innit:customize-set-variable resize-mini-windows 'grow-only)
-
-;; Typing yes/no is obnoxious when y/n will do
-(advice-add #'yes-or-no-p :override #'y-or-n-p)
-
-;; Try to keep the cursor out of the read-only portions of the minibuffer.
-(innit:customize-set-variable minibuffer-prompt-properties
-                              '(read-only         t
-                                intangible        t
-                                cursor-intangible t
-                                face              minibuffer-prompt))
-(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-
-;;------------------------------------------------------------------------------
 ;; Initialize!
 ;;------------------------------------------------------------------------------
 ;; TODO: This doesn't go here. This goes in mantle

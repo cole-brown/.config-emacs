@@ -13,12 +13,42 @@
 ;;; Commentary:
 ;;
 ;;  Ivy, Helm, SMOCE, or...
+;;    VMOCE?
+;;
+;;
+;; [2022-07-20] "SMOCE" Stack:
+;;   There's the standards like `ivy' and `helm', but I want to try newer next gen stuff.
+;;   Like this:
+;;     https://www.reddit.com/r/emacs/comments/ppg98f/comment/hd3hll1/?utm_source=share&utm_medium=web2x&context=3
+;;   From:
+;;     https://www.reddit.com/r/emacs/comments/ppg98f/which_completion_framework_do_you_use_and_why/
+;;
+;;   So... Introducing the "SMOCE Stack":
+;;     - https://github.com/radian-software/selectrum#complementary-extensions
+;;     - Selectrum:       https://github.com/raxod502/selectrum
+;;       - (or Vertico?): https://github.com/minad/vertico
+;;     - Marginalia:      https://github.com/minad/marginalia
+;;     - Orderless:       https://github.com/oantolin/orderless
+;;     - Consult:         https://github.com/minad/consult
+;;     - Embark:          https://github.com/oantolin/embark
+;;
+;;
+;; [2023-01-17] Deprecate Selectrum:
+;;   Selectrum's maintainer(s) decided Vertico is better (same features, simpler
+;;   code); instruct everyone to switch to Vertico.
+;;     - https://github.com/radian-software/selectrum#selectrum-is-replaced
+;;
+;;   So... I guess "SMOCE" is now... "VMOCE"?
+;;   "VMOCE Stack" doesn't have quite the ring to it compared to "SMOCE Stack"...
+;;
+;;   Migration Guide:
+;;     https://github.com/minad/vertico/wiki/Migrating-from-Selectrum-to-Vertico
 ;;
 ;;; Code:
 
 
 ;;------------------------------------------------------------------------------
-;; "SMOCE Stack": Selectrum & Friends
+;; "VMOCE Stack": Vertico & Friends
 ;;------------------------------------------------------------------------------
 ;; There's the standards like `ivy' and `helm', but I want to try newer next gen stuff.
 ;; Like this:
@@ -26,10 +56,8 @@
 ;; From:
 ;;   https://www.reddit.com/r/emacs/comments/ppg98f/which_completion_framework_do_you_use_and_why/
 ;;
-;; So... Introducing the "SMOCE Stack":
-;;   - https://github.com/radian-software/selectrum#complementary-extensions
-;;   - Selectrum:       https://github.com/raxod502/selectrum
-;;     - (or Vertico?): https://github.com/minad/vertico
+;; So... Introducing the "VMOCE Stack"):
+;;   - Vertico:    https://github.com/minad/vertico
 ;;   - Marginalia:      https://github.com/minad/marginalia
 ;;   - Orderless:       https://github.com/oantolin/orderless
 ;;   - Consult:         https://github.com/minad/consult
@@ -37,59 +65,195 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Selectrum: Better Completion UI
+;; Vertico: VERTical Interactive COmpletion
 ;;------------------------------------------------------------------------------
-;; https://github.com/raxod502/selectrum
+;; https://github.com/minad/vertico
 
 ;;------------------------------
-;; Selectrum
+;; Vertico
 ;;------------------------------
-;; Not a whole lot of configuration...
 
-(imp:use-package selectrum
-  ;;--------------------
+;; TODO: Finish README? https://github.com/minad/vertico#completion-styles-and-tab-completion
+(imp:use-package vertico
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+  ;; https://github.com/minad/vertico/blob/main/vertico.el
+  ;;   Search for: (defcustom
+
+  ;; Show more candidates (default 10).
+  (vertico-count 20)
+
+  ;; Different scroll margin (default 2).
+  ;; (vertico-scroll-margin 0)
+
+  ;; Grow and shrink the Vertico minibuffer.
+  ;;   - options: t, nil, `grow-only'
+  ;;   - default: `resize-mini-windows' (?!)
+  ;; See `resize-mini-windows' for details.
+  ;; (vertico-resize t)
+
+  ;; Enable cycling for `vertico-next' and `vertico-previous' (default nil).
+  ;; (vertico-cycle t)
+
+
+  ;;------------------------------
   :config
-  ;;--------------------
-  (selectrum-mode +1))
+  ;;------------------------------
+  (vertico-mode +1))
 
-;; TODO: Are there /evil/ Selectrum keybinds?
-;;   - https://github.com/radian-software/selectrum#keybindings
+;; TODO-keybinds: Are there (evil) Vertico keybinds?
+;; TODO-keybinds: Do any of my keybinds need editted to be ok with Vertico?
+;;   - https://github.com/minad/vertico#key-bindings
+;;   - See `C-h v vertico-map' for keybinds, or:
+;;     - https://github.com/minad/vertico/blob/main/vertico.el
 
 
 ;;------------------------------
-;; Selectrum + Orderless
+;; Vertico w/ Prescient?
 ;;------------------------------
-;; https://github.com/radian-software/selectrum#alternative-2-orderless
-;; https://github.com/oantolin/orderless#selectrum
-
-(imp:eval:after (:and selectrum orderless)
-
-  ;; Persist history over Emacs restarts
-  (savehist-mode +1)
-
-  ;; Optional performance optimization
-  ;; by highlighting only the visible candidates.
-  (innit:customize-set-variable orderless-skip-highlighting             (lambda () selectrum-is-active))
-  (innit:customize-set-variable selectrum-refine-candidates-function    #'orderless-filter)
-  (innit:customize-set-variable selectrum-highlight-candidates-function #'orderless-highlight-matches))
-
-
 ;; TODO: Do I want this:
 ;;   > "In some cases you may want to consider to use Prescient on top of
 ;;   > Orderless. Prescient can be used to provide frecency-based sorting (a
 ;;   > combination of frequency and recency) and history persistence by adding
 ;;   > the following."
-;; TODO: If so:
-;; TODO:   1) Uncomment this.
-;; TODO:   2) Make an `imp:use-package' section for `prescient'.
+;; TODO: If so: https://github.com/minad/vertico/wiki#using-prescientel-filtering-and-sorting
+
+
+;;------------------------------
+;; Save History
+;;------------------------------
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(imp:use-package savehist
+  :ensure nil ; This is an Emacs built-in feature.
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+  (savehist-mode +1))
+
+
+;;------------------------------
+;; Minibuffer Tweaks
+;;------------------------------
+;; TODO: Move minibuffer config elsewhere. Some of this was originally in "core/boot/10-init/10-settings.el"... Probably should be "mantle/config/minibuffer.el"?
+(imp:use-package emacs
+  :after vertico
+  :ensure nil ; This is an Emacs built-in feature.
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  ;; Typing yes/no is obnoxious when y/n will do
+  (advice-add #'yes-or-no-p :override #'y-or-n-p)
+
+  ;; Try to keep the cursor out of the read-only portions of the minibuffer.
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  (define-advice completing-read-multiple (:filter-args (fn &rest args) mantle:minibuffer:completing-read-multiple:indicator)
+    "Add a prompt indicator to `completing-read-multiple'.
+
+We display a prefix with the `crm-separator' in the prompt.
+Assuming:
+  1. The separator is a comma.
+  2. The prompt is \"prompt❯ \"
+Example:
+  ├CRM:,┤ prompt❯ _"
+    ;; Add prefix to PROMPT in ARGS.
+    (cons (format "├CRM:%s┤ %s" ; Unicode?
+                  ;; "[CRM:%s] %s" ; ASCII only
+                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                                            crm-separator)
+                  (car args))
+          (cdr args)))
+
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+
+  ;; Allow for minibuffer-ception. Sometimes we need another minibuffer command
+  ;; while we're in the minibuffer.
+  (enable-recursive-minibuffers t)
+
+  ;; Show current key-sequence in minibuffer ala 'set showcmd' in vim. Any
+  ;; feedback after typing is better UX than no feedback at all.
+  (echo-keystrokes 0.02)
+
+  ;; Expand the minibuffer to fit multi-line text displayed in the echo-area. This
+  ;; doesn't look too great with direnv, however...
+  (resize-mini-windows 'grow-only)
+
+  ;; Try to keep the cursor out of the read-only portions of the minibuffer.
+  (minibuffer-prompt-properties '(read-only         t
+                                  intangible        t
+                                  cursor-intangible t
+                                  face              minibuffer-prompt))
+
+  ;; TODO: Do I want to try this?
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  ;; (read-extended-command-predicate #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (enable-recursive-minibuffers t))
+
+
+;; ;;------------------------------------------------------------------------------
+;; ;; Selectrum: Better Completion UI
+;; ;;------------------------------------------------------------------------------
+;; ;; https://github.com/raxod502/selectrum
+
 ;; ;;------------------------------
-;; ;; Selectrum + Orderless + Prescient
+;; ;; Selectrum
 ;; ;;------------------------------
-;; (imp:eval:after (:and selectrum orderless prescient)
-;;
-;;   (innit:customize-set-variable selectrum-prescient-enable-filtering nil)
-;;   (selectrum-prescient-mode +1)
-;;   (prescient-persist-mode +1))
+;; ;; Not a whole lot of configuration...
+
+;; (imp:use-package selectrum
+;;   ;;------------------------------
+;;   :config
+;;   ;;------------------------------
+;;   (selectrum-mode +1))
+
+;; ;; TODO: Are there /evil/ Selectrum keybinds?
+;; ;;   - https://github.com/radian-software/selectrum#keybindings
+
+
+;; ;;------------------------------
+;; ;; Selectrum + Orderless
+;; ;;------------------------------
+;; ;; https://github.com/radian-software/selectrum#alternative-2-orderless
+;; ;; https://github.com/oantolin/orderless#selectrum
+
+;; (imp:eval:after (:and selectrum orderless)
+
+;;   ;; Persist history over Emacs restarts
+;;   (savehist-mode +1)
+
+;;   ;; Optional performance optimization
+;;   ;; by highlighting only the visible candidates.
+;;   (innit:customize-set-variable orderless-skip-highlighting             (lambda () selectrum-is-active))
+;;   (innit:customize-set-variable selectrum-refine-candidates-function    #'orderless-filter)
+;;   (innit:customize-set-variable selectrum-highlight-candidates-function #'orderless-highlight-matches))
+
+
+;; ;; TODO: Do I want this:
+;; ;;   > "In some cases you may want to consider to use Prescient on top of
+;; ;;   > Orderless. Prescient can be used to provide frecency-based sorting (a
+;; ;;   > combination of frequency and recency) and history persistence by adding
+;; ;;   > the following."
+;; ;; TODO: If so:
+;; ;; TODO:   1) Uncomment this.
+;; ;; TODO:   2) Make an `imp:use-package' section for `prescient'.
+;; ;; ;;------------------------------
+;; ;; ;; Selectrum + Orderless + Prescient
+;; ;; ;;------------------------------
+;; ;; (imp:eval:after (:and selectrum orderless prescient)
+;; ;;
+;; ;;   (innit:customize-set-variable selectrum-prescient-enable-filtering nil)
+;; ;;   (selectrum-prescient-mode +1)
+;; ;;   (prescient-persist-mode +1))
 
 
 ;;------------------------------------------------------------------------------
@@ -99,17 +263,17 @@
 
 (imp:use-package marginalia
   ;; The :init configuration is always executed (Not lazy!)
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   ;; Must be in the :init section of use-package such that the mode gets
   ;; enabled right away. Note that this forces loading the package.
   (marginalia-mode +1)
 
-  ;;--------------------
+  ;;------------------------------
   :bind
-  ;;--------------------
+  ;;------------------------------
   ;; TODO: What keybind to give this? What does it do?
   ;; Either bind `marginalia-cycle` globally or only in the minibuffer
   (("M-A" . marginalia-cycle)
@@ -124,13 +288,9 @@
 
 (imp:use-package orderless
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
-  ;; Selectrum suggests only `orderless' when using Selectrum & Orderless together.
-  ;; Orderless suggests `orderless' and `basic'.
-  ;; Orderless explains, so go with Orderless' settings?
-  ;;
+  ;;------------------------------
   ;;   > The `basic' completion style is specified as fallback in addition to
   ;;   > `orderless' in order to ensure that completion commands which rely on
   ;;   > dynamic completion tables, e.g., `completion-table-dynamic' or
@@ -154,9 +314,9 @@
 ;; Available Commands: https://github.com/minad/consult#available-commands
 
 (imp:use-package consult
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
   ;; Non-lazy things that need to happen?
   ;;   - See: https://github.com/minad/consult#use-package-example
   ;;     - Moved the setting of custom vars to `:custom'.
@@ -166,9 +326,9 @@
   (advice-add #'register-preview :override #'consult-register-window)
 
 
-  ;;--------------------
+  ;;------------------------------
   :bind
-  ;;--------------------
+  ;;------------------------------
   ;; TODO: Replace this `:bind' section with a `:general' section.
   ;; Replace bindings. Lazily loaded due by `use-package'.
   (;; C-c bindings (mode-specific-map)
@@ -223,17 +383,17 @@
    ("M-r" . consult-history))                ;; orig. previous-matching-history-element
 
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
+  ;;------------------------------
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
   (completion-list-mode-hook . consult-preview-at-point-mode)
 
 
-  ;;--------------------
+  ;;------------------------------
   :custom
-  ;;--------------------
+  ;;------------------------------
 
   ;; Optionally configure the register formatting. This improves the register
   ;; preview for `consult-register', `consult-register-load',
@@ -246,9 +406,9 @@
   (xref-show-definitions-function #'consult-xref)
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
@@ -316,26 +476,26 @@
 
 (imp:use-package embark
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
 
 
-  ;;--------------------
+  ;;------------------------------
   :bind
-  ;;--------------------
+  ;;------------------------------
   ;; TODO: EVIL bindings?
   (("C-." . embark-act)         ;; pick some comfortable binding
    ("C-;" . embark-dwim)        ;; good alternative: M-.
    ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
 
-  ;;--------------------
+  ;;------------------------------
   :config
-  ;;--------------------
+  ;;------------------------------
 
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
@@ -355,9 +515,9 @@
   ;; if you want to have consult previews as you move around an
   ;; auto-updating embark collect buffer
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
+  ;;------------------------------
   (embark-collect-mode-hook . consult-preview-at-point-mode))
 
 
@@ -420,14 +580,111 @@ targets."
 ;;   ;; Not all that much config help on the GitHub...
 ;;   ;; May have to go Googling to see how people use this.
 ;;
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   :config
-;;   ;;--------------------
+;;   ;;------------------------------
 ;;   (mini-frame-mode +1))
 ;;
 ;; TODO: If I like this, move it elsewhere. It was suggested by a "SMOCE"
 ;; completion framework package, but it's a minibuffer package, not a completion
 ;; package.
+
+
+;;------------------------------------------------------------------------------
+;; Corfu: Completion Overlay Region FUnction
+;;------------------------------------------------------------------------------
+
+;; https://github.com/minad/corfu
+(imp:use-package corfu
+  ;; ;;------------------------------
+  ;; :custom
+  ;; ;;------------------------------
+  ;;
+  ;; ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; ;; (corfu-auto t)                 ;; Enable auto completion (default nil)
+  ;; ;; (corfu-separator ?\s)          ;; Orderless field separator (default: `?\s' aka space)
+  ;; ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since Dabbrev can be used globally (M-/).
+  ;; See also `corfu-excluded-modes'.
+  (global-corfu-mode +1)
+
+  ;; ;;------------------------------
+  ;; :hook
+  ;; ;;------------------------------
+  ;; ;; Alternative: Enable Corfu only for certain modes.
+  ;; ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+  )
+
+
+;; ;; Completion settings in Emacs that could be useful for `corfu'.
+;; (imp:use-package emacs
+;;    :ensure nil ; This is an Emacs built-in feature.
+
+;;   ;;------------------------------
+;;   :custom
+;;   ;;------------------------------
+;;   ;; TAB cycle if there are only few candidates
+;;   (completion-cycle-threshold 3)
+
+;;   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
+;;   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+;;   ;; (read-extended-command-predicate #'command-completion-default-include-p)
+
+;;   ;; Enable indentation+completion using the TAB key?
+;;   ;; `completion-at-point' is often bound to M-TAB.
+;;   ;;
+;;   ;; Options:
+;;   ;;   - t          - TAB always just indents the current line.
+;;   ;;   - nil        - TAB indents the current line if point is at the left margin or in the line's indentation.
+;;   ;;                - Otherwise it inserts a TAB character or spaces, depending.
+;;   ;;   - `complete' - TAB first tries to indent the current line, and if the line
+;;   ;;                  was already indented, then try to complete the thing at point.
+;;   ;;
+;;   ;; Also see `tab-first-completion'.
+;;   ;;
+;;   ;; Some programming language modes have their own variable to control this,
+;;   ;; e.g., `c-tab-always-indent', and do not respect this variable.
+;;   ;;
+;;   ;; NOTE: We'll just bind completion to something other than TAB...
+;;   ;; (tab-always-indent 'complete)
+;;   )
+
+
+;; ;;------------------------------------------------------------------------------
+;; ;; Dabbrev: Dynamic Abbrev Expansion: Dynamic Abbreviation Expansion
+;; ;;------------------------------------------------------------------------------
+
+;; ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Dynamic-Abbrevs.html
+;; (imp:use-package dabbrev
+;;   :ensure nil ; This is an Emacs built-in feature.
+
+;;   ;;------------------------------
+;;   :bind
+;;   ;;------------------------------
+;;   ;; Swap 'M-/' and 'C-M-/'
+;;   ;; TODO: Yes or no on this? Doom doesn't swap 'em.
+;;   (("M-/" . dabbrev-completion)
+;;    ("C-M-/" . dabbrev-expand))
+
+;;   ;; TODO: `:general' keybinds?
+
+;;   ;;------------------------------
+;;   :custom
+;;   ;;------------------------------
+;;   ;; Other useful Dabbrev configurations.
+;;   (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
 
 
 ;;------------------------------------------------------------------------------
