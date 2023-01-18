@@ -31,6 +31,13 @@
   "The time it took, in seconds, for Emacs & `innit' to finish set-up.")
 
 
+(defvar innit:time:benchmark:message/clear-delay 10
+  "Seconds to delay before clearing message of function `innit:time:benchmark'.
+
+Set to 0/nil to have the message stick around until naturally
+cleared/overwritten.")
+
+
 ;;------------------------------------------------------------------------------
 ;; Functions
 ;;------------------------------------------------------------------------------
@@ -50,22 +57,58 @@ If STRING? is non-nil, return the message as a string instead of displaying it."
           (features/emacs (length features))
           message)
 
+      ;;------------------------------
+      ;; What to output?
+      ;;------------------------------
       (setq message
-            (mapconcat #'identity
-                       (-filter #'stringp
-                                (list "innit:"
-                                      (format "       init time: %8.03fs" time)
+            ;;---
+            ;; Fancy Indented Box:
+            ;;---
+            (mapconcat (lambda (str) (concat "                         " str))
+                       (seq-filter #'stringp
+                                   (list "┌──────────┤innit├──────────┐"
+                                         "├──────────┴─────┴──────────┤"
+                                         (format "│      init time: %8.03fs │" time)
                                       (when features/imp
-                                        (format "    imp features: %4d" features/imp))
-                                      (format "  emacs features: %4d" features/emacs)))
-                       "\n"))
+                                           (format "│   imp features: %4d      │" features/imp))
+                                         (format "│ emacs features: %4d      │" features/emacs)
+                                         "└───────────────────────────┘"))
+                       "\n")
+            ;; ;;---
+            ;; ;; Or... Plain Ole List:
+            ;; ;;---
+            ;; (mapconcat #'identity
+            ;;            (seq-filter #'stringp
+            ;;                        (list "innit:"
+            ;;                              (format "       init time: %8.03fs" time)
+            ;;                              (when features/imp
+            ;;                                (format "    imp features: %4d" features/imp))
+            ;;                              (format "  emacs features: %4d" features/emacs)))
+            ;;            "\n")
+            )
 
+      ;;------------------------------
       ;; Where to output?
+      ;;------------------------------
       (if string?
+          ;;---
+          ;; Simply return as a string.
+          ;;---
           message
-        (message message)))))
-;; (innit:time:benchmark)
 
+        ;;---
+        ;; Output to minibuffer & '*Messages*' buffer (also return the string).
+        ;;---
+        (prog1
+            ;; Write message & return string.
+            (message message)
+          ;; A valid clear delay? Use it to eventually clear out the minibuffer.
+          (when (and (numberp innit:time:benchmark:message/clear-delay)
+                     (> innit:time:benchmark:message/clear-delay 0))
+                 (run-with-idle-timer innit:time:benchmark:message/clear-delay
+                                      nil
+                                      (lambda () (message "")))))))))
+;; (innit:time:benchmark)
 
 
 ;;------------------------------------------------------------------------------
