@@ -20,7 +20,7 @@
 (require 'cl-lib)
 
 
-(imp:require :elisp 'utils 'predicates)
+(imp:require :elisp 'utils)
 
 
 ;;------------------------------------------------------------------------------
@@ -55,6 +55,18 @@ Return `buffer-name' of buffer on kill, nil on no kill."
 
       ;; Return nil when nothing killed.
       nil)))
+
+
+(defun buffer:kill:list (&rest buffers)
+  "Kill BUFFERS via `buffer:kill:ask'.
+
+BUFFERS will be flattened first, so that callers can provide a list if desired.
+
+Return list of return values from `buffer:kill:ask'.
+  - That is, return list of:
+    - killed buffer name strings (success)
+    - nil (failure)"
+  (seq-map #'buffer:kill:ask (elisp:list:flatten buffers)))
 
 
 (defun buffer:kill:special (arg)

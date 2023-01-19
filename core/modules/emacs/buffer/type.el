@@ -256,6 +256,24 @@ If DERIVED-P, test with `derived-mode-p', otherwise use `eq'."
 
 
 ;;------------------------------------------------------------------------------
+;; Fallback Buffer
+;;------------------------------------------------------------------------------
+
+(defcustom buffer:fallback:name "*scratch*"
+  "Buffer name string for `buffer:get-or-create:fallback'.")
+
+
+(defun buffer:fallback:get-or-create ()
+  "Return the fallback buffer, creating it if necessary.
+
+See `buffer:fallback:name' for its name.
+
+From Doom's `doom-fallback-buffer' in \"core/autoload/buffers.el\"."
+  (let (buffer-list-update-hook)
+    (get-buffer-create buffer:fallback:name)))
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :buffer 'type)
