@@ -1,4 +1,4 @@
-;;; modules/emacs/persp-mode-cmds.el --- `persp-mode' commands -*- lexical-binding: t; -*-
+;;; modules/emacs/persp+.el --- `persp-mode' commands -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -24,9 +24,6 @@
 
 (imp:require :window)
 (imp:require :buffer)
-
-
-;; TODO: filename -> 'persp+.el'
 
 
 ;;------------------------------------------------------------------------------
