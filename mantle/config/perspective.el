@@ -30,26 +30,6 @@
 ;; Persp-Mode
 ;;------------------------------------------------------------------------------
 
-(defvar mantle:user:perspective:default "main"
-  "The name of the primary and initial perspective.")
-
-(defvar mantle:user:perspective:func:switch-project #'file:cmd:project:find-file
-  "The function to run to switch projects.
-
-Run after `projectile-switch-project' or `counsel-projectile-switch-project'.
-This function must take one argument: the new project directory.")
-
-(defvar mantle:user:perspective:uniquify-style/cache nil
-  "Cache for `uniquify-buffer-name-style'.
-
-`persp-mode' has some issues with `uniquify' buffer names, so we have to cache
-the style & disable it occasionally.")
-
-
-;;------------------------------
-;; Use-Package
-;;------------------------------
-
 (imp:use-package persp-mode
   :unless noninteractive
   :commands persp-switch-to-buffer
@@ -77,7 +57,7 @@ the style & disable it occasionally.")
         (when (string= (safe-persp-name (get-current-persp frame)) persp-nil-name)
           ;; Take extra steps to ensure no frame ends up in the nil perspective
           (persp-frame-switch (or (cadr (hash-table-keys *persp-hash*))
-                                  mantle:user:perspective:default)
+                                  perspective:name:default)
                               frame)))))
 
   (innit:hook:defun
@@ -92,12 +72,12 @@ the style & disable it occasionally.")
         (when (equal (car persp-names-cache) persp-nil-name)
           (pop persp-names-cache))
         ;; ...and create a *real* main perspective to fill this role.
-        (unless (or (persp-get-by-name mantle:user:perspective:default)
+        (unless (or (persp-get-by-name perspective:name:default)
                     ;; Start from 2 b/c persp-mode counts the nil perspective
                     (> (hash-table-count *persp-hash*) 2))
-          (persp-add-new mantle:user:perspective:default))
+          (persp-add-new perspective:name:default))
         ;; HACK Fix #319: the warnings buffer gets swallowed when creating
-        ;;      `mantle:user:perspective:default', so display it ourselves, if it exists.
+        ;;      `perspective:name:default', so display it ourselves, if it exists.
         (when-let (warnings (get-buffer "*Warnings*"))
           (save-excursion
             (display-buffer-in-side-window warnings
@@ -261,11 +241,19 @@ the style & disable it occasionally.")
   ;;------------------------------
 
   ;;---
-  ;; Global Keybinds
+  ;; "Buffer" Keybinds
   ;;---
   (keybind:leader/global:def
    :infix   "b"
    "b" (list #'persp-switch-to-buffer :which-key "Switch Perspective Buffer"))
+
+  ;;---
+  ;; "Perspective" Keybinds
+  ;;---
+  (persp:keybind:general :prefix  (keybind:prefix :global "TAB")
+                         :states  keybind:leader/global:states
+                         :keymaps keybind:leader/global:keymaps
+                         "" (list nil :which-key "Perspectives...")) ;; prefix title
 
 
   ;;------------------------------

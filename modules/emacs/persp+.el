@@ -30,6 +30,17 @@
 ;; Constants & Variables
 ;;------------------------------------------------------------------------------
 
+(defvar perspective:name:default "main"
+  "The name of the primary and initial perspective.")
+
+
+(defvar perspective:cache:uniquify-buffer-name-style nil
+  "Cache for `uniquify-buffer-name-style'.
+
+`persp-mode' has some issues with `uniquify' buffer names, so we have to cache
+the style & disable it occasionally.")
+
+
 (defvar perspective:filename:data "_perspectives"
   "The basename of the file to store single workspace perspectives.
 
@@ -246,7 +257,7 @@ throws an error."
       (setq int<perspective>:last
             (or (and (not (string= old-name persp-nil-name))
                      old-name)
-                mantle:user:perspective:default))
+                perspective:name:default))
       (persp-frame-switch name))
     (equal (perspective:name:current) name)))
 
@@ -362,9 +373,9 @@ delete."
                 ;; Delete the only perspective.
                 (t
                  ;; Go to the default perspective...
-                 (perspective:action:switch mantle:user:perspective:default t)
+                 (perspective:action:switch perspective:name:default t)
                  ;; Delete that final perspective.
-                 (unless (string= (car workspaces) mantle:user:perspective:default)
+                 (unless (string= (car workspaces) perspective:name:default)
                    (perspective:action:delete name))
                  ;; ...and kill all buffers?
                  ;;   - Either all buffers for the perspective, or just ALL buffers...
@@ -386,7 +397,7 @@ If MESSAGE? is non-nil, output a message about how many of each were killed."
     (let ((persp-autokill-buffer-on-remove t))
       (unless (cl-every #'perspective:action:delete (perspective:name:list))
         (perspective:out:error "Could not kill workspace")))
-    (perspective:action:switch mantle:user:perspective:default t)
+    (perspective:action:switch perspective:name:default t)
     ;; TODO: Doom's `doom/kill-all-buffers' also closes windows?
     (setq buffers (buffer:kill:list (buffer-list)))
     (when (called-interactively-p)
@@ -476,7 +487,7 @@ N < 0: cycle left"
   (interactive (list 1))
   (let ((current-name (perspective:name:current)))
     (if (equal current-name persp-nil-name)
-        (perspective:action:switch mantle:user:perspective:default t)
+        (perspective:action:switch perspective:name:default t)
       (condition-case-unless-debug ex
           (let* ((persps (perspective:name:list))
                  (perspc (length persps))
@@ -656,7 +667,7 @@ Example for `use-package persp-mode' `:config' section:
   (add-hook 'server-done-hook #'perspective:hook:associated/delete)"
   (when persp-mode
     (if (not (persp-frame-list-without-daemon))
-        (perspective:action:switch mantle:user:perspective:default t)
+        (perspective:action:switch perspective:name:default t)
       (with-selected-frame frame
         (perspective:action:switch (int<perspective>:name:generate) t)
         (unless (buffer:type:real? (current-buffer))
