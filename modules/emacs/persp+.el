@@ -1,4 +1,4 @@
-;;; modules/emacs/persp+.el --- `persp-mode' commands -*- lexical-binding: t; -*-
+;;; modules/emacs/perspective.el --- `persp-mode' commands -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -30,13 +30,13 @@
 ;; Constants & Variables
 ;;------------------------------------------------------------------------------
 
-(defvar persp:filename:data "_perspectives"
+(defvar perspective:filename:data "_perspectives"
   "The basename of the file to store single workspace perspectives.
 
 Will be stored in `persp-save-dir'.")
 
 
-(defvar int<persp>:last nil
+(defvar int<perspective>:last nil
   "Last selected workspace.")
 
 
@@ -45,13 +45,14 @@ Will be stored in `persp-save-dir'.")
 ;;------------------------------
 
 ;;;###autoload
-(defface persp:face:tab/selected '((t (:inherit highlight)))
-  "The face for selected tabs displayed by `persp:cmd:display'."
+(defface perspective:face:tab/selected '((t (:inherit highlight)))
+  "The face for selected tabs displayed by `perspective:cmd:display'."
   :group 'persp-mode)
 
+
 ;;;###autoload
-(defface persp:face:tab '((t (:inherit default)))
-  "The face for selected tabs displayed by `persp:cmd:display'."
+(defface perspective:face:tab '((t (:inherit default)))
+  "The face for selected tabs displayed by `perspective:cmd:display'."
   :group 'persp-mode)
 
 
@@ -59,15 +60,15 @@ Will be stored in `persp-save-dir'.")
 ;; Predicates
 ;;------------------------------------------------------------------------------
 
-(defun int<persp>:protected? (name)
+(defun int<perspective>:protected? (name)
   "Is NAME a protected workspace?"
   (equal name persp-nil-name))
 
 
 ;;;###autoload
-(defun persp:exists? (name)
+(defun perspective:exists? (name)
   "Return t if NAME is the name of an existing workspace."
-  (member name (persp:name:list)))
+  (member name (perspective:name:list)))
 
 
 ;;------------------------------------------------------------------------------
@@ -75,12 +76,12 @@ Will be stored in `persp-save-dir'.")
 ;;------------------------------------------------------------------------------
 
 ;;;###autoload
-(defalias #'persp:current #'get-current-persp
+(defalias #'perspective:current #'get-current-persp
   "Return the currently active workspace.")
 
 
 ;;;###autoload
-(defun persp:get (name &optional no-error?)
+(defun perspective:get (name &optional no-error?)
   "Return a workspace named NAME.
 
 Throw an error if NAME doesn't exist, unless NO-ERROR? is non-nil."
@@ -91,10 +92,10 @@ Throw an error if NAME doesn't exist, unless NO-ERROR? is non-nil."
            (error "No workspace called '%s' was found" name)))))
 
 
-(defun int<persp>:name:generate ()
+(defun int<perspective>:name:generate ()
   "Generate a generic name for a new workspace."
   (format "#%s"
-          (or (cl-loop for name in (persp:name:list)
+          (or (cl-loop for name in (perspective:name:list)
                        when (string-match-p "^#[0-9]+$" name)
                        maximize (string-to-number (substring name 1)) into max
                        finally return (if max (1+ max)))
@@ -102,13 +103,13 @@ Throw an error if NAME doesn't exist, unless NO-ERROR? is non-nil."
 
 
 ;;;###autoload
-(defun persp:name:current ()
+(defun perspective:name:current ()
   "Get the name of the current workspace."
-  (safe-persp-name (persp:current)))
+  (safe-persp-name (perspective:current)))
 
 
 ;;;###autoload
-(defun persp:list ()
+(defun perspective:list ()
   "Return a list of workspace structs (satisifes `perspective-p')."
   ;; We don't use `hash-table-values' because it doesn't ensure order in older
   ;; versions of Emacs
@@ -118,25 +119,25 @@ Throw an error if NAME doesn't exist, unless NO-ERROR? is non-nil."
 
 
 ;;;###autoload
-(defun persp:name:list ()
+(defun perspective:name:list ()
   "Return the list of names of open workspaces."
   persp-names-cache)
 
 
 ;;;###autoload
-(defun persp:list:buffer (&optional persp)
+(defun perspective:list:buffer (&optional persp)
   "Return a list of buffers in PERSP.
 
 PERSP can be a string (name of a workspace) or a workspace (satisfies
 `perspective-p'). If nil or omitted, it defaults to the current workspace."
-  (let ((persp (or persp (persp:current))))
+  (let ((persp (or persp (perspective:current))))
     (unless (perspective-p persp)
       (user-error "Not in a valid workspace (%s)" persp))
     (persp-buffers persp)))
 
 
 ;;;###autoload
-(defun persp:buffer:list/orphaned ()
+(defun perspective:buffer:list/orphaned ()
   "Return a list of buffers that aren't associated with any perspective."
   (cl-remove-if #'persp--buffer-in-persps (buffer-list)))
 
@@ -146,49 +147,49 @@ PERSP can be a string (name of a workspace) or a workspace (satisfies
 ;;------------------------------------------------------------------------------
 
 ;;;###autoload
-(defun persp:action:load (name)
+(defun perspective:action:load (name)
   "Load a single workspace (named NAME) into the current session.
 
 Can only retrieve perspectives that were explicitly saved with
 `persp:action:save'.
 
 Returns t if successful, nil otherwise."
-  (when (persp:exists? name)
+  (when (perspective:exists? name)
     (user-error "A workspace named '%s' already exists." name))
   (persp-load-from-file-by-names
-   (expand-file-name persp:filename:data persp-save-dir)
+   (expand-file-name perspective:filename:data persp-save-dir)
    *persp-hash*
    (list name))
-  (persp:exists? name))
+  (perspective:exists? name))
 
 
 ;;;###autoload
-(defun persp:action:save (name)
+(defun perspective:action:save (name)
   "Save a single workspace (NAME) from the current session.
 
-Can be loaded again with `persp:action:load'. NAME can be the string name of a
-workspace or its perspective hash table.
+Can be loaded again with `perspective:action:load'. NAME can be the string name
+of a workspace or its perspective hash table.
 
 Return t on success, nil otherwise."
-  (unless (persp:exists? name)
+  (unless (perspective:exists? name)
     (error "'%s' is an invalid workspace" name))
-  (let ((fname (expand-file-name persp:filename:data persp-save-dir)))
+  (let ((fname (expand-file-name perspective:filename:data persp-save-dir)))
     (persp-save-to-file-by-names fname *persp-hash* (list name))
     (and (member name (persp-list-persp-names-in-file fname))
          t)))
 
 
 ;;;###autoload
-(defun persp:action:new (name)
+(defun perspective:action:new (name)
   "Create a new workspace named NAME.
 
 Return:
   - nil - NAME already exists
   - t   - success
   - nil - failure"
-  (when (int<persp>:protected? name)
+  (when (int<perspective>:protected? name)
     (error "Can't create a new '%s' workspace" name))
-  (when (persp:exists? name)
+  (when (perspective:exists? name)
     (error "A workspace named '%s' already exists" name))
   (let ((persp (persp-add-new name))
         ;; (+popup--inhibit-transient t)
@@ -205,17 +206,17 @@ Return:
 
 
 ;;;###autoload
-(defun persp:action:rename (name new-name)
+(defun perspective:action:rename (name new-name)
   "Rename the current workspace named NAME to NEW-NAME.
 
 Return non-nil on success, nil otherwise."
-  (when (int<persp>:protected? name)
+  (when (int<perspective>:protected? name)
     (error "Can't rename '%s' workspace" name))
-  (persp-rename new-name (persp:get name)))
+  (persp-rename new-name (perspective:get name)))
 
 
 ;;;###autoload
-(defun persp:action:delete (workspace &optional inhibit-kill?)
+(defun perspective:action:delete (workspace &optional inhibit-kill?)
   "Delete WORKSPACE.
 
 WORKSPACE can be the name of a perspective or its hash table.
@@ -223,31 +224,51 @@ WORKSPACE can be the name of a perspective or its hash table.
 If INHIBIT-KILL? is non-nil, don't kill this workspace's buffers."
   (unless (stringp workspace)
     (setq workspace (persp-name workspace)))
-  (when (int<persp>:protected? workspace)
+  (when (int<perspective>:protected? workspace)
     (error "Can't delete '%s' workspace" workspace))
-  (persp:get workspace) ; error checking
+  (perspective:get workspace) ; error checking
   (persp-kill workspace inhibit-kill?)
-  (not (persp:exists? workspace)))
+  (not (perspective:exists? workspace)))
 
 
 ;;;###autoload
-(defun persp:action:switch (name &optional auto-create?)
+(defun perspective:action:switch (name &optional auto-create?)
   "Switch to another workspace named NAME (a string).
 
 If AUTO-CREATE? is non-nil, create the workspace if it doesn't exist, otherwise
 throws an error."
-  (unless (persp:exists? name)
+  (unless (perspective:exists? name)
     (if auto-create?
-        (persp:action:new name)
+        (perspective:action:new name)
       (error "%s is not an available workspace" name)))
-  (let ((old-name (persp:name:current)))
+  (let ((old-name (perspective:name:current)))
     (unless (equal old-name name)
-      (setq int<persp>:last
+      (setq int<perspective>:last
             (or (and (not (string= old-name persp-nil-name))
                      old-name)
                 mantle:user:perspective:default))
       (persp-frame-switch name))
-    (equal (persp:name:current) name)))
+    (equal (perspective:name:current) name)))
+
+
+;;;###autoload
+(defun perspective:action:new (&optional name clone?)
+  "Create a new workspace named NAME.
+
+If NAME is empty/nil, generate a unique name.
+
+If CLONE? is non-nil, clone the current workspace, otherwise the new workspace
+is blank."
+  (unless name
+    (setq name (int<perspective>:name:generate)))
+  (condition-case e
+      (cond ((perspective:exists? name)
+             (error "%s already exists" name))
+            (clone? (persp-copy name t))
+            (t
+             (perspective:action:switch name t)
+             (perspective:cmd:display)))
+    ((debug error) (perspective:out:error (cadr e) t))))
 
 
 ;;------------------------------------------------------------------------------
@@ -255,7 +276,7 @@ throws an error."
 ;;------------------------------------------------------------------------------
 
 ;;;###autoload
-(defun persp:cmd:load (name)
+(defun perspective:cmd:load (name)
   "Load workspace NAME and switch to it.
 
 If called with the prefix argument, try to reload the current workspace from
@@ -263,77 +284,77 @@ session files."
   (interactive
    (list
     (if current-prefix-arg
-        (persp:name:current)
+        (perspective:name:current)
       (completing-read
        "Workspace to load: "
        (persp-list-persp-names-in-file
-        (expand-file-name persp:filename:data persp-save-dir))))))
-  (if (not (persp:action:load name))
-      (persp:out:error (format "Couldn't load workspace %s" name))
-    (persp:cmd:switch/index name)
-    (persp:cmd:display)))
+        (expand-file-name perspective:filename:data persp-save-dir))))))
+  (if (not (perspective:action:load name))
+      (perspective:out:error (format "Couldn't load workspace %s" name))
+    (perspective:cmd:switch/index name)
+    (perspective:cmd:display)))
 
 
 ;;;###autoload
-(defun persp:cmd:save (name)
+(defun perspective:cmd:save (name)
   "Save the current workspace as NAME.
 
 If called with the prefix argument, autosave the current workspace."
   (interactive
    (list
     (if current-prefix-arg
-        (persp:name:current)
-      (completing-read "Workspace to save: " (persp:name:list)))))
-  (if (persp:action:save name)
-      (persp:out:message (format "'%s' workspace saved" name) 'success)
-    (persp:out:error (format "Couldn't save workspace %s" name))))
+        (perspective:name:current)
+      (completing-read "Workspace to save: " (perspective:name:list)))))
+  (if (perspective:action:save name)
+      (perspective:out:message (format "'%s' workspace saved" name) 'success)
+    (perspective:out:error (format "Couldn't save workspace %s" name))))
 
 
 ;;;###autoload
-(defun persp:cmd:rename (new-name)
+(defun perspective:cmd:rename (new-name)
   "Rename the current workspace to NEW-NAME."
   (interactive (list (read-from-minibuffer "New workspace name: ")))
   (condition-case-unless-debug ex
-      (let* ((current-name (persp:name:current))
-             (old-name (persp:action:rename current-name new-name)))
+      (let* ((current-name (perspective:name:current))
+             (old-name (perspective:action:rename current-name new-name)))
         (unless old-name
           (error "Failed to rename %s" current-name))
-        (persp:out:message (format "Renamed '%s'->'%s'" old-name new-name) 'success))
-    ('error (persp:out:error ex t))))
+        (perspective:out:message (format "Renamed '%s'->'%s'" old-name new-name) 'success))
+    ('error (perspective:out:error ex t))))
 
 
 ;;;###autoload
-(defun persp:cmd:delete (name)
+(defun perspective:cmd:delete (name)
   "Delete the NAME workspace.
 
 If called with the prefix argument, prompts you for the name of the workspace to
 delete."
   (interactive
-   (let ((current-name (persp:name:current)))
+   (let ((current-name (perspective:name:current)))
      (list
       (if current-prefix-arg
           (completing-read (format "Delete workspace (default: %s): " current-name)
-                           (persp:name:list)
+                           (perspective:name:list)
                            nil nil nil nil current-name)
         current-name))))
   (condition-case-unless-debug ex
       ;; REVIEW refactor me
-      (let ((workspaces (persp:name:list)))
+      (let ((workspaces (perspective:name:list)))
         (if (not (member name workspaces))
-            (persp:out:message (format "'%s' workspace doesn't exist" name) 'warn)
+            (perspective:out:message (format "'%s' workspace doesn't exist" name) 'warn)
           ;; Sanity Check
           (cond ((delq (selected-frame) (persp-frames-with-persp (get-frame-persp)))
                  (user-error "Can't close workspace, it's visible in another frame"))
                 ;; Delete some other perspective.
-                ((not (equal (persp:name:current) name))
-                 (persp:action:delete name))
+                ((not (equal (perspective:name:current) name))
+                 (perspective:action:delete name))
                 ;; Delete one of N perspectives (N>1).
                 ((cdr workspaces)
-                 (persp:action:delete name)
-                 (persp:action:switch
-                  (if (persp:exists? int<persp>:last)
-                      int<persp>:last
-                    (car (persp:name:list))))
+                 (perspective:action:delete name)
+                 (perspective:action:switch
+                  (if (perspective:exists? int<perspective>:last)
+                      int<perspective>:last
+                    (car (perspective:name:list))))
                  ; doom: (unless (doom-buffer-frame-predicate (window-buffer))
                  (unless (or (buffer:type:real? (window-buffer))
                              (eq (window-buffer) (buffer:fallback:get-or-create)))
@@ -341,31 +362,31 @@ delete."
                 ;; Delete the only perspective.
                 (t
                  ;; Go to the default perspective...
-                 (persp:action:switch mantle:user:perspective:default t)
+                 (perspective:action:switch mantle:user:perspective:default t)
                  ;; Delete that final perspective.
                  (unless (string= (car workspaces) mantle:user:perspective:default)
-                   (persp:action:delete name))
+                   (perspective:action:delete name))
                  ;; ...and kill all buffers?
                  ;;   - Either all buffers for the perspective, or just ALL buffers...
                  (buffer:kill:list (buffer:list))))
-          (persp:out:message (format "Deleted '%s' workspace" name) 'success)))
-    ('error (persp:out:error ex t))))
+          (perspective:out:message (format "Deleted '%s' workspace" name) 'success)))
+    ('error (perspective:out:error ex t))))
 
 
 ;;;###autoload
-(defun persp:cmd:kill (&optional message?)
+(defun perspective:cmd:kill (&optional message?)
   "Delete all workspaces, windows, and their buffers.
 
 If MESSAGE? is non-nil, output a message about how many of each were killed."
   ;; If we were called interactively, we should probably always output the message?
   (interactive (list t))
   (let ((windows (length (window-list)))
-        (persps (length (persp:name:list)))
+        (persps (length (perspective:name:list)))
         (buffers 0))
     (let ((persp-autokill-buffer-on-remove t))
-      (unless (cl-every #'persp:action:delete (persp:name:list))
-        (persp:out:error "Could not kill workspace")))
-    (persp:action:switch mantle:user:perspective:default t)
+      (unless (cl-every #'perspective:action:delete (perspective:name:list))
+        (perspective:out:error "Could not kill workspace")))
+    (perspective:action:switch mantle:user:perspective:default t)
     ;; TODO: Doom's `doom/kill-all-buffers' also closes windows?
     (setq buffers (buffer:kill:list (buffer-list)))
     (when (called-interactively-p)
@@ -374,124 +395,120 @@ If MESSAGE? is non-nil, output a message about how many of each were killed."
 
 
 ;;;###autoload
-(defun persp:cmd:new (&optional name clone?)
+(defun perspective:cmd:new/named (&optional name clone?)
   "Create a new workspace named NAME.
+
+If NAME is empty/nil, generate a unique name.
+
+If CLONE? is non-nil, clone the current workspace, otherwise the new workspace
+is blank. CLONE? is the prefix argument when called interactively."
+  (interactive "sWorkspace Name (Optional): \nP")
+  (perspective:action:new name clone?))
+
+
+;;;###autoload
+(defun perspective:cmd:new (&optional clone?)
+  "Create a new workspace with a generated, unique name.
 
 If CLONE? is non-nil, clone the current workspace, otherwise the new workspace
 is blank."
-  (interactive (list nil current-prefix-arg))
-  (unless name
-    (setq name (int<persp>:name:generate)))
-  (condition-case e
-      (cond ((persp:exists? name)
-             (error "%s already exists" name))
-            (clone? (persp-copy name t))
-            (t
-             (persp:action:switch name t)
-             (persp:cmd:display)))
-    ((debug error) (persp:out:error (cadr e) t))))
+  (interactive "P")
+  (perspective:action:new nil clone?))
 
 
 ;;;###autoload
-(defun persp:cmd:new-named (name)
-  "Create a new workspace with a given NAME."
-  (interactive "sWorkspace Name: ")
-  (persp:cmd:new name))
-
-
-;;;###autoload
-(defun persp:cmd:switch/index (index)
+(defun perspective:cmd:switch/index (index)
   "Switch to a workspace at a given INDEX.
 
 A negative number will start from the end of the workspace list."
   (interactive
    (list (or current-prefix-arg
-             (completing-read "Switch to workspace: " (persp:name:list)))))
+             (completing-read "Switch to workspace: " (perspective:name:list)))))
   (when (and (stringp index)
              (string-match-p "^[0-9]+$" index))
     (setq index (string-to-number index)))
   (condition-case-unless-debug ex
-      (let ((names (persp:name:list))
-            (old-name (persp:name:current)))
+      (let ((names (perspective:name:list))
+            (old-name (perspective:name:current)))
         (cond ((numberp index)
                (let ((dest (nth index names)))
                  (unless dest
                    (error "No workspace at #%s" (1+ index)))
-                 (persp:action:switch dest)))
+                 (perspective:action:switch dest)))
               ((stringp index)
-               (persp:action:switch index t))
+               (perspective:action:switch index t))
               (t
                (error "Not a valid index: %s" index)))
         (unless (called-interactively-p 'interactive)
-          (if (equal (persp:name:current) old-name)
-              (persp:out:message (format "Already in %s" old-name) 'warn)
-            (persp:cmd:display))))
-    ('error (persp:out:error (cadr ex) t))))
+          (if (equal (perspective:name:current) old-name)
+              (perspective:out:message (format "Already in %s" old-name) 'warn)
+            (perspective:cmd:display))))
+    ('error (perspective:out:error (cadr ex) t))))
 
 
 ;;;###autoload
 (dotimes (i 9)
-  (defalias (intern (format "persp:cmd:switch/index:%d" i))
-    (lambda () (interactive) (persp:cmd:switch/index i))
+  (defalias (intern (format "perspective:cmd:switch/index:%d" i))
+    (lambda () (interactive) (perspective:cmd:switch/index i))
     (format "Switch to workspace #%d" (1+ i))))
 
 
 ;;;###autoload
-(defun persp:cmd:switch/final ()
+(defun perspective:cmd:switch/final ()
   "Switch to the final workspace in open workspaces."
   (interactive)
-  (persp:cmd:switch/index (car (last (persp:name:list)))))
+  (perspective:cmd:switch/index (car (last (perspective:name:list)))))
 
 
 ;;;###autoload
-(defun persp:cmd:switch/last ()
+(defun perspective:cmd:switch/last ()
   "Switch to the last activated workspace."
   (interactive)
-  (persp:cmd:switch/index int<persp>:last))
+  (perspective:cmd:switch/index int<perspective>:last))
 
 
 ;; ###autoload
-(defun persp:cmd:cycle (n)
+(defun perspective:cmd:cycle (n)
   "Cycle N workspaces to the right or left.
 
 N > 0: cycle right
 N < 0: cycle left"
   (interactive (list 1))
-  (let ((current-name (persp:name:current)))
+  (let ((current-name (perspective:name:current)))
     (if (equal current-name persp-nil-name)
-        (persp:action:switch mantle:user:perspective:default t)
+        (perspective:action:switch mantle:user:perspective:default t)
       (condition-case-unless-debug ex
-          (let* ((persps (persp:name:list))
+          (let* ((persps (perspective:name:list))
                  (perspc (length persps))
                  (index (cl-position current-name persps)))
             (when (= perspc 1)
               (user-error "No other workspaces"))
-            (persp:cmd:switch/index (% (+ index n perspc) perspc))
+            (perspective:cmd:switch/index (% (+ index n perspc) perspc))
             (unless (called-interactively-p 'interactive)
-              (persp:cmd:display)))
-        ('user-error (persp:out:error (cadr ex) t))
-        ('error (persp:out:error ex t))))))
+              (perspective:cmd:display)))
+        ('user-error (perspective:out:error (cadr ex) t))
+        ('error (perspective:out:error ex t))))))
 
 
 ;;;###autoload
-(defun persp:cmd:cycle/left ()
+(defun perspective:cmd:cycle/left ()
   "Cycle one workspace to the left."
   (interactive)
-  (persp:cmd:cycle -1))
+  (perspective:cmd:cycle -1))
 
 
 ;;;###autoload
-(defun persp:cmd:cycle/right ()
+(defun perspective:cmd:cycle/right ()
   "Cycle one workspace to the left."
   (interactive)
-  (persp:cmd:cycle +1))
+  (perspective:cmd:cycle +1))
 
 
 ;;;###autoload
-(defun persp:cmd:swap/left (&optional count)
+(defun perspective:cmd:swap/left (&optional count)
   "Swap the current workspace with the COUNTth workspace on its left."
   (interactive "p")
-  (let* ((current-name (persp:name:current))
+  (let* ((current-name (perspective:name:current))
          (count (or count 1))
          (index (- (cl-position current-name persp-names-cache :test #'equal)
                    count))
@@ -504,24 +521,24 @@ N < 0: cycle left"
                     (list current-name)
                     (cl-subseq names index))))
     (when (called-interactively-p 'any)
-      (persp:cmd:display))))
+      (perspective:cmd:display))))
 
 
 ;;;###autoload
-(defun persp:cmd:swap/right (&optional count)
+(defun perspective:cmd:swap/right (&optional count)
   "Swap the current workspace with the COUNTth workspace on its right."
   (interactive "p")
-  (funcall-interactively #'persp:cmd:swap/left (- count)))
+  (funcall-interactively #'perspective:cmd:swap/left (- count)))
 
 
 ;;------------------------------------------------------------------------------
 ;; Tabs Display In Minibuffer
 ;;------------------------------------------------------------------------------
 
-(defun int<persp>:format:tabline (&optional names)
+(defun int<perspective>:format:tabline (&optional names)
   "Format workspace NAMES into a display string."
-  (let ((names (or names (persp:name:list)))
-        (current-name (persp:name:current)))
+  (let ((names (or names (perspective:name:list)))
+        (current-name (perspective:name:current)))
     (mapconcat
      #'identity
      (cl-loop for name in names
@@ -529,34 +546,34 @@ N < 0: cycle left"
               collect
               (propertize (format " [%d] %s " (1+ i) name)
                           'face (if (equal current-name name)
-                                    'persp:face:tab/selected
-                                  'persp:face:tab)))
+                                    'perspective:face:tab/selected
+                                  'perspective:face:tab)))
      " ")))
 
 
 ;;;###autoload
-(defun persp:cmd:display ()
+(defun perspective:cmd:display ()
   "Display a list of workspaces (like tabs) in the echo area."
   (interactive)
   (let (message-log-max)
-    (message "%s" (int<persp>:format:tabline))))
+    (message "%s" (int<perspective>:format:tabline))))
 
 
 ;;------------------------------------------------------------------------------
 ;; Messaging Helpers
 ;;------------------------------------------------------------------------------
 
-(defun int<persp>:out:body (message &optional type)
+(defun int<perspective>:out:body (message &optional type)
   "Propertize and prefix MESSAGE for display in the modeline.
 
-Prefix MESSAGE with function `int<persp>:format:tabline'.
+Prefix MESSAGE with function `int<perspective>:format:tabline'.
 
 Propertize MESSAGE according to TYPE:
   - `error'
   - `warn'
   - `success'
   - `info'"
-  (concat (int<persp>:format:tabline)
+  (concat (int<perspective>:format:tabline)
           (propertize " | " 'face 'font-lock-comment-face)
           (propertize (format "%s" message)
                       'face (pcase type
@@ -567,24 +584,24 @@ Propertize MESSAGE according to TYPE:
 
 
 ;;;###autoload
-(defun persp:out:message (message &optional type)
+(defun perspective:out:message (message &optional type)
   "Show an 'elegant' MESSAGE in the echo area next to a listing of workspaces.
 
-Prefix MESSAGE with function `int<persp>:format:tabline'.
+Prefix MESSAGE with function `int<perspective>:format:tabline'.
 
 Propertize MESSAGE according to TYPE:
   - `error'
   - `warn'
   - `success'
   - `info'"
-  (message "%s" (int<persp>:out:body message type)))
+  (message "%s" (int<perspective>:out:body message type)))
 
 
 ;;;###autoload
-(defun persp:out:error (message &optional no-error?)
+(defun perspective:out:error (message &optional no-error?)
   "Show an 'elegant' error in the echo area next to a listing of workspaces.
 
-Prefix MESSAGE with function `int<persp>:format:tabline'.
+Prefix MESSAGE with function `int<perspective>:format:tabline'.
 
 Propertize MESSAGE according to TYPE:
   - `error'
@@ -595,7 +612,7 @@ Propertize MESSAGE according to TYPE:
 Will print using `error', unless NO-ERROR? is non-nil, in which case will print
 via `message'."
   (funcall (if no-error? #'message #'error)
-           "%s" (int<persp>:out:body message 'error)))
+           "%s" (int<perspective>:out:body message 'error)))
 
 
 ;;------------------------------------------------------------------------------
@@ -603,7 +620,7 @@ via `message'."
 ;;------------------------------------------------------------------------------
 
 ;;;###autoload
-(defun persp:hook:associated/delete (&optional frame)
+(defun perspective:hook:associated/delete (&optional frame)
   "Delete workspace associated with current FRAME.
 
 A workspace gets associated with a frame when a new frame is interactively
@@ -613,76 +630,153 @@ Example for `use-package persp-mode' `:config' section:
   ;; per-frame workspaces
   (setq persp-init-frame-behaviour t
         persp-init-new-frame-behaviour-override nil
-        persp-interactive-init-frame-behaviour-override #'persp:hook:associted/create
-        persp-emacsclient-init-frame-behaviour-override #'persp:hook:associted/create)
-  (add-hook 'delete-frame-functions #'persp:hook:associated/delete)
-  (add-hook 'server-done-hook #'persp:hook:associated/delete)"
+        persp-interactive-init-frame-behaviour-override #'perspective:hook:associted/create
+        persp-emacsclient-init-frame-behaviour-override #'perspective:hook:associted/create)
+  (add-hook 'delete-frame-functions #'perspective:hook:associated/delete)
+  (add-hook 'server-done-hook #'perspective:hook:associated/delete)"
   (when (and persp-mode (not (bound-and-true-p with-editor-mode)))
     (unless frame
       (setq frame (selected-frame)))
     (let ((frame-persp (frame-parameter frame 'workspace)))
-      (when (string= frame-persp (persp:name:current))
-        (persp:cmd:delete frame-persp)))))
+      (when (string= frame-persp (perspective:name:current))
+        (perspective:cmd:delete frame-persp)))))
 
 
 ;;;###autoload
-(defun persp:hook:associted/create (frame &optional _new-frame?)
+(defun perspective:hook:associted/create (frame &optional _new-frame?)
   "Create a blank, new perspective and associate it with FRAME.
 
 Example for `use-package persp-mode' `:config' section:
   ;; per-frame workspaces
   (setq persp-init-frame-behaviour t
         persp-init-new-frame-behaviour-override nil
-        persp-interactive-init-frame-behaviour-override #'persp:hook:associted/create
-        persp-emacsclient-init-frame-behaviour-override #'persp:hook:associted/create)
-  (add-hook 'delete-frame-functions #'persp:hook:associated/delete)
-  (add-hook 'server-done-hook #'persp:hook:associated/delete)"
+        persp-interactive-init-frame-behaviour-override #'perspective:hook:associted/create
+        persp-emacsclient-init-frame-behaviour-override #'perspective:hook:associted/create)
+  (add-hook 'delete-frame-functions #'perspective:hook:associated/delete)
+  (add-hook 'server-done-hook #'perspective:hook:associated/delete)"
   (when persp-mode
     (if (not (persp-frame-list-without-daemon))
-        (persp:action:switch mantle:user:perspective:default t)
+        (perspective:action:switch mantle:user:perspective:default t)
       (with-selected-frame frame
-        (persp:action:switch (int<persp>:name:generate) t)
+        (perspective:action:switch (int<perspective>:name:generate) t)
         (unless (buffer:type:real? (current-buffer))
           (switch-to-buffer (buffer:fallback:get-or-create)))
-        (set-frame-parameter frame 'workspace (persp:name:current))
+        (set-frame-parameter frame 'workspace (perspective:name:current))
         ;; ensure every buffer has a buffer-predicate
         (persp-set-frame-buffer-predicate frame))
-      (run-at-time 0.1 nil #'persp:cmd:display))))
+      (run-at-time 0.1 nil #'perspective:cmd:display))))
 
 
 ;;------------------------------------------------------------------------------
 ;; Keybinds
 ;;------------------------------------------------------------------------------
 
-;; TODO: a (more) generic(ish) keybind func like taskspace.
-;; (keybind:leader/global:def
-;;    :infix   "TAB"
-;;
-;;    "TAB" (list #'persp:cmd:display :which-key "Display Persps")
-;;    "n"   (list #'persp:cmd:new :which-key "New workspace")
-;;    "N"   (list #'persp:cmd:new-named :which-key "New named workspace")
-;;    "l"   (list #'persp:cmd:load :which-key "Load workspace from file")
-;;    "s"   (list #'persp:cmd:save :which-key "Save workspace to file")
-;;    "x"   (list #'persp:cmd:kill :which-key "Delete session")
-;;    "d"   (list #'persp:cmd:delete :which-key "Delete this workspace")
-;;    "r"   (list #'persp:cmd:rename :which-key "Rename workspace")
-;;    "]"   (list #'persp:cmd:cycle/right :which-key "Next workspace")
-;;    "["   (list #'persp:cmd:cycle/left :which-key "Previous workspace")
-;;    "."   (list #'persp:cmd:switch/index :which-key "Switch workspace")
-;;    "`"   (list #'persp:cmd:switch/last :which-key "Switch to last workspace")
-;;    "1"   (list #'persp:cmd:switch/index:0 :which-key "Switch to 1st workspace")
-;;    "2"   (list #'persp:cmd:switch/index:1 :which-key "Switch to 2nd workspace")
-;;    "3"   (list #'persp:cmd:switch/index:2 :which-key "Switch to 3rd workspace")
-;;    "4"   (list #'persp:cmd:switch/index:3 :which-key "Switch to 4th workspace")
-;;    "5"   (list #'persp:cmd:switch/index:4 :which-key "Switch to 5th workspace")
-;;    "6"   (list #'persp:cmd:switch/index:5 :which-key "Switch to 6th workspace")
-;;    "7"   (list #'persp:cmd:switch/index:6 :which-key "Switch to 7th workspace")
-;;    "8"   (list #'persp:cmd:switch/index:7 :which-key "Switch to 8th workspace")
-;;    "9"   (list #'persp:cmd:switch/index:8 :which-key "Switch to 9th workspace")
-;;    "0"   (list #'persp:cmd:switch/final :which-key "Switch to final workspace"))
+;;------------------------------
+;; Generic
+;;------------------------------
+
+(defvar perspective:keymap
+  ;; Create map...
+  (let ((map (make-sparse-keymap)))
+    ;; Add keys to map...
+    (define-key map (kbd "TAB") #'perspective:cmd:display)
+    (define-key map (kbd "n")   #'perspective:cmd:new/named)
+    (define-key map (kbd "N")   #'perspective:cmd:new)
+    (define-key map (kbd "l")   #'perspective:cmd:load)
+    (define-key map (kbd "s")   #'perspective:cmd:save)
+    ;; (define-key map (kbd "x")   #'perspective:cmd:kill)
+    (define-key map (kbd "d")   #'perspective:cmd:delete)
+    (define-key map (kbd "r")   #'perspective:cmd:rename)
+    (define-key map (kbd "]")   #'perspective:cmd:cycle/right)
+    (define-key map (kbd "[")   #'perspective:cmd:cycle/left)
+    (define-key map (kbd ".")   #'perspective:cmd:switch/index)
+    (define-key map (kbd "`")   #'perspective:cmd:switch/last)
+    (define-key map (kbd "1")   #'perspective:cmd:switch/index:0)
+    (define-key map (kbd "2")   #'perspective:cmd:switch/index:1)
+    (define-key map (kbd "3")   #'perspective:cmd:switch/index:2)
+    (define-key map (kbd "4")   #'perspective:cmd:switch/index:3)
+    (define-key map (kbd "5")   #'perspective:cmd:switch/index:4)
+    (define-key map (kbd "6")   #'perspective:cmd:switch/index:5)
+    (define-key map (kbd "7")   #'perspective:cmd:switch/index:6)
+    (define-key map (kbd "8")   #'perspective:cmd:switch/index:7)
+    (define-key map (kbd "9")   #'perspective:cmd:switch/index:8)
+    (define-key map (kbd "0")   #'perspective:cmd:switch/final)
+    ;; ...and return the map.
+    map)
+  "Bind this keymap to a key of your choice.")
+
+;; TODO-emacs-29: Change to using `defvar-keymap'.
+;; E.g.: https://github.com/minad/vertico/blob/main/vertico.el
+
+
+;;------------------------------
+;; General
+;;------------------------------
+
+(defmacro perspective:keybind:general (&rest args)
+  "Create keybinds using the supplied `general' ARGS.
+
+Provide `:which-key' descriptions for the bindings.
+
+If using `evil', consider placing this in your config:
+  ;; https://github.com/emacs-evil/evil-collection#making-spc-work-similarly-to-spacemacs
+  ;; NOTE: `evil-collection' binds over SPC in many packages. To use SPC as a
+  ;; leader key with `general', first set these override states:
+  (setq general-override-states '(insert
+                                  emacs
+                                  hybrid
+                                  normal
+                                  visual
+                                  motion
+                                  operator
+                                  replace))
+
+Call this function with the desired keybind settings:
+  (perspective:keybind:general
+    :prefix  \"SPC TAB\" ; NOTE: Provide entire prefix for \"Perspectives...\" keybinds.
+    :states  '(normal visual motion)
+    :keymaps 'override
+    \"\" (list nil :which-key \"Perspectives...\")) ; prefix title"
+  (unless (featurep 'general)
+    (nub:error
+     :innit
+     "perspective:keybind:general"
+     "`General' keybind feature is not loaded/defined! Cannot create keybinds."))
+
+  `(progn
+     ;; NOTE: We expect the prefix or whatever for the "Perspectives..." to be provided in ARGS.
+     ;; We'll only make the keybinds.
+     (general-define-key ,@args
+                         "TAB" (list #'perspective:cmd:display        :which-key "List")
+                         "n"   (list #'perspective:cmd:new-named      :which-key "New")
+                         "N"   (list #'perspective:cmd:new            :which-key "New Unnamed")
+                         "l"   (list #'perspective:cmd:load           :which-key "Load")
+                         "s"   (list #'perspective:cmd:save           :which-key "Save")
+                         ;; "x"   (list #'perspective:cmd:kill           :which-key "Kill All")
+                         "d"   (list #'perspective:cmd:delete         :which-key "Delete")
+                         "r"   (list #'perspective:cmd:rename         :which-key "Rename")
+                         "]"   (list #'perspective:cmd:cycle/right    :which-key "Cycle: Right")
+                         "["   (list #'perspective:cmd:cycle/left     :which-key "Cycle: Left")
+                         "."   (list #'perspective:cmd:switch/index   :which-key "Switch: _")
+                         "`"   (list #'perspective:cmd:switch/last    :which-key "Switch: Previous")
+                         "1"   (list #'perspective:cmd:switch/index:0 :which-key "Switch: 1st")
+                         "2"   (list #'perspective:cmd:switch/index:1 :which-key "Switch: 2nd")
+                         "3"   (list #'perspective:cmd:switch/index:2 :which-key "Switch: 3rd")
+                         "4"   (list #'perspective:cmd:switch/index:3 :which-key "Switch: 4th")
+                         "5"   (list #'perspective:cmd:switch/index:4 :which-key "Switch: 5th")
+                         "6"   (list #'perspective:cmd:switch/index:5 :which-key "Switch: 6th")
+                         "7"   (list #'perspective:cmd:switch/index:6 :which-key "Switch: 7th")
+                         "8"   (list #'perspective:cmd:switch/index:7 :which-key "Switch: 8th")
+                         "9"   (list #'perspective:cmd:switch/index:8 :which-key "Switch: 9th")
+                         "0"   (list #'perspective:cmd:switch/final   :which-key "Switch: Final"))))
+;; (perspective:keybind:general
+;;     :prefix  "SPC"
+;;     :states  '(normal visual motion)
+;;     :keymaps 'override)
+
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :buffer 'persp-mode-cmds)
+(imp:provide :emacs 'persp+)
