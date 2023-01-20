@@ -17,6 +17,9 @@
 ;;; Code:
 
 
+(require 'cl-lib)
+
+
 ;;------------------------------------------------------------------------------
 ;; Kill Functions
 ;;------------------------------------------------------------------------------
@@ -48,6 +51,20 @@ WINDOW must be a live window and defaults to the current/selected one."
   (quit-window kill window))
 ;; (window:quit-or-kill)
 ;; (window:quit-or-kill t)
+
+
+;;------------------------------------------------------------------------------
+;; Visible?
+;;------------------------------------------------------------------------------
+
+(defun window:list/visible (&optional window-list)
+  "Return a list of the visible, non-popup (dedicated) windows from WINDOW-LIST.
+
+If WINDOW-LIST is nil, use function `window-list' instead."
+  (cl-loop for window in (or window-list (window-list))
+           when (or (window-parameter window 'visible)
+                    (not (window-dedicated-p window)))
+           collect window))
 
 
 ;;------------------------------------------------------------------------------

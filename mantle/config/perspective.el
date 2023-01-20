@@ -95,7 +95,7 @@
     (cond (persp-mode
            ;; Cache & disable `uniquify' buffer renaming.
            (when (bound-and-true-p uniquify-buffer-name-style)
-             (setq mantle:user:perspective:uniquify-style/cache uniquify-buffer-name-style))
+             (setq perspective:cache:uniquify-buffer-name-style uniquify-buffer-name-style))
            (setq uniquify-buffer-name-style nil)
 
            ;; Ensure `persp-kill-buffer-query-function' is last
@@ -108,8 +108,8 @@
 
           ;; Disabling `persp-mode': re-enable `uniquify' buffer renaming.
           (t
-           (when mantle:user:perspective:uniquify-style/cache
-             (setq uniquify-buffer-name-style mantle:user:perspective:uniquify-style/cache)))))
+           (when perspective:cache:uniquify-buffer-name-style
+             (setq uniquify-buffer-name-style perspective:cache:uniquify-buffer-name-style)))))
 
   (innit:hook:defun
       (:name    "persp:winner:data/save"

@@ -78,7 +78,7 @@ Creates the taskspace keymap under the doom leader key (default SPC)"
 ;;------------------------------------------------------------------------------
 
 (defmacro taskspace:keybind:general (&rest args)
-  "Create keybinds using the supplied General definer.
+  "Create keybinds using the supplied `general' ARGS.
 
 If using `evil', consider placing this in your config:
   ;; https://github.com/emacs-evil/evil-collection#making-spc-work-similarly-to-spacemacs
@@ -105,6 +105,16 @@ Call this function with the desired keybind settings:
      "`General' keybind feature is not loaded/defined! Cannot create keybinds."))
 
   `(progn
+     ;; TODO: Do we expect:
+     ;;   1) Just the leader key, and we'll make the "Taskspace..." menu and sub-menus and keybinds?
+     ;;   2) The prefix for the "Taskspace..." menu, and we'll only make the keybinds?
+     ;; ;;---
+     ;; ;; Prefix Title
+     ;; ;;---
+     ;; (general-define-key ,@args
+     ;;                     "" (list nil :which-key "Taskspace..."))
+
+
      ;;---
      ;; Top Level Commands...
      ;;---
