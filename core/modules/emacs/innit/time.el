@@ -21,21 +21,39 @@
 ;; Customs, Constants, & Variables
 ;;------------------------------------------------------------------------------
 
+(defvar innit:time nil
+  "The time it took, in seconds, for Emacs & `innit' to finish set-up.")
+
+
 (defcustom innit:time:benchmark? t
   "Boolean flag for enabling/disabling Emacs start-up benchmark message."
   :group 'innit:group
   :type  '(boolean))
 
 
-(defvar innit:time nil
-  "The time it took, in seconds, for Emacs & `innit' to finish set-up.")
-
-
-(defvar innit:time:benchmark:message/clear-delay 10
+(defcustom innit:time:benchmark:message/clear-delay 10
   "Seconds to delay before clearing message of function `innit:time:benchmark'.
 
 Set to 0/nil to have the message stick around until naturally
-cleared/overwritten.")
+cleared/overwritten."
+  :group 'innit:group
+  :type  '(choice (nil :tag "Never Auto-Clear")
+                  (natnum :tag "Seconds")))
+
+
+(defcustom innit:time:benchmark:message/indent-func
+  (lambda (str)
+    "Prefix with spaces unless empty string, only whitespace, or not a string."
+    (if (or (not (stringp str))
+            (string-blank-p str))
+        str
+      (concat "            " str)))
+  "Indent each line of the function `innit:time:benchmark' output with this.
+
+If nil (or e.g. `identity'), do not indent."
+  :group 'innit:group
+  :type  '(choice (nil :tag "No Indent")
+                  (function)))
 
 
 ;;------------------------------------------------------------------------------
@@ -49,7 +67,8 @@ If STRING? is non-nil, return the message as a string instead of displaying it."
   ;; If string is desired instead of message, ignore `innit:time:benchmark?' flag.
   (unless (and (not innit:time:benchmark?)
                (not string?))
-    (let ((time (or innit:time
+    (let ((func/name "innit:time:benchmark")
+          (time (or innit:time
                     (setq innit:time
                           (float-time (time-subtract (current-time) before-init-time)))))
           (features/imp (when (functionp #'imp:feature:count)
@@ -64,9 +83,11 @@ If STRING? is non-nil, return the message as a string instead of displaying it."
             ;;---
             ;; Fancy Indented Box:
             ;;---
-            (mapconcat (lambda (str) (concat "                         " str))
+            (mapconcat (or innit:time:benchmark:message/indent-func
+                           #'identity)
                        (seq-filter #'stringp
-                                   (list "┌──────────┤innit├──────────┐"
+                                   (list ""
+                                         "┌──────────┤innit├──────────┐"
                                          "├──────────┴─────┴──────────┤"
                                          (format "│      init time: %8.03fs │" time)
                                       (when features/imp
@@ -99,15 +120,13 @@ If STRING? is non-nil, return the message as a string instead of displaying it."
         ;;---
         ;; Output to minibuffer & '*Messages*' buffer (also return the string).
         ;;---
-        (prog1
-            ;; Write message & return string.
-            (message message)
+        (nub:info :innit func/name message)
           ;; A valid clear delay? Use it to eventually clear out the minibuffer.
           (when (and (numberp innit:time:benchmark:message/clear-delay)
                      (> innit:time:benchmark:message/clear-delay 0))
                  (run-with-idle-timer innit:time:benchmark:message/clear-delay
                                       nil
-                                      (lambda () (message "")))))))))
+                               (lambda () (message ""))))))))
 ;; (innit:time:benchmark)
 
 
