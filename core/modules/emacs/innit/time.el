@@ -90,7 +90,7 @@ If STRING? is non-nil, return the message as a string instead of displaying it."
                                          "┌──────────┤innit├──────────┐"
                                          "├──────────┴─────┴──────────┤"
                                          (format "│      init time: %8.03fs │" time)
-                                      (when features/imp
+                                         (when features/imp
                                            (format "│   imp features: %4d      │" features/imp))
                                          (format "│ emacs features: %4d      │" features/emacs)
                                          "└───────────────────────────┘"))
@@ -121,11 +121,11 @@ If STRING? is non-nil, return the message as a string instead of displaying it."
         ;; Output to minibuffer & '*Messages*' buffer (also return the string).
         ;;---
         (nub:info :innit func/name message)
-          ;; A valid clear delay? Use it to eventually clear out the minibuffer.
-          (when (and (numberp innit:time:benchmark:message/clear-delay)
-                     (> innit:time:benchmark:message/clear-delay 0))
-                 (run-with-idle-timer innit:time:benchmark:message/clear-delay
-                                      nil
+        ;; A valid clear delay? Use it to eventually clear out the minibuffer.
+        (when (and (numberp innit:time:benchmark:message/clear-delay)
+                   (> innit:time:benchmark:message/clear-delay 0))
+          (run-with-idle-timer innit:time:benchmark:message/clear-delay
+                               nil
                                (lambda () (message ""))))))))
 ;; (innit:time:benchmark)
 

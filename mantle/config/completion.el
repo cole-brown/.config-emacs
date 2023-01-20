@@ -58,10 +58,10 @@
 ;;
 ;; So... Introducing the "VMOCE Stack"):
 ;;   - Vertico:    https://github.com/minad/vertico
-;;   - Marginalia:      https://github.com/minad/marginalia
-;;   - Orderless:       https://github.com/oantolin/orderless
-;;   - Consult:         https://github.com/minad/consult
-;;   - Embark:          https://github.com/oantolin/embark
+;;   - Marginalia: https://github.com/minad/marginalia
+;;   - Orderless:  https://github.com/oantolin/orderless
+;;   - Consult:    https://github.com/minad/consult
+;;   - Embark:     https://github.com/oantolin/embark
 
 
 ;;------------------------------------------------------------------------------
@@ -291,17 +291,17 @@ Example:
   ;;------------------------------
   :custom
   ;;------------------------------
-  ;;   > The `basic' completion style is specified as fallback in addition to
-  ;;   > `orderless' in order to ensure that completion commands which rely on
-  ;;   > dynamic completion tables, e.g., `completion-table-dynamic' or
-  ;;   > `completion-table-in-turn', work correctly. Furthermore the `basic'
-  ;;   > completion style needs to be tried /first/ (not as a fallback) for
-  ;;   > TRAMP hostname completion to work. In order to achieve that, we add an
-  ;;   > entry for the `file' completion category in the
-  ;;   > `completion-category-overrides' variable. In addition, the
-  ;;   > `partial-completion' style allows you to use wildcards for file
-  ;;   > completion and partial paths, e.g., '/u/s/l' for '/usr/share/local'.
-  ;;     - https://github.com/oantolin/orderless#overview
+  ;; > The `basic' completion style is specified as fallback in addition to
+  ;; > `orderless' in order to ensure that completion commands which rely on
+  ;; > dynamic completion tables, e.g., `completion-table-dynamic' or
+  ;; > `completion-table-in-turn', work correctly. Furthermore the `basic'
+  ;; > completion style needs to be tried /first/ (not as a fallback) for
+  ;; > TRAMP hostname completion to work. In order to achieve that, we add an
+  ;; > entry for the `file' completion category in the
+  ;; > `completion-category-overrides' variable. In addition, the
+  ;; > `partial-completion' style allows you to use wildcards for file
+  ;; > completion and partial paths, e.g., '/u/s/l' for '/usr/share/local'.
+  ;;   - https://github.com/oantolin/orderless#overview
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
