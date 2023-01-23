@@ -723,68 +723,34 @@ Example for `use-package persp-mode' `:config' section:
 ;;------------------------------
 ;; General
 ;;------------------------------
-
-(defmacro perspective:keybind:general (&rest args)
-  "Create keybinds using the supplied `general' ARGS.
-
-Provide `:which-key' descriptions for the bindings.
-
-If using `evil', consider placing this in your config:
-  ;; https://github.com/emacs-evil/evil-collection#making-spc-work-similarly-to-spacemacs
-  ;; NOTE: `evil-collection' binds over SPC in many packages. To use SPC as a
-  ;; leader key with `general', first set these override states:
-  (setq general-override-states '(insert
-                                  emacs
-                                  hybrid
-                                  normal
-                                  visual
-                                  motion
-                                  operator
-                                  replace))
-
-Call this function with the desired keybind settings:
-  (perspective:keybind:general
-    :prefix  \"SPC TAB\" ; NOTE: Provide entire prefix for \"Perspectives...\" keybinds.
-    :states  '(normal visual motion)
-    :keymaps 'override
-    \"\" (list nil :which-key \"Perspectives...\")) ; prefix title"
-  (unless (featurep 'general)
-    (nub:error
-     :innit
-     "perspective:keybind:general"
-     "`General' keybind feature is not loaded/defined! Cannot create keybinds."))
-
-  `(progn
-     ;; NOTE: We expect the prefix or whatever for the "Perspectives..." to be provided in ARGS.
-     ;; We'll only make the keybinds.
-     (general-define-key ,@args
-                         "TAB" (list #'perspective:cmd:display        :which-key "List")
-                         "n"   (list #'perspective:cmd:new-named      :which-key "New")
-                         "N"   (list #'perspective:cmd:new            :which-key "New Unnamed")
-                         "l"   (list #'perspective:cmd:load           :which-key "Load")
-                         "s"   (list #'perspective:cmd:save           :which-key "Save")
-                         ;; "x"   (list #'perspective:cmd:kill           :which-key "Kill All")
-                         "d"   (list #'perspective:cmd:delete         :which-key "Delete")
-                         "r"   (list #'perspective:cmd:rename         :which-key "Rename")
-                         "]"   (list #'perspective:cmd:cycle/right    :which-key "Cycle: Right")
-                         "["   (list #'perspective:cmd:cycle/left     :which-key "Cycle: Left")
-                         "."   (list #'perspective:cmd:switch/index   :which-key "Switch: _")
-                         "`"   (list #'perspective:cmd:switch/last    :which-key "Switch: Previous")
-                         "1"   (list #'perspective:cmd:switch/index:0 :which-key "Switch: 1st")
-                         "2"   (list #'perspective:cmd:switch/index:1 :which-key "Switch: 2nd")
-                         "3"   (list #'perspective:cmd:switch/index:2 :which-key "Switch: 3rd")
-                         "4"   (list #'perspective:cmd:switch/index:3 :which-key "Switch: 4th")
-                         "5"   (list #'perspective:cmd:switch/index:4 :which-key "Switch: 5th")
-                         "6"   (list #'perspective:cmd:switch/index:5 :which-key "Switch: 6th")
-                         "7"   (list #'perspective:cmd:switch/index:6 :which-key "Switch: 7th")
-                         "8"   (list #'perspective:cmd:switch/index:7 :which-key "Switch: 8th")
-                         "9"   (list #'perspective:cmd:switch/index:8 :which-key "Switch: 9th")
-                         "0"   (list #'perspective:cmd:switch/final   :which-key "Switch: Final"))))
-;; (perspective:keybind:general
-;;     :prefix  "SPC"
-;;     :states  '(normal visual motion)
-;;     :keymaps 'override)
-
+;; NOTE: Cannot figure out how to get something working that can be used in a
+;; `use-package' `:general' block. So I'm just doing it the dumb KISS way.
+;;
+;; (keybind:leader/global:def
+;;   :infix   "TAB"
+;;   "" (list nil :which-key "Perspectives...")
+;;   "TAB" (list #'perspective:cmd:display        :which-key "List")
+;;   "n"   (list #'perspective:cmd:new-named      :which-key "New")
+;;   "N"   (list #'perspective:cmd:new            :which-key "New Unnamed")
+;;   "l"   (list #'perspective:cmd:load           :which-key "Load")
+;;   "s"   (list #'perspective:cmd:save           :which-key "Save")
+;;   ;; "x"   (list #'perspective:cmd:kill           :which-key "Kill All")
+;;   "d"   (list #'perspective:cmd:delete         :which-key "Delete")
+;;   "r"   (list #'perspective:cmd:rename         :which-key "Rename")
+;;   "]"   (list #'perspective:cmd:cycle/right    :which-key "Cycle: Right")
+;;   "["   (list #'perspective:cmd:cycle/left     :which-key "Cycle: Left")
+;;   "."   (list #'perspective:cmd:switch/index   :which-key "Switch: _")
+;;   "`"   (list #'perspective:cmd:switch/last    :which-key "Switch: Previous")
+;;   "1"   (list #'perspective:cmd:switch/index:0 :which-key "Switch: 1st")
+;;   "2"   (list #'perspective:cmd:switch/index:1 :which-key "Switch: 2nd")
+;;   "3"   (list #'perspective:cmd:switch/index:2 :which-key "Switch: 3rd")
+;;   "4"   (list #'perspective:cmd:switch/index:3 :which-key "Switch: 4th")
+;;   "5"   (list #'perspective:cmd:switch/index:4 :which-key "Switch: 5th")
+;;   "6"   (list #'perspective:cmd:switch/index:5 :which-key "Switch: 6th")
+;;   "7"   (list #'perspective:cmd:switch/index:6 :which-key "Switch: 7th")
+;;   "8"   (list #'perspective:cmd:switch/index:7 :which-key "Switch: 8th")
+;;   "9"   (list #'perspective:cmd:switch/index:8 :which-key "Switch: 9th")
+;;   "0"   (list #'perspective:cmd:switch/final   :which-key "Switch: Final"))
 
 
 ;;------------------------------------------------------------------------------

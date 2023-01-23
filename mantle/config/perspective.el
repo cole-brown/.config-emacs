@@ -42,6 +42,7 @@
 (imp:use-package persp-mode
   :unless noninteractive
   :commands persp-switch-to-buffer
+  :demand t ; Need `persp-mode' loaded for the `:perspective' commands.
 
   ;;------------------------------
   :init
@@ -259,10 +260,31 @@
   ;;---
   ;; "Perspective" Keybinds
   ;;---
-  (persp:keybind:general :prefix  (keybind:prefix :global "TAB")
-                         :states  keybind:leader/global:states
-                         :keymaps keybind:leader/global:keymaps
-                         "" (list nil :which-key "Perspectives...")) ;; prefix title
+  (keybind:leader/global:def
+    :infix   "TAB"
+    "" (list nil :which-key "Perspectives...")
+    "TAB" (list #'perspective:cmd:display        :which-key "List")
+    "n"   (list #'perspective:cmd:new-named      :which-key "New")
+    "N"   (list #'perspective:cmd:new            :which-key "New Unnamed")
+    "l"   (list #'perspective:cmd:load           :which-key "Load")
+    "s"   (list #'perspective:cmd:save           :which-key "Save")
+    ;; "x"   (list #'perspective:cmd:kill           :which-key "Kill All")
+    "d"   (list #'perspective:cmd:delete         :which-key "Delete")
+    "r"   (list #'perspective:cmd:rename         :which-key "Rename")
+    "]"   (list #'perspective:cmd:cycle/right    :which-key "Cycle: Right")
+    "["   (list #'perspective:cmd:cycle/left     :which-key "Cycle: Left")
+    "."   (list #'perspective:cmd:switch/index   :which-key "Switch: _")
+    "`"   (list #'perspective:cmd:switch/last    :which-key "Switch: Previous")
+    "1"   (list #'perspective:cmd:switch/index:0 :which-key "Switch: 1st")
+    "2"   (list #'perspective:cmd:switch/index:1 :which-key "Switch: 2nd")
+    "3"   (list #'perspective:cmd:switch/index:2 :which-key "Switch: 3rd")
+    "4"   (list #'perspective:cmd:switch/index:3 :which-key "Switch: 4th")
+    "5"   (list #'perspective:cmd:switch/index:4 :which-key "Switch: 5th")
+    "6"   (list #'perspective:cmd:switch/index:5 :which-key "Switch: 6th")
+    "7"   (list #'perspective:cmd:switch/index:6 :which-key "Switch: 7th")
+    "8"   (list #'perspective:cmd:switch/index:7 :which-key "Switch: 8th")
+    "9"   (list #'perspective:cmd:switch/index:8 :which-key "Switch: 9th")
+    "0"   (list #'perspective:cmd:switch/final   :which-key "Switch: Final"))
 
 
   ;;------------------------------
@@ -306,7 +328,7 @@ or on some buffer listing ops."
 
   (define-advice persp-asave-on-exit (:around (fn &rest args) mantle:user:persp:autosave:real-buffers?)
     "Don't bother auto-saving the session if no real buffers are open."
-    (when (buffer:list:type/real)
+    (when (buffer:list :type :real)
       (apply fn args))
     t)
 
