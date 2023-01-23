@@ -35,6 +35,25 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Types
+;;------------------------------------------------------------------------------
+
+(defconst buffer:types
+  (list (cons nil                 #'buffer:type:any?)
+        (cons :any                #'buffer:type:any?)
+        (cons :dired              #'buffer:type:dired?)
+        (cons :special            #'buffer:type:special?)
+        (cons :temp               #'buffer:type:temp?)
+        (cons :visible            #'buffer:type:visible?)
+        (cons :buried             #'buffer:type:buried?)
+        (cons :file-visiting      #'buffer:type:file-visiting?)
+        (cons :non-file-visiting  #'buffer:type:non-file-visiting?)
+        (cons :real               #'buffer:type:real?)
+        (cons :unreal             #'buffer:type:unreal?))
+  "Alist of buffer type keywords to buffer type predicate/filter functions.")
+
+
+;;------------------------------------------------------------------------------
 ;; Variables
 ;;------------------------------------------------------------------------------
 
@@ -88,6 +107,14 @@ Via Doom's `doom-unreal-buffer-functions' in \"core/autoload/buffers.el\".")
 ;;------------------------------------------------------------------------------
 ;; Type Predicates
 ;;------------------------------------------------------------------------------
+
+;;;###autoload
+(defun buffer:type:any? (buffer)
+  "Return non-nil if BUFFER is... any... type of... buffer?
+
+Return `bufferp'"
+  (bufferp buffer))
+
 
 ;;;###autoload
 (defun buffer:type:dired? (buffer)
@@ -196,40 +223,90 @@ Via Doom's `doom-unreal-buffer-p' in \"core/autoload/buffers.el\"."
 ;; Buffer List
 ;;------------------------------------------------------------------------------
 
-(defun buffer:list (&optional perspective)
-  "Get a list of buffer objects for PERSPECTIVE.
+(cl-defun buffer:list (&key (perspective 'all) type)
+  "Get a list of buffer objects.
 
 PERSPECTIVE can be a string (name of a perspective) or a `persp-mode'
-perspective (satisfies `perspective-p'). If nil or omitted, it defaults to the
-current workspace.
+perspective (satisfies `perspective-p').
+  - If nil or `current', it defaults to the current workspace.
+  - If not supplied or `all', it defaults to the full, non-`persp-mode'-aware
+    buffer list.
 
-If `persp-mode' is enabled, use its list. Else use `buffer-list'."
-  ;; Hide all the `persp-mode' stuff behind a check for it.
-  (if (bound-and-true-p persp-mode)
-      ;; Get list of PERSPECTIVE's buffers.
-      (let ((perspective (or perspective (get-current-persp))))
-        (unless (perspective-p perspective)
-          (user-error "Not in a valid perspective (%s)" perspective))
-        (persp-buffers perspective))
+TYPE should be nil or a keyword from `buffer:types'."
+  (let ((func/name "buffer:list") ; TODO-nub: Use `nub:error' in this
+        persp/obj)
 
+  ;;------------------------------
+  ;; Filter list down to TYPE?
+  ;;------------------------------
+  (unless (assoc type buffer:types)
+    (error "%s: `%S' is not a valid buffer type! Valid (see `buffer:types'): (%S)"
+           func/name
+           type
+           (seq-map #'car buffer:types)))
+
+  (seq-map (alist-get type buffer:types)
+           ;;------------------------------
+           ;; Get complete (perspective's?) buffer list.
+           ;;------------------------------
+           (if (or (null perspective)
+                   (eq perspective 'all))
+               ;;------------------------------
     ;; No `persp-mode'; give the list of everything.
+               ;;------------------------------
 
-    ;; NOTE: Sending PERSPECTIVE as FRAME arg of `buffer-list'. It's...
+               ;; NOTE: ...Could send PERSPECTIVE as FRAME arg of `buffer-list'. It's
     ;; what Doom does with `doom-buffer-list' / `+workspace-buffer-list', except
     ;; that's done with defalias & override advice, so it's very implied.
-    (buffer-list perspective)))
+               ;; But I don't know why anyone would do that since
+               ;; `persp-buffers' doesn't have a FRAME arg so they cannot be
+               ;; equivalent?
+               (buffer-list)
+
+             ;;------------------------------
+             ;; `persp-mode'-aware list.
+             ;;------------------------------
+             ;;---
+             ;; No `persp-mode'? -> Error!
+             ;;---
+             (unless (bound-and-true-p persp-mode)
+               (when (not (boundp persp-mode))
+                 (error "%s: `persp-mode' not installed or loaded; cannot get a buffer list! perspective: %S"
+                        func/name
+                        perspective))
+               ;; else: (not persp-mode)
+               (error "%s: `persp-mode' not enabled; cannot get a buffer list for perspective: %S"
+                      func/name
+                      perspective))
+
+             ;;---
+             ;; `persp-mode'
+             ;;---
+             ;; Get persp-mode's perspective object.
+             (cond ((eq perspective 'current)
+                    (setq persp/obj (get-current-persp)))
+
+                   ((stringp perspective)
+                    (setq persp/obj (persp-get-by-name perspective))
+                    (when (eq persp/obj :nil) ; `persp-get-by-name' returns keyword `:nil' instead of nil.
+                      (error "%s: PERSPECTIVE (%s) is not a valid perspective name. Valid: %s"
+                             func/name
+                             perspective
+                             (persp-names-sorted))))
+
+                   (t
+                    (error "%s: PERSPECTIVE must be: nil, `current', `all', or a string. Got: %S"
+                              func/name
+                              perspective)))
+
+             ;; Get list of buffers.
+             (persp-buffers persp/obj)))))
+;; (buffer:list)
+;; (buffer:list :perspective nil)
+;; (buffer:list :perspective "emacs")
 
 
-;;;###autoload
-(defun buffer:list:type/real (&optional buffer-list)
-  "Return a list of buffers that satisfy `buffer:type:real?'.
-
-If BUFFER-LIST is nil, use return value of `buffer:list'.
-
-Via Doom's `doom-real-buffer-list' in \"core/autoload/buffers.el\"."
-  (cl-remove-if-not #'buffer:type:real? (or buffer-list (buffer:list))))
-
-
+;; TODO: Combine this with `buffer:list' too (add `:mode' keyword param?)?
 ;;;###autoload
 (defun buffer:list:mode (modes &optional buffer-list derived-p)
   "Return a list of buffers whose `major-mode' is `eq' to MODES.
