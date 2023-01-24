@@ -42,7 +42,6 @@
 (imp:use-package persp-mode
   :unless noninteractive
   :commands persp-switch-to-buffer
-  :demand t ; Need `persp-mode' loaded for the `:perspective' commands.
 
   ;;------------------------------
   :init
@@ -110,11 +109,7 @@
 
            ;; Ensure `persp-kill-buffer-query-function' is last
            (remove-hook 'kill-buffer-query-functions #'persp-kill-buffer-query-function)
-           (add-hook 'kill-buffer-query-functions #'persp-kill-buffer-query-function t)
-
-           ;; Restrict buffer list to perspective.
-           ;; NOTE: No need to do anything here; just use `buffer:list' instead of `buffer-list'.
-           )
+           (add-hook 'kill-buffer-query-functions #'persp-kill-buffer-query-function t))
 
           ;; Disabling `persp-mode': re-enable `uniquify' buffer renaming.
           (t
