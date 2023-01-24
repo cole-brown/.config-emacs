@@ -252,12 +252,12 @@ TYPE should be nil or a keyword from `buffer:types'."
            (if (or (null perspective)
                    (eq perspective 'all))
                ;;------------------------------
-    ;; No `persp-mode'; give the list of everything.
+               ;; No `persp-mode'; give the list of everything.
                ;;------------------------------
 
                ;; NOTE: ...Could send PERSPECTIVE as FRAME arg of `buffer-list'. It's
-    ;; what Doom does with `doom-buffer-list' / `+workspace-buffer-list', except
-    ;; that's done with defalias & override advice, so it's very implied.
+               ;; what Doom does with `doom-buffer-list' / `+workspace-buffer-list', except
+               ;; that's done with defalias & override advice, so it's very implied.
                ;; But I don't know why anyone would do that since
                ;; `persp-buffers' doesn't have a FRAME arg so they cannot be
                ;; equivalent?
