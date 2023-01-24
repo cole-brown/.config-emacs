@@ -8,8 +8,14 @@
 ;; Move along.
 ;;
 ;;; Commentary:
+;;
+;; Settings that the user needs ASAP (e.g. during "early-init.el" or before user
+;; init/config) should go here.
+;;
+;; NOTE: Normal settings should go in a `use-package emacs' block.
+;; Example at "$(git rev-parse --show-toplevel)/mantle/config/emacs.el"
+;;
 ;;; Code:
-
 
 
 ;;------------------------------------------------------------------------------
@@ -22,20 +28,22 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Init Output
+;; `innit' Output
 ;;------------------------------------------------------------------------------
 
 ;; Allow messages during innit for debugging.
-(setq innit:display:messages  t
-      innit:display:load-file t)
+(innit:customize-set-variable innit:display:messages  t)
+(innit:customize-set-variable innit:display:load-file t)
 
 
 ;;------------------------------------------------------------------------------
-;; Initial Frame Size / Position
+;; Frame
 ;;------------------------------------------------------------------------------
+
+;; TODO: Initial size / position should depend on what system we're on...
 
 ;;----------------------------
-;; Size
+;; Initial Frame Size
 ;;----------------------------
 ;; Set `initial-frame-alist' for only the first frame created, or set
 ;; `default-frame-alist' for _all_ frames created.
@@ -52,7 +60,7 @@
 
 
 ;;----------------------------
-;; Position
+;; Initial Frame Position
 ;;----------------------------
 ;; We also want to open it in the main/center monitor, which is... hacky?
 ;;  - https://stackoverflow.com/a/11460472
@@ -100,13 +108,17 @@
 (add-to-list 'initial-frame-alist '(left . 1079))
 
 
-;;------------------------------------------------------------------------------
-;; Frame
-;;------------------------------------------------------------------------------
+;;------------------------------
+;; Frame Resize
+;;------------------------------
 
 ;; Resize based on pixels, not characters. Allows maximizing to actually
 ;; maximize.
-(setq frame-resize-pixelwise t)
+(innit:customize-set-variable frame-resize-pixelwise t)
+
+;;------------------------------
+;; Frame UI Elements
+;;------------------------------
 
 ;; Menu Bar (File, Edit... Menus): No.
 (when (fboundp 'menu-bar-mode)
@@ -121,33 +133,8 @@
 ;;   - On the one hand, get rid of it to get a bit more screen real estate.
 ;;   - On the other hand, keep it for showing where in buffer we are and how big
 ;;     buffer is?
-;; (when (fboundp 'scroll-bar-mode)
-;;   (scroll-bar-mode -1))
-
-
-;;------------------------------------------------------------------------------
-;; Large Monitors / Window Splitting
-;;------------------------------------------------------------------------------
-
-;; For `split-window-sensibly'.
-;; To split "vertically" (as in a horizontal split so the new and current are
-;; now stacked vertically), must have at least this many lines visible RIGHT
-;; NOW (not after split). Or set to nil to disable.
-;;
-;; Annoying right now since my work monitors aren't big enough to bother getting
-;; used to more than 2 side-by-sides.
-(innit:customize-set-variable split-height-threshold nil)
-
-
-;; For `split-window-sensibly'.
-;; To split "horizontally" (as in a vertical split so the new and current are
-;; now stacked side-by-side), must have at least this many columns visible RIGHT
-;; NOW (not after split). Or set to nil to disable.
-;;
-;; Annoying right now since my work monitors aren't big enough to bother getting
-;; used to more than 2 side-by-sides. 160 is wide enough that it /should/ work
-;; for most situations.
-(innit:customize-set-variable split-width-threshold 160)
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
 
 
 ;;------------------------------------------------------------------------------

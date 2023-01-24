@@ -19,25 +19,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; File Time Formats
-;;------------------------------------------------------------------------------
-
-;; Set time format for e.g. dired to a better format:
-;;   RFC-3339 (human-readable ISO-8601)
-;; Original value:
-;;   '(\"%d.%m.%Y %H:%M\" \"%d.%m.%Y %H:%M\"))
-(innit:customize-set-variable ls-lisp-format-time-list
-                              (list
-                               ;; Recent Time Format:
-                               (datetime:format/get 'rfc-3339 'datetime)
-                               ;; Not-Recent Time Format:
-                               (datetime:format/get 'rfc-3339 'datetime)))
-
-;; Force use of `ls-lisp-format-time-list' regardless of locale.
-(innit:customize-set-variable ls-lisp-use-localized-time-format t)
-
-
-;;------------------------------------------------------------------------------
 ;; Buffer Names
 ;;------------------------------------------------------------------------------
 
@@ -201,45 +182,6 @@
   ;;------------------------------
 
   (doom-modeline-mode 1))
-
-
-;;------------------------------------------------------------------------------
-;; Title
-;;------------------------------------------------------------------------------
-
-;; This variable has the same structure as `mode-line-format', except that
-;; the %c, %C, and %l constructs are ignored.  It is used only on frames for
-;; which no explicit name has been set (see `modify-frame-parameters').
-(innit:customize-set-variable frame-title-format
-                              ;; buffer name
-                              '("｢%b｣"
-                                ;; system/host name
-                                " @"
-                                (:eval (or (file-remote-p default-directory 'host) system-name))
-                                ;; And I guess we should say what we are...
-                                " — Emacs "
-                                emacs-version))
-
-;; This is for the Emacs icon thingy in the OS app list/taskbar.
-;; Just have it be the same as the `frame-title-format'.
-(innit:customize-set-variable icon-title-format frame-title-format)
-
-
-;;------------------------------------------------------------------------------
-;; Cursor
-;;------------------------------------------------------------------------------
-
-(blink-cursor-mode 1)
-(setq blink-cursor-interval 0.75) ; default is 0.5 seconds
-
-
-;;------------------------------------------------------------------------------
-;; Lines
-;;------------------------------------------------------------------------------
-
-;;This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
 
 
 ;;------------------------------------------------------------------------------
