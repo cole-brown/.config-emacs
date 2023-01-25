@@ -35,8 +35,14 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Types
+;; Constants & Variables
 ;;------------------------------------------------------------------------------
+
+(defcustom buffer:fallback:name "*scratch*"
+  "Buffer name string for `buffer:get-or-create:fallback'."
+  :group 'buffer:group
+  :type '(string))
+
 
 (defconst buffer:types
   (list (cons nil                 #'buffer:type:any?)
@@ -49,8 +55,40 @@
         (cons :file-visiting      #'buffer:type:file-visiting?)
         (cons :non-file-visiting  #'buffer:type:non-file-visiting?)
         (cons :real               #'buffer:type:real?)
-        (cons :unreal             #'buffer:type:unreal?))
+        (cons :unreal             #'buffer:type:unreal?)
+        (cons :fallback           #'buffer:type:fallback?))
   "Alist of buffer type keywords to buffer type predicate/filter functions.")
+
+
+(cl-defun buffer:type/valid? (type &key invalids)
+  "Return non-nil if TYPE is a valid key in `buffer:types'.
+
+If INVALIDS is a list, all those will be considered invalid. Useful for e.g.
+ignoring `:any'/nil type."
+  (let ((func/name "buffer:type/valid?")) ; TODO-nub: Use `nub:error' in this func
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (when (and invalids
+               (not (proper-list-p invalids)))
+      (error "%s: `:invalids' must be a list! Got a %S: %S"
+             func/name
+             (type-of invalids)
+             invalids))
+
+    ;;------------------------------
+    ;; Valid?
+    ;;------------------------------
+    ;; Is it specifically invalid?
+    (unless (and invalids
+                 (memq type invalids))
+      ;; Is it actually a type?
+      (assoc type buffer:types))))
+;; (buffer:type/valid? nil)
+;; (buffer:type/valid? nil :invalids '(nil))
+;; (buffer:type/valid? :any :invalids '(nil))
+;; (buffer:type/valid? :jeff)
+;; (buffer:type/valid? :jeff :invalids '(nil))
 
 
 ;;------------------------------------------------------------------------------
@@ -219,6 +257,63 @@ Via Doom's `doom-unreal-buffer-p' in \"core/autoload/buffers.el\"."
   (not (buffer:type:real? buffer-or-name)))
 
 
+;;;###autoload
+(defun buffer:type:fallback? (buffer-or-name)
+  "Return non-nil if BUFFER-OR-NAME is _the_ fallback buffer."
+  ;; Just the name? Comparing strings should be enough for us...
+  (if (stringp buffer-or-name)
+      (string= buffer-or-name buffer:fallback:name)
+    ;; Not a name; assume buffer object.
+    (eq (buffer:fallback:get :create) ; Get or create first... then can just get.
+        (get-buffer buffer-or-name))))
+;; (buffer:type:fallback? "*scratch*")
+;; (buffer:type:fallback? (get-buffer "*scratch*"))
+
+
+;;------------------------------------------------------------------------------
+;; `next-buffer' / `other-buffer'
+;;------------------------------------------------------------------------------
+
+(defun buffer:next/other:ignore (&rest types)
+  "Make `next-buffer', `other-buffer', etc. ignore specified buffer TYPES.
+
+Set or update the `buffer-predicate' parameter on `default-frame-alist'.
+
+NOTE: Doom's setup in \"core/core-ui.el\" does the equivalent of:
+  (buffer:next/other:ignore :unreal)"
+  (let* ((func/name       "buffer:next/other:ignore") ; TODO-nub: Use `nub:error' in this func
+         (types/invalid   '(nil :any))
+         (types/to-ignore (seq-filter (lambda (type)
+                                        "Remove types nil and `:any'... They don't actually filter out anything."
+                                        (buffer:type/valid? type :invalids types/invalid))
+                                      types)))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (if types
+        ;; They provided TYPES of just nil/`:any', which is... not useful for ignoring any buffers...
+        (unless types/to-ignore
+          (error "%s: nil and `:any' are not valid types to ignore! Got: %S"
+                 func/name
+                 types/to-ignore))
+      ;; They provided nothing.
+      (error "%s: Can't ignore nothing; at least one buffer type must be specified! Got: %S"
+             func/name
+             types))
+
+    ;;------------------------------
+    ;; Build Buffer Type Predicate
+    ;;------------------------------
+    (cl-letf ((predicate
+               (lambda (buffer)
+                 "Filter buffers for `next-buffer', `other-buffer' etc. Return nil to skip BUFFER."
+                 (let ((allowed? t))
+                   (dolist (type types/to-ignore allowed?)
+                     (setq allowed? (funcall (alist-get type buffer:types) buffer)))))))
+      ;; Add (or replace if already present) `buffer-predicate' to `default-frame-alist'.
+      (setf (alist-get 'buffer-predicate default-frame-alist) predicate))))
+
+
 ;;------------------------------------------------------------------------------
 ;; Buffer List
 ;;------------------------------------------------------------------------------
@@ -233,7 +328,7 @@ perspective (satisfies `perspective-p').
     buffer list.
 
 TYPE should be nil or a keyword from `buffer:types'."
-  (let ((func/name "buffer:list") ; TODO-nub: Use `nub:error' in this
+  (let ((func/name "buffer:list") ; TODO-nub: Use `nub:error' in this func
         persp/obj)
 
   ;;------------------------------
@@ -335,10 +430,6 @@ If DERIVED-P, test with `derived-mode-p', otherwise use `eq'."
 ;;------------------------------------------------------------------------------
 ;; Fallback Buffer
 ;;------------------------------------------------------------------------------
-
-(defcustom buffer:fallback:name "*scratch*"
-  "Buffer name string for `buffer:get-or-create:fallback'.")
-
 
 (defun buffer:fallback:get (&optional create-if-dne?)
   "Return the fallback buffer or nil.
