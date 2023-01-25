@@ -340,14 +340,20 @@ If DERIVED-P, test with `derived-mode-p', otherwise use `eq'."
   "Buffer name string for `buffer:get-or-create:fallback'.")
 
 
-(defun buffer:fallback:get-or-create ()
-  "Return the fallback buffer, creating it if necessary.
+(defun buffer:fallback:get (&optional create-if-dne?)
+  "Return the fallback buffer or nil.
 
 See `buffer:fallback:name' for its name.
 
-From Doom's `doom-fallback-buffer' in \"core/autoload/buffers.el\"."
+If CREATE-IF-DNE? is non-nil, create the fallback buffer if it does not exist.
+Else, if fallback buffer does not exist, return nil.
+
+Originally Doom's `doom-fallback-buffer' in \"core/autoload/buffers.el\"."
   (let (buffer-list-update-hook)
-    (get-buffer-create buffer:fallback:name)))
+    (funcall (if create-if-dne?
+                 #'get-buffer-create
+               #'get-buffer)
+             buffer:fallback:name)))
 
 
 ;;------------------------------------------------------------------------------

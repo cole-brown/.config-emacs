@@ -368,8 +368,8 @@ delete."
                     (car (perspective:name:list))))
                  ; doom: (unless (doom-buffer-frame-predicate (window-buffer))
                  (unless (or (buffer:type:real? (window-buffer))
-                             (eq (window-buffer) (buffer:fallback:get-or-create)))
-                   (switch-to-buffer (buffer:fallback:get-or-create))))
+                             (eq (window-buffer) (buffer:fallback:get :create)))
+                   (switch-to-buffer (buffer:fallback:get :create))))
                 ;; Delete the only perspective.
                 (t
                  ;; Go to the default perspective...
@@ -671,7 +671,7 @@ Example for `use-package persp-mode' `:config' section:
       (with-selected-frame frame
         (perspective:action:switch (int<perspective>:name:generate) t)
         (unless (buffer:type:real? (current-buffer))
-          (switch-to-buffer (buffer:fallback:get-or-create)))
+          (switch-to-buffer (buffer:fallback:get :create)))
         (set-frame-parameter frame 'workspace (perspective:name:current))
         ;; ensure every buffer has a buffer-predicate
         (persp-set-frame-buffer-predicate frame))
