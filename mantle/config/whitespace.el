@@ -169,6 +169,17 @@
   ;;------------------------------
   :init
   ;;------------------------------
+
+  (defun mantle:user:whitespace:frame/childless? ()
+    "Return non-nil if current buffer should obey `global-whitespace-mode'.
+
+In this case, buffers that have no `parent-frame' should show whitespace.
+Otherwise `whitespace-mode' inundates child frames with whitespace markers, so
+this will disable it in child frames to fix all that visual noise.
+
+Add to `whitespace-enable-predicate' via `add-function'."
+    (null (frame-parameter nil 'parent-frame)))
+
   (innit:hook:defun
       (:name    "org/whitespace:mode/enter"
        :file    macro<imp>:path/file
@@ -245,6 +256,10 @@
 
   ;; NOTE: See thime's tweaks (e.g. "mantle/theme/zenburn/whitespace.el") for
   ;; changes to face attributes.
+
+  ;; `whitespace-mode' inundates child frames with whitespace markers; this
+  ;; fixes all that visual noise.
+  (add-function :before-while whitespace-enable-predicate #'mantle:user:whitespace:frame/childless?)
 
   ;; Enable whitespace-mode everywhere.
   (global-whitespace-mode +1))

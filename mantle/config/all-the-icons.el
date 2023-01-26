@@ -76,6 +76,7 @@ HEIGHT and V-ADJUST are sent to `all-the-icons-faicon'.
 
 ICON-COLOR is used to color only the icon character.
 
+NOTE: Used to be `with-fa'.
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
   ;; Want to keep the variables named properly, as the actual function (aka
   ;; override advice) uses them but don't want the linter complaining. So...
@@ -85,8 +86,8 @@ ICON-COLOR is used to color only the icon character.
   ;; Placeholder function; will be used if `all-the-icons' isn't loaded, so
   ;; don't call any `all-the-icons' functions. Just return the supplied STR.
   str)
-;; (with-faicon "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05)
-;; (insert (with-faicon "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05))
+;; (mantle:user:icon/font-awesome "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05)
+;; (insert (mantle:user:icon/font-awesome "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05))
 
 
 (defun mantle:user:icon/file-icon (icon str &rest plist)
@@ -230,8 +231,8 @@ ICON-COLOR is used to color only the icon character.
                              :height (or (plist-get plist :height) 1))
        " "
        str)))
-  ;; (with-faicon "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05)
-  ;; (insert (with-faicon "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05))
+  ;; (mantle:user:icon/font-awesome "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05)
+  ;; (insert (mantle:user:icon/font-awesome "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05))
 
 
   (define-advice mantle:user:icon/file-icon (:override (icon str &rest plist) mantle:override)

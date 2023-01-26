@@ -183,6 +183,14 @@
   ;; numbers are disabled. For relative line numbers, set this to `relative'.
   (display-line-numbers-type t)
 
+  ;; Explicitly define a width to reduce the cost of on-the-fly computation
+  (display-line-numbers-width 3)
+
+  ;; Show absolute line numbers for narrowed regions to make it easier to tell the
+  ;; buffer is narrowed, and where you are, exactly.
+  (display-line-numbers-widen t)
+
+
   ;;------------------------------
   ;; Scrolling
   ;;------------------------------
@@ -230,7 +238,22 @@
   ;; Make `next-buffer', `other-buffer', etc. ignore unreal buffers.
   (buffer:next/other:ignore :unreal)
 
-  (blink-cursor-mode +1))
+  (blink-cursor-mode +1)
+
+  ;; Just always show line numbers; why not?
+  (global-display-line-numbers-mode +1)
+  ;; NOTE: Doom is more judicious; only enabling for certain (widely used) base modes:
+  ;; ;; Enable line numbers in most text-editing modes. We avoid
+  ;; ;; `global-display-line-numbers-mode' because there are many special and
+  ;; ;; temporary modes where we don't need/want them.
+  ;; (add-hook! '(prog-mode-hook text-mode-hook conf-mode-hook)
+  ;;            #'display-line-numbers-mode)
+
+  ;; Doesn't exist in terminal Emacs, but some Emacs packages (internal and
+  ;; external) use it anyway, leading to a void-function error, so define a no-op
+  ;; substitute to suppress them.
+  (unless (fboundp 'define-fringe-bitmap)
+    (fset 'define-fringe-bitmap #'ignore)))
 
 
 ;;------------------------------------------------------------------------------
