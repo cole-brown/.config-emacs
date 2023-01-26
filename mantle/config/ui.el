@@ -185,7 +185,7 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Indentation Guide
+;; Highlight: Indentation Guide
 ;;------------------------------------------------------------------------------
 
 (imp:use-package highlight-indent-guides
@@ -254,6 +254,83 @@
   ;; If theme is already loaded, run the hook.
   (when innit:theme:loaded
     (mantle:hook:highlight-indent-guides:faces/init)))
+
+
+;;------------------------------------------------------------------------------
+;; Highlight: Current Line
+;;------------------------------------------------------------------------------
+
+(imp:use-package hl-line
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  ;; Temporarily disable `hl-line' when selection is active, since it doesn't
+  ;; serve much purpose when the selection is so much more visible.
+  (defvar mantle:user:ui:hl-line:enabled?/local-cache nil)
+
+  ;; TODO: Do we need this hook? It would hook into `hl-line-mode-hook'.
+  ;; See Doom's "core/core-ui.el".
+  ;; (innit:hook:defun
+  ;;     (:name    'hl-line:disable/local
+  ;;      :file    macro<imp>:path/file
+  ;;      :docstr  "Disable `hl-line' by setting our local var."
+  ;;      :squelch t)
+  ;;  (unless hl-line-mode
+  ;;    (setq-local mantle:user:ui:hl-line:enabled/local? nil)))
+
+  (innit:hook:defun
+      (:name    'hl-line:select-text/enter
+       :file    macro<imp>:path/file
+       :docstr  "Disable `hl-line' when starting to select text."
+       :squelch t)
+    (when hl-line-mode
+      (hl-line-mode -1)
+      (setq-local mantle:user:ui:hl-line:enabled?/local-cache t)))
+
+  (innit:hook:defun
+      (:name    'hl-line:select-text/exit
+       :file    macro<imp>:path/file
+       :docstr  "Enable `hl-line' when done selecting text."
+       :squelch t)
+   (when mantle:user:ui:hl-line:enabled?/local-cache
+     (hl-line-mode +1)))
+
+
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+
+  ((innit:theme:load:hook . global-hl-line-mode)
+   ((evil-visual-state-entry-hook activate-mark-hook)  . mantle:hook:hl-line:select-text/enter)
+   ((evil-visual-state-exit-hook deactivate-mark-hook) . mantle:hook:hl-line:select-text/exit))
+
+
+  ;; ;;------------------------------
+  ;; :config
+  ;; ;;------------------------------
+  ;;
+  ;; TODO: Do I needthis hack from Doom? Don't think I want/need a hl-line mode white/blacklist?
+  ;;
+  ;; (defvar global-hl-line-modes
+  ;;   '(prog-mode text-mode conf-mode special-mode
+  ;;     org-agenda-mode dired-mode)
+  ;;   "What modes to enable `hl-line-mode' in.")
+  ;;
+  ;; ;; HACK I reimplement `global-hl-line-mode' so we can white/blacklist modes in
+  ;; ;;      `global-hl-line-modes' _and_ so we can use `global-hl-line-mode',
+  ;; ;;      which users expect to control hl-line in Emacs.
+  ;; (define-globalized-minor-mode global-hl-line-mode hl-line-mode
+  ;;   (lambda ()
+  ;;     (and (cond (hl-line-mode nil)
+  ;;                ((null global-hl-line-modes) nil)
+  ;;                ((eq global-hl-line-modes t))
+  ;;                ((eq (car global-hl-line-modes) 'not)
+  ;;                 (not (derived-mode-p global-hl-line-modes)))
+  ;;                ((apply #'derived-mode-p global-hl-line-modes)))
+  ;;          (hl-line-mode +1))))
+  )
 
 
 ;;------------------------------------------------------------------------------

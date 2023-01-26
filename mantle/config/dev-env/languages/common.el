@@ -318,7 +318,7 @@ Answer questions like:
 
 
 ;;------------------------------------------------------------------------------
-;; <{[( Rainbow Delimiters )]}>
+;; <{[( Parentheseses )]}>
 ;;------------------------------------------------------------------------------
 
 ;; https://github.com/Fanael/rainbow-delimiters
@@ -342,6 +342,27 @@ Answer questions like:
   ;; Helps us distinguish stacked delimiter pairs, especially in parentheses-drunk
   ;; languages like Lisp (default: 9).
   (rainbow-delimiters-max-face-count 4))
+
+
+(imp:use-package paren
+  :ensure nil ; This is an Emacs built-in feature.
+
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+  (innit:theme:load:hook . show-paren-mode)
+
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+
+  ;; Seconds to delay before showing the matching parenthesis.
+  ;; (show-paren-delay 0.1)
+
+  (show-paren-highlight-openparen     t)
+  (show-paren-when-point-inside-paren t)
+  (show-paren-when-point-in-periphery t))
 
 
 ;;------------------------------------------------------------------------------
