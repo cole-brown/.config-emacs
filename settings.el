@@ -116,16 +116,24 @@
 ;; maximize.
 (innit:customize-set-variable frame-resize-pixelwise t)
 
+;; TODO: What is this set to by default?
+;; But do not resize windows pixelwise, this can cause crashes in some cases
+;; when resizing too many windows at once or rapidly.
+;; (innit:customize-set-variable window-resize-pixelwise nil)
+
+
 ;;------------------------------
 ;; Frame UI Elements
 ;;------------------------------
+;; Disable tool, menu, and scrollbars. Too much screen space and clutter when
+;; you should be using the keyboard.
 
 ;; Menu Bar (File, Edit... Menus): No.
-(when (fboundp 'menu-bar-mode)
+(when (bound-and-true-p menu-bar-mode)
   (menu-bar-mode -1))
 
 ;; Tool Bar (New, Open... Buttons): Go away.
-(when (fboundp 'tool-bar-mode)
+(when (bound-and-true-p tool-bar-mode)
   (tool-bar-mode -1))
 
 ;; Scroll Bar: Hm..........
@@ -133,8 +141,12 @@
 ;;   - On the one hand, get rid of it to get a bit more screen real estate.
 ;;   - On the other hand, keep it for showing where in buffer we are and how big
 ;;     buffer is?
-(when (fboundp 'scroll-bar-mode)
+(when (bound-and-true-p scroll-bar-mode)
   (scroll-bar-mode -1))
+
+;; Don't want popups for "help text". Put it in the echo area instead.
+(when (bound-and-true-p tooltip-mode)
+  (tooltip-mode -1))
 
 
 ;;------------------------------------------------------------------------------

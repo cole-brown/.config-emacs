@@ -109,8 +109,8 @@
 
   ;; This is set to `nil' by default, which causes a wrong-type-arg error
   ;; when you use `markdown-open'. These are more sensible defaults.
-  (markdown-open-command (cond ((innit:os:mac?)   "open")
-                               ((innit:os:linux?) "xdg-open")))
+  (markdown-open-command (cond (innit:os:mac?   "open")
+                               (innit:os:linux? "xdg-open")))
 
   ;; TODO [2023-01-03]: From Doom; do we want?
   ;; A sensible and simple default preamble for markdown exports that
