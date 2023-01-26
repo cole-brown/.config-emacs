@@ -38,6 +38,10 @@
           :path     (imp:path:current:dir/relative :mantle)
           :filename "snippets")
 
+(imp:load :feature  '(:mantle config user dev-env compile)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "compile")
+
 
 ;;------------------------------------------------------------------------------
 ;; Version Control

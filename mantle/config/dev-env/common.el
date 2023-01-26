@@ -107,12 +107,22 @@
   ;; `:depth' argument and `use-package' does not support it in the `:hook'
   ;; section. So that one is in the `:config'.
 
+  (innit:hook:defun
+      (:name   "ediff:window/restore"
+       :file   macro<imp>:path/file
+       :docstr "Restore a saved window config after quitting `ediff'."
+       :depth  'append)
+    (when (window-configuration-p mantle:user:ediff:window/cache)
+      (set-window-configuration mantle:user:ediff:window/cache))
+    (setq mantle:user:ediff:window/cache nil))
+
 
   ;;------------------------------
   :hook
   ;;------------------------------
   ;; Note: Use `innit:cmd:hook:func/name' to insert the func names created via the `innit:hook:defun' `:name' field.
-  ((ediff-before-setup-hook . mantle:hook:ediff:window/save))
+  ((ediff-before-setup-hook             . mantle:hook:ediff:window/save)
+   (ediff-quit-hook ediff-suspend-hook) . mantle:hook:ediff:window/restore)
 
 
   ;;------------------------------
@@ -129,22 +139,7 @@
   (ediff-window-setup-function 'ediff-setup-windows-plain)
 
   ;; Side-by-side instead of default top/bottom split.
-  (ediff-split-window-function 'split-window-horizontally)
-
-
-  ;;------------------------------
-  :config
-  ;;------------------------------
-
-  (innit:hook:defun-and-add
-      (ediff-quit-hook ediff-suspend-hook)
-      (:name   "ediff:window/restore"
-       :file   macro<imp>:path/file
-       :docstr "Restore a saved window config after quitting `ediff'."
-       :depth  'append)
-    (when (window-configuration-p mantle:user:ediff:window/cache)
-      (set-window-configuration mantle:user:ediff:window/cache))
-    (setq mantle:user:ediff:window/cache nil)))
+  (ediff-split-window-function 'split-window-horizontally))
 
 
 ;;------------------------------------------------------------------------------

@@ -346,6 +346,24 @@ Example:
 
 
 ;;------------------------------------------------------------------------------
+;; Command Interpreter (comint)
+;;------------------------------------------------------------------------------
+
+(imp:use-package emacs
+  :ensure nil ; This is an Emacs built-in feature.
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+
+  ;; Doom sets this; not sure exact effect?
+  (comint-prompt-read-only t)
+
+  ;; Double the default max buffer size.
+  (comint-buffer-maximum-size 2048))
+
+
+;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :mantle 'config 'user 'emacs)
