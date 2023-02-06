@@ -264,7 +264,7 @@
   :ensure nil ; This is an Emacs built-in feature.
 
   ;;------------------------------
-  :init
+  :config
   ;;------------------------------
 
   ;; Larger column width for function name in profiler reports

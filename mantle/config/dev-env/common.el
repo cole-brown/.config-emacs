@@ -103,14 +103,11 @@
        :docstr "Save window config so it can be restored after quitting `ediff'.")
     (setq mantle:user:ediff:window/cache (current-window-configuration)))
 
-  ;; NOTE: Cannot make the `ediff:window/restore' hook here as we need the
-  ;; `:depth' argument and `use-package' does not support it in the `:hook'
-  ;; section. So that one is in the `:config'.
-
   (innit:hook:defun
       (:name   "ediff:window/restore"
        :file   macro<imp>:path/file
        :docstr "Restore a saved window config after quitting `ediff'."
+       ;; NOTE: The `ediff:window/restore' hook needs the `:depth' argument!
        :depth  'append)
     (when (window-configuration-p mantle:user:ediff:window/cache)
       (set-window-configuration mantle:user:ediff:window/cache))
@@ -122,7 +119,7 @@
   ;;------------------------------
   ;; Note: Use `innit:cmd:hook:func/name' to insert the func names created via the `innit:hook:defun' `:name' field.
   ((ediff-before-setup-hook             . mantle:hook:ediff:window/save)
-   (ediff-quit-hook ediff-suspend-hook) . mantle:hook:ediff:window/restore)
+   ((ediff-quit-hook ediff-suspend-hook) . mantle:hook:ediff:window/restore))
 
 
   ;;------------------------------

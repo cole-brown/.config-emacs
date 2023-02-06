@@ -261,6 +261,7 @@
 ;;------------------------------------------------------------------------------
 
 (imp:use-package hl-line
+  :ensure nil ; This is an Emacs built-in feature.
 
   ;;------------------------------
   :init
@@ -281,13 +282,19 @@
   ;;    (setq-local mantle:user:ui:hl-line:enabled/local? nil)))
 
   (innit:hook:defun
+      (:name    'hl-line:enable/global
+       :file    macro<imp>:path/file
+       :docstr  "Disable `hl-line' when starting to select text.")
+  (global-hl-line-mode +1))
+
+  (innit:hook:defun
       (:name    'hl-line:select-text/enter
        :file    macro<imp>:path/file
        :docstr  "Disable `hl-line' when starting to select text."
        :squelch t)
-    (when hl-line-mode
-      (hl-line-mode -1)
-      (setq-local mantle:user:ui:hl-line:enabled?/local-cache t)))
+    (when (bound-and-true-p hl-line-mode)
+      (setq-local mantle:user:ui:hl-line:enabled?/local-cache t)
+      (hl-line-mode -1)))
 
   (innit:hook:defun
       (:name    'hl-line:select-text/exit
@@ -302,7 +309,8 @@
   :hook
   ;;------------------------------
 
-  ((innit:theme:load:hook . global-hl-line-mode)
+  (;(innit:theme:load:hook . global-hl-line-mode)
+   (emacs-startup-hook . mantle:hook:hl-line:enable/global)
    ((evil-visual-state-entry-hook activate-mark-hook)  . mantle:hook:hl-line:select-text/enter)
    ((evil-visual-state-exit-hook deactivate-mark-hook) . mantle:hook:hl-line:select-text/exit))
 
