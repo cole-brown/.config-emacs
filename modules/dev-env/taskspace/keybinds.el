@@ -38,8 +38,7 @@
 (defun taskspace:keybind:doom ()
   "Create keybinds in Doom, or raise an error if not in Doom.
 
-Create a keymap; insert into doom/evil or vanilla Emacs as
-appropriate/parameters say.
+Create keybinds using Doom's `map!' macro.
 
 Creates the taskspace keymap under the doom leader key (default SPC)"
   (if (null (symbolp 'doom!)) ;; Doom's loading function should mean this is doom?
@@ -113,7 +112,6 @@ Call this function with the desired keybind settings:
      ;; ;;---
      ;; (general-define-key ,@args
      ;;                     "" (list nil :which-key "Taskspace..."))
-
 
      ;;---
      ;; Top Level Commands...

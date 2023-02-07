@@ -15,6 +15,7 @@
 ;; Configure Undo and its Tree.
 ;;
 ;; NOTE: Prereq for `evil'!
+;;       ...if you're using both this and that, obviously...
 ;;
 ;;; Code:
 

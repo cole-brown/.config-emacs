@@ -23,10 +23,6 @@
 ;;--                +1.5 Evilness and +7.0 Keybind Confusion                  --
 ;;---------------------------(I'm still learning.)------------------------------
 
-;; TODO: Is this needed?
-;; (imp:provide :input 'keyboard 'evil)
-
-
 
 ;;------------------------------------------------------------------------------
 ;; Evil

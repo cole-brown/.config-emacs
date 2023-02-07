@@ -102,7 +102,7 @@
   ;;------------------------------
   (vertico-mode +1))
 
-;; TODO-keybinds: Are there (evil) Vertico keybinds?
+;; TODO-keybinds: Are there (evil/meow) Vertico keybinds?
 ;; TODO-keybinds: Do any of my keybinds need editted to be ok with Vertico?
 ;;   - https://github.com/minad/vertico#key-bindings
 ;;   - See `C-h v vertico-map' for keybinds, or:
@@ -149,7 +149,7 @@
 ;;   ;;------------------------------
 ;;   (selectrum-mode +1))
 
-;; ;; TODO: Are there /evil/ Selectrum keybinds?
+;; ;; TODO: Are there evil (or meow) Selectrum keybinds?
 ;; ;;   - https://github.com/radian-software/selectrum#keybindings
 
 
@@ -369,6 +369,7 @@
   ;; Optionally configure the narrowing key.
   ;; Both < and C-+ work reasonably well.
   ;; TODO: EVIL???
+  ;; TODO-meow: MEOW???
   (setq consult-narrow-key "<") ;; (kbd "C-+")
 
   ;; Optionally make narrowing help available in the minibuffer.
@@ -421,6 +422,7 @@
   :bind
   ;;------------------------------
   ;; TODO: EVIL bindings?
+  ;; TODO-meow: meow bindings?
   (("C-." . embark-act)         ;; pick some comfortable binding
    ("C-;" . embark-dwim)        ;; good alternative: M-.
    ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'

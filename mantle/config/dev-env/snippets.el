@@ -191,10 +191,10 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
    "b" '(yas-expand         :which-key "Expand Snippet")
    "h" '(yas-insert-snippet :which-key "Insert Snippet..."))
 
-  ;; TODO: Remove `evil-collection' keybinds or move into "b" prefix, or move
+  ;; TODO-meow: Remove `evil-collection' keybinds or move into "b" prefix, or move
   ;; "b" prefix keybinds into `evil-collection' keybinds instead?
 
-  ;; TODO: This is from vanilla-Emacs-keybinds era, what needs done for Evil-keybinds era?
+  ;; TODO-meow: This is from vanilla-Emacs-keybinds era, what needs done for Evil-keybinds era?
   ;; ;; Get rid of `yas-expand' binding on TAB. Annoyingly, cannot do this from the
   ;; ;; `:bind' section? And other annoyinglies as well. See sn-002 doc
   ;; ;; "yasnippet/unbind-tab.org" for more details.

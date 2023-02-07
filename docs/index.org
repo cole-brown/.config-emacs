@@ -162,7 +162,6 @@ So now we will try Meow.
 
 
 ** Use Meow
-** Use Evil Collection
 ** Probably also steal some of Doom's keybinds
 ** [SOONER] Get ~general~ sexprs of my ~:input/keyboard~ keybinds
 ** [LATER] Port my ~:input/keyboard~ work out so I can have my evil bastardization keybinds

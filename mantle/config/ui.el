@@ -63,7 +63,7 @@
 
 (imp:use-package doom-modeline
   ;; Has optional support for `all-the-icons'. So... opt in to that.
-  :after (all-the-icons evil)
+  :after all-the-icons
 
   ;;------------------------------
   :init
@@ -109,6 +109,7 @@
   ;;---
   ;; Modal Editting (Evil, etc)
   ;;---
+  ;; TODO-meow: Does this work with `meow' or do I gotta hack in some stuff?
   (doom-modeline-modal-icon t)
 
   ;;---

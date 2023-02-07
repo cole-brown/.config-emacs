@@ -301,9 +301,11 @@ On loan from Doom's \"core/autoload/buffers.el\"."
   "Toggle overwrite mode.
 
 Evil-Aware / Evil-Optional
+TODO-meow: Meow-Aware / Meow-Optional
 
 Toggles between 'insert' and 'replace' evil states."
-  ;; TODO: if evil evil-replace else emacs-replace
+  ;; TODO-evil: if evil evil-replace else emacs-replace
+  ;; TODO-meow: if meow meow-replace else emacs-replace
   (if (elisp:evil?)
     (if (evil-replace-state-p)
         (evil-append 0)
@@ -316,9 +318,11 @@ Toggles between 'insert' and 'replace' evil states."
   "Insert or overwrite CHARACTER into active buffer at point.
 
 Evil-Aware / Evil-Optional
+TODO-meow: Meow-Aware / Meow-Optional
 
 Need to fix the hydra's deleting before figuring out the integration into
 evil's replace state backspace 'undo' functionality."
+  ;; TODO-meow: if meow, etc...
   ;; If overwriting, first delete a character at point so we end up "replacing" it.
   (if (elisp:evil?)
       (when (evil-replace-state-p)

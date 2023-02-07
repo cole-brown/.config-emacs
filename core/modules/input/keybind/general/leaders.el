@@ -48,7 +48,9 @@
 (imp:require :keybind 'general 'constants)
 
 
-;; TODO: Do we want a different leader for "non-normal" Evil modes?
+;; TODO-meow: Leaders for non-evil Emacs.
+
+;; TODO-evil: Do we want a different leader for "non-normal" Evil modes?
 ;; See: https://github.com/noctuid/general.el#keyword-arguments
 ;; Example:
 ;;   (general-define-key

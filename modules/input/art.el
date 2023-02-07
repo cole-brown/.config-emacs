@@ -226,6 +226,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Movement Keys
   ;;------------------------------
+  ;; TODO-meow: keybinds for meow
   ("c" #'evil-previous-line "up")
   ("h" #'evil-backward-char "left")
   ("t" #'evil-next-line "down")
@@ -235,11 +236,13 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;; Misc.
   ;;------------------------------
   ("<SPC>" (buffer:insert-or-overwrite " ") "insert space")
+  ;; TODO-meow: keybinds for meow
   ("<insert>"
    (funcall #'mantle:evil:replace-state:toggle)
    (if (evil-replace-state-p)
        "insert state"
      "replace state"))
+  ;; TODO-meow: keybinds for meow
   ("x" #'evil-delete-char "delete char")
   ("X" #'evil-delete-char "delete backwards char")
   ("-" #'undo "undo")
@@ -251,6 +254,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ("d"   (hydra:nest 'hydra:art/box/double) "double lines (╬)" :exit t)
   ("G"   nil                 "quit (to insert state)" :color blue)
+  ;; TODO-meow: keybinds for meow
   ("g"   (evil-normal-state) "quit (to normal state)" :color blue)
   ("C-g" (evil-normal-state) "quit (to normal state)" :color blue))
 
@@ -302,6 +306,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Movement Keys
   ;;------------------------------
+  ;; TODO-meow: keybinds for meow
   ("c" #'evil-previous-line "up")
   ("h" #'evil-backward-char "left")
   ("t" #'evil-next-line "down")
@@ -312,10 +317,12 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ("<SPC>" (buffer:insert-or-overwrite " ") "insert space")
   ("<insert>"
+   ;; TODO-meow: keybinds for meow
    (funcall #'mantle:evil:replace-state:toggle)
    (if (evil-replace-state-p)
        "insert state"
      "replace state"))
+  ;; TODO-meow: keybinds for meow
   ("x" #'evil-delete-char "delete char")
   ("X" #'evil-delete-char "delete backwards char")
   ("-" #'undo "undo")
@@ -372,6 +379,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
 (defun art:cmd:box/draw ()
   "Get into the box drawing hydra in the proper evil state."
   (interactive)
+  ;; TODO-meow: meow
   (when (elisp:evil?)
     (evil-insert 0))
   (call-interactively #'art:hydra:box/single/body))

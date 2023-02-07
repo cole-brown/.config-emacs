@@ -134,7 +134,7 @@
   ;;---
   ;; Misc.
   ;;---
-  ;; TODO: is this emacs or evil? ...or both?
+  ;; TODO-meow: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local)
    :states  keybind:leader/local:states
    :keymaps 'markdown-mode-map
@@ -154,7 +154,7 @@
   ;;---
   ;; Insert...
   ;;---
-  ;; TODO: is this emacs or evil? ...or both?
+  ;; TODO-meow: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local "i")
    :states  keybind:leader/local:states
    :keymaps 'markdown-mode-map
@@ -224,7 +224,7 @@
   ;;------------------------------
   :general
   ;;------------------------------
-  ;; TODO: is this emacs or evil? ...or both?
+  ;; TODO-meow: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local "i") ;; Insert...
    :states  keybind:leader/local:states
    :keymaps 'markdown-mode-map

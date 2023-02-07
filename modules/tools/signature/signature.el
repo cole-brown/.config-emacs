@@ -198,6 +198,7 @@ Signature Types:
   "Get signature based on ARGS list & insert into buffer at current point.
 
 If using `evil', set it to insert mode after signature.
+TODO-meow: If using `meow', same?
 
 Signature type is expected before keyword args, if any keywords are used.
 For example:

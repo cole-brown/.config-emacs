@@ -153,7 +153,7 @@
      ("github" . "https://github.com/%s"))
    "Shortcuts for links. Translates [[link:tag]] (and [[link:tag][desc]]) into searches.")
 
-  ;; TODO: Not sure if works well with evil.
+  ;; TODO-meow: Not sure if works well with evil/meow.
   ;; ;; Enable Speed Keys as per my speed-commands predicate function.
   ;; (org-use-speed-commands
   ;;  #'mode:org:speed-commands?
@@ -242,6 +242,7 @@
 ;;------------------------------
 ;; Keybinds
 ;;------------------------------
+;; TODO-meow: Something for meow too?
 (imp:eval:after (:and (:keybind general ready)
                       evil
                       evil-collection
@@ -256,7 +257,7 @@
    "t" #'evil-org-open-below))
 
 
-;; TODO: Delete after checking org-mode to see if these can be deleted.
+;; TODO-meow: Delete after checking org-mode to see if these can be deleted.
 ;; ;;------------------------------
 ;; ;; Undo Doom hacks to Org-Mode
 ;; ;;------------------------------
@@ -271,7 +272,7 @@
 
 
 ;;------------------------------
-;; TODO: Do these work well with Evil?
+;; TODO-meow: Do these work well with Evil/Meow/whatever?
 ;;------------------------------
 ;; TODO: Move to `:mode/org' module?
 ;;----------

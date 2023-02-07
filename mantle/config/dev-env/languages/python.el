@@ -466,7 +466,8 @@ MODULE should be a string of the module name."
                   (bound-and-true-p lsp--buffer-deferred)
                   (not (executable-find python-shell-interpreter)))
         (anaconda-mode +1)
-        (evil-normalize-keymaps)))
+        (when (elisp:evil?)
+          (evil-normalize-keymaps))))
 
     (innit:hook:defun
         (:name   'python:anaconda:processes:auto-kill

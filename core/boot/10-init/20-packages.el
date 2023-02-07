@@ -36,22 +36,24 @@
   :init
   ;;--------------------
 
-  ;; We want SPC as a leader key, probably. So do this. It just affects what
-  ;; keybinds are overridden by the `override' keymap functionality that
-  ;; `general' provides.
-  ;;
-  ;; https://github.com/emacs-evil/evil-collection#making-spc-work-similarly-to-spacemacs
-  ;;
-  ;; NOTE: `evil-collection' binds over SPC in many packages. To use SPC as a
-  ;; leader key with `general', first set these override states:
-  (setq general-override-states '(insert
-                                  emacs
-                                  hybrid
-                                  normal
-                                  visual
-                                  motion
-                                  operator
-                                  replace))
+  ;; TODO-meow: Do I need anything similar for `meow'?
+  (when (imp:flag :keyboard +evil)
+    ;; We want SPC as a leader key, probably. So do this. It just affects what
+    ;; keybinds are overridden by the `override' keymap functionality that
+    ;; `general' provides.
+    ;;
+    ;; https://github.com/emacs-evil/evil-collection#making-spc-work-similarly-to-spacemacs
+    ;;
+    ;; NOTE: `evil-collection' binds over SPC in many packages. To use SPC as a
+    ;; leader key with `general', first set these override states:
+    (setq general-override-states '(insert
+                                    emacs
+                                    hybrid
+                                    normal
+                                    visual
+                                    motion
+                                    operator
+                                    replace)))
 
   ;; Define some leader keys & definers for `:mantle' to use:
 

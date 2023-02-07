@@ -61,23 +61,18 @@
                                    "hydra")
           :filename "init")
 
-;; Sets `imp:flag', which is used by `evil' config to figure out which optional
+;; Sets an `imp:flag', which is used by `evil' config to figure out which optional
 ;; undo system to use.
 (imp:load :feature  '(:mantle config user undo-tree)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "undo-tree")
-
-;; Set up `evil' et al. Do early in config in case we want to tweak a lot along
-;; the way.
-(imp:load :feature  '(:mantle config user evil)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "evil")
 
 
 ;;------------------------------
 ;; Keyboard Layout
 ;;------------------------------
 
+;; `evil' vs other (modal?) input layers
 (imp:load :feature  '(:mantle config user keyboard)
           :path     (imp:path:join (imp:path:current:dir/relative :mantle)
                                    "keyboard")

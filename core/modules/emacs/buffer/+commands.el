@@ -216,6 +216,7 @@ If optional JUSTIFY? is non-nil, justify the text filled (see function
 
 Borrowed from Doom's `doom/toggle-narrow-buffer' in \"core/autoload/ui.el\"."
   (interactive
+   ;; TODO-meow: Check for meow too?..
    (list (or (bound-and-true-p evil-visual-beginning) (region-beginning))
          (or (bound-and-true-p evil-visual-end)       (region-end))))
   (if (buffer-narrowed-p)

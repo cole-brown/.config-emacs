@@ -28,6 +28,9 @@
   ;; Line Joining Hydra
   ;;------------------------------------------------------------------------------
 
+  ;; TODO-vanilla: Different hydra if not using evil/meow/whatever.
+  ;; TODO-meow: Different hydra if using meow.
+  ;; TODO-evil: This hydra if using evil.
   ;; Call `buffer:hydra:join-lines/body' to enter.
   (defhydra buffer:hydra:join-lines (:color red  ;; Allow & quit on non-hydra-heads.
                                      :hint none) ;; no hint - just docstr

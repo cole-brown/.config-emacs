@@ -44,9 +44,9 @@
 ;; Keybinds
 ;;------------------------------------------------------------------------------
 
-;; TODO: Evil vs Emacs keybinds?
+;; TODO-meow: Evil/meow vs Emacs keybinds?
 
-
+;; TODO-meow: meow
 (imp:eval:after (:and evil evil-collection)
   ;; NOTE: /mantle/config/keyboard.el has the new general defs
 

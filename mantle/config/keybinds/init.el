@@ -34,9 +34,9 @@
              :path     path/here
              :filename "infixes")
 
-   ;; TODO: Do we have an evil vs non-evil check for whether to load Emacs or
-   ;;       Evil keybind files?
-   ;; TODO: What're them flags I have and are they useful here?
+   ;; TODO-meow: Do we have an evil vs non-evil check for whether to load Emacs or
+   ;;            Evil keybind files?
+   ;; TODO-meow: What're them flags I have and are they useful here?
 
    ;;------------------------------
    ;; Common or Smart Keybinds

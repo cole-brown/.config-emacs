@@ -23,7 +23,8 @@
 
 (defun buffer:region:active? ()
   "Return non-nil if selection is active.
-Will detect 'evil' visual mode as well."
+Will detect 'evil' visual mode as well.
+TODO-meow: Anything special for meow?"
   (declare (side-effect-free t))
   (or (use-region-p)
       (and (bound-and-true-p evil-local-mode)
@@ -36,7 +37,8 @@ Will detect 'evil' visual mode as well."
 
 (defun buffer:region:beginning ()
   "Return beginning position of selection.
-Use `evil-visual-beginning' if available."
+Use `evil-visual-beginning' if available.
+TODO-meow: Anything special for meow?"
   (declare (side-effect-free t))
   (or (and (bound-and-true-p evil-local-mode)
            (markerp evil-visual-beginning)
@@ -46,7 +48,8 @@ Use `evil-visual-beginning' if available."
 
 (defun buffer:region:end ()
   "Return end position of selection.
-Use `evil-visual-end' if available."
+Use `evil-visual-end' if available.
+TODO-meow: Anything special for meow?"
   (declare (side-effect-free t))
   (if (bound-and-true-p evil-local-mode)
       evil-visual-end

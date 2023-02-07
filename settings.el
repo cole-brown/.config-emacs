@@ -40,6 +40,24 @@
 ;; Feature Flags
 ;;------------------------------------------------------------------------------
 
+;; Two ways to check for a feature:
+;;   1. Desired:
+;;      (when (imp:flag? :keyboard +evil)
+;;        ...)
+;;
+;;   2. Existing:
+;;      (when (imp:feature? 'evil)
+;;        ...)
+;;      ;; or
+;;      (when (featurep 'evil)
+;;        ...)
+;;
+;; If you are checking after package init (e.g. in a `use-package' `:config'
+;; section), you can use #2.
+;;
+;; If you are checking earlier, use #1.
+
+
 ;;------------------------------
 ;; Manual
 ;;------------------------------
