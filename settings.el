@@ -37,6 +37,31 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Feature Flags
+;;------------------------------------------------------------------------------
+
+;;------------------------------
+;; Manual
+;;------------------------------
+
+;;---
+;; Input: Keyboard
+;;---
+;; Used to decide what, if any, keyboard input systems to configure:
+;;   - See: mantle/config/keyboard/init.el
+;; (imp:flag :keyboard +evil)
+(imp:flag :keyboard +meow)
+
+
+;;------------------------------
+;; Automatic
+;;------------------------------
+;;
+;; (imp:flag :emacs +undo-tree)
+;;   - Should be set by your `undo-tree' config in the `use-package' `:init' section.
+
+
+;;------------------------------------------------------------------------------
 ;; Frame
 ;;------------------------------------------------------------------------------
 

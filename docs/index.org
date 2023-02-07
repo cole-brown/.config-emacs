@@ -146,9 +146,22 @@ But if we're doing optional-to-the-max secrets, and also this...
 
 Probably requires that we have per-system config in this repo, then per-system secrets elsewhere.
 
-* Requirement: Keybinds, Evil, Evil-Collection
+* Requirement: Keybinds & Modality
 
-** Use Evil
+** Why Not Evil?
+
+Tried Evil for a while in Doom and started ~sn004~ off using Evil, but...
+  1. ~evil~ + ~evil-collection~ is very Qwerty centric.
+  2. They are very opinionated about what keybinds should be.
+     - Rebinding the basics causes a massive cascade of rebinding everything else everywhere.
+
+So now we will try Meow.
+  1. ~meow~ has no default bindings, but it does have suggestions for Qwerty, Dvorak, Programmer's Dvorak, and Colemak.
+  2. It appears to be more popular than other alternatives (but everyone's vastly less popular than ~evil~).
+     - ~boon~, ~fingers~, ~modalka~, ~ryo-modal~...
+
+
+** Use Meow
 ** Use Evil Collection
 ** Probably also steal some of Doom's keybinds
 ** [SOONER] Get ~general~ sexprs of my ~:input/keyboard~ keybinds
