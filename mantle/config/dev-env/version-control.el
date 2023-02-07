@@ -17,7 +17,10 @@
 ;;; Code:
 
 
+(require 'cl-lib)
+
 (imp:require :keybind)
+(imp:require :alist 'generic)
 
 
 ;;------------------------------------------------------------------------------
@@ -42,7 +45,7 @@
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
 (keybind:leader/global:def
- :prefix  "g"
+ :infix  "g"
  "" '(nil :which-key "Magit / Version Control"))
 
 
@@ -288,6 +291,71 @@
 ;; ...Just make sure it's installed...
 
 (imp:use-package deferred)
+
+
+;; ;;------------------------------------------------------------------------------
+;; ;; Keybinds
+;; ;;------------------------------------------------------------------------------
+;;
+;; ;; A lot of the evil-collection binds get nuked by my binds, so remake them?
+;; (imp:eval:after (:and magit evil-collection-magit)
+;;   ;;------------------------------
+;;   ;; Keybind Definer
+;;   ;;------------------------------
+;;   ;; Create a general keybind definer...
+;;   (general-create-definer keybind:leader/magit:def
+;;     ;; TODO: shorter or no prefix?
+;;     ;; TODO: like... idk... "g" is already taken by a lot of stuff but it's also our magit menu in all modes?
+;;     :prefix  (keybind:prefix :local)
+;;     ;; :states  evil-collection-magit-state
+;;     ;; :keymaps magit-mode-map-or-something ; keybind:leader/local:keymaps
+;;     )
+;;
+;;   ;;------------------------------
+;;   ;; Keybinds
+;;   ;;------------------------------
+;;
+;;  (let (binds:evil/general:by-keymap-state
+;;        set/keymaps)
+;;
+;;    ;; Translate from `evil-collection' to `general'.
+;;    (dolist (binding evil-collection-magit-mode-map-bindings)
+;;      ;; Binding will be e.g.:
+;;      ;;   ((normal visual) magit-mode-map "g")
+;;      ;;   ((normal visual) magit-mode-map "\C-j" magit-section-forward "n")
+;;      (let* ((bind/state (nth 0 binding))
+;;             (bind/map   (nth 1 binding))
+;;             (bind/key   (nth 2 binding))
+;;             (bind/func  (nth 3 binding))
+;;             (alist/key  (cons bind/map bind/state))
+;;             (binds  (alist:generic:get/value alist/key binds:evil/general:by-keymap-state :op/equal)))
+;;        (cl-pushnew bind/map set/keymaps)
+;;        (push bind/key binds)
+;;        (push `(function ,bind/func) binds)
+;;        (alist:generic:update alist/key binds binds:evil/general:by-keymap-state :op/equal)))
+;;
+;;    ;; Create in `general'.
+;;    (dolist (map/binds binds:evil/general:by-keymap-state)
+;;      (let ((map   (caar map/binds))
+;;            (state (cdar map/binds))
+;;            (binds (nreverse (cdr map/binds))))
+;;
+;;        ;; Give it its title?
+;;        (when (memq map set/keymaps)
+;;          (eval
+;;           `(keybind:leader/magit:def
+;;              :states  ',state
+;;              :keymaps ',map
+;;              "" '(nil :which-key "Magit...")))
+;;          (setq set/keymaps (remove map set/keymaps)))
+;;
+;;        ;; Make the bindings.
+;;        (eval
+;;         `(keybind:leader/magit:def
+;;            :states  ',state
+;;            :keymaps ',map
+;;            ,@binds)))))
+;;   )
 
 
 ;;------------------------------------------------------------------------------
