@@ -12,7 +12,9 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Configure Evil and Friends.
+;; Configure Evil and Friends.
+;;
+;; https://github.com/emacs-evil/evil
 ;;
 ;;; Code:
 
