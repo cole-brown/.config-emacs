@@ -108,6 +108,16 @@ by `imp:features:locate'.")
 ;; (imp:feature? :imp)
 
 
+(defun imp:mode? (mode)
+  "Check if MODE exists and is enabled."
+  ;; Can't use `bound-and-true-p' due to MODE being passed in,
+  ;; so check bound and truthy separately.
+  (and (boundp mode)
+       (symbol-value mode)))
+;; (imp:mode? 'evil-mode)
+;; (imp:mode? 'evil-mode-jeff)
+
+
 (defalias 'imp:featurep 'imp:feature?)
 
 

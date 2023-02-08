@@ -22,7 +22,6 @@
 
 
 (imp:require :buffer 'type)
-(imp:require :elisp  'utils 'predicates)
 (imp:require :keybind)
 
 
@@ -290,7 +289,7 @@
   (add-to-list 'window-persistent-parameters '(winner-ring . t))
 
   ;; Replace an evil func with a perspective-aware varient.
-  (when (elisp:evil?)
+  (when (imp:mode? 'evil-mode)
     (define-advice evil-alternate-buffer (:override (&optional window) mantle:user:persp:alternate-buffer)
       "Make `evil-alternate-buffer' ignore buffers outside the current perspective."
       (let* ((prev-buffers

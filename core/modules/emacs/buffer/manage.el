@@ -306,7 +306,7 @@ TODO-meow: Meow-Aware / Meow-Optional
 Toggles between 'insert' and 'replace' evil states."
   ;; TODO-evil: if evil evil-replace else emacs-replace
   ;; TODO-meow: if meow meow-replace else emacs-replace
-  (if (elisp:evil?)
+  (if (imp:mode? 'evil-mode)
     (if (evil-replace-state-p)
         (evil-append 0)
       (evil-replace-state))
@@ -324,7 +324,7 @@ Need to fix the hydra's deleting before figuring out the integration into
 evil's replace state backspace 'undo' functionality."
   ;; TODO-meow: if meow, etc...
   ;; If overwriting, first delete a character at point so we end up "replacing" it.
-  (if (elisp:evil?)
+  (if (imp:mode? 'evil-mode)
       (when (evil-replace-state-p)
         ;; TODO: Will this let evil's backspace/delete 'undo' functionality work?
         ;; (evil-replace-pre-command)

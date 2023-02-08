@@ -20,8 +20,8 @@
 
 
 (imp:require :buffer 'manage)
-(imp:require :elisp  'utils 'predicates)
 (imp:require :mantle 'config 'user 'hydra)
+
 
 ;;------------------------------------------------------------------------------
 ;; Manual Unicode Box Drawing Chars That Don't Work Right Now
@@ -380,7 +380,7 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   "Get into the box drawing hydra in the proper evil state."
   (interactive)
   ;; TODO-meow: meow
-  (when (elisp:evil?)
+  (when (imp:mode? 'evil-mode)
     (evil-insert 0))
   (call-interactively #'art:hydra:box/single/body))
 ;; ┌────┐

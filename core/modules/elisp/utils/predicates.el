@@ -17,15 +17,10 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Evil
+;; Placeholder
 ;;------------------------------------------------------------------------------
 
-(defun elisp:evil? ()
-  "Does `evil' exist and is it enabled?"
-  (and (featurep 'evil)
-       evil-mode))
-
-;; TODO-meow: another one for `meow' and put in imp or something.
+;; TODO: Any predicates anymore???
 
 
 ;;------------------------------------------------------------------------------
