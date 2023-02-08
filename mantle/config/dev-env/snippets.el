@@ -209,7 +209,7 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
   :after (:and evil evil-collection)
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   ;; Snippets are quite common - put them outside the leader key.
   ;;---

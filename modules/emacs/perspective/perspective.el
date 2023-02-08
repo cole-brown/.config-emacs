@@ -682,6 +682,8 @@ Example for `use-package persp-mode' `:config' section:
 ;; Keybinds
 ;;------------------------------------------------------------------------------
 
+;; TODO-meow: Are these bound? Where?
+
 ;;------------------------------
 ;; Generic
 ;;------------------------------

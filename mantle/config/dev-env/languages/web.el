@@ -150,7 +150,58 @@
 
 
   ;;------------------------------
-  :general
+  :config
+  ;;------------------------------
+
+  ;;---
+  ;; SmartParens & Web-Mode
+  ;;---
+  (imp:eval:after smartparens
+    (defun mantle:user:web:is-auto-close-style-3 (_id action _context)
+      (and (eq action 'insert)
+           (eq web-mode-auto-close-style 3)))
+    (sp-local-pair 'web-mode
+                   "<" ">"
+                   :unless '(:add mantle:user:web:is-auto-close-style-3))
+
+    ;; let smartparens handle these
+    (innit:customize-set-variable web-mode-enable-auto-quoting nil)
+    (innit:customize-set-variable web-mode-enable-auto-pairing t)
+
+    ;; 1. Remove web-mode auto pairs whose end pair starts with a latter
+    ;;    (truncated autopairs like <?p and hp ?>). Smartparens handles these
+    ;;    better.
+    ;; 2. Strips out extra closing pairs to prevent redundant characters
+    ;;    inserted by smartparens.
+    (dolist (alist web-mode-engines-auto-pairs)
+      (setcdr alist
+              (cl-loop for pair in (cdr alist)
+                       unless (string-match-p "^[a-z-]" (cdr pair))
+                       collect (cons (car pair)
+                                     (string-trim-right (cdr pair)
+                                                        "\\(?:>\\|]\\|}\\)+\\'")))))
+    (setq web-mode-engines-auto-pairs (delq nil web-mode-engines-auto-pairs)))
+
+  ;;---
+  ;; Web-Mode Config
+  ;;---
+  (add-to-list 'web-mode-engines-alist '("elixir" . "\\.eex\\'"))
+  (add-to-list 'web-mode-engines-alist '("phoenix" . "\\.[lh]eex\\'"))
+
+  ;; Use // instead of /* as the default comment delimited in JS
+  (setf (alist-get "javascript" web-mode-comment-formats nil nil #'equal)
+        "//"))
+
+
+;;------------------------------------------------------------------------------
+;; Keybinds
+;;------------------------------------------------------------------------------
+
+(imp:use-package web-mode
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :general ; evil
   ;;------------------------------
   ;;---
   ;; Attribute
@@ -267,51 +318,7 @@
    "]t" (list #'web-mode-tag-next           :which-key "Tag: Next")
    "[t" (list #'web-mode-tag-previous       :which-key "Tag: Previous")
    "]T" (list #'web-mode-element-child      :which-key "Child: Next")
-   "[T" (list #'web-mode-element-parent     :which-key "Child: Previous"))
-
-
-  ;;------------------------------
-  :config
-  ;;------------------------------
-
-  ;;---
-  ;; SmartParens & Web-Mode
-  ;;---
-  (imp:eval:after smartparens
-    (defun mantle:user:web:is-auto-close-style-3 (_id action _context)
-      (and (eq action 'insert)
-           (eq web-mode-auto-close-style 3)))
-    (sp-local-pair 'web-mode
-                   "<" ">"
-                   :unless '(:add mantle:user:web:is-auto-close-style-3))
-
-    ;; let smartparens handle these
-    (innit:customize-set-variable web-mode-enable-auto-quoting nil)
-    (innit:customize-set-variable web-mode-enable-auto-pairing t)
-
-    ;; 1. Remove web-mode auto pairs whose end pair starts with a latter
-    ;;    (truncated autopairs like <?p and hp ?>). Smartparens handles these
-    ;;    better.
-    ;; 2. Strips out extra closing pairs to prevent redundant characters
-    ;;    inserted by smartparens.
-    (dolist (alist web-mode-engines-auto-pairs)
-      (setcdr alist
-              (cl-loop for pair in (cdr alist)
-                       unless (string-match-p "^[a-z-]" (cdr pair))
-                       collect (cons (car pair)
-                                     (string-trim-right (cdr pair)
-                                                        "\\(?:>\\|]\\|}\\)+\\'")))))
-    (setq web-mode-engines-auto-pairs (delq nil web-mode-engines-auto-pairs)))
-
-  ;;---
-  ;; Web-Mode Config
-  ;;---
-  (add-to-list 'web-mode-engines-alist '("elixir" . "\\.eex\\'"))
-  (add-to-list 'web-mode-engines-alist '("phoenix" . "\\.[lh]eex\\'"))
-
-  ;; Use // instead of /* as the default comment delimited in JS
-  (setf (alist-get "javascript" web-mode-comment-formats nil nil #'equal)
-        "//"))
+   "[T" (list #'web-mode-element-parent     :which-key "Child: Previous")))
 
 
 ;;------------------------------------------------------------------------------

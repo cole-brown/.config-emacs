@@ -75,10 +75,20 @@
    ;; Evil Keybinds
    ;;------------------------------
    (imp:eval:after (:and evil evil-collection)
-
     (imp:load :feature  '(:mantle config user keybinds evil)
               :path     (imp:path:join path/here "evil")
-              :filename "init"))))
+              :filename "init"))
+
+
+   ;; TODO-meow: this:
+   ;; ;;------------------------------
+   ;; ;; Meow Keybinds
+   ;; ;;------------------------------
+   ;; (imp:eval:after meow
+   ;;  (imp:load :feature  '(:mantle config user keybinds meow)
+   ;;            :path     (imp:path:join path/here "meow")
+   ;;            :filename "init"))
+   ))
 
 
 ;;------------------------------------------------------------------------------

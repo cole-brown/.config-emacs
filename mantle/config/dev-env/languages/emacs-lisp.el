@@ -151,47 +151,8 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
    ;; ;; emacs configs, so we disable `emacs-lisp-checkdoc' and reduce the
    ;; ;; `emacs-lisp' checker's verbosity.
    ;; (flycheck-mode-hook #'+emacs-lisp-reduce-flycheck-errors-in-emacs-config-h)
-   (emacs-lisp-mode-hook . rainbow-delimiters-mode)
-   )
+   (emacs-lisp-mode-hook . rainbow-delimiters-mode))
 
-
-  ;;------------------------------
-  :general
-  ;;------------------------------
-  ;;---
-  ;; Debug...
-  ;;---
-  (keybind:leader/local:def
-   :infix "d"
-   "f" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/on :which-key "`edebug' instrument enable")
-   "F" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/off :which-key "`edebug' instrument disable"))
-
-  ;;---
-  ;; Eval...
-  ;;---
-  (keybind:leader/local:def
-   :infix "e"
-   ;; TODO: Try these without "Display Names" and see if it actually is better?
-   ;; Doom doesn't bother with a pretty name.
-   "b" #'eval-buffer       ; (list #'eval-buffer       :which-key "Eval Buffer")
-   "d" #'eval-defun        ; (list #'eval-defun        :which-key "Eval Defun")
-   "e" #'eval-last-sexp    ; (list #'eval-last-sexp    :which-key "Eval Last Sexp")
-   "E" #'pp-eval-last-sexp ; (list #'pp-eval-last-sexp :which-key "Eval Last Sexp: Pretty Print")
-   "r" #'eval-region       ; (list #'eval-region       :which-key "Eval Region")
-   "l" #'load-library      ; (list #'load-library      :which-key "Load Library")
-   )
-
-  ;;---
-  ;; "Go To Considered Harmful"
-  ;;---
-  (keybind:leader/local:def
-   :infix "g"
-   ;; TODO: Try these without "Display Names" and see if it actually is better?
-   ;; Doom doesn't bother with a pretty name.
-   "f" #'find-function
-   "F" #'find-function-at-point
-   "v" #'find-variable
-   "l" #'find-library)
 
   ;;------------------------------
   :config
@@ -228,6 +189,56 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
                             (if (< (length str) limit) "" truncated))))
         ret))))
 
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package elisp-mode
+  :ensure nil ; This is an Emacs built-in feature.
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :general ; evil
+  ;;------------------------------
+  ;;---
+  ;; Debug...
+  ;;---
+  (keybind:leader/local:def
+   :infix "d"
+   "f" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/on :which-key "`edebug' instrument enable")
+   "F" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/off :which-key "`edebug' instrument disable"))
+
+  ;;---
+  ;; Eval...
+  ;;---
+  (keybind:leader/local:def
+   :infix "e"
+   ;; TODO: Try these without "Display Names" and see if it actually is better?
+   ;; Doom doesn't bother with a pretty name.
+   "b" #'eval-buffer       ; (list #'eval-buffer       :which-key "Eval Buffer")
+   "d" #'eval-defun        ; (list #'eval-defun        :which-key "Eval Defun")
+   "e" #'eval-last-sexp    ; (list #'eval-last-sexp    :which-key "Eval Last Sexp")
+   "E" #'pp-eval-last-sexp ; (list #'pp-eval-last-sexp :which-key "Eval Last Sexp: Pretty Print")
+   "r" #'eval-region       ; (list #'eval-region       :which-key "Eval Region")
+   "l" #'load-library)     ; (list #'load-library      :which-key "Load Library")
+
+  ;;---
+  ;; "Go To Considered Harmful"
+  ;;---
+  (keybind:leader/local:def
+   :infix "g"
+   ;; TODO: Try these without "Display Names" and see if it actually is better?
+   ;; Doom doesn't bother with a pretty name.
+   "f" #'find-function
+   "F" #'find-function-at-point
+   "v" #'find-variable
+   "l" #'find-library))
+
+
+;;------------------------------
+;; Highlight Quoted Symbols
+;;------------------------------
 
 ;; Make quoted symbols easier to distinguish from free variables
 ;; https://github.com/Fanael/highlight-quoted
@@ -369,17 +380,6 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
 
 
   ;;------------------------------
-  :general
-  ;;------------------------------
-  (:prefix  (keybind:prefix :local "t") ; test
-   :states  keybind:leader/local:states
-   :keymaps 'buttercup-minor-mode-map
-   "t" (list #'mantle:user:emacs-lisp:buttercup:run-file    :which-key "buttercup: run file")
-   "a" (list #'mantle:user:emacs-lisp:buttercup:run-project :which-key "buttercup: run project")
-   "s" (list #'buttercup-run-at-point                       :which-key "buttercup: run at point"))
-
-
-  ;;------------------------------
   :config
   ;;------------------------------
 
@@ -392,16 +392,41 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
     (add-hook 'buttercup-minor-mode-hook #'evil-normalize-keymaps)))
 
 
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package buttercup
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :general ; evil
+  ;;------------------------------
+  (:prefix  (keybind:prefix :local "t") ; test
+   :states  keybind:leader/local:states
+   :keymaps 'buttercup-minor-mode-map
+   "t" (list #'mantle:user:emacs-lisp:buttercup:run-file    :which-key "buttercup: run file")
+   "a" (list #'mantle:user:emacs-lisp:buttercup:run-project :which-key "buttercup: run project")
+   "s" (list #'buttercup-run-at-point                       :which-key "buttercup: run at point")))
+
+
 ;;------------------------------------------------------------------------------
 ;; Macros
 ;;------------------------------------------------------------------------------
 
 ;; Provides a very helpful elisp macro debugging tool: `macrostep-expand'
-(imp:use-package macrostep
+(imp:use-package macrostep)
 
-  ;;--------------------
-  :general
-  ;;--------------------
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package macrostep
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :general ; evil
+  ;;------------------------------
   (:prefix  (keybind:prefix :local)
    :states  keybind:leader/local:states
    :keymaps 'emacs-lisp-mode-map

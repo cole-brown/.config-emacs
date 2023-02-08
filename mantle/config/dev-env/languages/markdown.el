@@ -129,7 +129,42 @@
 
 
   ;;------------------------------
-  :general
+  :config
+  ;;------------------------------
+
+  ;; Add backtick as a parenthesis type if using smartparens.
+  (imp:eval:after smartparens
+    (sp-local-pair '(markdown-mode gfm-mode)
+                   "`" "`"
+                   :unless '(:add sp-point-before-word-p sp-point-before-same-p)))
+
+  ;; Add a language's mode to highlight code blocks correctly if/when:
+  ;;   1. Using a language that `markdown-mode' doesn't already support.
+  ;;   2. Using a language mode that is not a `markdown-mode' default.
+  ;;
+  ;; Rust fulfills both, so add whichever we're using when it shows up.
+  (imp:eval:after rust-mode
+    (add-to-list 'markdown-code-lang-modes '("rust" . rust-mode)))
+  (imp:eval:after rustic
+    (add-to-list 'markdown-code-lang-modes '("rust" . rustic-mode)))
+
+  ;; HACK Prevent mis-fontification of YAML metadata blocks in `markdown-mode'
+  ;;      which occurs when the first line contains a colon in it.
+  ;;      See: https://github.com/jrblevin/markdown-mode/issues/328
+  ;;        - Which, last update is [2018-07-16], so.
+  (define-advice markdown-match-generic-metadata (:override (&rest _) mantle:advice:yaml-fontification/disable)
+    (ignore (goto-char (point-max)))))
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package markdown-mode
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :general ; evil
   ;;------------------------------
   ;;---
   ;; Misc.
@@ -183,34 +218,7 @@
    "q" (list #'markdown-insert-blockquote     :which-key "New blockquote")
    "s" (list #'markdown-insert-strike-through :which-key "Strike through")
    "t" (list #'markdown-insert-table          :which-key "Table")
-   "w" (list #'markdown-insert-wiki-link      :which-key "Wiki Link"))
-
-  ;;------------------------------
-  :config
-  ;;------------------------------
-
-  ;; Add backtick as a parenthesis type if using smartparens.
-  (imp:eval:after smartparens
-    (sp-local-pair '(markdown-mode gfm-mode)
-                   "`" "`"
-                   :unless '(:add sp-point-before-word-p sp-point-before-same-p)))
-
-  ;; Add a language's mode to highlight code blocks correctly if/when:
-  ;;   1. Using a language that `markdown-mode' doesn't already support.
-  ;;   2. Using a language mode that is not a `markdown-mode' default.
-  ;;
-  ;; Rust fulfills both, so add whichever we're using when it shows up.
-  (imp:eval:after rust-mode
-    (add-to-list 'markdown-code-lang-modes '("rust" . rust-mode)))
-  (imp:eval:after rustic
-    (add-to-list 'markdown-code-lang-modes '("rust" . rustic-mode)))
-
-  ;; HACK Prevent mis-fontification of YAML metadata blocks in `markdown-mode'
-  ;;      which occurs when the first line contains a colon in it.
-  ;;      See: https://github.com/jrblevin/markdown-mode/issues/328
-  ;;        - Which, last update is [2018-07-16], so.
-  (define-advice markdown-match-generic-metadata (:override (&rest _) mantle:advice:yaml-fontification/disable)
-    (ignore (goto-char (point-max)))))
+   "w" (list #'markdown-insert-wiki-link      :which-key "Wiki Link")))
 
 
 ;;------------------------------------------------------------------------------
@@ -219,10 +227,18 @@
 
 ;; https://github.com/ardumont/markdown-toc
 (imp:use-package markdown-toc
-  :after markdown-mode
+  :after markdown-mode)
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package markdown-toc
+  :after (:and markdown-mode evil evil-collection)
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   ;; TODO-meow: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local "i") ;; Insert...
@@ -249,7 +265,7 @@
    (evil-markdown-mode-hook . evil-normalize-keymaps))
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   ;; TODO: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local)
@@ -386,11 +402,18 @@ You can then:
             (t
              (imp-remove-user-filter)
              (impatient-mode -1)
-             (funcall-interactively #'httpd-stop))))
+             (funcall-interactively #'httpd-stop)))))
 
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package impatient-mode
+  :after (:and markdown-mode evil evil-collection)
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   ;; TODO: is this emacs or evil? ...or both?
   (:prefix  (keybind:prefix :local "p")

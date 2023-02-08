@@ -70,11 +70,18 @@
     (buffer:kill:matching ".*magit.*"
                           :internal
                           :modified
-                          :process))
+                          :process)))
 
+
+;;------------------------------
+;; Keybinds: Magit
+;;------------------------------
+
+(imp:use-package magit
+  :after (:and evil evil-collection)
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   ;; Put Magit Leader under the Global Leader
   ;;---
@@ -159,20 +166,27 @@
   :after magit
 
   ;;------------------------------
-  :general
+  :config
+  ;;------------------------------
+  (magit-todos-mode +1))
+
+
+;;------------------------------
+;; Keybinds: Magit-Todos
+;;------------------------------
+
+(imp:use-package magit-todos
+  :after (:and magit evil evil-collection)
+
+  ;;------------------------------
+  :general ; evil
   ;;------------------------------
   (keybind:leader/global:def
    :infix  "g"
    ;;---
    ;; Magit-Todos Keybinds
    ;;---
-   "t" '(magit-todos-list :which-key "Magit TODOs list buffer"))
-
-
-  ;;------------------------------
-  :config
-  ;;------------------------------
-  (magit-todos-mode +1))
+   "t" '(magit-todos-list :which-key "Magit TODOs list buffer")))
 
 
 ;;------------------------------------------------------------------------------

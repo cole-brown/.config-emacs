@@ -306,7 +306,7 @@ or on some buffer listing ops."
   :after (:and evil evil-collection)
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
 
   ;;---

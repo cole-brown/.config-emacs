@@ -48,10 +48,19 @@
   :hook
   ;;------------------------------
   ((json-mode-hook . mantle:hook:json:settings)
-   (json-mode-hook . rainbow-delimiters-mode))
+   (json-mode-hook . rainbow-delimiters-mode)))
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+;; https://github.com/joshwnj/json-mode
+(imp:use-package json-mode
+  :after (:and evil evil-collection)
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   (:prefix  (keybind:prefix :local)
    :states  keybind:leader/local:states
@@ -72,9 +81,18 @@
 ;; ;;------------------------------------------------------------------------------
 ;;
 ;; ;; https://github.com/Sterlingg/json-snatcher
+;; (imp:use-package json-snatcher)
+;;
+;;
+;; ;;------------------------------
+;; ;; Keybinds
+;; ;;------------------------------
+;;
 ;; (imp:use-package json-snatcher
+;;   :after (:and evil evil-collection)
+;;
 ;;   ;;------------------------------
-;;   :general
+;;   :general ; evil
 ;;   ;;------------------------------
 ;;   (:prefix  (keybind:prefix :local)
 ;;    :states  keybind:leader/local:states

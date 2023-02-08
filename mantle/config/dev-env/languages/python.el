@@ -43,21 +43,21 @@
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
 (keybind:leader/local:def
- :keymaps 'python-mode-map
- :infix   "i"                      ; insert
- "" '(nil :which-key "insert...")) ; infix's title
+  :keymaps 'python-mode-map
+  :infix   "i"                      ; insert
+  "" '(nil :which-key "insert...")) ; infix's title
 
 
 (keybind:leader/local:def
- :keymaps 'python-mode-map
- :infix   "t"                    ; test
- "" '(nil :which-key "test...")) ; infix's title
+  :keymaps 'python-mode-map
+  :infix   "t"                    ; test
+  "" '(nil :which-key "test...")) ; infix's title
 
 
 (keybind:leader/local:def
- :keymaps 'python-mode-map
- :infix   "e"                           ; pipenv/conda/etc
- "" '(nil :which-key "environment...")) ; infix's title
+  :keymaps 'python-mode-map
+  :infix   "e"                           ; pipenv/conda/etc
+  "" '(nil :which-key "environment...")) ; infix's title
 
 
 ;;------------------------------------------------------------------------------
@@ -71,11 +71,11 @@
 MODULE should be a string of the module name."
   (unless (stringp module)
     (nub:error
-       :innit
-       "python:module:installed?"
-     "MODULE must be a string! Got `%S': %S"
-     (type-of module)
-     module))
+        :innit
+        "python:module:installed?"
+      "MODULE must be a string! Got `%S': %S"
+      (type-of module)
+      module))
 
   ;; We use this in set-up so `python-shell-interpreter' might not exist yet...
   (let ((exe/python (or (and (bound-and-true-p python-shell-interpreter)
@@ -224,10 +224,22 @@ MODULE should be a string of the module name."
 ;;------------------------------------------------------------------------------
 
 (imp:use-package pyimport
-  :after python
+  :after python)
+
+
+(imp:use-package py-isort
+  :after python)
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package pyimport
+  :after (:and python evil evil-collection)
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   (:prefix  (keybind:prefix :local "i")
    :states  keybind:leader/local:states
@@ -238,10 +250,10 @@ MODULE should be a string of the module name."
 
 
 (imp:use-package py-isort
-  :after python
+  :after (:and python evil evil-collection)
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   (:prefix  (keybind:prefix :local "i")
    :states  keybind:leader/local:states
@@ -276,10 +288,18 @@ MODULE should be a string of the module name."
   ;;------------------------------
   :hook
   ;;------------------------------
-  (python-mode . pipenv-mode)
+  (python-mode . pipenv-mode))
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package pipenv
+  :after (:and evil evil-collection)
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   (:prefix  (keybind:prefix :local "e")
    :states  keybind:leader/local:states
@@ -388,53 +408,53 @@ MODULE should be a string of the module name."
 
 (if (not (executable-find "conda"))
     (nub:info
-       :innit
-       (path:current:file)
-     "Need executable `conda' installed in order to use package `conda'.")
-
-  (imp:use-package conda
-   :after python
-
-   ;;------------------------------
-   :config
-   ;;------------------------------
-   ;; The location of your anaconda home will be guessed from a list of common
-   ;; possibilities, starting with `conda-anaconda-home''s default value (which
-   ;; will consult the `ANACONDA_HOME' envvar, if it exists).
-   ;;
-   ;; If none of these work for you, `conda-anaconda-home' must be set
-   ;; explicitly. Afterwards, run M-x `conda-env-activate' to switch between
-   ;; environments
-   (unless (cl-loop for dir in (list conda-anaconda-home
-                                     "~/.anaconda"
-                                     "~/.miniconda"
-                                     "~/.miniconda3"
-                                     "~/.miniforge3"
-                                     "~/anaconda3"
-                                     "~/miniconda3"
-                                     "~/miniforge3"
-                                     "~/opt/miniconda3"
-                                     "/usr/bin/anaconda3"
-                                     "/usr/local/anaconda3"
-                                     "/usr/local/miniconda3"
-                                     "/usr/local/Caskroom/miniconda/base"
-                                     "~/.conda")
-                    if (path:exists? dir :dir)
-                    return (setq conda-anaconda-home (path:absolute dir)
-                                 conda-env-home-directory (path:absolute dir)))
-     (nub:warning
         :innit
         (path:current:file)
-      "Cannot find `conda' directory."))
+      "Need executable `conda' installed in order to use package `conda'.")
 
-   ;; Integration with term/eshell
-   (conda-env-initialize-interactive-shells)
-   (imp:eval:after eshell
-     (conda-env-initialize-eshell))
+  (imp:use-package conda
+    :after python
 
-   (add-to-list 'global-mode-string
-                '(conda-env-current-name (" conda:" conda-env-current-name " "))
-                'append)))
+    ;;------------------------------
+    :config
+    ;;------------------------------
+    ;; The location of your anaconda home will be guessed from a list of common
+    ;; possibilities, starting with `conda-anaconda-home''s default value (which
+    ;; will consult the `ANACONDA_HOME' envvar, if it exists).
+    ;;
+    ;; If none of these work for you, `conda-anaconda-home' must be set
+    ;; explicitly. Afterwards, run M-x `conda-env-activate' to switch between
+    ;; environments
+    (unless (cl-loop for dir in (list conda-anaconda-home
+                                      "~/.anaconda"
+                                      "~/.miniconda"
+                                      "~/.miniconda3"
+                                      "~/.miniforge3"
+                                      "~/anaconda3"
+                                      "~/miniconda3"
+                                      "~/miniforge3"
+                                      "~/opt/miniconda3"
+                                      "/usr/bin/anaconda3"
+                                      "/usr/local/anaconda3"
+                                      "/usr/local/miniconda3"
+                                      "/usr/local/Caskroom/miniconda/base"
+                                      "~/.conda")
+                     if (path:exists? dir :dir)
+                     return (setq conda-anaconda-home (path:absolute dir)
+                                  conda-env-home-directory (path:absolute dir)))
+      (nub:warning
+          :innit
+          (path:current:file)
+        "Cannot find `conda' directory."))
+
+    ;; Integration with term/eshell
+    (conda-env-initialize-interactive-shells)
+    (imp:eval:after eshell
+      (conda-env-initialize-eshell))
+
+    (add-to-list 'global-mode-string
+                 '(conda-env-current-name (" conda:" conda-env-current-name " "))
+                 'append)))
 
 
 ;;------------------------------
@@ -442,93 +462,101 @@ MODULE should be a string of the module name."
 ;;------------------------------
 
 (imp:eval:after python
- ;; `anaconda-mode' requires Python module "setuptools"
- (if (not (python:module:installed? "setuptools"))
-     (nub:warning
-        :innit
-        (path:current:file)
-      "Need Python module `setuptools' installed in order to use package `anaconda-mode'.")
+  ;; `anaconda-mode' requires Python module "setuptools"
+  (if (not (python:module:installed? "setuptools"))
+      (nub:warning
+          :innit
+          (path:current:file)
+        "Need Python module `setuptools' installed in order to use package `anaconda-mode'.")
 
-   (imp:use-package anaconda-mode
-    ;; Defer loading; we'll load in a hook if we want this.
-    :defer t
+    (imp:use-package anaconda-mode
+      ;; Defer loading; we'll load in a hook if we want this.
+      :defer t
+
+      ;;------------------------------
+      :init
+      ;;------------------------------
+
+      (innit:hook:defun
+          (:name   'python:anaconda:enable/maybe
+           :file   macro<imp>:path/file
+           :docstr "Enable `anaconda-mode' if `lsp-mode' is absent and `python-shell-interpreter' is present.")
+        (unless (or (bound-and-true-p lsp-mode)
+                    (bound-and-true-p eglot--managed-mode)
+                    (bound-and-true-p lsp--buffer-deferred)
+                    (not (executable-find python-shell-interpreter)))
+          (anaconda-mode +1)
+          (when (imp:mode? 'evil-mode)
+            (evil-normalize-keymaps))))
+
+      (innit:hook:defun
+          (:name   'python:anaconda:processes:auto-kill
+           :file   macro<imp>:path/file
+           :docstr "Kill anaconda processes if this buffer is the last python buffer.")
+        (when (and (eq major-mode 'python-mode)
+                   (not (delq (current-buffer)
+                              (buffer:list:mode 'python-mode (buffer-list)))))
+          (anaconda-mode-stop)))
+
+      (innit:hook:defun
+          (:name   'python:anaconda:processes:auto-kill/local
+           :file   macro<imp>:path/file
+           :docstr (mapconcat #'identity
+                              '("Add a local hook to auto-kill the buffer's anaconda processes."
+                                ""
+                                "Add `mantle:hook:python:anaconda:processes:auto-kill' to `kill-buffer-hook'.")
+                              "\n"))
+        (add-hook 'kill-buffer-hook #'mantle:hook:python:anaconda:processes:auto-kill
+                  nil
+                  'local))
+
+
+      ;;------------------------------
+      :hook
+      ;;------------------------------
+      ((anaconda-mode-hook          . anaconda-eldoc-mode)
+       (python-mode-local-vars-hook . mantle:hook:python:anaconda:enable/maybe)
+       (python-mode-hook            . mantle:hook:python:anaconda:processes:auto-kill/local))
+
+
+      ;; ;;------------------------------
+      ;; :custom
+      ;; ;;------------------------------
+      ;;
+      ;; ;; TODO: What does this do, exactly?
+      ;; ;; (anaconda-mode-eldoc-as-single-line t)
+
+
+      ;; ;;------------------------------
+      ;; :config
+      ;; ;;------------------------------
+      ;;
+      ;; TODO: If I add `company':
+      ;; (set-company-backend! 'anaconda-mode '(company-anaconda))
+      )
 
     ;;------------------------------
-    :init
+    ;; Keybinds
     ;;------------------------------
 
-    (innit:hook:defun
-        (:name   'python:anaconda:enable/maybe
-         :file   macro<imp>:path/file
-         :docstr "Enable `anaconda-mode' if `lsp-mode' is absent and `python-shell-interpreter' is present.")
-      (unless (or (bound-and-true-p lsp-mode)
-                  (bound-and-true-p eglot--managed-mode)
-                  (bound-and-true-p lsp--buffer-deferred)
-                  (not (executable-find python-shell-interpreter)))
-        (anaconda-mode +1)
-        (when (imp:mode? 'evil-mode)
-          (evil-normalize-keymaps))))
+    (imp:use-package anaconda-mode
+      ;; Defer loading; we'll load in a hook if we want this.
+      :defer t
+      :after (:and evil evil-collection)
 
-    (innit:hook:defun
-        (:name   'python:anaconda:processes:auto-kill
-         :file   macro<imp>:path/file
-         :docstr "Kill anaconda processes if this buffer is the last python buffer.")
-      (when (and (eq major-mode 'python-mode)
-                 (not (delq (current-buffer)
-                            (buffer:list:mode 'python-mode (buffer-list)))))
-        (anaconda-mode-stop)))
+      ;;------------------------------
+      :general ; evil
+      ;;------------------------------
+      (:prefix  (keybind:prefix :local "g")
+       :states  keybind:leader/local:states
+       :keymaps 'anaconda-mode-map
+       "" '(nil :which-key "goto...") ; infix's title
 
-    (innit:hook:defun
-        (:name   'python:anaconda:processes:auto-kill/local
-         :file   macro<imp>:path/file
-         :docstr (mapconcat #'identity
-                            '("Add a local hook to auto-kill the buffer's anaconda processes."
-                              ""
-                              "Add `mantle:hook:python:anaconda:processes:auto-kill' to `kill-buffer-hook'.")
-                            "\n"))
-      (add-hook 'kill-buffer-hook #'mantle:hook:python:anaconda:processes:auto-kill
-                nil
-                'local))
-
-
-    ;;------------------------------
-    :hook
-    ;;------------------------------
-    ((anaconda-mode-hook          . anaconda-eldoc-mode)
-     (python-mode-local-vars-hook . mantle:hook:python:anaconda:enable/maybe)
-     (python-mode-hook            . mantle:hook:python:anaconda:processes:auto-kill/local))
-
-
-    ;; ;;------------------------------
-    ;; :custom
-    ;; ;;------------------------------
-    ;;
-    ;; ;; TODO: What does this do, exactly?
-    ;; ;; (anaconda-mode-eldoc-as-single-line t)
-
-
-    ;;------------------------------
-    :general
-    ;;------------------------------
-    (:prefix  (keybind:prefix :local "g")
-     :states  keybind:leader/local:states
-     :keymaps 'anaconda-mode-map
-     "" '(nil :which-key "goto...") ; infix's title
-
-     "d" (list #'anaconda-mode-find-definitions :which-key "Find Definitions")
-     "h" (list #'anaconda-mode-show-doc         :which-key "Show Doc")
-     "a" (list #'anaconda-mode-find-assignments :which-key "Find Assignments")
-     "f" (list #'anaconda-mode-find-file        :which-key "Find File")
-     "u" (list #'anaconda-mode-find-references  :which-key "Find References"))
-
-
-    ;; ;;------------------------------
-    ;; :config
-    ;; ;;------------------------------
-    ;;
-    ;; TODO: If I add `company':
-    ;; (set-company-backend! 'anaconda-mode '(company-anaconda))
-    )))
+       "d" (list #'anaconda-mode-find-definitions :which-key "Find Definitions")
+       "h" (list #'anaconda-mode-show-doc         :which-key "Show Doc")
+       "a" (list #'anaconda-mode-find-assignments :which-key "Find Assignments")
+       "f" (list #'anaconda-mode-find-file        :which-key "Find File")
+       "u" (list #'anaconda-mode-find-references  :which-key "Find References")))))
 
 
 ;;------------------------------
@@ -560,10 +588,21 @@ MODULE should be a string of the module name."
 
 (imp:use-package python-pytest
   :after python
+  :commands python-pytest-dispatch)
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package anaconda-mode
+  ;; Defer loading; we'll load in a hook if we want this.
+  :defer t
+  :after (:and python evil evil-collection)
   :commands python-pytest-dispatch
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   (:prefix  (keybind:prefix :local "t")
    :states  keybind:leader/local:states
@@ -575,7 +614,6 @@ MODULE should be a string of the module name."
    "T" (list #'python-pytest-function      :which-key "Run tests on function")
    "r" (list #'python-pytest-repeat        :which-key "Repeat tests")
    "p" (list #'python-pytest-dispatch      :which-key "Pytest Popup...")))
-
 
 
 ;;------------------------------------------------------------------------------

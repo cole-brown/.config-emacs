@@ -132,10 +132,18 @@
   ;;------------------------------
   :hook
   ;;------------------------------
-  ((js-mode typescript-mode) . npm-mode)
+  ((js-mode typescript-mode) . npm-mode))
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package npm-mode
+  :after (:and evil evil-collection)
 
   ;;------------------------------
-  :general
+  :general ; evil
   ;;------------------------------
   (:prefix  (keybind:prefix :local)
    :states  keybind:leader/local:states

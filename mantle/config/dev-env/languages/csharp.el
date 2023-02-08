@@ -41,9 +41,9 @@
 
 
 (imp:use-package csharp-mode
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   (innit:hook:defun
      (:name   'csharp:settings
@@ -90,9 +90,9 @@
      ;; (subword-mode t)
      )
 
-  ;;--------------------
+  ;;------------------------------
   :hook
-  ;;--------------------
+  ;;------------------------------
   ((csharp-mode-hook . mantle:hook:csharp:settings)
    (csharp-mode-hook . rainbow-delimiters-mode)))
 
@@ -103,10 +103,19 @@
 ;; https://github.com/sebasmonia/sharper
 
 
+(imp:use-package sharper)
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
 (imp:use-package sharper
-  ;;--------------------
-  :general
-  ;;--------------------
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :general ; evil
+  ;;------------------------------
   (keybind:leader/local:def
    ;; TODO: "compile" or some such infix?
    ;; `sharper-main-transient' is the entrypoint.
