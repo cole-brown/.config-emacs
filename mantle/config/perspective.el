@@ -115,6 +115,7 @@
            (when perspective:cache:uniquify-buffer-name-style
              (setq uniquify-buffer-name-style perspective:cache:uniquify-buffer-name-style)))))
 
+
   (innit:hook:defun
       (:name    "persp:winner:data/save"
        :file    macro<imp>:path/file
@@ -155,6 +156,7 @@
          persp-add-buffer-on-after-change-major-mode-filter-functions)
         (persp-add-buffer (current-buffer) (get-current-persp) nil nil)))
 
+
   (innit:hook:defun
       (:name     "persp:buffer:ignore/dead"
        :argslist (buffer)
@@ -163,7 +165,8 @@
        ;; :squelch  t ;; TODO: Do I need to squelch?
        )
       ;; Fix bug: Ignore dead buffers in `persp-mode' buffer list
-      (not (buffer-live-p buffer)))
+    (not (buffer-live-p buffer)))
+
 
   (innit:hook:defun
       (:name     "persp:buffer:ignore/remote"
@@ -241,6 +244,68 @@
 
 
   ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; Per-perspective `winner-mode' history
+  (add-to-list 'window-persistent-parameters '(winner-ring . t))
+
+  ;; Replace an evil func with a perspective-aware varient.
+  (when (imp:mode? 'evil-mode)
+    (define-advice evil-alternate-buffer (:override (&optional window) mantle:user:persp:alternate-buffer)
+      "Make `evil-alternate-buffer' ignore buffers outside the current perspective."
+      (let* ((prev-buffers
+              (if persp-mode
+                  (cl-remove-if-not #'persp-contain-buffer-p (window-prev-buffers)
+                                    :key #'car)
+                (window-prev-buffers)))
+             (head (car prev-buffers)))
+        (if (eq (car head) (window-buffer window))
+            (cadr prev-buffers)
+          head))))
+
+  ;; HACK: Fix: Selecting deleted buffer error when quitting Emacs or on some buffer listing ops.
+  (define-advice persp-buffers-to-savelist (:before (persp) mantle:user:persp:remove-dead-buffers)
+    "Remove dead buffers before `persp' can save them.
+
+Fixes a bug in `persp' where selecting deleted buffer errors when quitting Emacs
+or on some buffer listing ops."
+    (when (perspective-p persp)
+      ;; HACK: Can't use `persp-buffers' because of a race condition with its gv
+      ;;      getter/setter not being defined in time.
+      (setf (aref persp 2)
+            (cl-delete-if-not #'persp-get-buffer-or-null (persp-buffers persp)))))
+
+  (define-advice persp-asave-on-exit (:around (fn &rest args) mantle:user:persp:autosave:real-buffers?)
+    "Don't bother auto-saving the session if no real buffers are open."
+    (when (buffer:list :type :real)
+      (apply fn args))
+    t)
+
+  ;; Fix bug: Stop session persistence from restoring a broken posframe.
+  (imp:eval:after posframe
+    (innit:hook:defun-and-add
+        persp-after-load-state-functions
+        (:name    "persp:state/load"
+         :file    macro<imp>:path/file
+         :docstr "Fix bug: Stop session persistence from restoring a broken posframe."
+         ;; :squelch t ;; TODO: Do I need to squelch?
+         )
+      (posframe-delete-all)))
+
+  ;; Enable `persp-mode'!
+  (persp-mode +1))
+
+
+;;------------------------------------------------------------------------------
+;; Keybinds
+;;------------------------------------------------------------------------------
+
+(imp:use-package persp-mode
+  :unless noninteractive
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
   :general
   ;;------------------------------
 
@@ -281,64 +346,16 @@
     "0"   (list #'perspective:cmd:switch/final   :which-key "Switch: Final"))
 
 
-  ;;------------------------------
-  :config
-  ;;------------------------------
-
-  ;; Per-perspective `winner-mode' history
-  (add-to-list 'window-persistent-parameters '(winner-ring . t))
-
-  ;; Replace an evil func with a perspective-aware varient.
-  (when (imp:mode? 'evil-mode)
-    (define-advice evil-alternate-buffer (:override (&optional window) mantle:user:persp:alternate-buffer)
-      "Make `evil-alternate-buffer' ignore buffers outside the current perspective."
-      (let* ((prev-buffers
-              (if persp-mode
-                  (cl-remove-if-not #'persp-contain-buffer-p (window-prev-buffers)
-                                    :key #'car)
-                (window-prev-buffers)))
-             (head (car prev-buffers)))
-        (if (eq (car head) (window-buffer window))
-            (cadr prev-buffers)
-          head))))
-
-  ;; HACK: Fix: Selecting deleted buffer error when quitting Emacs or on some buffer listing ops.
-  (define-advice persp-buffers-to-savelist (:before (persp) mantle:user:persp:remove-dead-buffers)
-    "Remove dead buffers before `persp' can save them.
-
-Fixes a bug in `persp' where selecting deleted buffer errors when quitting Emacs
-or on some buffer listing ops."
-    (when (perspective-p persp)
-      ;; HACK: Can't use `persp-buffers' because of a race condition with its gv
-      ;;      getter/setter not being defined in time.
-      (setf (aref persp 2)
-            (cl-delete-if-not #'persp-get-buffer-or-null (persp-buffers persp)))))
-
-  ;; TODO: Doom remaps these functions to delete the perspective. Do we want this?
+  ;; ;;------------------------------
+  ;; :config
+  ;; ;;------------------------------
+  ;;
+  ; TODO: Doom remaps these functions to delete the perspective. Do we want this?
   ;; ;; Delete the current perspective if closing the last open window
   ;; (define-key! persp-mode-map
   ;;   [remap delete-window] #'+workspace/close-window-or-workspace
   ;;   [remap evil-window-delete] #'+workspace/close-window-or-workspace)
-
-  (define-advice persp-asave-on-exit (:around (fn &rest args) mantle:user:persp:autosave:real-buffers?)
-    "Don't bother auto-saving the session if no real buffers are open."
-    (when (buffer:list :type :real)
-      (apply fn args))
-    t)
-
-  ;; Fix bug: Stop session persistence from restoring a broken posframe.
-  (imp:eval:after posframe
-    (innit:hook:defun-and-add
-        persp-after-load-state-functions
-        (:name    "persp:state/load"
-         :file    macro<imp>:path/file
-         :docstr "Fix bug: Stop session persistence from restoring a broken posframe."
-         ;; :squelch t ;; TODO: Do I need to squelch?
-         )
-      (posframe-delete-all)))
-
-  ;; Enable `persp-mode'!
-  (persp-mode +1))
+  )
 
 
 ;;------------------------------------------------------------------------------

@@ -27,19 +27,6 @@
 
 (imp:use-package projectile
 
-  ;; TODO: keybinds!
-  ;; TODO: Doom made it lazy/auto-load based on these commands. Do I want that or to let use-package do whatever it does normally?
-  ;; ;;------------------------------
-  ;; :commands
-  ;; ;;------------------------------
-  ;;
-  ;; (projectile-project-root
-  ;;  projectile-project-name
-  ;;  projectile-project-p
-  ;;  projectile-locate-dominating-file
-  ;;  projectile-relevant-known-projects)
-
-
   ;;------------------------------
   :init
   ;;------------------------------
@@ -96,18 +83,6 @@
   ;; Per-project compilation buffers
   (compilation-buffer-name-function   #'projectile-compilation-buffer-name)
   (compilation-save-buffers-predicate #'projectile-current-project-buffer-p)
-
-
-  ;; ;;------------------------------
-  ;; :general ;; TODO: Or maybe put in `:config'? Or both?
-  ;; ;;------------------------------
-
-  ;; TODO: keybinds!
-  ;; ;; Recommended keymap prefix on Windows/Linux
-  ;; ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-
-  ;; (global-set-key [remap evil-jump-to-tag] #'projectile-find-tag)
-  ;; (global-set-key [remap find-tag]         #'projectile-find-tag)
 
 
   ;;------------------------------
@@ -180,6 +155,38 @@
   ;; Enable!
   (projectile-mode +1))
 
+
+;;------------------------------------------------------------------------------
+;; Keybinds
+;;------------------------------------------------------------------------------
+
+;; (imp:use-package projectile
+;;   :after (:and evil evil-collection)
+;;
+;;   ;; TODO: keybinds!
+;;   ;; TODO: Doom made it lazy/auto-load based on these commands. Do I want that or to let use-package do whatever it does normally?
+;;   ;; ;;------------------------------
+;;   ;; :commands
+;;   ;; ;;------------------------------
+;;   ;;
+;;   ;; (projectile-project-root
+;;   ;;  projectile-project-name
+;;   ;;  projectile-project-p
+;;   ;;  projectile-locate-dominating-file
+;;   ;;  projectile-relevant-known-projects)
+;;
+;;
+;;   ;; ;;------------------------------
+;;   ;; :general ; evil
+;;   ;; ;;------------------------------
+;;   ;; TODO: Or maybe put in `:config'? Or both?;
+;;   ;; TODO: keybinds!
+;;   ;; ;; Recommended keymap prefix on Windows/Linux
+;;   ;; ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+;;
+;;   ;; (global-set-key [remap evil-jump-to-tag] #'projectile-find-tag)
+;;   ;; (global-set-key [remap find-tag]         #'projectile-find-tag)
+;;   )
 
 ;;------------------------------------------------------------------------------
 ;; The End.

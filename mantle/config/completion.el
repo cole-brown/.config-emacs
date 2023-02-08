@@ -260,7 +260,59 @@
 
 
   ;;------------------------------
-  :bind
+  :hook
+  ;;------------------------------
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  (completion-list-mode-hook . consult-preview-at-point-mode)
+
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (register-preview-delay    0.5)
+  (register-preview-function #'consult-register-format)
+
+  ;; Use Consult to select xref locations with preview.
+  (xref-show-xrefs-function       #'consult-xref)
+  (xref-show-definitions-function #'consult-xref)
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; By default `consult-project-function' uses `project-root' from project.el.
+  ;; Optionally configure a different project root function.
+  ;; There are multiple reasonable alternatives to chose from.
+  ;;;; 1. project.el (the default)
+  ;; (setq consult-project-function #'consult--default-project--function)
+  ;;;; 2. projectile.el (projectile-project-root)
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+  ;;;; 3. vc.el (vc-root-dir)
+  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+  ;;;; 4. locate-dominating-file
+  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")
+  )
+
+;; TODO: Consult packages for integrating with other packages?
+;; https://github.com/minad/consult#recommended-packages
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package consult
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :bind ; evil
   ;;------------------------------
   ;; TODO: Replace this `:bind' section with a `:general' section.
   ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -317,29 +369,6 @@
 
 
   ;;------------------------------
-  :hook
-  ;;------------------------------
-  ;; Enable automatic preview at point in the *Completions* buffer. This is
-  ;; relevant when you use the default completion UI.
-  (completion-list-mode-hook . consult-preview-at-point-mode)
-
-
-  ;;------------------------------
-  :custom
-  ;;------------------------------
-
-  ;; Optionally configure the register formatting. This improves the register
-  ;; preview for `consult-register', `consult-register-load',
-  ;; `consult-register-store' and the Emacs built-ins.
-  (register-preview-delay    0.5)
-  (register-preview-function #'consult-register-format)
-
-  ;; Use Consult to select xref locations with preview.
-  (xref-show-xrefs-function       #'consult-xref)
-  (xref-show-definitions-function #'consult-xref)
-
-
-  ;;------------------------------
   :config
   ;;------------------------------
 
@@ -375,23 +404,7 @@
   ;; Optionally make narrowing help available in the minibuffer.
   ;; You may want to use `embark-prefix-help-command' or which-key instead.
   ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
-
-  ;; By default `consult-project-function' uses `project-root' from project.el.
-  ;; Optionally configure a different project root function.
-  ;; There are multiple reasonable alternatives to chose from.
-  ;;;; 1. project.el (the default)
-  ;; (setq consult-project-function #'consult--default-project--function)
-  ;;;; 2. projectile.el (projectile-project-root)
-  ;; (autoload 'projectile-project-root "projectile")
-  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
-  ;;;; 3. vc.el (vc-root-dir)
-  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
-  ;;;; 4. locate-dominating-file
-  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")
   )
-
-;; TODO: Consult packages for integrating with other packages?
-;; https://github.com/minad/consult#recommended-packages
 
 
 ;;------------------------------------------------------------------------------
@@ -606,20 +619,31 @@ targets."
 ;;   :ensure nil ; This is an Emacs built-in feature.
 
 ;;   ;;------------------------------
-;;   :bind
-;;   ;;------------------------------
-;;   ;; Swap 'M-/' and 'C-M-/'
-;;   ;; TODO: Yes or no on this? Doom doesn't swap 'em.
-;;   (("M-/" . dabbrev-completion)
-;;    ("C-M-/" . dabbrev-expand))
-
-;;   ;; TODO: `:general' keybinds?
-
-;;   ;;------------------------------
 ;;   :custom
 ;;   ;;------------------------------
 ;;   ;; Other useful Dabbrev configurations.
 ;;   (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
+
+
+;; ;;------------------------------
+;; ;; Keybinds
+;; ;;------------------------------
+;;
+;; ;; (imp:use-package dabbrev
+;; ;;   :ensure nil ; This is an Emacs built-in feature.
+;; ;;   :after (:and evil evil-collection)
+;; ;;
+;; ;;   ;;------------------------------
+;; ;;   :bind ; evil
+;; ;;   ;;------------------------------
+;; ;;   ;; Swap 'M-/' and 'C-M-/'
+;; ;;   ;; TODO: Yes or no on this? Doom doesn't swap 'em.
+;; ;;   (("M-/" . dabbrev-completion)
+;; ;;    ("C-M-/" . dabbrev-expand))
+;; ;;
+;; ;;   ;; TODO: `:general' keybinds?
+;; ;;   )
+
 
 
 ;;------------------------------------------------------------------------------

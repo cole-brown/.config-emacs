@@ -176,33 +176,6 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
 
 
   ;;------------------------------
-  :general
-  ;;------------------------------
-  ;; Snippets are quite common - put them outside the leader key.
-  ;;---
-  (keybind:global:def
-   :infix  "b"
-   ;; Title
-   "" '(nil :which-key "Snippets")
-
-   ;;---
-   ;;
-   ;;---
-   "b" '(yas-expand         :which-key "Expand Snippet")
-   "h" '(yas-insert-snippet :which-key "Insert Snippet..."))
-
-  ;; TODO-meow: Remove `evil-collection' keybinds or move into "b" prefix, or move
-  ;; "b" prefix keybinds into `evil-collection' keybinds instead?
-
-  ;; TODO-meow: This is from vanilla-Emacs-keybinds era, what needs done for Evil-keybinds era?
-  ;; ;; Get rid of `yas-expand' binding on TAB. Annoyingly, cannot do this from the
-  ;; ;; `:bind' section? And other annoyinglies as well. See sn-002 doc
-  ;; ;; "yasnippet/unbind-tab.org" for more details.
-  ;; (unbind-key "TAB"   yas-minor-mode-map)
-  ;; (unbind-key "<tab>" yas-minor-mode-map)
-
-
-  ;;------------------------------
   :config
   ;;------------------------------
 
@@ -225,6 +198,46 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
   ;; Enable everywhere!
   ;;---
   (yas-global-mode +1))
+
+
+;;------------------------------------------------------------------------------
+;; Keybinds
+;;------------------------------------------------------------------------------
+
+(imp:use-package yasnippet
+  :demand t
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :general
+  ;;------------------------------
+  ;; Snippets are quite common - put them outside the leader key.
+  ;;---
+  (:prefix  "b"
+   ;; Title
+   "" '(nil :which-key "Snippets")
+
+   ;;---
+   ;; Snippet Menu
+   ;;---
+   "b" '(yas-expand         :which-key "Expand Snippet")
+   "h" '(yas-insert-snippet :which-key "Insert Snippet..."))
+
+  ;; TODO-evil: Remove `evil-collection' keybinds or move into "b" prefix, or move
+  ;; "b" prefix keybinds into `evil-collection' keybinds instead?
+
+  ;; ;;------------------------------
+  ;; :config
+  ;; ;;------------------------------
+  ;;
+  ;; TODO-evil: This is from vanilla-Emacs-keybinds era, what needs done for Evil-keybinds era?
+  ;; ;; Get rid of `yas-expand' binding on TAB. Annoyingly, cannot do this from the
+  ;; ;; `:bind' section? And other annoyinglies as well. See sn-002 doc
+  ;; ;; "yasnippet/unbind-tab.org" for more details.
+  ;; (unbind-key "TAB"   yas-minor-mode-map)
+  ;; (unbind-key "<tab>" yas-minor-mode-map)
+  )
+
 
 
 ;;------------------------------------------------------------------------------

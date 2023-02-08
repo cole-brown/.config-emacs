@@ -67,6 +67,7 @@
 ;;---
 ;; Used to decide what, if any, keyboard input systems to configure:
 ;;   - See: mantle/config/keyboard/init.el
+;; TODO-meow: SWITCH THESE!
 (imp:flag :keyboard +evil) ; https://github.com/emacs-evil/evil
 ;; (imp:flag :keyboard +meow)    ; https://github.com/meow-edit/meow
 

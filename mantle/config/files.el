@@ -195,7 +195,27 @@
 
 
   ;;------------------------------
-  :general
+  :config
+  ;;------------------------------
+
+  ;;---
+  ;; Project Root Overrides
+  ;;---
+  ;; TODO: Search per-comp configs for `deadgrep-project-root' to find what's set?
+  ;;   - `deadgrep-project-root-overrides'
+  ;;   - `deadgrep-project-root-function'
+  )
+
+
+;;------------------------------
+;; Keybinds
+;;------------------------------
+
+(imp:use-package deadgrep
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :general ; evil
   ;;------------------------------
 
   ;;---
@@ -212,7 +232,6 @@
 
    "q" (list #'mantle:user:deadgrep:buffer:kill       :which-key "Kill All 'deadgrep' Buffers"))
 
-
   ;;---
   ;; `deadgrep-mode-map' Keybinds
   ;;---
@@ -227,21 +246,7 @@
    "S-RET" (list #'deadgrep-visit-result              :which-key "Visit Result (w/ This Window)")
 
    ;; Bind for EEEVIL!
-   "g r" (list #'deadgrep-restart :which-key "↺ Refresh"))
-
-
-  ;;------------------------------
-  :config
-  ;;------------------------------
-
-  ;;---
-  ;; Project Root Overrides
-  ;;---
-  ;; TODO: Search per-comp configs for `deadgrep-project-root' to find what's set?
-  ;;   - `deadgrep-project-root-overrides'
-  ;;   - `deadgrep-project-root-function'
-  )
-
+   "g r" (list #'deadgrep-restart :which-key "↺ Refresh")))
 
 
 ;;------------------------------------------------------------------------------
