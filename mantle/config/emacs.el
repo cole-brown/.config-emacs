@@ -176,15 +176,20 @@
   (mouse-yank-at-point t)
 
   ;;------------------------------
-  ;; Lines
+  ;; Lines & Columns
   ;;------------------------------
+
+  ;; Show line & column in the modeline.
+  (line-number-mode t)
+  (column-number-mode t)
+  ;; TODO: Display fancier? (lll,cc) -> lll cc
 
   ;;This determines the style of line numbers in effect. If set to `nil', line
   ;; numbers are disabled. For relative line numbers, set this to `relative'.
   (display-line-numbers-type t)
 
   ;; Explicitly define a width to reduce the cost of on-the-fly computation
-  (display-line-numbers-width 3)
+  (display-line-numbers-width 4)
 
   ;; Show absolute line numbers for narrowed regions to make it easier to tell the
   ;; buffer is narrowed, and where you are, exactly.
@@ -239,6 +244,9 @@
   (buffer:next/other:ignore :unreal)
 
   (blink-cursor-mode +1)
+
+  ;; Enable line/column in modeline.
+  (line-number-mode +1)
 
   ;; Just always show line numbers; why not?
   (global-display-line-numbers-mode +1)
