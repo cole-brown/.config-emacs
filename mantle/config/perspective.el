@@ -22,8 +22,6 @@
 
 
 (imp:require :buffer 'type)
-(imp:require :keybind)
-
 
 ;;------------------------------------------------------------------------------
 ;; Module: Perspective

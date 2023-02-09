@@ -23,7 +23,6 @@
 
 
 (imp:require :buffer)
-(imp:require :keybind)
 
 ;; Require all the optional features needed in case they weren't provided.
 (imp:require :str    '+hydra '+case)

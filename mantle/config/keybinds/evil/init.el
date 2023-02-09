@@ -23,25 +23,24 @@
 ;;------------------------------------------------------------------------------
 ;; ...of evil!
 
-(let ((path/here (imp:path:current:dir/relative :mantle)))
-  ;; NOTE: We're called after evil, general, etc are ready.
-  ;; e.g.:
-  ;;   (imp:eval:after (:and (:keybinds user general)
-  ;;                         general
-  ;;                         evil
-  ;;                         evil-collection))
-  ;;   <stuff in this file>)
+;; NOTE: We're already called after evil, general, etc are ready.
+;; e.g.:
+;;   (imp:eval:after (:and (:keybinds user general)
+;;                         general
+;;                         evil
+;;                         evil-collection))
+;;   <stuff in this file>)
 
 
-  ;;------------------------------
-  ;; Keybinds for Evil Commands
-  ;;------------------------------
-  (imp:load :feature  '(:mantle config user keybinds evil evil)
-            :path     path/here
-            :filename "evil"))
+;;------------------------------
+;; Keybinds for Evil Commands
+;;------------------------------
+(imp:load :feature  '(:mantle config user keybinds evil evil)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "evil")
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'keybinds 'evil)
+(imp:provide :mantle 'config 'user 'keybinds '+evil)

@@ -19,7 +19,6 @@
 
 (require 'cl-lib)
 
-(imp:require :keybind)
 (imp:require :alist 'generic)
 
 

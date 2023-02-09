@@ -17,7 +17,6 @@
 ;;; Code:
 
 
-(imp:require :keybind)
 (imp:provide :innit 'vars)
 
 

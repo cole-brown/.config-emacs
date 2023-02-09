@@ -36,8 +36,10 @@
 (imp:use-package evil
   :demand t ;; Always load.
 
+  ;;------------------------------
   ;; https://github.com/emacs-evil/evil#dependencies
   :preface
+  ;;------------------------------
   ;; Can't just simply use `:after' since we want to conditionally decide. Rely
   ;; instead on someone setting a flag somewhere (like in the `use-package'
   ;; `:init' section for `undo-tree'.
@@ -154,4 +156,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'evil)
+(imp:provide :mantle 'init 'keybinds '+evil)

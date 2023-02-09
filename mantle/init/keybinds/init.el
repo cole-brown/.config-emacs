@@ -36,9 +36,9 @@
   ;; Or if you don't use `imp' for loading, the Emacs feature symbol is:
   ;;  (imp:feature:normalize:imp->emacs :mantle 'user 'init 'keybinds 'general 'ready)
   ;;    -> `keybinds:general:ready'
-  (imp:load :feature  '(:mantle user init keybinds general)
-            :path     "general"
-            :filename "init")
+  (imp:load :feature  '(:mantle init keybinds general)
+            :path     (imp:path:current:dir/relative :mantle)
+            :filename "general")
 
 
   ;;------------------------------------------------------------------------------
@@ -54,7 +54,7 @@
   ;; Evil?
   ;;------------------------------
   (when (imp:flag? :keybinds +evil)
-    (imp:load :feature  '(:mantle config user keyboard +evil)
+    (imp:load :feature  '(:mantle init keybinds +evil)
               :path     (imp:path:current:dir/relative :mantle)
               :filename "+evil"))
 
@@ -62,7 +62,7 @@
   ;; Meow?
   ;;------------------------------
   (when (imp:flag? :keybinds +meow)
-    (imp:load :feature  '(:mantle config user keyboard +meow)
+    (imp:load :feature  '(:mantle init keybinds +meow)
               :path     (imp:path:current:dir/relative :mantle)
               :filename "+meow"))
 
@@ -78,4 +78,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide:with-emacs :mantle 'user 'init 'keybinds)
+(imp:provide:with-emacs :mantle 'init 'keybinds)

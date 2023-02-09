@@ -255,4 +255,4 @@ For example:
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'user 'init 'keybinds 'general)
+(imp:provide :mantle 'init 'keybinds 'general)

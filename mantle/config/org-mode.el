@@ -32,7 +32,6 @@
 (imp:require :buffer 'search)
 (imp:require :buffer 'name)
 (imp:require :mode 'org)
-(imp:require :keybind)
 
 
 ;;------------------------------------------------------------------------------

@@ -18,77 +18,95 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Keybinds Dependencies
+;; Load Keybind Configs
 ;;------------------------------------------------------------------------------
+(message "\n\n[CONFIG] config/keydinds!!!\n\n")
 
 (let ((path/here (imp:path:current:dir/relative :mantle)))
+
   ;; Just assume all keybinds in here need `general'. Most of them will.
+  (message "\n\n[CONFIG] eval rest after `:keydinds/user/general'...\n\n")
   (imp:eval:after (:keybinds user general)
-   ;; TODO: fix indentation?
+    (message "\n\nHELLO THERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
+    (message "\n\nHELLO THERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
+    (message "\n\nHELLO THERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
+    (message "\n\nHELLO THERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
 
-   ;;------------------------------
-   ;; Prereqs
-   ;;------------------------------
-   ;; Set up local & global leaders' common infix menus.
-   (imp:load :feature  '(:mantle config user keybinds infixes)
-             :path     path/here
-             :filename "infixes")
+    ;;------------------------------------------------------------------------------
+    ;; Prereqs
+    ;;------------------------------------------------------------------------------
 
-   ;; TODO-meow: Do we have an evil vs non-evil check for whether to load Emacs or
-   ;;            Evil keybind files?
-   ;; TODO-meow: What're them flags I have and are they useful here?
+    ;; Set up local & global leaders' common infix menus.
+    (imp:load :feature  '(:mantle config user keybinds infixes)
+              :path     path/here
+              :filename "infixes")
 
-   ;;------------------------------
-   ;; Common or Smart Keybinds
-   ;;------------------------------
-   ;; Keybinds that don't care about Emacs/Evil, or can figure out which kind to create.
+    ;;------------------------------------------------------------------------------
+    ;; Optional: Modal Input System?
+    ;;------------------------------------------------------------------------------
 
-   (imp:load :feature  '(:mantle config user keybinds signature)
-             :path     path/here
-             :filename "signature")
+    ;; TODO: `imp:load' keyword for "if flagged"... like `:flagged?'?
+    ;;   (imp:load :if '(:flag? (:keybinds +evil)) ...)
+    ;;   (imp:load :flagged? '(:keybinds +evil) ...)
+    ;;   (imp:load :if '(:flagged? . (:keybinds +evil)) ...)
+    ;; TODO: May also an `:after' keyword for stuffing the load inside an `imp:eval:after'?
 
-   (imp:load :feature  '(:mantle config user keybinds text)
-             :path     path/here
-             :filename "text")
+    ;;------------------------------
+    ;; Evil?
+    ;;------------------------------
+    (when (imp:flag? :keybinds +evil)
+      (message "\n\n[CONFIG] when evil...\n\n")
+      (imp:eval:after (:and evil evil-collection)
+        (message "\n\n[CONFIG] Eval after evil, evil-collection!\n\n")
+        (imp:load :feature  '(:mantle config keybinds +evil)
+                  :path     path/here
+                  :filename "+evil")))
+
+    ;;------------------------------
+    ;; Meow?
+    ;;------------------------------
+    ;; TODO-meow: make this file
+    (when (imp:flag? :keybinds +meow)
+      (imp:eval:after meow
+        (imp:load :feature  '(:mantle config keybinds +meow)
+                  :path     path/here
+                  :filename "+meow")))
+
+
+    ;;------------------------------------------------------------------------------
+    ;; Common or Smart Keybinds
+    ;;------------------------------------------------------------------------------
+    ;; Keybinds that don't care about Emacs/Evil, or can figure out which kind to create.
+
+    (imp:load :feature  '(:mantle config user keybinds signature)
+              :path     path/here
+              :filename "signature")
+
+    (imp:load :feature  '(:mantle config user keybinds text)
+              :path     path/here
+              :filename "text")
 
     (imp:load :feature  '(:mantle config user keybinds file)
-             :path     path/here
-             :filename "file")
+              :path     path/here
+              :filename "file")
 
     (imp:load :feature  '(:mantle config user keybinds buffer)
               :path     path/here
               :filename "buffer")
 
-   ;;------------------------------
-   ;; Emacs Keybinds
-   ;;------------------------------
-   ;; TODO: Do these need to be after anything?
-   ;; TODO:   - No `evil' to load...
-   ;; TODO:   - `general' is already loaded...
-   ;; (imp:eval:after TODO-something-or-other-maybe?
-   ;;
-   ;;  (imp:load :feature  '(:mantle config user keybinds emacs)
-   ;;            :path     (imp:path:join path/here "emacs")
-   ;;            :filename "init"))
 
-   ;;------------------------------
-   ;; Evil Keybinds
-   ;;------------------------------
-   (imp:eval:after (:and evil evil-collection)
-    (imp:load :feature  '(:mantle config user keybinds evil)
-              :path     (imp:path:join path/here "evil")
-              :filename "init"))
-
-
-   ;; TODO-meow: this:
-   ;; ;;------------------------------
-   ;; ;; Meow Keybinds
-   ;; ;;------------------------------
-   ;; (imp:eval:after meow
-   ;;  (imp:load :feature  '(:mantle config user keybinds meow)
-   ;;            :path     (imp:path:join path/here "meow")
-   ;;            :filename "init"))
-   ))
+    ;;------------------------------------------------------------------------------
+    ;; Emacs Keybinds
+    ;;------------------------------------------------------------------------------
+    ;; TODO: Do these need to be after anything?
+    ;; TODO:   - No `evil' to load...
+    ;; TODO:   - `general' is already loaded...
+    ;; (imp:eval:after TODO-something-or-other-maybe?
+    ;;
+    ;;  (imp:load :feature  '(:mantle config user keybinds emacs)
+    ;;            :path     (imp:path:join path/here "emacs")
+    ;;            :filename "init"))
+    ))
 
 
 ;;------------------------------------------------------------------------------

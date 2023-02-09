@@ -37,7 +37,7 @@
   ;;------------------------------
 
   ;; TODO-meow: Do I need anything similar for `meow'?
-  (when (imp:flag :keybinds +evil)
+  (when (imp:flag? :keybinds +evil)
     ;; We want SPC as a leader key, probably. So do this. It just affects what
     ;; keybinds are overridden by the `override' keymap functionality that
     ;; `general' provides.
@@ -68,15 +68,11 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Core `:keybinds' Module
+;; Core Keybinds
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:keybind)
-          :path     (imp:path:join innit:path:core/module
-                                   "input"
-                                   "keybind")
-          :filename "init.el")
-
+;; Trying to avoid having any keybinds set by core.
+;; Let's see how it goes.
 
 
 ;;------------------------------------------------------------------------------

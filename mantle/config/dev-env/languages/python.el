@@ -17,7 +17,6 @@
 ;;; Code:
 
 
-(imp:require :keybind)
 (imp:require :jerky)
 (imp:require :buffer 'type)
 (imp:require :path)
@@ -151,7 +150,7 @@ MODULE should be a string of the module name."
   ;; TODO-LSP: disable some error messages:
   ;; ;; Tell some annoying LSP messages to f right off back where
   ;; ;; they came from...
-  ;; (when (imp:flag :dev-env 'languages 'lsp) ;; TODO-LSP: What is the "are we doing LSP?" check?
+  ;; (when (imp:flag? :dev-env 'languages 'lsp) ;; TODO-LSP: What is the "are we doing LSP?" check?
   ;;   (customize-set-variable 'lsp-pyls-plugins-pycodestyle-ignore
   ;;                           ;; spaces before colon
   ;;                           ;; I like to line things up.
