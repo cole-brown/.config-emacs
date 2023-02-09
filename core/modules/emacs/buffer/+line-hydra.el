@@ -29,32 +29,37 @@
   ;;------------------------------------------------------------------------------
 
   ;; TODO-vanilla: Different hydra if not using evil/meow/whatever.
+
   ;; TODO-meow: Different hydra if using meow.
-  ;; TODO-evil: This hydra if using evil.
-  ;; Call `buffer:hydra:join-lines/body' to enter.
-  (defhydra buffer:hydra:join-lines (:color red  ;; Allow & quit on non-hydra-heads.
-                                     :hint none) ;; no hint - just docstr
-    "
+
+  ;;------------------------------
+  ;; Evil?
+  ;;------------------------------
+  (imp:eval:after (:and evil evil-collection)
+    ;; Call `buffer:hydra:join-lines/body' to enter.
+    (defhydra buffer:hydra:join-lines (:color red  ;; Allow & quit on non-hydra-heads.
+                                       :hint none) ;; no hint - just docstr
+      "
 Join lines.
 _o_: ?o?     _c_: ?c?
 _O_: ?O?     _t_: ?t?"
-    ;;---
-    ;; NOTE: Arrow Meanings:
-    ;;---
-    ;; ↑: Above line.
-    ;; ↓: Below line.
+      ;;---
+      ;; NOTE: Arrow Meanings:
+      ;;---
+      ;; ↑: Above line.
+      ;; ↓: Below line.
 
-    ;;------------------------------
-    ;; Emacs Functions
-    ;;------------------------------
-    ("c" #'join-line               "↑ `join-line' (Trim)")
-    ("t" (emacs:cmd (join-line 1)) "↓ `join-line' (Trim)")
+      ;;------------------------------
+      ;; Emacs Functions
+      ;;------------------------------
+      ("c" #'join-line               "↑ `join-line' (Trim)")
+      ("t" (elisp:cmd (join-line 1)) "↓ `join-line' (Trim)")
 
-    ;;------------------------------
-    ;; Evil Functions
-    ;;------------------------------
-    ("o" #'evil-join            (format "%-50s" "↓ `evil-join' (Smart Comments)"))
-    ("O" #'evil-join-whitespace (format "%-50s" "↓ `evil-join-whitespace' (As-Is)")))
+      ;;------------------------------
+      ;; Evil Functions
+      ;;------------------------------
+      ("o" #'evil-join            (format "%-50s" "↓ `evil-join' (Smart Comments)"))
+      ("O" #'evil-join-whitespace (format "%-50s" "↓ `evil-join-whitespace' (As-Is)"))))
 
 
   ) ;; /Delay until after Hydra is loaded...

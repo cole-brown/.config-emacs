@@ -223,9 +223,6 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
    "b" '(yas-expand         :which-key "Expand Snippet")
    "h" '(yas-insert-snippet :which-key "Insert Snippet..."))
 
-  ;; TODO-evil: Remove `evil-collection' keybinds or move into "b" prefix, or move
-  ;; "b" prefix keybinds into `evil-collection' keybinds instead?
-
   ;; ;;------------------------------
   ;; :config
   ;; ;;------------------------------

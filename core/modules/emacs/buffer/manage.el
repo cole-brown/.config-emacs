@@ -304,14 +304,18 @@ Evil-Aware / Evil-Optional
 TODO-meow: Meow-Aware / Meow-Optional
 
 Toggles between 'insert' and 'replace' evil states."
-  ;; TODO-evil: if evil evil-replace else emacs-replace
-  ;; TODO-meow: if meow meow-replace else emacs-replace
-  (if (imp:mode? 'evil-mode)
-    (if (evil-replace-state-p)
-        (evil-append 0)
-      (evil-replace-state))
 
-    (overwrite-mode)))
+  ;; Are you evil? Use evil functions, evil-doer.
+  (cond ((imp:mode? 'evil-mode)
+         (if (evil-replace-state-p)
+             (evil-append 0)
+           (evil-replace-state)))
+
+        ;; TODO-meow: does meow have replace/append things like evil?
+
+        ;; Vanilla Emacs
+        (t
+         (overwrite-mode))))
 
 
 (defun buffer:insert-or-overwrite (character)

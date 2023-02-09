@@ -29,7 +29,16 @@
 ;;------------------------------
 ;; Evil
 ;;------------------------------
-;; TODO-evil: rebinds for evil?
+;; TODO-evil: Make a rebinds for evil function? Or put in a use-package?
+;; (imp:use-package package-name
+;;   :after (:and evil evil-collection)
+;;
+;;   ;;------------------------------
+;;   :general ; evil
+;;   ;;------------------------------
+;;
+;;   ;; TODO-evil: rebinds for evil here
+;;   )
 
 
 ;;------------------------------
