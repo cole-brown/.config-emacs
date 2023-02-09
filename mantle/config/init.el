@@ -67,22 +67,6 @@
           :path     (imp:path:current:dir/relative :mantle)
           :filename "undo-tree")
 
-
-;;------------------------------
-;; Keyboard Layout
-;;------------------------------
-
-;; `evil' vs other (modal?) input layers
-(imp:load :feature  '(:mantle config user keyboard)
-          :path     (imp:path:join (imp:path:current:dir/relative :mantle)
-                                   "keyboard")
-          :filename "init")
-
-
-;;------------------------------
-;; Keybinds
-;;------------------------------
-
 (imp:load :feature  '(:mantle config user keybinds)
           :path     (imp:path:join (imp:path:current:dir/relative :mantle)
                                    "keybinds")

@@ -42,7 +42,7 @@
 
 ;; Two ways to check for a feature:
 ;;   1. Desired:
-;;      (when (imp:flag? :keyboard +evil)
+;;      (when (imp:flag? :keybinds +evil)
 ;;        ...)
 ;;
 ;;   2. Existing:
@@ -68,8 +68,8 @@
 ;; Used to decide what, if any, keyboard input systems to configure:
 ;;   - See: mantle/config/keyboard/init.el
 ;; TODO-meow: SWITCH THESE!
-(imp:flag :keyboard +evil) ; https://github.com/emacs-evil/evil
-;; (imp:flag :keyboard +meow)    ; https://github.com/meow-edit/meow
+(imp:flag :keybinds +evil) ; https://github.com/emacs-evil/evil
+;; (imp:flag :keybinds +meow)    ; https://github.com/meow-edit/meow
 
 
 ;;------------------------------

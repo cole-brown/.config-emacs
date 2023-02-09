@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-07-12
-;; Modified:   2022-07-13
+;; Modified:   2023-02-09
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -13,6 +13,9 @@
 ;;; Commentary:
 ;;
 ;; Configure Evil and Friends.
+;;
+;; This should be entirely optional, since we're swapping over to `meow' to try
+;; that modal input package out.
 ;;
 ;; https://github.com/emacs-evil/evil
 ;;

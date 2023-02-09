@@ -27,7 +27,7 @@
     (imp:path:current:dir)
 
   ;;----------------------------------------------------------------------------
-  ;; `general' Dependencies
+  ;; Fancy Keybind Helper `general'
   ;;----------------------------------------------------------------------------
   ;; All this stuff needs `general' and won't be loaded until after it has been.
   ;; So if you use it, guard your code like so:
@@ -39,6 +39,32 @@
   (imp:load :feature  '(:mantle user init keybinds general)
             :path     "general"
             :filename "init")
+
+
+  ;;------------------------------------------------------------------------------
+  ;; Optional: Modal Input System?
+  ;;------------------------------------------------------------------------------
+
+  ;; TODO: `imp:load' keyword for "if flagged"... like `:flagged?'?
+  ;;   (imp:load :if '(:flag? (:keybinds +evil)) ...)
+  ;;   (imp:load :flagged? '(:keybinds +evil) ...)
+  ;;   (imp:load :if '(:flagged? . (:keybinds +evil)) ...)
+
+  ;;------------------------------
+  ;; Evil?
+  ;;------------------------------
+  (when (imp:flag? :keybinds +evil)
+    (imp:load :feature  '(:mantle config user keyboard +evil)
+              :path     (imp:path:current:dir/relative :mantle)
+              :filename "+evil"))
+
+  ;;------------------------------
+  ;; Meow?
+  ;;------------------------------
+  (when (imp:flag? :keybinds +meow)
+    (imp:load :feature  '(:mantle config user keyboard +meow)
+              :path     (imp:path:current:dir/relative :mantle)
+              :filename "+meow"))
 
 
   ;;----------------------------------------------------------------------------

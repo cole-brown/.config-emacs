@@ -37,7 +37,7 @@
   ;;------------------------------
 
   ;; TODO-meow: Do I need anything similar for `meow'?
-  (when (imp:flag :keyboard +evil)
+  (when (imp:flag :keybinds +evil)
     ;; We want SPC as a leader key, probably. So do this. It just affects what
     ;; keybinds are overridden by the `override' keymap functionality that
     ;; `general' provides.
