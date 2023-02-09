@@ -243,7 +243,7 @@
 ;; Keybinds
 ;;------------------------------
 ;; TODO-meow: Something for meow too?
-(imp:eval:after (:and (:keybind general ready)
+(imp:eval:after (:and (:keybinds user general)
                       evil
                       evil-collection
                       org

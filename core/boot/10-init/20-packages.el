@@ -32,9 +32,9 @@
 (imp:use-package general
   :demand t ;; Always load.
 
-  ;;--------------------
+  ;;------------------------------
   :init
-  ;;--------------------
+  ;;------------------------------
 
   ;; TODO-meow: Do I need anything similar for `meow'?
   (when (imp:flag :keyboard +evil)
@@ -55,15 +55,15 @@
                                     operator
                                     replace)))
 
-  ;; Define some leader keys & definers for `:mantle' to use:
-
-
-  ;; ;;--------------------
+  ;; ;;------------------------------
   ;; :config
-  ;; ;;--------------------
+  ;; ;;------------------------------
 
   ;; Keybinds configured in "mantle/config/keybinds/" files, or nearer to
   ;; (ideally in) their `use-package'.
+
+  ;; Leaders, etc configured in "mantle/init/keybinds/" files, or nearer to
+  ;; their `use-package' for specialty leaders.
   )
 
 

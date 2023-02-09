@@ -23,7 +23,7 @@
 
 (let ((path/here (imp:path:current:dir/relative :mantle)))
   ;; Just assume all keybinds in here need `general'. Most of them will.
-  (imp:eval:after (:keybind general ready)
+  (imp:eval:after (:keybinds user general)
    ;; TODO: fix indentation?
 
    ;;------------------------------

@@ -1,4 +1,4 @@
-;;; modules/input/keybind/init.el --- Bind Keys to Your Will -*- lexical-binding: t; -*-
+;;; mantle/init/keybinds/init.el --- Bind Keys to Your Will -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -18,47 +18,38 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Set imp Root.
-;;------------------------------------------------------------------------------
-
-(imp:path:root/set :keybind
-                   (imp:path:current:dir)
-                   "init.el")
-
-
-;;------------------------------------------------------------------------------
 ;; Load Files
 ;;------------------------------------------------------------------------------
 
 (imp:timing
-    '(:keybind)
+    '(:mantle user init keybinds)
     (imp:file:current)
     (imp:path:current:dir)
-
-  ;;----------------------------------------------------------------------------
-  ;; Standard Keybind Stuff
-  ;;----------------------------------------------------------------------------
-
 
   ;;----------------------------------------------------------------------------
   ;; `general' Dependencies
   ;;----------------------------------------------------------------------------
   ;; All this stuff needs `general' and won't be loaded until after it has been.
   ;; So if you use it, guard your code like so:
-  ;;   (imp:eval:after (:keybind general ready)
+  ;;   (imp:eval:after (:keybinds user general)
   ;;     ...)
   ;; Or if you don't use `imp' for loading, the Emacs feature symbol is:
-  ;;  (imp:feature:normalize:imp->emacs :keybind 'general 'ready)
-  ;;    -> `keybind:general:ready'
-  (imp:load :feature  '(:keybind general)
+  ;;  (imp:feature:normalize:imp->emacs :mantle 'user 'init 'keybinds 'general 'ready)
+  ;;    -> `keybinds:general:ready'
+  (imp:load :feature  '(:mantle user init keybinds general)
             :path     "general"
             :filename "init")
 
-  ;; End load timing.
+
+  ;;----------------------------------------------------------------------------
+  ;; Standard Keybind Stuff
+  ;;----------------------------------------------------------------------------
+
+  ;; Nothing currently for init.
   )
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide:with-emacs :keybind)
+(imp:provide:with-emacs :mantle 'user 'init 'keybinds)

@@ -26,7 +26,7 @@
 (let ((path/here (imp:path:current:dir/relative :mantle)))
   ;; NOTE: We're called after evil, general, etc are ready.
   ;; e.g.:
-  ;;   (imp:eval:after (:and (:keybind general ready)
+  ;;   (imp:eval:after (:and (:keybinds user general)
   ;;                         general
   ;;                         evil
   ;;                         evil-collection))

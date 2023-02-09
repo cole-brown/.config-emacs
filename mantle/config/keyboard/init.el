@@ -23,7 +23,7 @@
 
 ;; They might need to do keybinds as part of set-up, so...
 ;; let them use `general'.
-(imp:eval:after (:keybind general ready)
+(imp:eval:after (:keybinds user general)
 
   ;;------------------------------------------------------------------------------
   ;; Modal Input Systems
@@ -33,6 +33,8 @@
   ;;   (imp:load :if '(:flag? (:keyboard +evil)) ...)
   ;;   (imp:load :flagged? '(:keyboard +evil) ...)
   ;;   (imp:load :if '(:flagged? . (:keyboard +evil)) ...)
+
+  ;; TODO: move these to keybinds? Keyboard is dvorak, qwerty, etc. This is not that.
 
   ;;------------------------------
   ;; Evil?

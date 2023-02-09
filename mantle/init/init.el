@@ -15,6 +15,26 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Init: Input
+;;------------------------------------------------------------------------------
+
+;; Get the `:input' root set up.
+(imp:load :feature  '(:input)
+          :path     (imp:path:join innit:path:module "input")
+          :filename "init")
+
+
+;;------------------------------
+;; General Keybinds
+;;------------------------------
+
+(imp:load :feature  '(:mantle user init keybinds)
+          :path     (imp:path:join (imp:path:current:dir/relative :mantle)
+                                   "keybinds")
+          :filename "init")
+
+
+;;------------------------------------------------------------------------------
 ;; Init: Systems & Secrets?
 ;;------------------------------------------------------------------------------
 
@@ -67,34 +87,6 @@
 (imp:load :feature  '(:mantle init user secret)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "secret")
-
-
-;;------------------------------------------------------------------------------
-;; Init: Input
-;;------------------------------------------------------------------------------
-
-;; Get the `:input' root set up.
-(imp:load :feature  '(:input)
-          :path     (imp:path:join innit:path:module "input")
-          :filename "init")
-
-
-;;------------------------------
-;; Keyboard Layouts
-;;------------------------------
-
-;; (imp:load :feature  '(:input keyboard evil init)
-;;           :path     (imp:path:join innit:path:module "input" "keyboard" "evil")
-;;           :filename "init")
-
-
-;;------------------------------
-;; Keybinds
-;;------------------------------
-
-(imp:load :feature  '(:keybind)
-          :path     (imp:path:join innit:path:module "input" "keybind")
-          :filename "init")
 
 
 ;;------------------------------------------------------------------------------
