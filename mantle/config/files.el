@@ -220,16 +220,18 @@
   ;;---
   ;; Global Keybinds
   ;;---
-  (:states  'normal
-   :keymaps 'override
-   :infix "/"
+  (keybind:global:def
+    :states  'normal
+    :infix "/"
+    ;; Title
+    "" '(nil :which-key "Search...")
 
-   "/" (list #'deadgrep                               :which-key "`rg' @ project root")
-   "." (list #'mantle:user:deadgrep:default-directory :which-key "`rg' @ default-directory")
-   ;; TODO: A deadgrep search that lets me choose the starting dir?
-   ;; "?" (list #'mantle:user:deadgrep:default-directory :which-key "`rg' @...")
+    "/" (list #'deadgrep                               :which-key "`rg' @ project root")
+    "." (list #'mantle:user:deadgrep:default-directory :which-key "`rg' @ default-directory")
+    ;; TODO: A deadgrep search that lets me choose the starting dir?
+    ;; "?" (list #'mantle:user:deadgrep:default-directory :which-key "`rg' @...")
 
-   "q" (list #'mantle:user:deadgrep:buffer:kill       :which-key "Kill All 'deadgrep' Buffers"))
+    "q" (list #'mantle:user:deadgrep:buffer:kill       :which-key "Kill All 'deadgrep' Buffers"))
 
   ;;---
   ;; `deadgrep-mode-map' Keybinds

@@ -248,8 +248,9 @@ For example:
   ;;------------------------------------------------------------------------------
   ;; Feature for Definers, Etc.
   ;;------------------------------------------------------------------------------
-  ;; TODO: do we need this? Don't think so?
-  (imp:provide :keybinds 'user 'general))
+  ;; TODO: Have imp provide all of everything to Emacs?
+  ;;       - That is, replace `imp:provide' with `imp:provide:with-emacs' in imp.
+  (imp:provide:with-emacs :keybinds 'user 'general))
 
 
 ;;------------------------------------------------------------------------------

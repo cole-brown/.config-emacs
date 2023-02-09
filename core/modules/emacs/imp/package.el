@@ -70,6 +70,9 @@ functions or variables. It can be:
     (imp:eval:after (:and feature-a feature-b ...) BODY...)
     (imp:eval:after (:and feature-a (:or feature-b feature-c) ...) BODY...)
 
+NOTE: FEATURE must ultimately be provided to Emacs; cannot work on imp-only
+features.
+
 This is a wrapper around `eval-after-load' that:
 1. Suppresses warnings for disabled features at compile-time
 2. Supports compound feature statements
@@ -152,13 +155,12 @@ This is a wrapper around `eval-after-load' that:
                                    condition
                                    feature)))))))
 ;; (imp:eval:after nil (message "hi"))
-;; (imp:eval:after ':imp (message "hi"))
 ;; (imp:eval:after :imp (message "hi"))
 ;; (imp:eval:after imp (message "hi"))
 ;; (imp:eval:after (:imp package) (message "hi"))
 ;; (imp:eval:after (:and :imp (imp package)) (message "hi"))
 ;; Incorrect:
-;;   (imp:eval:after 'zenburn (message "hi"))
+;;   (imp:eval:after ':imp (message "hi"))
 
 
 ;;------------------------------------------------------------------------------

@@ -27,7 +27,6 @@
 ;;------------------------------
 ;; General, Evil, Meow, etc...
 ;;------------------------------
-(message "\n\n[INIT] Keydinds!!!\n\n")
 (imp:load :feature  '(:mantle init keybinds)
           :path     (imp:path:join (imp:path:current:dir/relative :mantle)
                                    "keybinds")

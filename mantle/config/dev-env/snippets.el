@@ -210,9 +210,10 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
   ;;------------------------------
   :general ; evil
   ;;------------------------------
+  (keybind:global:def
+    :states 'normal
   ;; Snippets are quite common - put them outside the leader key.
-  ;;---
-  (:prefix  "b"
+   :infix  "b"
    ;; Title
    "" '(nil :which-key "Snippets")
 

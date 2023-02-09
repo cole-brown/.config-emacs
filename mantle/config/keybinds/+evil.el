@@ -1,4 +1,4 @@
-;;; mantle/config/keybinds/evil/evil.el --- Evil's own keybinds. -*- lexical-binding: t; -*-
+;;; mantle/config/keybinds/+evil.el --- Evil's own keybinds. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
@@ -237,4 +237,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'keybinds 'evil 'evil)
+(imp:provide :mantle 'config 'keybinds '+evil)
