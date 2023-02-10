@@ -135,25 +135,7 @@
   (evil-collection-init))
 
 
-;;------------------------------------------------------------------------------
-;; TODO: More 'evil' / 'evil-collection' packages...
-;;------------------------------------------------------------------------------
-
-;; TODO: Add more packages for supporting evil? Unless these are automatically included?
-;;       - https://github.com/emacs-evil/evil-collection#third-party-packages
-;; TODO: Check what Doom does.
-
-
-;;------------------------------------------------------------------------------
-;; TODO: 'SPC' as a leader key like Doom.
-;;------------------------------------------------------------------------------
-
-;; TODO: See https://github.com/emacs-evil/evil-collection#making-spc-work-similarly-to-spacemacs
-;; TODO: See also: wherever Doom sets up its 'SPC' functionality
-;;       - https://github.com/doomemacs/doomemacs/tree/develop/modules/editor/evil
-
-
-;;------------------------------------------------------------------------------
+;;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
 (imp:provide :mantle 'init 'keybinds '+evil)

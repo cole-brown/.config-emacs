@@ -20,17 +20,11 @@
 ;;------------------------------------------------------------------------------
 ;; Load Keybind Configs
 ;;------------------------------------------------------------------------------
-(message "\n\n[CONFIG] config/keydinds!!!\n\n")
 
 (let ((path/here (imp:path:current:dir/relative :mantle)))
 
   ;; Just assume all keybinds in here need `general'. Most of them will.
-  (message "\n\n[CONFIG] eval rest after `:keydinds/user/general'...\n\n")
   (imp:eval:after (:keybinds user general)
-    (message "\n\nHELLO THERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
-    (message "\n\nHELLO THERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
-    (message "\n\nHELLO THERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
-    (message "\n\nHELLO THERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
 
     ;;------------------------------------------------------------------------------
     ;; Prereqs
@@ -55,9 +49,7 @@
     ;; Evil?
     ;;------------------------------
     (when (imp:flag? :keybinds +evil)
-      (message "\n\n[CONFIG] when evil...\n\n")
       (imp:eval:after (:and evil evil-collection)
-        (message "\n\n[CONFIG] Eval after evil, evil-collection!\n\n")
         (imp:load :feature  '(:mantle config keybinds +evil)
                   :path     path/here
                   :filename "+evil")))
@@ -65,7 +57,6 @@
     ;;------------------------------
     ;; Meow?
     ;;------------------------------
-    ;; TODO-meow: make this file
     (when (imp:flag? :keybinds +meow)
       (imp:eval:after meow
         (imp:load :feature  '(:mantle config keybinds +meow)
