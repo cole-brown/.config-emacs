@@ -165,6 +165,23 @@
   :after magit
 
   ;;------------------------------
+  :custom
+  ;;------------------------------
+
+  ;; Global glob patterns to ignore:
+  (magit-todos-exclude-globs '(".git/"
+                               ;; Web: Ignore source maps and minified Javascript & CSS.
+                               "*.js.map"
+                               "*.css.map"
+                               "*.min.js"
+                               "*.min.css"
+                               ))
+  ;; https://github.com/alphapapa/magit-todos/#tips
+  ;; They suggest to use `magit-todos-exclude-globs' as a dir local var for
+  ;; per-repository settings, but let's ignore some globally too.
+
+
+  ;;------------------------------
   :config
   ;;------------------------------
   (magit-todos-mode +1))
