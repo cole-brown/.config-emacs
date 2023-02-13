@@ -192,25 +192,70 @@
                               :modified
                               :process))
 
-
-  ;;------------------------------
-  :config
-  ;;------------------------------
-
-  ;;---
-  ;; Project Root Overrides
-  ;;---
-  ;; TODO: Search per-comp configs for `deadgrep-project-root' to find what's set?
-  ;;   - `deadgrep-project-root-overrides'
-  ;;   - `deadgrep-project-root-function'
+  ;; ;;------------------------------
+  ;; :config
+  ;; ;;------------------------------
+  ;;
+  ;; ;;---
+  ;; ;; Project Root Overrides
+  ;; ;;---
+  ;; ;; TODO: Search per-comp configs for `deadgrep-project-root' to find what's set?
+  ;; ;;   - `deadgrep-project-root-overrides'
+  ;; ;;   - `deadgrep-project-root-function'
   )
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
 (imp:use-package deadgrep
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config ; meow
+  ;;------------------------------
+
+  ;;---
+  ;; Global Keybinds
+  ;;---
+  (defvar mantle:meow/keymap/global:search
+    (let ((map (make-sparse-keymap)))
+      (define-key map "/" #'deadgrep) ; "`rg' @ project root"
+      (define-key map "." #'mantle:user:deadgrep:default-directory) ; "`rg' @ default-directory")
+      ;; TODO: A deadgrep search that lets me choose the starting dir?
+      ;; (define-key map "?" #'mantle:user:deadgrep:default-directory) ; "`rg' @...")
+      (define-key map "k" #'mantle:user:deadgrep:buffer:kill) ; "Kill All 'deadgrep' Buffers"
+
+      map)
+    "Keymap for `deadgrep' commands that should be available globally.")
+
+  (meow-leader-define-key
+   '("/" . mantle:meow/keymap/global:search))
+
+
+  ;;---
+  ;; `deadgrep-mode-map' Keybinds
+  ;;---
+
+  ;; TODO-meow: Is this only for `deadgrep-mode-map'?
+  ;; TODO: Rebind (more) keybinds from this map?
+  (meow-normal-define-key
+   '("k" . window:kill-or-quit) ; 'kill-or-quit' instead of 'quit-or-kill'
+   '("g" . deadgrep-restart)    ; "↺ Refresh" / rerun search
+
+   ;; Normal Enter/Return is "visit in other window".
+   '("RET"   . deadgrep-visit-result-other-window)
+   '("S-RET" . deadgrep-visit-result)))
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package deadgrep
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------

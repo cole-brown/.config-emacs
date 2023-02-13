@@ -213,8 +213,6 @@
   ;;------------------------------
   :bind ; meow
   ;;------------------------------
-  ;; If I want to bind in vanilla and bind in meow via keybind, can do the
-  ;; vanilla binding here.
   ([remap evil-jump-to-tag] #'projectile-find-tag)
   ([remap find-tag]         #'projectile-find-tag))
 
