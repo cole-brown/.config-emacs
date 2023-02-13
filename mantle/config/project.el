@@ -27,6 +27,19 @@
 
 (imp:use-package projectile
 
+  ;; TODO: Doom made it lazy/auto-load based on these commands. Do I want that
+  ;; or to let use-package do whatever it does normally?
+  ;; ;;------------------------------
+  ;; :commands
+  ;; ;;------------------------------
+  ;;
+  ;; (projectile-project-root
+  ;;  projectile-project-name
+  ;;  projectile-project-p
+  ;;  projectile-locate-dominating-file
+  ;;  projectile-relevant-known-projects)
+
+
   ;;------------------------------
   :init
   ;;------------------------------
@@ -160,33 +173,68 @@
 ;; Keybinds
 ;;------------------------------------------------------------------------------
 
-;; (imp:use-package projectile
-;;   :after (:and evil evil-collection)
-;;
-;;   ;; TODO: keybinds!
-;;   ;; TODO: Doom made it lazy/auto-load based on these commands. Do I want that or to let use-package do whatever it does normally?
-;;   ;; ;;------------------------------
-;;   ;; :commands
-;;   ;; ;;------------------------------
-;;   ;;
-;;   ;; (projectile-project-root
-;;   ;;  projectile-project-name
-;;   ;;  projectile-project-p
-;;   ;;  projectile-locate-dominating-file
-;;   ;;  projectile-relevant-known-projects)
-;;
-;;
-;;   ;; ;;------------------------------
-;;   ;; :general ; evil
-;;   ;; ;;------------------------------
-;;   ;; TODO: Or maybe put in `:config'? Or both?;
-;;   ;; TODO: keybinds!
-;;   ;; ;; Recommended keymap prefix on Windows/Linux
-;;   ;; ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-;;
-;;   ;; (global-set-key [remap evil-jump-to-tag] #'projectile-find-tag)
-;;   ;; (global-set-key [remap find-tag]         #'projectile-find-tag)
-;;   )
+;;------------------------------
+;; Vanilla Emacs
+;;------------------------------
+
+(imp:use-package projectile
+  :unless  (or (imp:flag? :keybinds +meow)
+               (imp:flag? :keybinds +evil))
+
+  ;;------------------------------
+  :bind-keymap ; emacs
+  ;;------------------------------
+  ;; Wants "C-c p" but currently `persp-mode' has bound to that.
+  ("C-c r" . projectile-command-map)
+
+  ;;------------------------------
+  :general ; emacs
+  ;;------------------------------
+  (keybind:global:def
+    :map   projectile-mode-map
+    [remap evil-jump-to-tag] #'projectile-find-tag
+    [remap find-tag]         #'projectile-find-tag))
+
+
+;;------------------------------
+;; Meow
+;;------------------------------
+
+(imp:use-package projectile
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;; ;;------------------------------
+  ;; :bind-keymap ; TODO-meow?
+  ;; ;;------------------------------
+  ;; ;; Wants "C-c p" but currently `persp-mode' has bound to that.
+  ;; ("C-c r" . projectile-command-map)
+
+  ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
+  ;; If I want to bind in vanilla and bind in meow via keybind, can do the
+  ;; vanilla binding here.
+  ([remap evil-jump-to-tag] #'projectile-find-tag)
+  ([remap find-tag]         #'projectile-find-tag))
+
+
+;;------------------------------
+;; Evil
+;;------------------------------
+
+(imp:use-package projectile
+  :when  (imp:flag? :keybinds +evil)
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :general ; evil
+  ;;------------------------------
+  (keybind:global:def
+    :map   projectile-mode-map
+    [remap evil-jump-to-tag] #'projectile-find-tag
+    [remap find-tag]         #'projectile-find-tag))
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.
