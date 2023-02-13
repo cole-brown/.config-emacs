@@ -299,7 +299,71 @@ or on some buffer listing ops."
 ;; Keybinds
 ;;------------------------------------------------------------------------------
 
+;;------------------------------
+;; Meow
+;;------------------------------
+
 (imp:use-package persp-mode
+  :when  (imp:flag? :keybinds +meow)
+  :unless noninteractive
+  :after  meow
+
+  ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
+
+  (:map mantle:meow/keymap/leader:buffer
+   ("b" . persp-switch-to-buffer))
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (defvar mantle:meow/keymap/leader:perspectives
+    (let ((map (make-sparse-keymap)))
+      (define-key map "/" #'deadgrep) ; "`rg' @ project root"
+      (define-key map "." #'mantle:user:deadgrep:default-directory) ; "`rg' @ default-directory")
+      ;; TODO: A deadgrep search that lets me choose the starting dir?
+      ;; (define-key map "?" #'mantle:user:deadgrep:default-directory) ; "`rg' @...")
+      (define-key map "k" #'mantle:user:deadgrep:buffer:kill) ; "Kill All 'deadgrep' Buffers"
+
+      (define-key map "TAB" #'perspective:cmd:display)
+      (define-key map "n"   #'perspective:cmd:new-named)
+      (define-key map "N"   #'perspective:cmd:new)
+      (define-key map "l"   #'perspective:cmd:load)
+      (define-key map "s"   #'perspective:cmd:save)
+      ;; (define-key map "x"   #'perspective:cmd:kill)
+      (define-key map "d"   #'perspective:cmd:delete)
+      (define-key map "r"   #'perspective:cmd:rename)
+      (define-key map "]"   #'perspective:cmd:cycle/right)
+      (define-key map "["   #'perspective:cmd:cycle/left)
+      (define-key map "."   #'perspective:cmd:switch/index)
+      (define-key map "`"   #'perspective:cmd:switch/last )
+      (define-key map "1"   #'perspective:cmd:switch/index:0)
+      (define-key map "2"   #'perspective:cmd:switch/index:1)
+      (define-key map "3"   #'perspective:cmd:switch/index:2)
+      (define-key map "4"   #'perspective:cmd:switch/index:3)
+      (define-key map "5"   #'perspective:cmd:switch/index:4)
+      (define-key map "6"   #'perspective:cmd:switch/index:5)
+      (define-key map "7"   #'perspective:cmd:switch/index:6)
+      (define-key map "8"   #'perspective:cmd:switch/index:7)
+      (define-key map "9"   #'perspective:cmd:switch/index:8)
+      (define-key map "0"   #'perspective:cmd:switch/final)
+
+      map)
+    "Keymap for perspective commands that should be available globally.")
+
+  (meow-leader-define-key
+   '("TAB" . mantle:meow/keymap/leader:perspectives)))
+
+
+;;------------------------------
+;; Evil
+;;------------------------------
+
+(imp:use-package persp-mode
+  :when  (imp:flag? :keybinds +evil)
   :unless noninteractive
   :after (:and evil evil-collection)
 

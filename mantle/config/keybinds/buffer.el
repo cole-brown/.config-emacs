@@ -17,7 +17,41 @@
 ;; Keybinds
 ;;------------------------------------------------------------------------------
 
-;; TODO: Evil vs Emacs keybinds?
+;;------------------------------
+;; Meow
+;;------------------------------
+
+(imp:use-package emacs
+  :when  (imp:flag? :keybinds +meow)
+  :after  meow
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (defvar mantle:meow/keymap/leader:buffer
+    (let ((map (make-sparse-keymap)))
+      ;; TOOD-meow: this
+      ;; (define-key map "/" #'deadgrep) ; "`rg' @ project root"
+      ;; (define-key map "." #'mantle:user:deadgrep:default-directory) ; "`rg' @ default-directory")
+      ;; ;; TODO: A deadgrep search that lets me choose the starting dir?
+      ;; ;; (define-key map "?" #'mantle:user:deadgrep:default-directory) ; "`rg' @...")
+      ;; (define-key map "k" #'mantle:user:deadgrep:buffer:kill) ; "Kill All 'deadgrep' Buffers"
+
+      map)
+    "Keymap for `deadgrep' commands that should be available globally.")
+
+  ;; ;;------------------------------
+  ;; :config
+  ;; ;;------------------------------
+  ;; TOOD-meow: this
+
+  )
+
+
+;;------------------------------
+;; Evil
+;;------------------------------
 
 (imp:eval:after (:and evil evil-collection)
 
