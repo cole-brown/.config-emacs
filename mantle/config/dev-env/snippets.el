@@ -203,8 +203,38 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
 ;; Keybinds
 ;;------------------------------------------------------------------------------
 
+;;------------------------------
+;; Meow
+;;------------------------------
+
 (imp:use-package yasnippet
   :demand t
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (defvar mantle:meow/keymap/normal:snippet
+    (let ((map (make-sparse-keymap)))
+      (define-key map "b" #'yas-expand)
+      (define-key map "h" #'yas-insert-snippet)
+      map)
+    "Keymap for `yasnippet' commands that should be available globally.")
+
+  ;; Snippets are quite common - put them outside the leader key.
+  (meow-leader-define-key
+   '("b" . mantle:meow/keymap/normal:snippet)))
+
+
+;;------------------------------
+;; Evil
+;;------------------------------
+
+(imp:use-package yasnippet
+  :demand t
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------
@@ -221,19 +251,7 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
    ;; Snippet Menu
    ;;---
    "b" '(yas-expand         :which-key "Expand Snippet")
-   "h" '(yas-insert-snippet :which-key "Insert Snippet..."))
-
-  ;; ;;------------------------------
-  ;; :config
-  ;; ;;------------------------------
-  ;;
-  ;; TODO-evil: This is from vanilla-Emacs-keybinds era, what needs done for Evil-keybinds era?
-  ;; ;; Get rid of `yas-expand' binding on TAB. Annoyingly, cannot do this from the
-  ;; ;; `:bind' section? And other annoyinglies as well. See sn-002 doc
-  ;; ;; "yasnippet/unbind-tab.org" for more details.
-  ;; (unbind-key "TAB"   yas-minor-mode-map)
-  ;; (unbind-key "<tab>" yas-minor-mode-map)
-  )
+   "h" '(yas-insert-snippet :which-key "Insert Snippet...")))
 
 
 
