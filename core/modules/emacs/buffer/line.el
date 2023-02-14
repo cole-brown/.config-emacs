@@ -7,44 +7,86 @@
 ;;------------------------------
 ;; Emacs
 ;;------------------------------
-;; ;; Remap C-a to `buffer:cmd:line/smart:move-beginning:logical'
-;; (bind-key [remap move-beginning-of-line]
-;;           'buffer:cmd:line/smart:move-beginning:logical)
+;; (imp:use-package emacs
+;;   :unless (or (imp:flag? :keybinds +meow)
+;;               (imp:flag? :keybinds +evil))
 ;;
+;;   ;;------------------------------
+;;   :bind ; vanilla Emacs
+;;   ;;------------------------------
 ;;
-;; ;; Remap C-a to `buffer:cmd:line/smart:move-beginning:visual' in visual-line-mode-map
-;; (bind-keys :map visual-line-mode-map
-;;            ;; beginning of line
-;;            ([remap beginning-of-visual-line]
-;;             . buffer:cmd:line/smart:move-beginning:visual)
-;;            ([remap move-beginning-of-line]
-;;             . buffer:cmd:line/smart:move-beginning:visual)
-;;            ;; end of line
-;;            ([remap end-of-visual-line]
-;;             . buffer:cmd:line/smart:move-end:visual)
-;;            ([remap move-end-of-line]
-;;             . buffer:cmd:line/smart:move-end:visual))
+;;   ;; Remap C-a to `buffer:cmd:line/smart:move-beginning:logical'
+;;   (([remap move-beginning-of-line] . buffer:cmd:line/smart:move-beginning:logical)
+;;
+;;    ;; Remap C-a to `buffer:cmd:line/smart:move-beginning:visual' in visual-line-mode-map
+;;    :map visual-line-mode-map
+;;    ([remap beginning-of-visual-line] . buffer:cmd:line/smart:move-beginning:visual)
+;;    ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning:visual)
+;;    ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end:visual)
+;;    ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end:visual)))
+
+
+;;------------------------------
+;; Meow
+;;------------------------------
+;; (imp:use-package package-name
+;;   :when  (imp:flag? :keybinds +meow)
+;;   :after meow
+;;
+;;   ;; TODO-meow: Do I need to make a meow version of the smart line functions?
+;;   ;; Meow doesn't have beginning/end of line functions itself, so how do you navigate there in Meow?
+;;
+;;   ;;------------------------------
+;;   :bind ; meow
+;;   ;;------------------------------
+;;
+;;   ;; Remap C-a to `buffer:cmd:line/smart:move-beginning:logical'
+;;   (([remap move-beginning-of-line] . buffer:cmd:line/smart:move-beginning:logical)
+;;
+;;    ;; Remap C-a to `buffer:cmd:line/smart:move-beginning:visual' in visual-line-mode-map
+;;    :map visual-line-mode-map
+;;    ([remap beginning-of-visual-line] . buffer:cmd:line/smart:move-beginning:visual)
+;;    ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning:visual)
+;;    ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end:visual)
+;;    ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end:visual)))
 
 
 ;;------------------------------
 ;; Evil
 ;;------------------------------
-;; TODO-evil: Make a rebinds for evil function? Or put in a use-package?
+
 ;; (imp:use-package package-name
+;;   :when  (imp:flag? :keybinds +evil)
 ;;   :after (:and evil evil-collection)
 ;;
 ;;   ;;------------------------------
 ;;   :general ; evil
 ;;   ;;------------------------------
 ;;
-;;   ;; TODO-evil: rebinds for evil here
+;;   ;;---
+;;   ;; Choose either this...
+;;   ;;---
+;;   ;; ;; Replace `evil-beginning-of-line' and `evil-end-of-line' everywhere?
+;;   ;; (:states 'motion
+;;   ;;  :keymaps keybind:keymaps:override
+;;   ;;
+;;   ;;  [remap evil-beginning-of-visual-line] #'buffer:cmd:line/smart:move-beginning:visual
+;;   ;;  [remap evil-beginning-of-line]        #'buffer:cmd:line/smart:move-beginning:visual
+;;   ;;  [remap evil-end-of-visual-line]       #'buffer:cmd:line/smart:move-end:visual
+;;   ;;  [remap evil-end-of-line]              #'buffer:cmd:line/smart:move-end:visual)
+;;
+;;   ;;---
+;;   ;; Or this?..
+;;   ;;---
+;;   ;; ;; Only use the smarter functions in visual line mode?
+;;   ;; (:states 'motion
+;;   ;;  :keymaps 'visual-line-mode-map
+;;   ;;
+;;   ;;  [remap evil-beginning-of-visual-line] #'buffer:cmd:line/smart:move-beginning:visual
+;;   ;;  [remap evil-beginning-of-line]        #'buffer:cmd:line/smart:move-beginning:visual
+;;   ;;  [remap evil-end-of-visual-line]       #'buffer:cmd:line/smart:move-end:visual
+;;   ;;  [remap evil-end-of-line]              #'buffer:cmd:line/smart:move-end:visual)
 ;;   )
-
-
-;;------------------------------
-;; Meow
-;;------------------------------
-;; TODO-meow: rebinds for meow?
 
 
 ;;------------------------------------------------------------------------------

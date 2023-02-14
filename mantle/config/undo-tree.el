@@ -110,8 +110,38 @@
 ;; Keybinds
 ;;------------------------------------------------------------------------------
 
+;;------------------------------
+;; Meow
+;;------------------------------
+
 (imp:use-package undo-tree
   :demand t
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (meow-normal-define-key
+   '("h" . undo-tree-undo)
+   '("n" . undo-tree-redo)
+   '("t" . undo-tree-visualize)
+   '("c" . undo-tree-switch-branch))
+
+  ;; TODO: Do I want to change/add keybinds for these modes?
+  ;; `undo-tree-visualizer-selection-mode-map'
+  ;; `undo-tree-visualizer-mode-map'
+  )
+
+
+;;------------------------------
+;; Evil
+;;------------------------------
+
+(imp:use-package undo-tree
+  :demand t
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------
@@ -125,7 +155,7 @@
    "t" (list #'undo-tree-visualize :which-key "visualize")
    "c" (list #'undo-tree-switch-branch :which-key "switch undo branch")
 
-   ;; TODO: Keybinds for these maps:
+   ;; TODO: Do I want to change/add keybinds for these modes?
    ;; `undo-tree-visualizer-selection-mode-map'
    ;; `undo-tree-visualizer-mode-map'
    ))
