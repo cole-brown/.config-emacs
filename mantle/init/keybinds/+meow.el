@@ -39,6 +39,33 @@
     "A prefix to bind commands to for Meow \"local\" leader.")
 
 
+  (defmacro mantle:meow:keymap (symbol docstr &rest keybind)
+    "Macro to create a (sparse) keymap named SYMBOL populated with KEYS.
+
+SYMBOL should be an unquoted symbol.
+
+DOCSTR should be a document string for SYMBOL's `defvar'.
+
+Each KEYBIND should be a list of args to pass to `define-key'."
+    (declare (indent 2) (doc-string 2))
+    `(defvar ,(elisp:unquote symbol)
+       (let ((map (make-sparse-keymap)))
+         (dolist (each ',keybind)
+           (apply #'define-key map (elisp:unquote each)))
+         map)
+       docstr))
+  ;; (mantle:meow:keymap
+  ;;     'test:keymap:foo
+  ;;     "bar"
+  ;;   '("a" ignore)
+  ;;   '("b" identity))
+  ;; (mantle:meow:keymap
+  ;;     test:keymap:foo
+  ;;     "bar"
+  ;;   ("a" ignore)
+  ;;   ("b" identity))
+
+
   (defun mantle:meow:leader/local:key (map key func)
     "Bind prefix + KEY to FUNC for Meow \"local \" leader.
 
@@ -97,10 +124,38 @@ FUNC should be the function/command to bind."
                         func))))
 
 
+  (defun mantle:meow:leader/local:keys (map &rest keybind)
+    "Bind prefix + key to func for Meow \"local \" leader.
+
+MAP should be a keymap or nil(ish). Add to the global keymap if MAP is:
+  - nil
+  - `global'
+  - `:global'
+
+Each KEYBIND should be a list/cons of:
+  '(key . func)
+See `mantle:meow:leader/local:key'."
+    (unless keybind
+        (nub:error
+            :innit
+            func/name
+          "Must have one or more KEYBIND list/cons! Got: %S"
+          keybind))
+    (dolist (each keybind)
+      (mantle:meow:leader/local:key map
+                                    (if (proper-list-p each)
+                                        (nth 0 each)
+                                      (car each))
+                                    (if (proper-list-p each)
+                                        (nth 1 each)
+                                      (cdr each)))))
+
+
   (defun mantle:meow:leader/local:entry (key)
     "Create a \"local\" leader entry in Meow for \"mode-specific\" keybinds.
 
-Must be used with `mantle:meow:leader/local:key' to populate the entry created.
+Must be used with `mantle:meow:leader/local:key' or
+`mantle:meow:leader/local:keys' to populate the entry created.
 Example:
   ;; Bind keys (globally or locally) for \"toggle stuff\" that we want in our Meow
   ;; leader \"toggle stuff\" entry.
@@ -115,7 +170,7 @@ Example:
   ;; Now Meow has a global toggle \"SPC t l\" and two modes have a local toggle
   ;; \"SPC t i\".
 
-Re: \"add mode and meow state specific keymaps\"
+From: \"add mode and meow state specific keymaps\"
  │ So my recommendation is to bind keys in vanilla Emacs. For example:
  │
  │ You want a consistent keybinding SPC t i to toggle images in both org-mode and
@@ -126,8 +181,10 @@ Re: \"add mode and meow state specific keymaps\"
  │   ;; global 'toggle' commands
  │   (global-set-key (kbd \"C-x M-t l\") 'display-line-numbers-mode)
  │   ;; major mode specific 'toggle' commands
- │   (define-key markdown-mode-map (kbd \"C-x M-t i\") #'markdown-toggle-inline-images)
- │   (define-key org-mode-map (kbd \"C-x M-t i\") #'org-toggle-inline-images)
+ │   (define-key markdown-mode-map (kbd \"C-x M-t i\")
+ │                                 #'markdown-toggle-inline-images)
+ │   (define-key org-mode-map (kbd \"C-x M-t i\")
+ │                                 #'org-toggle-inline-images)
  │   ;; add entry for 'toggle' in leader
  │   (meow-leader-define-key '(\"t\" . \"C-x M-t\"))
  │
@@ -152,9 +209,19 @@ Re: \"add mode and meow state specific keymaps\"
                                 (t
                                  meow-cheatsheet-layout)))
 
+
   ;;------------------------------
   :config
   ;;------------------------------
+
+  ;;---
+  ;; Meow "Local" Leader Entries
+  ;;---
+  (mantle:meow:leader/local:entry "m") ; mode...
+
+  ;;---
+  ;; Engage!
+  ;;---
   (meow-mode +1))
 
 
