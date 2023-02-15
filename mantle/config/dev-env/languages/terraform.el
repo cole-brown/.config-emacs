@@ -61,10 +61,33 @@
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
 (imp:use-package terraform-mode
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+  (mantle:meow:leader/local:key 'terraform-mode-map
+                                "a" ; terraform apply
+                                (elisp:cmd (compile (format "%s apply" mantle:terraform:runner) t)))
+  (mantle:meow:leader/local:key 'terraform-mode-map
+                                "i" ; terraform init
+                                (elisp:cmd (compile (format "%s init" mantle:terraform:runner))))
+  (mantle:meow:leader/local:key 'terraform-mode-map
+                                "p" ; terraform plan
+                                (elisp:cmd (compile (format "%s plan" mantle:terraform:runner)))))
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package terraform-mode
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------

@@ -49,11 +49,33 @@
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
-;; https://github.com/joshwnj/json-mode
 (imp:use-package json-mode
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (mantle:meow:leader/local:keys 'json-mode-map
+                                 "p" #'json-mode-show-path ; Copy JSON Path
+                                 "d" #'json-mode-kill-path ; Kill JSON Path
+                                 "t" #'json-toggle-boolean
+                                 "x" #'json-nullify-sexp
+                                 "+" #'json-increment-number-at-point
+                                 "-" #'json-decrement-number-at-point
+                                 "f" #'json-mode-beautify))
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package json-mode
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------
@@ -82,10 +104,29 @@
 ;;
 ;;
 ;; ;;------------------------------
-;; ;; Keybinds
+;; ;; Keybinds : Meow
 ;; ;;------------------------------
 ;;
 ;; (imp:use-package json-snatcher
+;;   :when  (imp:flag? :keybinds +meow)
+;;   :after meow
+;;
+;;   ;;------------------------------
+;;   :config
+;;   ;;------------------------------
+;;
+;;   ;; TODO: Replace `json-mode-show-path' with this?
+;;   (mantle:meow:leader/local:keys 'json-mode-map
+;;                                  "p" #'jsons-print-path ; JSON Path
+;;                                  ))
+;;
+;;
+;;;; ;;------------------------------
+;; ;; Keybinds : Evil
+;; ;;------------------------------
+;;
+;; (imp:use-package json-snatcher
+;;   :when  (imp:flag? :keybinds +evil)
 ;;   :after (:and evil evil-collection)
 ;;
 ;;   ;;------------------------------

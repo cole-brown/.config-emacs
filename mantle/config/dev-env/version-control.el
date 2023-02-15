@@ -64,7 +64,7 @@
   (defun mantle:user:magit:buffer:kill ()
     "Kill all magit buffers."
     (interactive)
-    (message "[%s] Kill 'magit' buffers..."
+    (message "[%s] Kill all 'magit' buffers..."
              (datetime:string/get 'rfc-3339 'datetime))
     (buffer:kill:matching ".*magit.*"
                           :internal
@@ -73,10 +73,35 @@
 
 
 ;;------------------------------
-;; Keybinds: Magit
+;; Magit Keybinds: Meow
 ;;------------------------------
 
 (imp:use-package magit
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (defvar mantle:meow/keymap/global:version-control
+    (let ((map (make-sparse-keymap)))
+      (define-key map "g" #'magit-status)
+      (define-key map "q" #'mantle:user:magit:buffer:kill)
+
+      map)
+    "Keymap for version control (`magit', etc) commands that should be available globally.")
+
+  (meow-leader-define-key
+   '("g" . mantle:meow/keymap/global:version-control)))
+
+
+;;------------------------------
+;; Magit Keybinds: evil
+;;------------------------------
+
+(imp:use-package magit
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------
@@ -188,10 +213,26 @@
 
 
 ;;------------------------------
-;; Keybinds: Magit-Todos
+;; Magit-Todos Keybinds: meow
 ;;------------------------------
 
 (imp:use-package magit-todos
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and magit meow)
+
+  ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
+  (:map mantle:meow/keymap/global:version-control
+   ("t" . magit-todos-list)))
+
+
+;;------------------------------
+;; Magit-Todos Keybinds: evil
+;;------------------------------
+
+(imp:use-package magit-todos
+  :when  (imp:flag? :keybinds +evil)
   :after (:and magit evil evil-collection)
 
   ;;------------------------------
@@ -219,6 +260,29 @@
   :config
   ;;------------------------------
   (global-git-gutter-mode +1))
+
+;; TODO-meow: More keybinds!
+;; TODO-evil: More keybinds!
+;; And use `:repeat' / `:jump', or are those evil?
+;;   https://github.com/noctuid/general.el#evil-command-properties
+;;   https://github.com/noctuid/evil-guide#command-properties
+;;
+;; (general-define-key
+;;  :keymaps 'normal
+;;  :prefix "SPC"
+;;  "gj" '(git-gutter:next-hunk :properties (:repeat t :jump t))
+;;  "gk" '(git-gutter:previous-hunk :repeat t :jump t))
+;;
+;; ;; they also work globally
+;; (general-define-key
+;;  :keymaps 'normal
+;;  :prefix "SPC"
+;;  :properties '(:repeat t :jump t)
+;;  ;; or
+;;  :repeat t
+;;  :jump t
+;;  "gj" 'git-gutter:next-hunk
+;;  "gk" 'git-gutter:previous-hunk)
 
 
 ;;------------------------------------------------------------------------------

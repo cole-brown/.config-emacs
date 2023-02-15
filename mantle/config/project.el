@@ -213,8 +213,8 @@
   ;;------------------------------
   :bind ; meow
   ;;------------------------------
-  ([remap evil-jump-to-tag] #'projectile-find-tag)
-  ([remap find-tag]         #'projectile-find-tag))
+  (([remap evil-jump-to-tag] . #'projectile-find-tag)
+   ([remap find-tag]         . #'projectile-find-tag)))
 
 
 ;;------------------------------
