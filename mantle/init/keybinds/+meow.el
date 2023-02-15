@@ -35,7 +35,8 @@
   :init
   ;;------------------------------
 
-  (defconst mantle:meow:leader/local:prefix "C-c M-m"
+  (defconst mantle:meow:leader/local:prefix '(:emacs "C-c M-m"
+                                              :meow  "m")
     "A prefix to bind commands to for Meow \"local\" leader.")
 
 
@@ -116,11 +117,13 @@ FUNC should be the function/command to bind."
       (if (keymapp map)
           ;; Local keybind.
           (define-key map
-            (kbd (concat mantle:meow:leader/local:prefix key))
+            (kbd (concat (plist-get mantle:meow:leader/local:prefix :emacs)
+                         key))
             func)
 
         ;; Global keybind.
-        (global-set-key (kbd (concat mantle:meow:leader/local:prefix key))
+        (global-set-key (kbd (concat (plist-get mantle:meow:leader/local:prefix :emacs)
+                                     key))
                         func))))
 
 
@@ -151,7 +154,7 @@ See `mantle:meow:leader/local:key'."
                                       (cdr each)))))
 
 
-  (defun mantle:meow:leader/local:entry (key)
+  (defun mantle:meow:leader/local:init (key)
     "Create a \"local\" leader entry in Meow for \"mode-specific\" keybinds.
 
 Must be used with `mantle:meow:leader/local:key' or
@@ -165,10 +168,10 @@ Example:
                                 \"i\" #'markdown-toggle-inline-images)
   (mantle:meow:leader/local:key 'org-mode-map
                                 \"i\" #'org-toggle-inline-images)
-  ;; Define Meow Leader entry for \"toggle stuff\".
-  (mantle:meow:leader/local:entry \"t\")
-  ;; Now Meow has a global toggle \"SPC t l\" and two modes have a local toggle
-  ;; \"SPC t i\".
+  ;; Define Meow \"Local\" Leader entry.
+  (mantle:meow:leader/local:init)
+  ;; Now Meow has a global toggle \"SPC m l\" and two modes have a local toggle
+  ;; \"SPC m i\".
 
 From: \"add mode and meow state specific keymaps\"
  │ So my recommendation is to bind keys in vanilla Emacs. For example:
@@ -192,8 +195,10 @@ From: \"add mode and meow state specific keymaps\"
  │
  └── https://github.com/meow-edit/meow/pull/126#issuecomment-992004368"
     ;; Add entry to the (global) leader.
-    (meow-leader-define-key '(key . (kbd (concat mantle:meow:leader/local:prefix
-                                                 key)))))
+    (meow-leader-define-key (cons (concat (plist-get mantle:meow:leader/local:prefix :meow)
+                                          key)
+                                  (concat (plist-get mantle:meow:leader/local:prefix :emacs)
+                                               key))))
 
 
   ;;------------------------------
@@ -217,7 +222,7 @@ From: \"add mode and meow state specific keymaps\"
   ;;---
   ;; Meow "Local" Leader Entries
   ;;---
-  (mantle:meow:leader/local:entry "m") ; mode...
+  (mantle:meow:leader/local:init) ; "SPC m" -> mode/local keybinds
 
   ;;---
   ;; Engage!

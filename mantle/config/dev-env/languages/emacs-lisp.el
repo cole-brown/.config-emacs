@@ -25,34 +25,34 @@
 ;;------------------------------------------------------------------------------
 
 (keybind:leader/local:def
- :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
- :infix   "d"                     ; debug
- "" '(nil :which-key "debug...")) ; infix's title
+  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+  :infix   "d"                     ; debug
+  "" '(nil :which-key "debug...")) ; infix's title
 
 
 (keybind:leader/local:def
- :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
- :infix   "e"                    ; eval
- "" '(nil :which-key "eval...")) ; infix's title
+  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+  :infix   "e"                    ; eval
+  "" '(nil :which-key "eval...")) ; infix's title
 
 
 (keybind:leader/local:def
- :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
- :infix   "g"                    ; goto
- "" '(nil :which-key "goto...")) ; infix's title
+  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+  :infix   "g"                    ; goto
+  "" '(nil :which-key "goto...")) ; infix's title
 
 
 (keybind:leader/local:def
- :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
- :infix   "t"                    ; test
- "" '(nil :which-key "test...")) ; infix's title
+  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+  :infix   "t"                    ; test
+  "" '(nil :which-key "test...")) ; infix's title
 
 
 ;;------------------------------------------------------------------------------
 ;; Emacs Lisp
 ;;------------------------------------------------------------------------------
 
-(imp:use-package elisp-mode
+(imp:use-package emacs-lisp-mode
   :ensure nil ; This is an Emacs built-in feature.
 
   ;; TODO: Add cask?
@@ -190,11 +190,68 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
-(imp:use-package elisp-mode
+(imp:use-package emacs-lisp-mode
   :ensure nil ; This is an Emacs built-in feature.
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;;---
+  ;; Debug...
+  ;;---
+  (mantle:meow:keymap
+      mantle:meow/keymap/leader:elisp/debug
+      "Debug commands in Meow \"Local\" Leader for Emacs Lisp Mode."
+    ("f" mantle:user:emacs-lisp:edebug:instrument-defun/on) ; "`edebug' instrument enable"
+    ("F" mantle:user:emacs-lisp:edebug:instrument-defun/off)) ; "`edebug' instrument disable"
+
+  (mantle:meow:leader/local:key emacs-lisp-mode-map
+                                "d" mantle:meow/keymap/leader:elisp/debug)
+
+  ;;---
+  ;; Eval...
+  ;;---
+  (mantle:meow:keymap
+      mantle:meow/keymap/leader:elisp/eval
+      "Eval commands in Meow \"Local\" Leader for Emacs Lisp Mode."
+    ("b" #'eval-buffer)
+    ("d" #'eval-defun)
+    ("e" #'eval-last-sexp)
+    ("E" #'pp-eval-last-sexp)
+    ("r" #'eval-region)
+    ("l" #'load-library))
+
+  (mantle:meow:leader/local:key emacs-lisp-mode-map
+                                "e" mantle:meow/keymap/leader:elisp/eval)
+
+  ;;---
+  ;; "Go To Considered Harmful"
+  ;;---
+  (mantle:meow:keymap
+      mantle:meow/keymap/leader:elisp/goto
+      "Eval commands in Meow \"Local\" Leader for Emacs Lisp Mode."
+    ("f" #'find-function)
+    ("F" #'find-function-at-point)
+    ("v" #'find-variable)
+    ("l" #'find-library))
+
+  (mantle:meow:leader/local:key emacs-lisp-mode-map
+                                "g" mantle:meow/keymap/leader:elisp/goto))
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package emacs-lisp-mode
+  :ensure nil ; This is an Emacs built-in feature.
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------
@@ -204,35 +261,35 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   ;; Debug...
   ;;---
   (keybind:leader/local:def
-   :infix "d"
-   "f" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/on :which-key "`edebug' instrument enable")
-   "F" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/off :which-key "`edebug' instrument disable"))
+    :infix "d"
+    "f" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/on :which-key "`edebug' instrument enable")
+    "F" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/off :which-key "`edebug' instrument disable"))
 
   ;;---
   ;; Eval...
   ;;---
   (keybind:leader/local:def
-   :infix "e"
-   ;; TODO: Try these without "Display Names" and see if it actually is better?
-   ;; Doom doesn't bother with a pretty name.
-   "b" #'eval-buffer       ; (list #'eval-buffer       :which-key "Eval Buffer")
-   "d" #'eval-defun        ; (list #'eval-defun        :which-key "Eval Defun")
-   "e" #'eval-last-sexp    ; (list #'eval-last-sexp    :which-key "Eval Last Sexp")
-   "E" #'pp-eval-last-sexp ; (list #'pp-eval-last-sexp :which-key "Eval Last Sexp: Pretty Print")
-   "r" #'eval-region       ; (list #'eval-region       :which-key "Eval Region")
-   "l" #'load-library)     ; (list #'load-library      :which-key "Load Library")
+    :infix "e"
+    ;; TODO: Try these without "Display Names" and see if it actually is better?
+    ;; Doom doesn't bother with a pretty name.
+    "b" #'eval-buffer       ; (list #'eval-buffer       :which-key "Eval Buffer")
+    "d" #'eval-defun        ; (list #'eval-defun        :which-key "Eval Defun")
+    "e" #'eval-last-sexp    ; (list #'eval-last-sexp    :which-key "Eval Last Sexp")
+    "E" #'pp-eval-last-sexp ; (list #'pp-eval-last-sexp :which-key "Eval Last Sexp: Pretty Print")
+    "r" #'eval-region       ; (list #'eval-region       :which-key "Eval Region")
+    "l" #'load-library)     ; (list #'load-library      :which-key "Load Library")
 
   ;;---
   ;; "Go To Considered Harmful"
   ;;---
   (keybind:leader/local:def
-   :infix "g"
-   ;; TODO: Try these without "Display Names" and see if it actually is better?
-   ;; Doom doesn't bother with a pretty name.
-   "f" #'find-function
-   "F" #'find-function-at-point
-   "v" #'find-variable
-   "l" #'find-library))
+    :infix "g"
+    ;; TODO: Try these without "Display Names" and see if it actually is better?
+    ;; Doom doesn't bother with a pretty name.
+    "f" #'find-function
+    "F" #'find-function-at-point
+    "v" #'find-variable
+    "l" #'find-library))
 
 
 ;;------------------------------
