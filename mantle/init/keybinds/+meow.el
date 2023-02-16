@@ -135,8 +135,9 @@ MAP should be a keymap or nil(ish). Add to the global keymap if MAP is:
   - `global'
   - `:global'
 
-Each KEYBIND should be a list/cons of:
-  '(key . func)
+KEYBINDs should be should be a sequence of keys and functions:
+  - key      : string fit for `kbd'
+  - function : quote function
 See `mantle:meow:leader/local:key'."
     (unless keybind
         (nub:error
@@ -144,17 +145,17 @@ See `mantle:meow:leader/local:key'."
             func/name
           "Must have one or more KEYBIND list/cons! Got: %S"
           keybind))
-    (dolist (each keybind)
-      (mantle:meow:leader/local:key map
-                                    (if (proper-list-p each)
-                                        (nth 0 each)
-                                      (car each))
-                                    (if (proper-list-p each)
-                                        (nth 1 each)
-                                      (cdr each)))))
+    (let (key)
+      (dolist (each keybind)
+        ;; Is this the key or the function?
+        (if (not key)
+            ;; Save key; continue on to next in KEYBINDs for func...
+            (setq key each)
+          ;; Create the keybind in the map.
+          (mantle:meow:leader/local:key map key func)))))
 
 
-  (defun mantle:meow:leader/local:init (key)
+  (defun mantle:meow:leader/local:init ()
     "Create a \"local\" leader entry in Meow for \"mode-specific\" keybinds.
 
 Must be used with `mantle:meow:leader/local:key' or
@@ -168,7 +169,7 @@ Example:
                                 \"i\" #'markdown-toggle-inline-images)
   (mantle:meow:leader/local:key 'org-mode-map
                                 \"i\" #'org-toggle-inline-images)
-  ;; Define Meow \"Local\" Leader entry.
+  ;; Define Meow \"Local\" Leader entrypoint keybind.
   (mantle:meow:leader/local:init)
   ;; Now Meow has a global toggle \"SPC m l\" and two modes have a local toggle
   ;; \"SPC m i\".

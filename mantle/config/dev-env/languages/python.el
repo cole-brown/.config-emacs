@@ -231,10 +231,57 @@ MODULE should be a string of the module name."
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
 (imp:use-package pyimport
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and python meow)
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  ;; Have to create early so `py-isort' can use this too...
+  (mantle:meow:keymap
+      mantle:meow/keymap/local:python/import-isort
+      "Python import & isort commands")
+
+  ;;------------------------------
+  :bind
+  ;;------------------------------
+
+  (:map mantle:meow/keymap/local:python/import-isort
+   ("i" #'pyimport-insert-missing)   ; Insert missing imports
+   ("r" #'pyimport-remove-unused)    ; Remove unused imports
+   ("o" #'+python/optimize-imports)) ; Optimize imports
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (mantle:meow:leader/local:key 'python-mode-map
+                                "i" 'mantle:meow/keymap/local:import-isort))
+
+
+(imp:use-package py-isort
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and python meow)
+
+  ;;------------------------------
+  :bind
+  ;;------------------------------
+  (:map mantle:meow/keymap/local:python/import-isort
+   ("s" #'py-isort-buffer)   ; Sort imports
+   ("r" #'py-isort-region))) ; Sort region
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package pyimport
+  :when  (imp:flag? :keybinds +evil)
   :after (:and python evil evil-collection)
 
   ;;------------------------------
@@ -249,6 +296,7 @@ MODULE should be a string of the module name."
 
 
 (imp:use-package py-isort
+  :when  (imp:flag? :keybinds +evil)
   :after (:and python evil evil-collection)
 
   ;;------------------------------
@@ -291,11 +339,40 @@ MODULE should be a string of the module name."
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
 (imp:use-package pipenv
-  :after (:and evil evil-collection)
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and python meow)
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (mantle:meow:keymap
+      mantle:meow/keymap/local:python/pipenv
+      "`web-mode' \"attribute\" keybinds"
+   ("a" #'pipenv-activate)   ; activate
+   ("d" #'pipenv-deactivate) ; deactivate
+   ("i" #'pipenv-install)    ; install
+   ("l" #'pipenv-lock)       ; lock
+   ("o" #'pipenv-open)       ; open module
+   ("r" #'pipenv-run)        ; run
+   ("s" #'pipenv-shell)      ; shell
+   ("u" #'pipenv-uninstall)) ; uninstall
+
+  (mantle:meow:leader/local:key 'python-mode-map
+                                "e" 'mantle:meow/keymap/local:python/pipenv))
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package pipenv
+  :when  (imp:flag? :keybinds +evil)
+  :after (:and python evil evil-collection)
 
   ;;------------------------------
   :general ; evil
@@ -534,14 +611,43 @@ MODULE should be a string of the module name."
       ;; (set-company-backend! 'anaconda-mode '(company-anaconda))
       )
 
+
     ;;------------------------------
-    ;; Keybinds
+    ;; Keybinds : Meow
     ;;------------------------------
 
     (imp:use-package anaconda-mode
       ;; Defer loading; we'll load in a hook if we want this.
       :defer t
-      :after (:and evil evil-collection)
+      :when  (imp:flag? :keybinds +meow)
+      :after (:and python meow)
+
+      ;;------------------------------
+      :config
+      ;;------------------------------
+      (mantle:meow:keymap
+          mantle:meow/keymap/local:python/anaconda
+          "Python Anaconda keybinds"
+       ("d" #'anaconda-mode-find-definitions) ; Find Definitions
+       ("h" #'anaconda-mode-show-doc)         ; Show Doc
+       ("a" #'anaconda-mode-find-assignments) ; Find Assignments
+       ("f" #'anaconda-mode-find-file)        ; Find File
+       ("u" #'anaconda-mode-find-references)) ; Find References
+
+      ;; TODO: Does this go under "g"?
+      (mantle:meow:leader/local:key 'anaconda-mode-map
+                                    "g" 'mantle:meow/keymap/local:python/anaconda))
+
+
+    ;;------------------------------
+    ;; Keybinds : Evil
+    ;;------------------------------
+
+    (imp:use-package anaconda-mode
+      ;; Defer loading; we'll load in a hook if we want this.
+      :defer t
+      :when  (imp:flag? :keybinds +evil)
+      :after (:and python evil evil-collection)
 
       ;;------------------------------
       :general ; evil
@@ -591,12 +697,42 @@ MODULE should be a string of the module name."
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
-(imp:use-package anaconda-mode
+(imp:use-package python-pytest
   ;; Defer loading; we'll load in a hook if we want this.
   :defer t
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and python meow)
+  :commands python-pytest-dispatch
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+  (mantle:meow:keymap
+      mantle:meow/keymap/local:python/pytest
+      "Pytest keybinds"
+    ("a" #'python-pytest)               ; Run all tests
+    ("f" #'python-pytest-file-dwim)     ; DWIM: Run tests on file
+    ("F" #'python-pytest-file)          ; Run tests on file
+    ("t" #'python-pytest-function-dwim) ; DWIM: Run tests on function
+    ("T" #'python-pytest-function)      ; Run tests on function
+    ("r" #'python-pytest-repeat)        ; Repeat tests
+    ("p" #'python-pytest-dispatch))     ; Pytest Popup...
+
+  (mantle:meow:leader/local:key 'python-mode-map
+                                "t" 'mantle:meow/keymap/local:python/pytest))
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package python-pytest
+  ;; Defer loading; we'll load in a hook if we want this.
+  :defer t
+  :when  (imp:flag? :keybinds +evil)
   :after (:and python evil evil-collection)
   :commands python-pytest-dispatch
 

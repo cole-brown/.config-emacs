@@ -156,10 +156,80 @@
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
 (imp:use-package markdown-mode
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+  ;;---
+  ;; Misc.
+  ;;---
+  (mantle:meow:leader/local:keys 'markdown-mode-map
+                                 "'" #'markdown-edit-code-block
+                                 "e" #'markdown-export
+                                 ;; "i" == insert menu
+                                 "o" #'markdown-open)
+
+  ;;---
+  ;; Preview...
+  ;;---
+  ;; `impatient-mode' will add more to this keymap
+  (mantle:meow:keymap
+      mantle:meow/keymap/local:markdown/preview
+      "Preview Markdown"
+    ("p" #'markdown-preview))
+
+  (mantle:meow:leader/local:key 'markdown-mode-map
+                                "p" 'mantle:meow/keymap/local:markdown/preview)
+
+  ;;---
+  ;; Insert...
+  ;;---
+  (mantle:meow:keymap
+      mantle:meow/keymap/local:markdown/insert
+      "`markdown-mode' \"insert\" keybinds"
+    ("i" #'markdown-insert-image)          ; Image
+    ("l" #'markdown-insert-link)           ; Link
+    ("-" #'markdown-insert-hr)             ; <hr>
+    ("1" #'markdown-insert-header-atx-1)   ; Heading 1
+    ("2" #'markdown-insert-header-atx-2)   ; Heading 2
+    ("3" #'markdown-insert-header-atx-3)   ; Heading 3
+    ("4" #'markdown-insert-header-atx-4)   ; Heading 4
+    ("5" #'markdown-insert-header-atx-5)   ; Heading 5
+    ("6" #'markdown-insert-header-atx-6)   ; Heading 6
+    ("C" #'markdown-insert-gfm-code-block) ; Code Block
+    ("P" #'markdown-pre-region)            ; Pre Region
+    ("Q" #'markdown-blockquote-region)     ; Blockquote Region
+    ("[" #'markdown-insert-gfm-checkbox)   ; Checkbox
+    ("b" #'markdown-insert-bold)           ; Bold
+    ("c" #'markdown-insert-code)           ; Inline Code
+    ("e" #'markdown-insert-italic)         ; Italic
+    ("f" #'markdown-insert-footnote)       ; Footnote
+    ("h" #'markdown-insert-header-dwim)    ; Header DWIM
+    ("i" #'markdown-insert-italic)         ; Italic
+    ("k" #'markdown-insert-kbd)            ; kbd
+    ("l" #'markdown-insert-link)           ; Link
+    ("p" #'markdown-insert-pre)            ; Pre
+    ("q" #'markdown-insert-blockquote)     ; New Blockquote
+    ("s" #'markdown-insert-strike-through) ; Strike Through
+    ("t" #'markdown-insert-table)          ; Table
+    ("w" #'markdown-insert-wiki-link))     ; Wiki Link
+
+  (mantle:meow:leader/local:key 'markdown-mode-map
+                                "i" 'mantle:meow/keymap/local:markdown/insert))
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package markdown-mode
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------
@@ -230,10 +300,27 @@
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
 (imp:use-package markdown-toc
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and markdown-mode meow)
+
+  ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
+  ;; Add to "Insert" keybinds...
+  (:map mantle:meow/keymap/local:markdown/insert
+   ("T" . #'markdown-toc-generate-toc))) ; Table Of Content
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package markdown-toc
+  :when  (imp:flag? :keybinds +evil)
   :after (:and markdown-mode evil evil-collection)
 
   ;;------------------------------
@@ -252,6 +339,7 @@
 
 (imp:use-package evil-markdown
   :when (imp:feature? 'evil)
+  :after (:and markdown-mode evil)
   ;; Not on a package repository so get it from GitHub:
   :straight (:type git
              :host github
@@ -405,10 +493,30 @@ You can then:
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
 (imp:use-package impatient-mode
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and markdown-mode meow)
+
+  ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
+  (:map mantle:meow/keymap/local:markdown/preview
+   ;; `markdown-mode' package puts `markdown-preview' as "p".
+   ;; Steal "p", but add `markdown-preview' back somewhere else.
+   ("p" . #'mantle:cmd:markdown:preview-live/start)  ; Preview (Live)
+   ("P" . #'markdown-preview)                        ; Preview (Static)
+   ("s" . #'mantle:cmd:markdown:preview-live/stop))) ; Stop Preview (Live)
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package impatient-mode
+  :when  (imp:flag? :keybinds +evil)
   :after (:and markdown-mode evil evil-collection)
 
   ;;------------------------------

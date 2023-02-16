@@ -106,10 +106,40 @@
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
 (imp:use-package sharper
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+  (mantle:meow:leader/local:keys 'emacs-lisp-mode-map
+                                 "c" #'sharper-main-transient) ; `dotnet' CLI..."
+
+  ;; TODO: Doom also mapped these; do we want any?
+  ;; (map! (:map sharper--solution-management-mode-map
+  ;;        :nv "RET" #'sharper-transient-solution
+  ;;        :nv "gr" #'sharper--solution-management-refresh)
+  ;;       (:map sharper--project-references-mode-map
+  ;;        :nv "RET" #'sharper-transient-project-references
+  ;;        :nv "gr" #'sharper--project-references-refresh)
+  ;;       (:map sharper--project-packages-mode-map
+  ;;        :nv "RET" #'sharper-transient-project-packages
+  ;;        :nv "gr" #'sharper--project-packages-refresh)
+  ;;       (:map sharper--nuget-results-mode-map
+  ;;        :nv "RET" #'sharper--nuget-search-install))
+  )
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package sharper
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------
