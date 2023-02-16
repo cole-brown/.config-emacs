@@ -70,9 +70,9 @@
 (imp:flag :keyboard +dvorak)
 
 ;; Used to decide what, if any, input systems to configure.
-;; TODO-meow: NO MORE EVIL!
-(imp:flag :keybinds +evil) ; https://github.com/emacs-evil/evil
-;; (imp:flag :keybinds +meow)    ; https://github.com/meow-edit/meow
+;; (imp:flag :keybinds +evil) ; https://github.com/emacs-evil/evil
+(imp:flag :keybinds +meow)    ; https://github.com/meow-edit/meow
+
 
 ;;------------------------------
 ;; Automatic
