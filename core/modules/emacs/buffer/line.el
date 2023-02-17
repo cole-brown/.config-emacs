@@ -12,7 +12,7 @@
 ;;               (imp:flag? :keybinds +evil))
 ;;
 ;;   ;;------------------------------
-;;   :bind ; vanilla Emacs
+;;   :bind ; emacs
 ;;   ;;------------------------------
 ;;
 ;;   ;; Remap C-a to `buffer:cmd:line/smart:move-beginning:logical'

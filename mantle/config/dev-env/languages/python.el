@@ -248,13 +248,12 @@ MODULE should be a string of the module name."
       "Python import & isort commands")
 
   ;;------------------------------
-  :bind
+  :bind ; meow
   ;;------------------------------
 
   (:map mantle:meow/keymap/local:python/import-isort
-   ("i" #'pyimport-insert-missing)   ; Insert missing imports
-   ("r" #'pyimport-remove-unused)    ; Remove unused imports
-   ("o" #'+python/optimize-imports)) ; Optimize imports
+   ("i" . #'pyimport-insert-missing) ; Insert missing import for item at point.
+   ("r" . #'pyimport-remove-unused)) ; Remove unused imports from file.
 
   ;;------------------------------
   :config
@@ -269,11 +268,11 @@ MODULE should be a string of the module name."
   :after (:and python meow)
 
   ;;------------------------------
-  :bind
+  :bind ; meow
   ;;------------------------------
   (:map mantle:meow/keymap/local:python/import-isort
-   ("s" #'py-isort-buffer)   ; Sort imports
-   ("r" #'py-isort-region))) ; Sort region
+   ("s" . #'py-isort-buffer)   ; Sort imports
+   ("r" . #'py-isort-region))) ; Sort region
 
 
 ;;------------------------------
@@ -291,8 +290,7 @@ MODULE should be a string of the module name."
    :states  keybind:leader/local:states
    :keymaps 'python-mode-map
    "i" (list #'pyimport-insert-missing :which-key "Insert missing imports")
-   "r" (list #'pyimport-remove-unused :which-key "Remove unused imports")
-   "o" (list #'+python/optimize-imports :which-key "Optimize imports")))
+   "r" (list #'pyimport-remove-unused :which-key "Remove unused imports")))
 
 
 (imp:use-package py-isort

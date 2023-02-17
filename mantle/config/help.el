@@ -140,13 +140,12 @@
   ;; :after helm
   ;; :after ivy
 
-
   ;;------------------------------
-  ;; Normal Emacs (Non-Evil) Keybinds
+  :bind ; emacs
   ;;------------------------------
-  ;;------------------------------
-  :bind ;; global
-  ;;------------------------------
+  ;;---
+  ;; global
+  ;;---
   (("C-h f" . helpful-callable)
    ("C-h v" . helpful-variable)
    ("C-h k" . helpful-key)
@@ -154,17 +153,17 @@
    ;; replaces `finder-by-keyword' but I've never used that...
    ("C-h p" . helpful-at-point)
    ;; replaces `describe-coding-system' but I've never used that...
-   ("C-h C" . helpful-command))
+   ("C-h C" . helpful-command)
 
-  ;;------------------------------
-  :bind ;; helpful-mode-map
-  ;;------------------------------
-  (:map helpful-mode-map
-        ;; kill-this-buffer instead of quit (bury)
-        ;; TRIAL: [2019-10-28]
-        ;; kill-or-quit instead of original quit-or-kill?
-        ;;  - "quit" as in bury...
-        ("q" . window:kill-or-quit))
+   ;;---
+   ;; helpful-mode-map
+   ;;---
+   :map helpful-mode-map
+   ;; kill-this-buffer instead of quit (bury)
+   ;; TRIAL: [2019-10-28]
+   ;; kill-or-quit instead of original quit-or-kill?
+   ;;  - "quit" as in bury...
+   ("q" . window:kill-or-quit))
 
 
   ;; ;;------------------------------

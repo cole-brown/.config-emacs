@@ -102,7 +102,8 @@
   ;;------------------------------
   (vertico-mode +1))
 
-;; TODO-keybinds: Are there (evil/meow) Vertico keybinds?
+;; TODO-evil: Are there evil Vertico keybinds?
+;; TODO-meow: Are there meow Vertico keybinds?
 ;; TODO-keybinds: Do any of my keybinds need editted to be ok with Vertico?
 ;;   - https://github.com/minad/vertico#key-bindings
 ;;   - See `C-h v vertico-map' for keybinds, or:
@@ -202,16 +203,23 @@
 
   ;; Must be in the :init section of use-package such that the mode gets
   ;; enabled right away. Note that this forces loading the package.
-  (marginalia-mode +1)
+  (marginalia-mode +1))
 
+;;------------------------------
+;; Keybinds : Emacs
+;;------------------------------
+
+(imp:use-package marginalia
   ;;------------------------------
-  :bind
+  :bind ; emacs
   ;;------------------------------
   ;; TODO: What keybind to give this? What does it do?
-  ;; Either bind `marginalia-cycle` globally or only in the minibuffer
   (("M-A" . marginalia-cycle)
    :map minibuffer-local-map
    ("M-A" . marginalia-cycle)))
+
+;; TODO-evil: Evil keybinds for `marginalia-cycle'?
+;; TODO-meow: Meow keybinds for `marginalia-cycle'?
 
 
 ;;------------------------------------------------------------------------------
@@ -305,14 +313,15 @@
 
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Vanilla Emacs
 ;;------------------------------
 
 (imp:use-package consult
-  :after (:and evil evil-collection)
+  :unless  (or (imp:flag? :keybinds +meow)
+               (imp:flag? :keybinds +evil))
 
   ;;------------------------------
-  :bind ; evil
+  :bind ; Emacs
   ;;------------------------------
   ;; TODO: Replace this `:bind' section with a `:general' section.
   ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -407,6 +416,214 @@
   )
 
 
+;;------------------------------
+;; Keybinds : meow
+;;------------------------------
+
+(imp:use-package consult
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;; TODO-meow: Meow leader keybinds for some of these functions.
+
+  ;;------------------------------
+  :bind ; still do all these vanilla Emacs binds
+  ;;------------------------------
+  ;; TODO: Replace this `:bind' section with a `:general' section.
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  (;; C-c bindings (mode-specific-map)
+   ("C-c h" . consult-history)
+   ("C-c m" . consult-mode-command)
+   ("C-c k" . consult-kmacro)
+   ;; C-x bindings (ctl-x-map)
+   ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+   ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+   ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+   ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+   ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+   ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+   ;; Custom M-# bindings for fast register access
+   ("M-#" . consult-register-load)
+   ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+   ("C-M-#" . consult-register)
+   ;; Other custom bindings
+   ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+   ("<help> a" . consult-apropos)            ;; orig. apropos-command
+   ;; M-g bindings (goto-map)
+   ("M-g e" . consult-compile-error)
+   ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+   ("M-g g" . consult-goto-line)             ;; orig. goto-line
+   ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+   ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+   ("M-g m" . consult-mark)
+   ("M-g k" . consult-global-mark)
+   ("M-g i" . consult-imenu)
+   ("M-g I" . consult-imenu-multi)
+   ;; M-s bindings (search-map)
+   ("M-s d" . consult-find)
+   ("M-s D" . consult-locate)
+   ("M-s g" . consult-grep)
+   ("M-s G" . consult-git-grep)
+   ("M-s r" . consult-ripgrep)
+   ("M-s l" . consult-line)
+   ("M-s L" . consult-line-multi)
+   ("M-s m" . consult-multi-occur)
+   ("M-s k" . consult-keep-lines)
+   ("M-s u" . consult-focus-lines)
+   ;; Isearch integration
+   ("M-s e" . consult-isearch-history)
+   :map isearch-mode-map
+   ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+   ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+   ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+   ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+   ;; Minibuffer history
+   :map minibuffer-local-map
+   ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+   ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key (kbd "M-."))
+  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme
+   :preview-key '(:debounce 0.2 any)
+
+   consult-ripgrep
+   consult-git-grep
+   consult-grep
+   consult-bookmark
+   consult-recent-file
+   consult-xref
+   consult--source-bookmark
+   consult--source-recent-file
+   consult--source-project-recent-file
+   :preview-key (kbd "M-."))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  ;; TODO: EVIL???
+  ;; TODO-meow: MEOW???
+  (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+  )
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package consult
+  :when  (imp:flag? :keybinds +evil)
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :bind ; still do all these vanilla Emacs binds
+  ;;------------------------------
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  (;; C-c bindings (mode-specific-map)
+   ("C-c h" . consult-history)
+   ("C-c m" . consult-mode-command)
+   ("C-c k" . consult-kmacro)
+   ;; C-x bindings (ctl-x-map)
+   ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+   ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+   ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+   ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+   ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+   ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+   ;; Custom M-# bindings for fast register access
+   ("M-#" . consult-register-load)
+   ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+   ("C-M-#" . consult-register)
+   ;; Other custom bindings
+   ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+   ("<help> a" . consult-apropos)            ;; orig. apropos-command
+   ;; M-g bindings (goto-map)
+   ("M-g e" . consult-compile-error)
+   ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+   ("M-g g" . consult-goto-line)             ;; orig. goto-line
+   ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+   ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+   ("M-g m" . consult-mark)
+   ("M-g k" . consult-global-mark)
+   ("M-g i" . consult-imenu)
+   ("M-g I" . consult-imenu-multi)
+   ;; M-s bindings (search-map)
+   ("M-s d" . consult-find)
+   ("M-s D" . consult-locate)
+   ("M-s g" . consult-grep)
+   ("M-s G" . consult-git-grep)
+   ("M-s r" . consult-ripgrep)
+   ("M-s l" . consult-line)
+   ("M-s L" . consult-line-multi)
+   ("M-s m" . consult-multi-occur)
+   ("M-s k" . consult-keep-lines)
+   ("M-s u" . consult-focus-lines)
+   ;; Isearch integration
+   ("M-s e" . consult-isearch-history)
+   :map isearch-mode-map
+   ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+   ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+   ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+   ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+   ;; Minibuffer history
+   :map minibuffer-local-map
+   ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+   ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key (kbd "M-."))
+  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme
+   :preview-key '(:debounce 0.2 any)
+
+   consult-ripgrep
+   consult-git-grep
+   consult-grep
+   consult-bookmark
+   consult-recent-file
+   consult-xref
+   consult--source-bookmark
+   consult--source-recent-file
+   consult--source-project-recent-file
+   :preview-key (kbd "M-."))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  ;; TODO: EVIL???
+  ;; TODO-meow: MEOW???
+  (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+  )
+
 ;;------------------------------------------------------------------------------
 ;; Embark: Emacs Mini-Buffer Action Rooted in Keymaps
 ;;------------------------------------------------------------------------------
@@ -432,16 +649,6 @@
 
 
   ;;------------------------------
-  :bind
-  ;;------------------------------
-  ;; TODO: EVIL bindings?
-  ;; TODO-meow: meow bindings?
-  (("C-." . embark-act)         ;; pick some comfortable binding
-   ("C-;" . embark-dwim)        ;; good alternative: M-.
-   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-
-
-  ;;------------------------------
   :config
   ;;------------------------------
 
@@ -450,6 +657,59 @@
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
                  (window-parameters (mode-line-format . none)))))
+
+
+;;------------------------------
+;; Keybinds : Emacs
+;;------------------------------
+
+(imp:use-package embark
+  :unless  (or (imp:flag? :keybinds +meow)
+               (imp:flag? :keybinds +evil))
+
+  ;;------------------------------
+  :bind
+  ;;------------------------------
+  ;; TODO: EVIL bindings?
+  ;; TODO-meow: meow bindings?
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings))) ;; alternative for `describe-bindings'
+
+
+;;------------------------------
+;; Keybinds : Meow
+;;------------------------------
+
+(imp:use-package embark
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
+  ;; TODO-meow: Meow bindings?
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings))) ;; alternative for `describe-bindings'
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package embark
+  :when  (imp:flag? :keybinds +evil)
+  :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :bind ; evil
+  ;;------------------------------
+  ;; TODO-evil: Evil bindings?
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings))) ;; alternative for `describe-bindings'
+
 
 ;;------------------------------
 ;; Embark + Consult
@@ -626,23 +886,20 @@ targets."
 
 
 ;; ;;------------------------------
-;; ;; Keybinds
+;; ;; Keybinds : Emacs
 ;; ;;------------------------------
 ;;
 ;; ;; (imp:use-package dabbrev
 ;; ;;   :ensure nil ; This is an Emacs built-in feature.
-;; ;;   :after (:and evil evil-collection)
+;; ;;   ;; Always do this keybind swap.
 ;; ;;
 ;; ;;   ;;------------------------------
-;; ;;   :bind ; evil
+;; ;;   :bind ; emacs
 ;; ;;   ;;------------------------------
 ;; ;;   ;; Swap 'M-/' and 'C-M-/'
 ;; ;;   ;; TODO: Yes or no on this? Doom doesn't swap 'em.
 ;; ;;   (("M-/" . dabbrev-completion)
-;; ;;    ("C-M-/" . dabbrev-expand))
-;; ;;
-;; ;;   ;; TODO: `:general' keybinds?
-;; ;;   )
+;; ;;    ("C-M-/" . dabbrev-expand)))
 
 
 
