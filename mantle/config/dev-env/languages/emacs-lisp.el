@@ -52,7 +52,7 @@
 ;; Emacs Lisp
 ;;------------------------------------------------------------------------------
 
-(imp:use-package emacs-lisp-mode
+(imp:use-package elisp-mode
   :ensure nil ; This is an Emacs built-in feature.
 
   ;; TODO: Add cask?
@@ -193,7 +193,7 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
 ;; Keybinds : Meow
 ;;------------------------------
 
-(imp:use-package emacs-lisp-mode
+(imp:use-package elisp-mode
   :ensure nil ; This is an Emacs built-in feature.
   :when  (imp:flag? :keybinds +meow)
   :after meow
@@ -249,7 +249,7 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
 ;; Keybinds : Evil
 ;;------------------------------
 
-(imp:use-package emacs-lisp-mode
+(imp:use-package elisp-mode
   :ensure nil ; This is an Emacs built-in feature.
   :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)

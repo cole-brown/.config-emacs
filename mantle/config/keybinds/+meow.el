@@ -36,6 +36,13 @@
   ;; I am... ignoring the suggestions.
 
   ;; ╔═════════════════════════════════════════════════════════════════════════╗
+  ;; ║ Undefine Keys                                                           ║
+  ;; ╚═════════════════════════════════════════════════════════════════════════╝
+
+  (global-unset-key (kbd "C-s")) ; `isearch-forward'
+
+
+  ;; ╔═════════════════════════════════════════════════════════════════════════╗
   ;; ║ Define Keys                                                             ║
   ;; ╚═════════════════════════════════════════════════════════════════════════╝
 
@@ -47,6 +54,14 @@
   ;; H & ; (Dvorak D & S) are "extra left" and "extra right", basically.
 
   ;; `normal'
+
+  (meow-define-keys
+      'insert
+    ;; '("<escape>" . meow-insert-exit) ; already bound by `meow'
+    '("C-s" . meow-insert-exit)
+    ;; "C-g" stays as `keyboard-quit'
+    )
+
 
   ;; `insert'
 
@@ -61,18 +76,19 @@
     "Keymap for entering `meow-insert-mode' state.")
 
   (meow-normal-define-key
-   '("s" . mantle:meow/keymap:insert:enter))
+   (cons "s" mantle:meow/keymap:insert:enter))
 
 
-  ;; `motion':
+  ;; `motion': Transitive state after(/when?) using a motion command and it gives you numbers/whatever to jump to.
   ;; TODO-meow: Can I have use this for multiple defined keys, or do I need to...
   (meow-motion-overwrite-define-key
+   '("C-s"       . ignore)
    '("<escape>" . ignore)
    '("C-g"      . ignore))
 
-  ;; `keypad'
+  ;; `keypad': TODO-meow Who/what/where/when/why/how is this state???
 
-  ;; `beacon'
+  ;; `beacon': TODO-meow Who/what/where/when/why/how is this state???
 
 
   ;; ┌────────────────────────────────┐
@@ -193,7 +209,7 @@
    '("," . meow-find)    ; search (forward) and select to the end of that char
    '("<" . meow-till)    ; search (forward) and select to the end of that char
    '("v" . meow-visit)   ; prompt for regex, search (forward) and select it
-   '("y" . meow-search)) ; search (forward) for (unprompted) regex and select it
+   '("V" . meow-search)) ; search (forward) for (unprompted) regex and select it
 
 
   ;; ┌────────────────────────────────┐
@@ -214,4 +230,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'init 'keybinds '+meow)
+(imp:provide :mantle 'config 'keybinds '+meow)

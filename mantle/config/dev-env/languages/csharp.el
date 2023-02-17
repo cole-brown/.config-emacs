@@ -111,12 +111,12 @@
 
 (imp:use-package sharper
   :when  (imp:flag? :keybinds +meow)
-  :after meow
+  :after (:and csharp-mode meow)
 
   ;;------------------------------
   :config
   ;;------------------------------
-  (mantle:meow:leader/local:keys 'emacs-lisp-mode-map
+  (mantle:meow:leader/local:keys 'csharp-mode-map
                                  "c" #'sharper-main-transient) ; `dotnet' CLI..."
 
   ;; TODO: Doom also mapped these; do we want any?
@@ -140,7 +140,7 @@
 
 (imp:use-package sharper
   :when  (imp:flag? :keybinds +evil)
-  :after (:and evil evil-collection)
+  :after (:and csharp-mode evil evil-collection)
 
   ;;------------------------------
   :general ; evil

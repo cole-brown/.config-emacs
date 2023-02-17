@@ -87,7 +87,8 @@ FUNC should be the function/command to bind."
       (unless (or (null map)
                   (eq map :global)
                   (eq map 'global)
-                  (keymapp map))
+                  ;; (keymapp map) ;; Can't check for keymap yet as it's not loaded in `use-package` `:config` section??
+                  (symbolp map))
         (nub:error
             :innit
             func/name
@@ -139,6 +140,7 @@ KEYBINDs should be should be a sequence of keys and functions:
   - key      : string fit for `kbd'
   - function : quote function
 See `mantle:meow:leader/local:key'."
+    (let ((func/name "mantle:meow:leader/local:keys"))
     (unless keybind
         (nub:error
             :innit
@@ -152,7 +154,8 @@ See `mantle:meow:leader/local:key'."
             ;; Save key; continue on to next in KEYBINDs for func...
             (setq key each)
           ;; Create the keybind in the map.
-          (mantle:meow:leader/local:key map key func)))))
+          (mantle:meow:leader/local:key map key each)
+          (setq key nil))))))
 
 
   (defun mantle:meow:leader/local:init ()
@@ -196,10 +199,8 @@ From: \"add mode and meow state specific keymaps\"
  │
  └── https://github.com/meow-edit/meow/pull/126#issuecomment-992004368"
     ;; Add entry to the (global) leader.
-    (meow-leader-define-key (cons (concat (plist-get mantle:meow:leader/local:prefix :meow)
-                                          key)
-                                  (concat (plist-get mantle:meow:leader/local:prefix :emacs)
-                                               key))))
+    (meow-leader-define-key (cons (plist-get mantle:meow:leader/local:prefix :meow)
+                                  (plist-get mantle:meow:leader/local:prefix :emacs))))
 
 
   ;;------------------------------
@@ -252,8 +253,6 @@ From: \"add mode and meow state specific keymaps\"
 ;;   (meow-leader-define-key '("t" . "C-x M-t"))
 ;;
 ;; Then you have consistent keybinding SPC t i in leader and C-x M-t i in vanilla Emacs.
-
-
 
 
 ;;------------------------------------------------------------------------------
