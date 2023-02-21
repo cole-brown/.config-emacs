@@ -43,17 +43,29 @@
 
 
   ;; ╔═════════════════════════════════════════════════════════════════════════╗
+  ;; ║ (Re)define Keys                                                         ║
+  ;; ╚═════════════════════════════════════════════════════════════════════════╝
+
+  (mantle:meow:orphan:bind "C-k"
+                           kill-line
+                           meow--kbd-kill-line)
+  ;; TODO: Redefine _all_ meow keybinds??
+  ;; TODO: Or... allow to define as "just use the functions"?
+
+
+  ;; ╔═════════════════════════════════════════════════════════════════════════╗
   ;; ║ Define Keys                                                             ║
   ;; ╚═════════════════════════════════════════════════════════════════════════╝
 
   ;; ┌────────────────────────────────┐
   ;; │ Meow States                    │
   ;; └────────────────────────────────┘
-  ;; IJKL position keys (shifted-WASD right-hand, index on home key)
-  ;;   - Except Dvorak, so CHTN keys.
-  ;; H & ; (Dvorak D & S) are "extra left" and "extra right", basically.
+  ;; https://github.com/meow-edit/meow/blob/master/TUTORIAL.org#states
 
-  ;; `normal'
+  ;; ──┬────────────────
+  ;;   │ `normal'
+  ;; ──┴────────────────
+  ;; The default state; most commands are bound here.
 
   (meow-define-keys
       'insert
@@ -63,7 +75,14 @@
     )
 
 
-  ;; `insert'
+  ;; ──┬────────────────
+  ;;   │ `insert'
+  ;; ──┴────────────────
+  ;; The "insert letters into buffer" state.
+  ;;
+  ;; IJKL position keys (shifted-WASD right-hand, index on home key)
+  ;;   - Except Dvorak, so CHTN keys.
+  ;; H & ; (Dvorak D & S) are "extra left" and "extra right", basically.
 
   (defvar mantle:meow/keymap:insert:enter
     (let ((map (make-sparse-keymap)))
@@ -79,16 +98,56 @@
    (cons "s" mantle:meow/keymap:insert:enter))
 
 
-  ;; `motion': Transitive state after(/when?) using a motion command and it gives you numbers/whatever to jump to.
-  ;; TODO-meow: Can I have use this for multiple defined keys, or do I need to...
+  ;; ──┬────────────────
+  ;;   │ `motion'
+  ;; ──┴────────────────
+  ;; Transitive state after(/when?) using a motion command and it gives you numbers/whatever to jump to.
+
+  ;; These should be ignored as they are our cancel/exit keys.
   (meow-motion-overwrite-define-key
-   '("C-s"       . ignore)
+   '("C-s"      . ignore)
    '("<escape>" . ignore)
    '("C-g"      . ignore))
 
-  ;; `keypad': TODO-meow Who/what/where/when/why/how is this state???
 
-  ;; `beacon': TODO-meow Who/what/where/when/why/how is this state???
+  ;; ──┬────────────────
+  ;;   │ `keypad'
+  ;; ──┴────────────────
+  ;; "The state used for executing commands without modifier keys."
+  ;; https://github.com/meow-edit/meow/blob/master/TUTORIAL.org#keypad
+  ;;
+  ;; NOTE:
+  ;;   1. Meow enters `keypad' state when SPC (leader key) is pressed in NORMAL or MOTION state.
+  ;;   2. In `keypad' state, single keys will be _translated_:
+  ;;      - Start with 'x' / 'h' / 'c' / 'm' / 'g' will begin with 'C-x' / 'C-h' / 'C-c' / 'M-' / 'C-M-' respectively.
+  ;;      - Any other key will start with itself, and temporarily activate the leader keymap.
+  ;;
+  ;; The following keys will act according to following rules:
+  ;;   - 'm' will be translated to 'M-'.
+  ;;   - 'g' will be translated to 'C-M-'.
+  ;;   - Any key following a prefix like 'm' or 'g' is interpreted as 'C-<key>'.
+  ;;   - 'SPC' stands for literal prefix, means that the key will not be modified with 'C-'.
+  ;;   - If the translation results in an undefined binding, the last key will fallback
+  ;;     to an unmodified version. (e.g. If 'C-c C-a' is undefined, fallback to 'C-c a')
+  ;;
+  ;; Some examples (assuming in `normal' state):
+  ;;   | Input       | Translation          | Explanation
+  ;;   |-------------+----------------------+--------------
+  ;;   | SPC a       | 'a' in leader keymap | leader map default is mode-specific-map, C-c
+  ;;   | SPC c t t   | C-c C-t C-t          | start with 'c' as 'C-c'
+  ;;   | SPC x m t   | C-x M-t              | 'm' as meta prefix ('M-')
+  ;;   | SPC g x     | C-M-x                | 'g' as control + meta prefix ('C-M-')
+  ;;   | SPC x SPC p | C-x p                | 'SPC' as literal prefix
+
+  ;; TODO-meow-now: have helper check that I don't use the hard-coded ones (x, h, c, m, g)
+  ;; TODO-meow: Can I change what keys it claims for this shit, or should I just learn/adjust?
+
+
+  ;; ──┬────────────────
+  ;;   │ `beacon'
+  ;; ──┴────────────────
+  ;; "The state used for applying kmacro to multiple places quickly."
+  ;; It's kinda like multiple-cursors, but it works differently."
 
 
   ;; ┌────────────────────────────────┐
@@ -141,65 +200,89 @@
   ;;     - "shift extra left" (A) is `evil-backward-word-begin' which goes back
   ;;       further, to the beginning of the previous word.
 
+  ;; ──┬───────────────────────────────
+  ;;   │ Movement in Insert State
+  ;; ──┴───────────────────────────────
+  (meow-define-keys
+      'insert
+   ;; ──┬────────────────
+   ;;   │ ↑ ↓ ← →
+   ;; ──┴────────────────
+   '("M-." . meow-prev)
+   '("M-e" . meow-next)
+   '("M-o" . meow-left)
+   '("M-u" . meow-right))
+
+
+  ;; ──┬───────────────────────────────
+  ;;   │ Normal Movement & Selection
+  ;; ──┴───────────────────────────────
   (meow-normal-define-key
    ;; ──┬────────────────
    ;;   │ ↑ ↓ ← →
    ;; ──┴────────────────
+   ;; Do we want non-selecting movement keys?
+   ;;   - To make `M-x meow-tutor` easier to start, yes.
+   '("M-." . meow-prev)
+   '("M-e" . meow-next)
+   '("M-o" . meow-left)
+   '("M-u" . meow-right)
+
    ;; ↑ / prev / up / ...expand?
-   '("."   . meow-prev)
-   '("C-." . meow-prev-expand)
-   '(">"   . meow-bounds-of-thing) ; expand to bounds of thing?
-   '("M-." . meow-block)    ; TODO-meow: ???
-   '("M->" . meow-to-block) ; TODO-meow: ???
+   '("." . meow-prev-expand)
+   '(">" . meow-bounds-of-thing) ; expand to bounds of thing?
 
    ;; ↓ / next / down / ...contract?
-   '("e"   . meow-next)
-   '("C-e" . meow-next-expand)
-   '("E"   . meow-inner-of-thing) ; contract to inner bounds of thing?
+   '("e" . meow-next-expand)
+   '("E" . meow-inner-of-thing) ; contract to inner bounds of thing?
 
    ;; ← / back / left
-   '("o"   . meow-left)
-   '("C-o" . meow-left-expand)
-   '("O"   . meow-back-word)
-   '("a"   . meow-back-symbol)
-   '("A"   . meow-beginning-of-thing)
+   '("o" . meow-left-expand)
+   '("O" . meow-back-word)
+   '("a" . meow-back-symbol)
+   '("A" . meow-beginning-of-thing)
 
    ;; → / forward / right
-   '("u"   . meow-right)
-   '("C-u" . meow-right-expand)
-   '("U"   . meow-next-word)
-   '("i"   . meow-next-symbol)
-   '("I"   . meow-end-of-thing)
+   '("u" . meow-right-expand)
+   '("U" . meow-next-word)
+   '("i" . meow-next-symbol)
+   '("I" . meow-end-of-thing)
+
+  ;; lines
+  '("C-o" . meow-join) ; beginning of line (effectively)
+  '("C-u" . meow-line) ; end of line (effectively)
+  ;; TODO: (smart) beginning/end of lines?
 
    ;; region / selection...
+   '("m"  . meow-mark-word)
+   '("M"  . meow-mark-symbol)
    '(";"  . meow-reverse)
-   '("dd" . meow-line)
+   '("g"  . meow-cancel-selection)
+   ;; I guess "d" is some meow command menu?
+   '("dd" . meow-block)
+   '("db" . meow-to-block)
    '("dl" . meow-goto-line)
-   '("dx" . meow-cancel-selection)
    '("ds" . meow-grab)      ; create secondary selection
    '("dr" . meow-swap-grab) ; swap region and secondary selection
-   '("dz"  . meow-pop-selection)
+   '("dz" . meow-pop-selection)
 
    ;; cut / copy / paste / kill / yank / violence
    ;;   - cut / kill   = qwerty('x') = dvorak('q')
    ;;   - copy / save  = qwerty('c') = dvorak('j')
    ;;   - paste / yank = qwerty('v') = dvorak('k')
-   '("q" . meow-kill)
-   '("j" . meow-save)
-   '("k" . meow-yank)
-   '("K" . meow-replace) ; Replace current selection with yank.
+   '("q"   . meow-kill)
+   '("j"   . meow-save)
+   '("k"   . meow-yank)
+   '("K"   . meow-replace)   ; Replace current selection with yank.
    '("C-k" . meow-sync-grab) ; Sync grab to region.
 
    ;; delete / kill
    '("x" . meow-delete)
    '("X" . meow-backward-delete)
 
-  ;; lines
-  '("j" . meow-join)
-  ;; TODO: (smart) beginning/end of lines?
-
-  ;; TODO: scroll?
-  )
+   ;; scroll
+   '("C-." . scroll-down-command)
+   '("C-e" . scroll-up-command))
 
 
   ;; ┌────────────────────────────────┐
