@@ -38,7 +38,12 @@
 
 (imp:use-package persp-mode
   :unless noninteractive
-  :commands persp-switch-to-buffer
+  ;; Want `persp-mode' quite early, and all the
+  ;; "modules/emacs/perspective/perspective.el" functions need it and I don't
+  ;; feel like figuring out autoloading everything that uses...
+  :demand t
+
+  ;; :commands persp-switch-to-buffer
 
   ;;------------------------------
   :init
@@ -329,7 +334,7 @@ or on some buffer listing ops."
       (define-key map "k" #'mantle:user:deadgrep:buffer:kill) ; "Kill All 'deadgrep' Buffers"
 
       (define-key map "TAB" #'perspective:cmd:display)
-      (define-key map "n"   #'perspective:cmd:new-named)
+      (define-key map "n"   #'perspective:cmd:new/named)
       (define-key map "N"   #'perspective:cmd:new)
       (define-key map "l"   #'perspective:cmd:load)
       (define-key map "s"   #'perspective:cmd:save)
@@ -385,7 +390,7 @@ or on some buffer listing ops."
     :infix   "TAB"
     "" (list nil :which-key "Perspectives...")
     "TAB" (list #'perspective:cmd:display        :which-key "List")
-    "n"   (list #'perspective:cmd:new-named      :which-key "New")
+    "n"   (list #'perspective:cmd:new/named      :which-key "New")
     "N"   (list #'perspective:cmd:new            :which-key "New Unnamed")
     "l"   (list #'perspective:cmd:load           :which-key "Load")
     "s"   (list #'perspective:cmd:save           :which-key "Save")

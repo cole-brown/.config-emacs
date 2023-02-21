@@ -67,7 +67,6 @@
           :path     (imp:path:current:dir/relative :mantle)
           :filename "undo-tree")
 
-(message "\n\n[CONF] Keydinds!!!\n\n")
 (imp:load :feature  '(:mantle config user keybinds)
           :path     (imp:path:join (imp:path:current:dir/relative :mantle)
                                    "keybinds")

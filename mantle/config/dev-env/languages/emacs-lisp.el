@@ -211,8 +211,8 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
     ("f" mantle:user:emacs-lisp:edebug:instrument-defun/on) ; "`edebug' instrument enable"
     ("F" mantle:user:emacs-lisp:edebug:instrument-defun/off)) ; "`edebug' instrument disable"
 
-  (mantle:meow:leader/local:key 'emacs-lisp-mode-map
-                                "d" 'mantle:meow/keymap/leader:elisp/debug)
+  (mantle:meow:leader/local:key emacs-lisp-mode-map
+                                "d" mantle:meow/keymap/leader:elisp/debug)
 
   ;;---
   ;; Eval...
@@ -227,8 +227,8 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
     ("r" #'eval-region)
     ("l" #'load-library))
 
-  (mantle:meow:leader/local:key 'emacs-lisp-mode-map
-                                "e" 'mantle:meow/keymap/leader:elisp/eval)
+  (mantle:meow:leader/local:key emacs-lisp-mode-map
+                                "e" mantle:meow/keymap/leader:elisp/eval)
 
   ;;---
   ;; "Go To Considered Harmful"
@@ -241,8 +241,8 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
     ("v" #'find-variable)
     ("l" #'find-library))
 
-  (mantle:meow:leader/local:key 'emacs-lisp-mode-map
-                                "g" 'mantle:meow/keymap/leader:elisp/goto))
+  (mantle:meow:leader/local:key emacs-lisp-mode-map
+                                "g" mantle:meow/keymap/leader:elisp/goto))
 
 
 ;;------------------------------

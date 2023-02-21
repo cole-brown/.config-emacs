@@ -732,7 +732,7 @@ Example for `use-package persp-mode' `:config' section:
 ;;   :infix   "TAB"
 ;;   "" (list nil :which-key "Perspectives...")
 ;;   "TAB" (list #'perspective:cmd:display        :which-key "List")
-;;   "n"   (list #'perspective:cmd:new-named      :which-key "New")
+;;   "n"   (list #'perspective:cmd:new/named      :which-key "New")
 ;;   "N"   (list #'perspective:cmd:new            :which-key "New Unnamed")
 ;;   "l"   (list #'perspective:cmd:load           :which-key "Load")
 ;;   "s"   (list #'perspective:cmd:save           :which-key "Save")
