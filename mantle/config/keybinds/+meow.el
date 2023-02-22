@@ -329,8 +329,8 @@
            (meow-normal-define-key
             '("h" . meow-undo)
             '("H" . meow-undo-in-selection)
-            '("n" . mantle:meow/undo-tree:redo)
-            '("N" . mantle:meow/undo-tree:redo/kbd)))
+            '("n" . mantle:meow/undo:redo)
+            '("N" . mantle:meow/undo:redo-in-selection)))
 
           ;; ...or the pre-Emacs-28 standard undo ring?
           (t

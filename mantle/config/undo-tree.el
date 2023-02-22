@@ -129,13 +129,13 @@
 
   (mantle:meow:orphan:bind "C-u r"
                            undo-tree-redo
-                           mantle:meow/undo-tree:redo/kbd)
+                           mantle:meow/undo:redo/kbd)
 
   (meow-normal-define-key
    '("h" . meow-undo)
    '("H" . meow-undo-in-selection)
    '("n" . mantle:meow/undo:redo)
-   '("N" . mantle:meow/undo:redo/kbd)
+   '("N" . mantle:meow/undo:redo-in-selection)
    '("t" . undo-tree-visualize)
    '("c" . undo-tree-switch-branch))
 

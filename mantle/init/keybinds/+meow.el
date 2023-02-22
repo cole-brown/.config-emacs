@@ -241,7 +241,7 @@ From: \"add mode and meow state specific keymaps\"
 
 
   ;; TODO-meow: Patch these into meow itself?
-  (defvar mantle:meow/undo-tree:redo/kbd nil
+  (defvar mantle:meow/undo:redo/kbd nil
     "String suitable for `kbd' that calls the redo function.")
 
 
@@ -251,7 +251,7 @@ From: \"add mode and meow state specific keymaps\"
     (interactive)
     (when (region-active-p)
       (meow--cancel-selection))
-    (meow--execute-kbd-macro mantle:meow/undo-tree:redo/kbd))
+    (meow--execute-kbd-macro mantle:meow/undo:redo/kbd))
 
 
   ;; TODO-meow: Patch these into meow itself?
@@ -259,7 +259,7 @@ From: \"add mode and meow state specific keymaps\"
     "Redo in current region."
     (interactive)
     (when (region-active-p)
-      (meow--execute-kbd-macro mantle:meow/undo-tree:redo/kbd)))
+      (meow--execute-kbd-macro mantle:meow/undo:redo/kbd)))
 
 
   ;;------------------------------
