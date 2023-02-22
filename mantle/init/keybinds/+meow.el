@@ -51,9 +51,9 @@ other things and refuses to refer to it by name? *shrug*")
        (global-set-key (kbd key/bind-to)
                        #',func)
        (innit:customize-set-variable ,var key/bind-to)))
-  (mantle:meow:orphan:bind "C-k"
-                           kill-line
-                           meow--kbd-kill-line)
+  ;; (mantle:meow:orphan:bind "C-k"
+  ;;                          kill-line
+  ;;                          meow--kbd-kill-line)
 
 
   (defconst mantle:meow:leader/local:prefix '(:emacs "C-c M-m"
@@ -238,6 +238,28 @@ From: \"add mode and meow state specific keymaps\"
    ;;  ;; Add entry to the (global) leader.
    ;;  (meow-leader-define-key (cons (plist-get mantle:meow:leader/local:prefix :meow)
    ;;                                (plist-get mantle:meow:leader/local:prefix :emacs))))
+
+
+  ;; TODO-meow: Patch these into meow itself?
+  (defvar mantle:meow/undo-tree:redo/kbd nil
+    "String suitable for `kbd' that calls the redo function.")
+
+
+  ;; TODO-meow: Patch these into meow itself?
+  (defun mantle:meow/undo:redo ()
+    "Cancel current selection then redo."
+    (interactive)
+    (when (region-active-p)
+      (meow--cancel-selection))
+    (meow--execute-kbd-macro mantle:meow/undo-tree:redo/kbd))
+
+
+  ;; TODO-meow: Patch these into meow itself?
+  (defun mantle:meow/undo:redo-in-selection ()
+    "Redo in current region."
+    (interactive)
+    (when (region-active-p)
+      (meow--execute-kbd-macro mantle:meow/undo-tree:redo/kbd)))
 
 
   ;;------------------------------

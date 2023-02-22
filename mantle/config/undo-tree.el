@@ -123,9 +123,19 @@
   :config
   ;;------------------------------
 
+  (mantle:meow:orphan:bind "C-u u"
+                           undo-tree-undo
+                           meow--kbd-undo)
+
+  (mantle:meow:orphan:bind "C-u r"
+                           undo-tree-redo
+                           mantle:meow/undo-tree:redo/kbd)
+
   (meow-normal-define-key
-   '("h" . undo-tree-undo)
-   '("n" . undo-tree-redo)
+   '("h" . meow-undo)
+   '("H" . meow-undo-in-selection)
+   '("n" . mantle:meow/undo:redo)
+   '("N" . mantle:meow/undo:redo/kbd)
    '("t" . undo-tree-visualize)
    '("c" . undo-tree-switch-branch))
 
