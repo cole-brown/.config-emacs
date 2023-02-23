@@ -263,22 +263,17 @@ From: \"add mode and meow state specific keymaps\"
 
 
   ;;------------------------------
-  :custom
-  ;;------------------------------
-
-  ;; Don't aggregate all actions while in insert state into a single undo action.
-  ;; Act like normal Emacs instead.
-  (meow-cheatsheet-layout (cond ((imp:flag? :keyboard +dvorak)
-                                 meow-cheatsheet-layout-dvorak)
-                                ((imp:flag? :keyboard +qwerty)
-                                 meow-cheatsheet-layout-qwerty)
-                                (t
-                                 meow-cheatsheet-layout)))
-
-
-  ;;------------------------------
   :config
   ;;------------------------------
+
+  ;; `M-x meow-cheatsheet' keyboard layout.
+  ;; NOTE: This didn't work in the `:custom' section.
+  (setq meow-cheatsheet-layout (cond ((imp:flag? :keyboard +dvorak)
+                                      meow-cheatsheet-layout-dvorak)
+                                     ((imp:flag? :keyboard +qwerty)
+                                      meow-cheatsheet-layout-qwerty)
+                                     (t
+                                      meow-cheatsheet-layout)))
 
   ;;---
   ;; Meow "Local" Leader Entries
