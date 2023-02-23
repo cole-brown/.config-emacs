@@ -214,41 +214,39 @@
   :after meow
 
   ;;------------------------------
-  :config ; meow
+  :bind ; meow
+  ;;------------------------------
+
+  (:map deadgrep-mode-map ; TODO: Rebind (more) keybinds from this map?
+   ("k" . window:kill-or-quit) ; 'kill-or-quit' instead of 'quit-or-kill'
+   ("/" . deadgrep-restart)    ; "↺ Refresh" / rerun search
+   ;; Normal Enter/Return is "visit in other window".
+   ("RET"   . deadgrep-visit-result-other-window)
+   ("S-RET" . deadgrep-visit-result))
+
+  ;;------------------------------
+  :config
   ;;------------------------------
 
   ;;---
   ;; Global Keybinds
   ;;---
-  (defvar mantle:meow/keymap/global:search
-    (let ((map (make-sparse-keymap)))
-      (define-key map "/" #'deadgrep) ; "`rg' @ project root"
-      (define-key map "." #'mantle:user:deadgrep:default-directory) ; "`rg' @ default-directory")
-      ;; TODO: A deadgrep search that lets me choose the starting dir?
-      ;; (define-key map "?" #'mantle:user:deadgrep:default-directory) ; "`rg' @...")
-      (define-key map "k" #'mantle:user:deadgrep:buffer:kill) ; "Kill All 'deadgrep' Buffers"
 
-      map)
-    "Keymap for `deadgrep' commands that should be available globally.")
-
-  ;; TODO-meow: This should be a `meow-normal-define-key'!
-  (meow-leader-define-key
-   (cons "/" mantle:meow/keymap/global:search))
-
+  (transient-define-prefix mantle:meow/transient:search ()
+    "Search commands that should be available globally."
+    [("/" "`rg' @ project root"         deadgrep)]
+    [("." "`rg' @ default-directory"    mantle:user:deadgrep:default-directory)]
+    ;; TODO: A deadgrep search that lets me choose the starting dir?
+    ;; [("?" "`rg' @ ..."                  mantle:user:deadgrep:default-directory)]
+    [("k" "Kill All 'deadgrep' Buffers" mantle:user:deadgrep:buffer:kill)])
 
   ;;---
-  ;; `deadgrep-mode-map' Keybinds
+  ;; Entrypoint
   ;;---
 
-  ;; TODO-meow: Is this only for `deadgrep-mode-map'?
-  ;; TODO: Rebind (more) keybinds from this map?
+  ;; "f [...]"
   (meow-normal-define-key
-   '("k" . window:kill-or-quit) ; 'kill-or-quit' instead of 'quit-or-kill'
-   '("g" . deadgrep-restart)    ; "↺ Refresh" / rerun search
-
-   ;; Normal Enter/Return is "visit in other window".
-   '("RET"   . deadgrep-visit-result-other-window)
-   '("S-RET" . deadgrep-visit-result)))
+   '("/" . mantle:meow/transient:search))) ; :which-key "Search..."
 
 
 ;;------------------------------
