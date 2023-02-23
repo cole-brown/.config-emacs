@@ -231,8 +231,9 @@
       map)
     "Keymap for `deadgrep' commands that should be available globally.")
 
+  ;; TODO-meow: This should be a `meow-normal-define-key'!
   (meow-leader-define-key
-   '("/" . mantle:meow/keymap/global:search))
+   (cons "/" mantle:meow/keymap/global:search))
 
 
   ;;---

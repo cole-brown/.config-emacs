@@ -360,7 +360,7 @@ or on some buffer listing ops."
     "Keymap for perspective commands that should be available globally.")
 
   (meow-leader-define-key
-   '("TAB" . mantle:meow/keymap/leader:perspectives)))
+   (cons "TAB" mantle:meow/keymap/leader:perspectives)))
 
 
 ;;------------------------------

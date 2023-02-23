@@ -225,7 +225,7 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
 
   ;; Snippets are quite common - put them outside the leader key.
   (meow-leader-define-key
-   '("b" . mantle:meow/keymap/normal:snippet)))
+   (cons "b" mantle:meow/keymap/normal:snippet)))
 
 
 ;;------------------------------

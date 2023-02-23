@@ -93,7 +93,7 @@
     "Keymap for version control (`magit', etc) commands that should be available globally.")
 
   (meow-leader-define-key
-   '("g" . mantle:meow/keymap/global:version-control)))
+   (cons "g" mantle:meow/keymap/global:version-control)))
 
 
 ;;------------------------------
