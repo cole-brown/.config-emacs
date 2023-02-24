@@ -205,44 +205,41 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   ;;---
   ;; Debug...
   ;;---
-  (mantle:meow:keymap
-      mantle:meow/keymap/leader:elisp/debug
-      "Debug commands in Meow \"Local\" Leader for Emacs Lisp Mode."
-    ("f" mantle:user:emacs-lisp:edebug:instrument-defun/on) ; "`edebug' instrument enable"
-    ("F" mantle:user:emacs-lisp:edebug:instrument-defun/off)) ; "`edebug' instrument disable"
+  (transient-define-prefix mantle:meow/transient:elisp:debug ()
+    "Debug commands in Meow \"Local\" Leader for Emacs Lisp Mode."
+    [("f" "`edebug' instrument enable"  mantle:user:emacs-lisp:edebug:instrument-defun/on)]
+    [("F" "`edebug' instrument disable" mantle:user:emacs-lisp:edebug:instrument-defun/off)])
 
   (mantle:meow:leader/local:key emacs-lisp-mode-map
-                                "d" mantle:meow/keymap/leader:elisp/debug)
+                                "d" #'mantle:meow/transient:elisp:debug)
 
   ;;---
   ;; Eval...
   ;;---
-  (mantle:meow:keymap
-      mantle:meow/keymap/leader:elisp/eval
-      "Eval commands in Meow \"Local\" Leader for Emacs Lisp Mode."
-    ("b" #'eval-buffer)
-    ("d" #'eval-defun)
-    ("e" #'eval-last-sexp)
-    ("E" #'pp-eval-last-sexp)
-    ("r" #'eval-region)
-    ("l" #'load-library))
+  (transient-define-prefix mantle:meow/transient:elisp:eval ()
+    "Eval commands in Meow \"Local\" Leader for Emacs Lisp Mode."
+    [("b" "eval-buffer"       eval-buffer)]
+    [("d" "eval-defun"        eval-defun)]
+    [("e" "eval-last-sexp"    eval-last-sexp)]
+    [("E" "pp-eval-last-sexp" pp-eval-last-sexp)]
+    [("r" "eval-region"       eval-region)]
+    [("l" "load-library"      load-library)])
 
   (mantle:meow:leader/local:key emacs-lisp-mode-map
-                                "e" mantle:meow/keymap/leader:elisp/eval)
+                                "e" #'mantle:meow/transient:elisp:eval)
 
   ;;---
-  ;; "Go To Considered Harmful"
+  ;; Find...
   ;;---
-  (mantle:meow:keymap
-      mantle:meow/keymap/leader:elisp/goto
-      "Eval commands in Meow \"Local\" Leader for Emacs Lisp Mode."
-    ("f" #'find-function)
-    ("F" #'find-function-at-point)
-    ("v" #'find-variable)
-    ("l" #'find-library))
+  (transient-define-prefix mantle:meow/transient:elisp:find ()
+    "Find commands in Meow \"Local\" Leader for Emacs Lisp Mode."
+    [("f" "find-function"          find-function)]
+    [("F" "find-function-at-point" find-function-at-point)]
+    [("v" "find-variable"          find-variable)]
+    [("l" "find-library"           find-library)])
 
   (mantle:meow:leader/local:key emacs-lisp-mode-map
-                                "g" mantle:meow/keymap/leader:elisp/goto))
+                                "g" #'mantle:meow/transient:elisp:find))
 
 
 ;;------------------------------
