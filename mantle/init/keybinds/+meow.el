@@ -56,39 +56,15 @@ other things and refuses to refer to it by name? *shrug*")
   ;;                          meow--kbd-kill-line)
 
 
-  (defconst mantle:meow:leader/local:prefix '(:emacs "C-c M-m"
-                                              :meow  "m")
-    "A prefix to bind commands to for Meow \"local\" leader.")
+  (defconst mantle:meow:leader/local:prefix '(:emacs "C-x M-l" ; -> "SPC l"
+                                              ;; :emacs "C-x M-m" ; -> "SPC c m m"
+                                              :meow  "l")
+    "A prefix to bind commands to for Meow \"local\" leader.
 
-
-  (defmacro mantle:meow:keymap (symbol docstr &rest keybind)
-    "Macro to create a (sparse) keymap named SYMBOL populated with KEYS.
-
-SYMBOL should be an unquoted symbol.
-
-DOCSTR should be a document string for SYMBOL's `defvar'.
-
-Each KEYBIND should be a list of args to pass to `define-key'."
-    (declare (indent 2) (doc-string 2))
-    `(defvar ,(elisp:unquote symbol) "hello there" nil))
-   ;;  `(progn
-   ;;     (message "mantle:meow:keymap(%S %S)" ',symbol ',keybind)
-   ;;  (defvar ,(elisp:unquote symbol)
-   ;;     (let ((map (make-sparse-keymap)))
-   ;;       (dolist (each ',keybind)
-   ;;         (apply #'define-key map (elisp:unquote each)))
-   ;;       map)
-   ;;     docstr)))
-  ;; (mantle:meow:keymap
-  ;;     'test:keymap:foo
-  ;;     "bar"
-  ;;   '("a" ignore)
-  ;;   '("b" identity))
-  ;; (mantle:meow:keymap
-  ;;     test:keymap:foo
-  ;;     "bar"
-  ;;   ("a" ignore)
-  ;;   ("b" identity))
+Have to avoid all the \"special\" keys that Meow Keypad state uses.
+See: https://github.com/meow-edit/meow/blob/master/TUTORIAL.org#keypad
+Example: 'SPC m' actual means 'M-', so you can't actually bind anything
+to 'm' in the Meow Leader.")
 
 
   (defun mantle:meow:leader/local:key (map key func)
@@ -102,65 +78,78 @@ MAP should be a keymap or nil(ish). Add to the global keymap if MAP is:
 KEY shoud be a string. It will be appended to `mantle:meow:leader/local:prefix'
 and then passed through `kbd'.
 
-FUNC should be the function/command to bind."
-    `(ignore ',map ',key ',func))
-   ;;  (let ((func/name "mantle:meow:leader/local:key")
-   ;;        ;; Normalize global MAP to nil.
-   ;;        (keymap (if (memq map '(:global global))
-   ;;                    nil
-   ;;                  map)))
-  ;;
-   ;;    ;;------------------------------
-   ;;    ;; Error Checks
-   ;;    ;;------------------------------
-   ;;    ;; Check normalized `keymap', report error on original MAP.
-   ;;    (unless (or (null keymap)
-   ;;                (keymapp keymap))
-   ;;      (nub:error
-   ;;          :innit
-   ;;          func/name
-   ;;        "MAP must be a keymap (or nil/`:global'/`global' for global keymap)! Got %S: %S"
-   ;;        (type-of map)
-   ;;        map))
-  ;;
-   ;;    (unless (stringp key)
-   ;;      (nub:error
-   ;;          :innit
-   ;;          func/name
-   ;;        "KEY must be a string! Got %S: %S"
-   ;;        (type-of key)
-   ;;        key))
-  ;;
-   ;;    (unless (or (commandp func)
-   ;;                (keymapp func))
-   ;;      (nub:error
-   ;;          :innit
-   ;;          func/name
-   ;;        "FUNC must be a command (interactive function) or keymap! Got %S: %S"
-   ;;        (type-of func)
-   ;;        func))
-  ;;
-   ;;    ;;------------------------------
-   ;;    ;; Create Keybind
-   ;;    ;;------------------------------
-   ;;    (if (null keymap)
-   ;;        ;; Global keybind.
-   ;;        (global-set-key (kbd (concat (plist-get mantle:meow:leader/local:prefix :emacs)
-   ;;                                     " "
-   ;;                                     key))
-   ;;                        func)
-   ;;      ;; Local keybind.
-   ;;      (message "define-key(%S %S %S)"
-   ;;               keymap
-   ;;               (concat (plist-get mantle:meow:leader/local:prefix :emacs)
-   ;;                     " "
-   ;;                     key)
-   ;;               func)
-   ;;      (define-key keymap
-   ;;        (kbd (concat (plist-get mantle:meow:leader/local:prefix :emacs)
-   ;;                     " "
-   ;;                     key))
-   ;;        func))))
+FUNC should be the function/command to bind.
+
+This will bind FUNC to a /Vanilla Emacs Keybind/! For example:
+  (mantle:meow:leader/local:key 'org-mode-map \"x\" #'org-md-export-as-markdown)
+
+This actually technically binds `org-md-export-as-markdown' to \"C-c M-m x\",
+and if `mantle:meow:leader/local:init' has been run it will be Meow keybind
+\"SPC m x\" (assuming `mantle:meow:leader/local:prefix' hasn't changed from
+default)."
+    (let ((func/name "mantle:meow:leader/local:key")
+          ;; Normalize global MAP to nil.
+          (keymap (if (memq map '(:global global))
+                      nil
+                    map)))
+
+      ;;------------------------------
+      ;; Error Checks
+      ;;------------------------------
+      ;; Check normalized `keymap', report error on original MAP.
+      (unless (or (null keymap)
+                  (keymapp keymap))
+        (nub:error
+            :innit
+            func/name
+          "MAP must be a keymap (or nil/`:global'/`global' for global keymap)! Got %S: %S"
+          (type-of map)
+          map))
+
+      (unless (stringp key)
+        (nub:error
+            :innit
+            func/name
+          "KEY must be a string! Got %S: %S"
+          (type-of key)
+          key))
+
+      (cond ((commandp func)
+             nil)
+            ;; Can't use keymaps in `meow' leader? Or, rather, it doesn't like a
+            ;; keymap of keymaps? Says "f f is not defined" for "SPC f f" where
+            ;; "SPC f" was a keymap and "f" was an entry in that keymap that was
+            ;; also a keymap.
+            ((keymapp func)
+             (nub:error
+                 :innit
+                 func/name
+               "FUNC cannot be a keymap; it must be a command (interactive function)! Got %S: %S"
+               (type-of func)
+               func))
+            (nil
+             (nub:error
+                 :innit
+                 func/name
+               "FUNC must be a command (interactive function)! Got %S: %S"
+               (type-of func)
+               func)))
+
+      ;;------------------------------
+      ;; Create Keybind
+      ;;------------------------------
+      (if (null keymap)
+          ;; Global keybind.
+          (global-set-key (kbd (concat (plist-get mantle:meow:leader/local:prefix :emacs)
+                                       " "
+                                       key))
+                          func)
+        ;; Local keybind.
+        (define-key keymap
+          (kbd (concat (plist-get mantle:meow:leader/local:prefix :emacs)
+                       " "
+                       key))
+          func))))
 
 
   (defun mantle:meow:leader/local:keys (map &rest keybind)
@@ -175,23 +164,22 @@ KEYBINDs should be should be a sequence of keys and functions:
   - key      : string fit for `kbd'
   - function : quote function
 See `mantle:meow:leader/local:key'."
-    (ignore ',map ',keybind))
-   ;;  (let ((func/name "mantle:meow:leader/local:keys"))
-   ;;  (unless keybind
-   ;;      (nub:error
-   ;;          :innit
-   ;;          func/name
-   ;;        "Must have one or more KEYBIND list/cons! Got: %S"
-   ;;        keybind))
-   ;;  (let (key)
-   ;;    (dolist (each keybind)
-   ;;      ;; Is this the key or the function?
-   ;;      (if (not key)
-   ;;          ;; Save key; continue on to next in KEYBINDs for func...
-   ;;          (setq key each)
-   ;;        ;; Create the keybind in the map.
-   ;;        (mantle:meow:leader/local:key map key each)
-   ;;        (setq key nil))))))
+    (let ((func/name "mantle:meow:leader/local:keys"))
+      (unless keybind
+        (nub:error
+            :innit
+            func/name
+          "Must have one or more KEYBIND list/cons! Got: %S"
+          keybind))
+      (let (key)
+        (dolist (each keybind)
+          ;; Is this the key or the function?
+          (if (not key)
+              ;; Save key; continue on to next in KEYBINDs for func...
+              (setq key each)
+            ;; Create the keybind in the map.
+            (mantle:meow:leader/local:key map key each)
+            (setq key nil))))))
 
 
   (defun mantle:meow:leader/local:init ()
@@ -234,10 +222,9 @@ From: \"add mode and meow state specific keymaps\"
  │ Then you have consistent keybinding SPC t i in leader and C-x M-t i in vanilla Emacs.
  │
  └── https://github.com/meow-edit/meow/pull/126#issuecomment-992004368"
-    (ignore))
-   ;;  ;; Add entry to the (global) leader.
-   ;;  (meow-leader-define-key (cons (plist-get mantle:meow:leader/local:prefix :meow)
-   ;;                                (plist-get mantle:meow:leader/local:prefix :emacs))))
+    ;; Add entry to the (global) leader.
+    (meow-leader-define-key (cons (plist-get mantle:meow:leader/local:prefix :meow)
+                                  (plist-get mantle:meow:leader/local:prefix :emacs))))
 
 
   ;; TODO-meow: Patch these into meow itself?
