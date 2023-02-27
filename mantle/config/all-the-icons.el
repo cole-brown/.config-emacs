@@ -71,10 +71,16 @@ Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
   - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
 
 HEIGHT and V-ADJUST are sent to `all-the-icons-faicon'.
 
 ICON-COLOR is used to color only the icon character.
+
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 NOTE: Used to be `with-fa'.
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
@@ -97,10 +103,16 @@ Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
   - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
 
 HEIGHT and V-ADJUST are sent to `all-the-icons-fileicon'.
 
 ICON-COLOR is used to color only the icon character.
+
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
   ;; Want to keep the variables named properly, as the actual function (aka
@@ -120,10 +132,16 @@ Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
   - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
 
 HEIGHT and V-ADJUST are sent to `all-the-icons-octicon'.
 
 ICON-COLOR is used to color only the icon character.
+
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
   ;; Want to keep the variables named properly, as the actual function (aka
@@ -143,10 +161,16 @@ Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
   - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
 
 HEIGHT and V-ADJUST are sent to `all-the-icons-material'.
 
 ICON-COLOR is used to color only the icon character.
+
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
   ;; Want to keep the variables named properly, as the actual function (aka
@@ -167,6 +191,8 @@ Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
   - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
 
 SEPARATOR, a string to use to separate the icon and STR. Defaults to \" \".
 If no separator is desired, supply something that is not a string, like `:none'
@@ -186,6 +212,10 @@ If this is not desired, supply the correct V-ADJUST.
 HEIGHT and V-ADJUST are sent to `all-the-icons-icon-for-mode'.
 
 ICON-COLOR is used to color only the icon character.
+
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
   ;; Want to keep the variables named properly, as the actual function (aka
@@ -204,6 +234,28 @@ ICON-COLOR is used to color only the icon character.
 
 ;; Wait for `all-the-icons' to appear.
 (imp:eval:after all-the-icons
+
+  (defun int<mantle>:user:icon:face (plist)
+    "Get face to use from PLIST.
+
+Check `:face' and `:color:icon'.
+Return nil if no face found."
+    (cond ((plist-get plist :face))
+          ((plist-member plist :color:icon)
+           (list :foreground (plist-get plist :color:icon))
+           (t
+            nil))))
+
+
+  (defun +modeline-format-icon (icon label &optional face help-echo voffset)
+  (propertize (concat (all-the-icons-material
+                       icon
+                       :face face
+                       :height 1.1
+                       :v-adjust (or voffset -0.225))
+                      (propertize label 'face face))
+              'help-echo help-echo))
+
   ;; Advice via `define-advice' is named SYMBOL@NAME, so in this case the advice
   ;; function is `mantle:user:icon/font-awesome@mantle:override'.
   (define-advice mantle:user:icon/font-awesome (:override (icon str &rest plist) mantle:override)
@@ -213,24 +265,30 @@ Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
   - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
+
 
 HEIGHT and V-ADJUST are sent to `all-the-icons-faicon'.
 
 ICON-COLOR is used to color only the icon character.
 
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
+
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
     ;; Only bother propertizing if we need to.
-    (let ((face (if (plist-member plist :color:icon)
-                    (list :foreground (plist-get plist :color:icon))
-                  nil)))
-
+    (let ((face (int<mantle>:user:icon:face plist)))
       (concat
        (all-the-icons-faicon icon
                              :face face
                              :v-adjust (or (plist-get plist :v-adjust) 0)
                              :height (or (plist-get plist :height) 1))
        " "
-       str)))
+       (if face
+           (propertize str 'face face)
+         str))))
   ;; (mantle:user:icon/font-awesome "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05)
   ;; (insert (mantle:user:icon/font-awesome "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05))
 
@@ -242,24 +300,30 @@ Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
   - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
 
 HEIGHT and V-ADJUST are sent to `all-the-icons-fileicon'.
 
 ICON-COLOR is used to color only the icon character.
 
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
+
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
     ;; Only bother propertizing if we need to.
-    (let ((face (if (plist-member plist :color:icon)
-                    (list :foreground (plist-get plist :color:icon))
-                  nil)))
-
+    (let ((face (int<mantle>:user:icon:face plist)))
       (concat
        (all-the-icons-fileicon icon
                                :face face
                                :v-adjust (or (plist-get plist :v-adjust) 0)
                                :height (or (plist-get plist :height) 1))
        " "
-       str)))
+              (if face
+           (propertize str 'face face)
+         str))))
+
 
 
   (define-advice mantle:user:icon/octicon (:override (icon str &rest plist) mantle:override)
@@ -269,24 +333,30 @@ Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
   - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
 
 HEIGHT and V-ADJUST are sent to `all-the-icons-octicon'.
 
 ICON-COLOR is used to color only the icon character.
 
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
+
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
     ;; Only bother propertizing if we need to.
-    (let ((face (if (plist-member plist :color:icon)
-                    (list :foreground (plist-get plist :color:icon))
-                  nil)))
-
+    (let ((face (int<mantle>:user:icon:face plist)))
       (concat
        (all-the-icons-octicon icon
                               :face face
                               :v-adjust (or (plist-get plist :v-adjust) 0)
                               :height (or (plist-get plist :height) 1))
        " "
-       str)))
+              (if face
+           (propertize str 'face face)
+         str))))
+
 
 
   (define-advice mantle:user:icon/material (:override (icon str &rest plist) mantle:override)
@@ -296,24 +366,30 @@ Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
   - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
 
 HEIGHT and V-ADJUST are sent to `all-the-icons-material'.
 
 ICON-COLOR is used to color only the icon character.
 
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
+
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
     ;; Only bother propertizing if we need to.
-    (let ((face (if (plist-member plist :color:icon)
-                    (list :foreground (plist-get plist :color:icon))
-                  nil)))
-
+    (let ((face (int<mantle>:user:icon:face plist)))
       (concat
        (all-the-icons-material icon
                                :face face
                                :v-adjust (or (plist-get plist :v-adjust) 0)
                                :height (or (plist-get plist :height) 1))
        " "
-       str)))
+              (if face
+           (propertize str 'face face)
+         str))))
+
 
 
   (define-advice mantle:user:icon:for-mode (:override (icon str &rest plist) mantle:override)
@@ -324,6 +400,8 @@ Optional PLIST's optional keys:
   - `:height'     - HEIGHT
   - `:v-adjust'   - V-ADJUST
   - `:color:icon' - ICON-COLOR
+  - `:face'       - FACE
+  - `:help:echo'  - HELP-ECHO
 
 SEPARATOR, a string to use to separate the icon and STR. Defaults to \" \".
 If no separator is desired, supply something that is not a string, like `:none'
@@ -344,6 +422,10 @@ HEIGHT and V-ADJUST are sent to `all-the-icons-icon-for-mode'.
 
 ICON-COLOR is used to color only the icon character.
 
+FACE is used for the icon and label.
+
+HELP-ECHO should be a string and will be put in the `help-echo' property.
+
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
     ;; Only bother propertizing if we need to.
     (let* ((height    (plist-get plist :height))
@@ -351,9 +433,7 @@ ICON-COLOR is used to color only the icon character.
                           (if (eq major-mode 'emacs-lisp-mode)
                               0.0
                             0.05)))
-           (face      (if (plist-member plist :color:icon)
-                          (list :foreground (plist-get plist :color:icon))
-                        nil))
+           (face (int<mantle>:user:icon:face plist))
            (separator (if (stringp (plist-get plist :separator))
                           (plist-get plist :separator)
                         " "))
@@ -369,7 +449,11 @@ ICON-COLOR is used to color only the icon character.
                                                  :v-adjust v-adjust)
                         icon)))
 
-      (concat icon separator str))))
+      (concat icon
+              separator
+              (if face
+                  (propertize str 'face face)
+                str)))))
 
 
 ;;------------------------------------------------------------------------------
