@@ -10,6 +10,54 @@
   (not (null (string-match-p (regexp-quote needle) haystack))))
 
 
+(defun str:trim (str &rest args)
+  "Remove whitespace from STR.
+
+ARGS can contain:
+  - `:left', 'left'
+  - `:right', `right'
+  - `:full', `full', `:both', `both'
+    - default"
+  (declare (pure t) (side-effect-free t))
+  (let (trim/left
+        trim/right)
+
+    (dolist (arg args)
+      (pcase arg
+        ((or :left 'left)
+         (setq trim/left t))
+        ((or :right 'right)
+         (setq trim/right t))
+        ((or :full 'full :both 'both)
+         (setq trim/right t
+               trim/left  t))))
+
+    (string-trim str trim/left trim/right)))
+;; (str:trim " foo " :left)
+;; (str:trim " foo " :left :right)
+;; (str:trim " foo " :left :both)
+
+
+(defun str:empty? (str &optional trim-args)
+  "Return non-nil if STR is nil or empty.
+
+See `str:trim' for TRIM-ARGS. TL;DR:
+  - `:left', 'left'
+  - `:right', `right'
+  - `:full', `full', `:both', `both'
+  - nil (no trimming)
+    - default"
+  (or (null str)
+      (string= ""
+               (if trim-args
+                   (str:trim str)
+                 str))))
+;; (str:empty? nil)
+;; (str:empty? "")
+;; (str:empty? " ")
+;; (str:empty? " " :full)
+
+
 ;;------------------------------------------------------------------------------
 ;; Regions
 ;;------------------------------------------------------------------------------
