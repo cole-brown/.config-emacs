@@ -30,7 +30,10 @@
             :filename "predicates")
   (imp:load :feature  '(:elisp utils test)
             :path     (imp:path:current:dir/relative :elisp)
-            :filename "test"))
+            :filename "test")
+  (imp:load :feature  '(:elisp utils units)
+            :path     (imp:path:current:dir/relative :elisp)
+            :filename "units"))
 
 
 ;;------------------------------------------------------------------------------
