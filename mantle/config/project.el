@@ -190,10 +190,9 @@
   ;;------------------------------
   :general ; emacs
   ;;------------------------------
-  (keybind:global:def
-    :map   projectile-mode-map
-    [remap evil-jump-to-tag] #'projectile-find-tag
-    [remap find-tag]         #'projectile-find-tag))
+  (:map   projectile-mode-map
+   [remap evil-jump-to-tag] #'projectile-find-tag
+   [remap find-tag]         #'projectile-find-tag))
 
 
 ;;------------------------------
@@ -211,10 +210,11 @@
   ;; ("C-c r" . projectile-command-map)
 
   ;;------------------------------
-  :bind ; meow
+  :general ; meow
   ;;------------------------------
-  (([remap evil-jump-to-tag] . #'projectile-find-tag)
-   ([remap find-tag]         . #'projectile-find-tag)))
+  (:map   projectile-mode-map
+   [remap evil-jump-to-tag] #'projectile-find-tag
+   [remap find-tag]         #'projectile-find-tag))
 
 
 ;;------------------------------
@@ -228,10 +228,9 @@
   ;;------------------------------
   :general ; evil
   ;;------------------------------
-  (keybind:global:def
-    :map   projectile-mode-map
-    [remap evil-jump-to-tag] #'projectile-find-tag
-    [remap find-tag]         #'projectile-find-tag))
+  (:map   projectile-mode-map
+   [remap evil-jump-to-tag] #'projectile-find-tag
+   [remap find-tag]         #'projectile-find-tag))
 
 
 ;;------------------------------------------------------------------------------

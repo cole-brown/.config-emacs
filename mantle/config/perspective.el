@@ -314,53 +314,88 @@ or on some buffer listing ops."
   :after  meow
 
   ;;------------------------------
-  :bind ; meow
-  ;;------------------------------
-
-  (:map mantle:meow/keymap/leader:buffer
-   ("b" . persp-switch-to-buffer))
-
-
-  ;;------------------------------
   :config
   ;;------------------------------
 
-  (defvar mantle:meow/keymap/leader:perspectives
-    (let ((map (make-sparse-keymap)))
-      (define-key map "/" #'deadgrep) ; "`rg' @ project root"
-      (define-key map "." #'mantle:user:deadgrep:default-directory) ; "`rg' @ default-directory")
-      ;; TODO: A deadgrep search that lets me choose the starting dir?
-      ;; (define-key map "?" #'mantle:user:deadgrep:default-directory) ; "`rg' @...")
-      (define-key map "k" #'mantle:user:deadgrep:buffer:kill) ; "Kill All 'deadgrep' Buffers"
+  ;; Replace "Switch Buffer" with `persp-mode' aware function.
+  ;; See: "mantle/config/keybinds/buffer.el" for buffer transient.
+  (transient-replace-suffix 'mantle:meow/transient:buffer
+    "b"
+    '("b" "Switch Perspective Buffer" persp-switch-to-buffer))
+  ;; (transient-get-suffix 'mantle:meow/transient:buffer "b")
 
-      (define-key map "TAB" #'perspective:cmd:display)
-      (define-key map "n"   #'perspective:cmd:new/named)
-      (define-key map "N"   #'perspective:cmd:new)
-      (define-key map "l"   #'perspective:cmd:load)
-      (define-key map "s"   #'perspective:cmd:save)
-      ;; (define-key map "x"   #'perspective:cmd:kill)
-      (define-key map "d"   #'perspective:cmd:delete)
-      (define-key map "r"   #'perspective:cmd:rename)
-      (define-key map "]"   #'perspective:cmd:cycle/right)
-      (define-key map "["   #'perspective:cmd:cycle/left)
-      (define-key map "."   #'perspective:cmd:switch/index)
-      (define-key map "`"   #'perspective:cmd:switch/last )
-      (define-key map "1"   #'perspective:cmd:switch/index:0)
-      (define-key map "2"   #'perspective:cmd:switch/index:1)
-      (define-key map "3"   #'perspective:cmd:switch/index:2)
-      (define-key map "4"   #'perspective:cmd:switch/index:3)
-      (define-key map "5"   #'perspective:cmd:switch/index:4)
-      (define-key map "6"   #'perspective:cmd:switch/index:5)
-      (define-key map "7"   #'perspective:cmd:switch/index:6)
-      (define-key map "8"   #'perspective:cmd:switch/index:7)
-      (define-key map "9"   #'perspective:cmd:switch/index:8)
-      (define-key map "0"   #'perspective:cmd:switch/final)
-
-      map)
-    "Keymap for perspective commands that should be available globally.")
+  ;; Transient for common persp-mode commands.
+  (transient-define-prefix mantle:meow/transient:perspective ()
+    "Keymap for perspective commands that should be available globally."
+    ["Perspectives..."
+     [:description ""
+      ("TAB" "List" perspective:cmd:display)
+      ("n"   "New..." perspective:cmd:new/named)
+      ("N"   "New Unnamed" perspective:cmd:new)
+      ("l"   "Load" perspective:cmd:load)
+      ("s"   "Save" perspective:cmd:save)
+      ;; ("x"   "Kill All" perspective:cmd:kill)
+      ("d"   "Delete" perspective:cmd:delete)
+      ("r"   "Rename" perspective:cmd:rename)
+      ("]"   "Cycle: Right" perspective:cmd:cycle/right)
+      ("["   "Cycle: Left" perspective:cmd:cycle/left)]
+     [:description "Switch Indexed..."
+      ("1"  "Switch: 1st"         perspective:cmd:switch/index:0)
+      ("2"  "Switch: 2nd"         perspective:cmd:switch/index:1)
+      ("3"  "Switch: 3rd"         perspective:cmd:switch/index:2)
+      ("4"  "Switch: 4th"         perspective:cmd:switch/index:3)
+      ("5"  "Switch: 5th"         perspective:cmd:switch/index:4)
+      ("6"  "Switch: 6th"         perspective:cmd:switch/index:5)
+      ("7"  "Switch: 7th"         perspective:cmd:switch/index:6)
+      ("8"  "Switch: 8th"         perspective:cmd:switch/index:7)
+      ("9"  "Switch: 9th"         perspective:cmd:switch/index:8)]
+     [:description "Switch..."
+      ("0"  "Switch to Final"       perspective:cmd:switch/final)
+      ("."  "Switch to index..." perspective:cmd:switch/index)
+      ("`"  "Switch to Previous"    perspective:cmd:switch/last)]])
 
   (meow-leader-define-key
-   (cons "TAB" mantle:meow/keymap/leader:perspectives)))
+   '("TAB" . mantle:meow/transient:perspective))
+
+
+  ;; TODO-meow: Do I prefer the new transient or the old keymap?
+  ;; (defvar mantle:meow/keymap/leader:perspectives
+  ;;   (let ((map (make-sparse-keymap)))
+  ;;     (define-key map "/" #'deadgrep) ; "`rg' @ project root"
+  ;;     (define-key map "." #'mantle:user:deadgrep:default-directory) ; "`rg' @ default-directory")
+  ;;     ;; TODO: A deadgrep search that lets me choose the starting dir?
+  ;;     ;; (define-key map "?" #'mantle:user:deadgrep:default-directory) ; "`rg' @...")
+  ;;     (define-key map "k" #'mantle:user:deadgrep:buffer:kill) ; "Kill All 'deadgrep' Buffers"
+  ;;
+  ;;     (define-key map "TAB" #'perspective:cmd:display)
+  ;;     (define-key map "n"   #'perspective:cmd:new/named)
+  ;;     (define-key map "N"   #'perspective:cmd:new)
+  ;;     (define-key map "l"   #'perspective:cmd:load)
+  ;;     (define-key map "s"   #'perspective:cmd:save)
+  ;;     ;; (define-key map "x"   #'perspective:cmd:kill)
+  ;;     (define-key map "d"   #'perspective:cmd:delete)
+  ;;     (define-key map "r"   #'perspective:cmd:rename)
+  ;;     (define-key map "]"   #'perspective:cmd:cycle/right)
+  ;;     (define-key map "["   #'perspective:cmd:cycle/left)
+  ;;     (define-key map "."   #'perspective:cmd:switch/index)
+  ;;     (define-key map "`"   #'perspective:cmd:switch/last )
+  ;;     (define-key map "1"   #'perspective:cmd:switch/index:0)
+  ;;     (define-key map "2"   #'perspective:cmd:switch/index:1)
+  ;;     (define-key map "3"   #'perspective:cmd:switch/index:2)
+  ;;     (define-key map "4"   #'perspective:cmd:switch/index:3)
+  ;;     (define-key map "5"   #'perspective:cmd:switch/index:4)
+  ;;     (define-key map "6"   #'perspective:cmd:switch/index:5)
+  ;;     (define-key map "7"   #'perspective:cmd:switch/index:6)
+  ;;     (define-key map "8"   #'perspective:cmd:switch/index:7)
+  ;;     (define-key map "9"   #'perspective:cmd:switch/index:8)
+  ;;     (define-key map "0"   #'perspective:cmd:switch/final)
+  ;;
+  ;;     map)
+  ;;   "Keymap for perspective commands that should be available globally.")
+
+  ;; (meow-leader-define-key
+  ;;  (cons "TAB" mantle:meow/keymap/leader:perspectives))
+  )
 
 
 ;;------------------------------

@@ -153,10 +153,10 @@
   (when (system:secret:has)
     (transient-append-suffix 'mantle:meow/transient:file/path/at
       nil
-      [("s" "Find file in `.secret.d'..." mantle:meow/transient:file/path/at:find-project-file/dot-secret)]
-      (transient-append-suffix 'mantle:meow/transient:file/path/at
-        nil
-        [("S" "Browse `.secret.d'..."       mantle:meow/transient:file/path/at:find-file/dot-secret)]))
+      [("s" "Find file in `.secret.d'..." mantle:meow/transient:file/path/at:find-project-file/dot-secret)])
+    (transient-append-suffix 'mantle:meow/transient:file/path/at
+      nil
+      [("S" "Browse `.secret.d'..."       mantle:meow/transient:file/path/at:find-file/dot-secret)]))
 
 
   ;;------------------------------
