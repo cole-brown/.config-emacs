@@ -234,17 +234,22 @@
 
   (transient-define-prefix mantle:meow/transient:search ()
     "Search commands that should be available globally."
-    [("/" "`rg' @ project root"         deadgrep)]
-    [("." "`rg' @ default-directory"    mantle:user:deadgrep:default-directory)]
-    ;; TODO: A deadgrep search that lets me choose the starting dir?
-    ;; [("?" "`rg' @ ..."                  mantle:user:deadgrep:default-directory)]
-    [("k" "Kill All 'deadgrep' Buffers" mantle:user:deadgrep:buffer:kill)])
+    ["Search..."
+     ["Project:"
+      ("/" "`rg' @ project root"         deadgrep)
+      ("." "`rg' @ default-directory"    mantle:user:deadgrep:default-directory)
+      ;; TODO-meow: A deadgrep search that lets me choose the starting dir?
+      ;; ("?" "`rg' @ ..."                  mantle:user:deadgrep:default-directory)
+      ("k" "Kill All 'deadgrep' Buffers" mantle:user:deadgrep:buffer:kill)]
+
+     ["Buffer:"
+      ("s" "Search Forward"  isearch-forward)
+      ("r" "Search Backward" isearch-backward)]])
 
   ;;---
   ;; Entrypoint
   ;;---
 
-  ;; "f [...]"
   (meow-normal-define-key
    '("/" . mantle:meow/transient:search))) ; :which-key "Search..."
 
