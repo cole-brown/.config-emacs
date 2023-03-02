@@ -26,6 +26,11 @@
           :filename "common")
 
 
+(imp:load :feature  '(:mantle config user dev-env languages lsp)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "lsp")
+
+
 ;;------------------------------------------------------------------------------
 ;; Programming Languages
 ;;------------------------------------------------------------------------------
