@@ -44,6 +44,16 @@
   :init
   ;;------------------------------
 
+  ;; TODO: Do I want this from Doom? Are strings still breaking `csharp-mode'?
+  ;;   (defadvice! +csharp-disable-clear-string-fences-a (fn &rest args)
+  ;;     "This turns off `c-clear-string-fences' for `csharp-mode'. When
+  ;; on for `csharp-mode' font lock breaks after an interpolated string
+  ;; or terminating simple string."
+  ;;     :around #'csharp-disable-clear-string-fences
+  ;;     (unless (eq major-mode 'csharp-mode)
+  ;;       (apply fn args)))
+
+
   (innit:hook:defun
      (:name   'csharp:settings
       :file   macro<imp>:path/file
@@ -89,11 +99,36 @@
      ;; (subword-mode t)
      )
 
+
   ;;------------------------------
   :hook
   ;;------------------------------
   ((csharp-mode-hook . mantle:hook:csharp:settings)
    (csharp-mode-hook . rainbow-delimiters-mode)))
+
+
+;;------------------------------
+;; C# LSP
+;;------------------------------
+
+(imp:use-package csharp-mode
+  :when (and (imp:flag? :dev-env +lsp)
+             (imp:flag? :lsp +csharp))
+
+  ;; NOTE: `M-x lsp-install-server' has 2 options for C# LSPs:
+  ;;   1) 'omnisharp-roslyn' : https://emacs-lsp.github.io/lsp-mode/page/lsp-csharp-omnisharp/
+  ;;   2) 'csharp-ls'        : https://emacs-lsp.github.io/lsp-mode/page/lsp-csharp-ls/
+  ;;
+  ;; Not sure which is best, but I've had issues with 'omnisharp-roslyn' in the
+  ;; past so... try the other one this time?
+  ;;
+  ;; Also 'omnisharp-roslyn' says it's built with Mono on Linux, whereas
+  ;; 'csharp-ls' is installed with `dotnet' CLI.
+
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+  (csharp-mode-hook . mantle:hook:lsp:enable))
 
 
 ;;------------------------------------------------------------------------------

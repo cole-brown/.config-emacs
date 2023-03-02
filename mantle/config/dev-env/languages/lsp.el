@@ -33,13 +33,21 @@
 ;;------------------------------------------------------------------------------
 ;; Language Server Protocol
 ;;------------------------------------------------------------------------------
-;; https://github.com/emacs-lsp/lsp-mode
 
+;; https://github.com/emacs-lsp/lsp-mode
+;; https://emacs-lsp.github.io/lsp-mode/page/installation/
 (imp:use-package lsp-mode
   :when (imp:flag? :dev-env +lsp)
   :after no-littering
 
-  :commands lsp-install-server
+  ;;------------------------------
+  :commands
+  ;;------------------------------
+  (lsp-install-server
+   lsp-update-server
+   lsp-update-servers
+   lsp
+   lsp-deferred)
 
   ;;------------------------------
   :init
@@ -139,6 +147,32 @@ Borrowed from Doom."
                    'append)))
 
 
+  (innit:hook:defun
+     (:name   'lsp:header/breadcrumb
+      :file   macro<imp>:path/file
+      :docstr "Set up `lsp-mode' to show some information in the header line.")
+    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    (lsp-headerline-breadcrumb-mode))
+
+
+  (innit:hook:defun
+      (:name   'lsp:enable
+       :file   macro<imp>:path/file
+       :docstr (mapconcat #'identity
+                          '("Basic hook to enable `lsp-mode' for a buffer."
+                            ""
+                            "NOTE: Use this hook in languages' `use-package' blocks!"
+                            "Example:"
+                            "  (imp:use-package csharp-mode"
+                            "    :hook (csharp-mode-hook . mantle:hook:lsp:enable))")
+                          "\n"))
+    ;; Wait to start language server until a buffer is visible.
+    (lsp-deferred)
+    ;; Integrate with `which-key' for all major modes active in the buffer
+    ;; (e.g. `web-mode' can have a few modes active).
+    (lsp-enable-which-key-integration :all))
+
+
   ;;------------------------------
   :hook
   ;;------------------------------
@@ -149,7 +183,11 @@ Borrowed from Doom."
      lsp-after-uninitialized-functions
      lsp-before-open-hook
      lsp-after-open-hook)
-    . mantle:hook:lsp:modeline/update))
+    . mantle:hook:lsp:modeline/update)
+   (lsp-mode-hook . mantle:hook:lsp:header/breadcrumb)
+   ;; Add LSP servers to our upgrade/update command.
+   (innit:upgrade:hook . lsp-update-servers))
+
 
   ;;------------------------------
   :custom

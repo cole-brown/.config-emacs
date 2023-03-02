@@ -63,7 +63,7 @@
 ;;------------------------------
 
 ;;---
-;; Input: Keyboard
+;; Input
 ;;---
 
 ;; (imp:flag :keyboard +qwerty)
@@ -72,6 +72,19 @@
 ;; Used to decide what, if any, input systems to configure.
 ;; (imp:flag :keybinds +evil) ; https://github.com/emacs-evil/evil
 (imp:flag :keybinds +meow)    ; https://github.com/meow-edit/meow
+
+;;---
+;; Development
+;;---
+
+(imp:flag :dev-env +lsp)
+;; (imp:flag :dev-env +eglot)
+
+;; So `:dev-env +lsp' or `:dev-env +eglot' are enabled, what languages should
+;; have language servers enabled for them?
+(imp:flag :lsp +csharp)
+;; (imp:flag :lsp +python)
+;; (imp:flag :lsp +rust)
 
 
 ;;------------------------------
