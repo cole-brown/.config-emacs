@@ -331,28 +331,28 @@
    ("C-c k" . consult-kmacro)
    ;; C-x bindings (ctl-x-map)
    ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-   ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+   ("C-x b"   . consult-buffer)                ;; orig. switch-to-buffer
    ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
    ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
    ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
    ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
    ;; Custom M-# bindings for fast register access
-   ("M-#" . consult-register-load)
-   ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+   ("M-#"   . consult-register-load)
+   ("M-'"   . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
    ("C-M-#" . consult-register)
    ;; Other custom bindings
-   ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+   ("M-y"      . consult-yank-pop)                ;; orig. yank-pop
    ("<help> a" . consult-apropos)            ;; orig. apropos-command
    ;; M-g bindings (goto-map)
-   ("M-g e" . consult-compile-error)
-   ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-   ("M-g g" . consult-goto-line)             ;; orig. goto-line
+   ("M-g e"   . consult-compile-error)
+   ("M-g f"   . consult-flymake)               ;; Alternative: consult-flycheck
+   ("M-g g"   . consult-goto-line)             ;; orig. goto-line
    ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-   ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-   ("M-g m" . consult-mark)
-   ("M-g k" . consult-global-mark)
-   ("M-g i" . consult-imenu)
-   ("M-g I" . consult-imenu-multi)
+   ("M-g o"   . consult-outline)               ;; Alternative: consult-org-heading
+   ("M-g m"   . consult-mark)
+   ("M-g k"   . consult-global-mark)
+   ("M-g i"   . consult-imenu)
+   ("M-g I"   . consult-imenu-multi)
    ;; M-s bindings (search-map)
    ("M-s d" . consult-find)
    ("M-s D" . consult-locate)
@@ -384,8 +384,8 @@
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
   ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key (kbd "M-."))
-  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
 
   ;; For some commands and buffer sources it is useful to configure the
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
@@ -402,13 +402,13 @@
    consult--source-bookmark
    consult--source-recent-file
    consult--source-project-recent-file
-   :preview-key (kbd "M-."))
+   :preview-key "M-.")
 
   ;; Optionally configure the narrowing key.
   ;; Both < and C-+ work reasonably well.
   ;; TODO: EVIL???
   ;; TODO-meow: MEOW???
-  (setq consult-narrow-key "<") ;; (kbd "C-+")
+  (setq consult-narrow-key "<") ;; "C-+"
 
   ;; Optionally make narrowing help available in the minibuffer.
   ;; You may want to use `embark-prefix-help-command' or which-key instead.
@@ -490,8 +490,8 @@
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
   ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key (kbd "M-."))
-  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
 
   ;; For some commands and buffer sources it is useful to configure the
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
@@ -508,13 +508,7 @@
    consult--source-bookmark
    consult--source-recent-file
    consult--source-project-recent-file
-   :preview-key (kbd "M-."))
-
-  ;; Optionally configure the narrowing key.
-  ;; Both < and C-+ work reasonably well.
-  ;; TODO: EVIL???
-  ;; TODO-meow: MEOW???
-  (setq consult-narrow-key "<") ;; (kbd "C-+")
+   :preview-key "M-.")
 
   ;; Optionally make narrowing help available in the minibuffer.
   ;; You may want to use `embark-prefix-help-command' or which-key instead.
@@ -593,8 +587,8 @@
   ;; Optionally configure preview. The default value
   ;; is 'any, such that any key triggers the preview.
   ;; (setq consult-preview-key 'any)
-  ;; (setq consult-preview-key (kbd "M-."))
-  ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
 
   ;; For some commands and buffer sources it is useful to configure the
   ;; :preview-key on a per-command basis using the `consult-customize' macro.
@@ -611,13 +605,7 @@
    consult--source-bookmark
    consult--source-recent-file
    consult--source-project-recent-file
-   :preview-key (kbd "M-."))
-
-  ;; Optionally configure the narrowing key.
-  ;; Both < and C-+ work reasonably well.
-  ;; TODO: EVIL???
-  ;; TODO-meow: MEOW???
-  (setq consult-narrow-key "<") ;; (kbd "C-+")
+   :preview-key "M-.")
 
   ;; Optionally make narrowing help available in the minibuffer.
   ;; You may want to use `embark-prefix-help-command' or which-key instead.

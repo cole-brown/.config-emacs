@@ -127,7 +127,7 @@ OPTIONS is a plist of optional vars:
 
   :argslist  - If a list, create the hook's `defun' with this list of arguments.
 
-  :announce  - If non-nil, do not output the 'Running hook [...]' message.
+  :announce  - If non-nil, output the 'Running hook [...]' message.
 
   :squelch   - If non-nil, wrap BODY in `innit:squelch'.
 
