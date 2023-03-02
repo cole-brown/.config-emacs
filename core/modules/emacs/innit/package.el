@@ -618,12 +618,40 @@ Will only upgrade the first MAX if MAX is numberp or can be converted by
              func/name
            "Package update declined."))))))
 
+
 ;; http://nhoffman.github.io/.emacs.d/#orgf46780c
 ;; Some useful ELPA variables and functions:
 ;;   M-x package-list-packages  - open list of packages
 ;;   package-activated-list     - variable containing list of the names of currently activated packages
 ;;   package-install            - install a package
 ;;   package-installed-p        - true if package is installed
+
+
+(defvar innit:upgrade:hook nil
+  "Functions to run after updating packages in `innit:cmd:upgrade'.")
+
+
+(defun innit:cmd:upgrade (&optional max-packages)
+  "Upgrade all the things! Packages, LSP servers...
+
+First update the packages, then run all hooks in `innit:hook:upgrade'
+
+First updates package metadata, then upgrades all packages that have newer
+versions.
+
+Will only upgrade the first MAX if MAX is numberp or can be converted by
+`string-to-number', and number to upgrade is greater than MAX."
+  (interactive "P")
+
+  ;;------------------------------
+  ;; 1st: Upgrade packages...
+  ;;------------------------------
+  (funcall #'innit:cmd:package:upgrade max-packages)
+
+  ;;------------------------------
+  ;; 2nd: Upgrade hook...
+  ;;------------------------------
+  (innit:hook:run 'innit:upgrade:hook))
 
 
 ;;------------------------------------------------------------------------------
