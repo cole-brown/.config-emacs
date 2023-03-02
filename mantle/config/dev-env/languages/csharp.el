@@ -134,9 +134,8 @@
 ;;------------------------------------------------------------------------------
 ;; .NET CLI Transient Menu
 ;;------------------------------------------------------------------------------
+
 ;; https://github.com/sebasmonia/sharper
-
-
 (imp:use-package sharper)
 
 
@@ -151,8 +150,9 @@
   ;;------------------------------
   :config
   ;;------------------------------
-  (mantle:meow:leader/local:keys 'csharp-mode-map
-                                 "c" #'sharper-main-transient) ; `dotnet' CLI..."
+
+  (mantle:meow:leader/local:key csharp-mode-map
+                                "c" #'sharper-main-transient)
 
   ;; TODO: Doom also mapped these; do we want any?
   ;; (map! (:map sharper--solution-management-mode-map
