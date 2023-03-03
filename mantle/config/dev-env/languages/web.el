@@ -194,135 +194,136 @@
 ;; Keybinds : Meow
 ;;------------------------------
 
-(imp:use-package web-mode
-  :when  (imp:flag? :keybinds +meow)
-  :after meow
+;; (imp:use-package web-mode
+;;   :when  (imp:flag? :keybinds +meow)
+;;   :after meow
 
-  ;;------------------------------
-  :config
-  ;;------------------------------
+;;   ;;------------------------------
+;;   :config
+;;   ;;------------------------------
 
-  ;;---
-  ;; Attribute
-  ;;---
-  (mantle:meow:keymap
-      mantle:meow/keymap/local:web/attribute
-      "`web-mode' \"attribute\" keybinds"
-   ("b" #'web-mode-attribute-beginning)  ; Beginning
-   ("e" #'web-mode-attribute-end)        ; End
-   ("i" #'web-mode-attribute-insert)     ; Insert
-   ("n" #'web-mode-attribute-next)       ; Next
-   ("s" #'web-mode-attribute-select)     ; Select
-   ("k" #'web-mode-attribute-kill)       ; Kill
-   ("p" #'web-mode-attribute-previous)   ; Previous
-   ("t" #'web-mode-attribute-transpose)) ; Transpose
+;;   ;;---
+;;   ;; Attribute
+;;   ;;---
+;;   (mantle:meow:keymap
+;;       mantle:meow/keymap/local:web/attribute
+;;       "`web-mode' \"attribute\" keybinds"
+;;    ("b" #'web-mode-attribute-beginning)  ; Beginning
+;;    ("e" #'web-mode-attribute-end)        ; End
+;;    ("i" #'web-mode-attribute-insert)     ; Insert
+;;    ("n" #'web-mode-attribute-next)       ; Next
+;;    ("s" #'web-mode-attribute-select)     ; Select
+;;    ("k" #'web-mode-attribute-kill)       ; Kill
+;;    ("p" #'web-mode-attribute-previous)   ; Previous
+;;    ("t" #'web-mode-attribute-transpose)) ; Transpose
 
-  (mantle:meow:leader/local:key 'web-mode-map
-                                "a" 'mantle:meow/keymap/local:web/attribute)
+;;   (mantle:meow:leader/local:key 'web-mode-map
+;;                                 "a" 'mantle:meow/keymap/local:web/attribute)
 
-  ;;---
-  ;; Block
-  ;;---
-  (mantle:meow:keymap
-       mantle:meow/keymap/local:web/block
-       "`web-mode' \"block\" keybinds"
-    ("b" #'web-mode-block-beginning) ; Beginning
-    ("c" #'web-mode-block-close)     ; Close
-    ("e" #'web-mode-block-end)       ; End
-    ("k" #'web-mode-block-kill)      ; Kill
-    ("n" #'web-mode-block-next)      ; Next
-    ("p" #'web-mode-block-previous)  ; Previous
-    ("s" #'web-mode-block-select))   ; Select
+;;   ;;---
+;;   ;; Block
+;;   ;;---
+;;   (mantle:meow:keymap
+;;        mantle:meow/keymap/local:web/block
+;;        "`web-mode' \"block\" keybinds"
+;;     ("b" #'web-mode-block-beginning) ; Beginning
+;;     ("c" #'web-mode-block-close)     ; Close
+;;     ("e" #'web-mode-block-end)       ; End
+;;     ("k" #'web-mode-block-kill)      ; Kill
+;;     ("n" #'web-mode-block-next)      ; Next
+;;     ("p" #'web-mode-block-previous)  ; Previous
+;;     ("s" #'web-mode-block-select))   ; Select
 
-  (mantle:meow:leader/local:key 'web-mode-map
-                                "a" 'mantle:meow/keymap/local:web/block)
+;;   (mantle:meow:leader/local:key 'web-mode-map
+;;                                 "a" 'mantle:meow/keymap/local:web/block)
 
-  ;;---
-  ;; DOM
-  ;;---
-  (mantle:meow:keymap
-       mantle:meow/keymap/local:web/dom
-       "`web-mode' \"DOM\" keybinds"
-    ("a" #'web-mode-dom-apostrophes-replace) ; Replace Apostrophies
-    ("d" #'web-mode-dom-errors-show)         ; Show Errors
-    ("e" #'web-mode-dom-entities-encode)     ; Encode Entities
-    ("n" #'web-mode-dom-normalize)           ; Normalize
-    ("q" #'web-mode-dom-quotes-replace)      ; Replace Quotes
-    ("t" #'web-mode-dom-traverse)            ; Traverse
-    ("x" #'web-mode-dom-xpath))              ; XPath
+;;   ;;---
+;;   ;; DOM
+;;   ;;---
+;;   (mantle:meow:keymap
+;;        mantle:meow/keymap/local:web/dom
+;;        "`web-mode' \"DOM\" keybinds"
+;;     ("a" #'web-mode-dom-apostrophes-replace) ; Replace Apostrophies
+;;     ("d" #'web-mode-dom-errors-show)         ; Show Errors
+;;     ("e" #'web-mode-dom-entities-encode)     ; Encode Entities
+;;     ("n" #'web-mode-dom-normalize)           ; Normalize
+;;     ("q" #'web-mode-dom-quotes-replace)      ; Replace Quotes
+;;     ("t" #'web-mode-dom-traverse)            ; Traverse
+;;     ("x" #'web-mode-dom-xpath))              ; XPath
 
-  (mantle:meow:leader/local:key 'web-mode-map
-                                "d" 'mantle:meow/keymap/local:web/dom)
+;;   (mantle:meow:leader/local:key 'web-mode-map
+;;                                 "d" 'mantle:meow/keymap/local:web/dom)
 
-  ;;---
-  ;; Element
-  ;;---
-  (mantle:meow:keymap
-       mantle:meow/keymap/local:web/element
-       "`web-mode' \"ELEMENT\" keybinds"
-    ("/" #'web-mode-element-close)                   ; Close
-    ("a" #'web-mode-element-content-select)          ; Select Content
-    ("b" #'web-mode-element-beginning)               ; Beginning
-    ("c" #'web-mode-element-clone)                   ; Clone
-    ("d" #'web-mode-element-child)                   ; Child
-    ("e" #'web-mode-element-end)                     ; End
-    ("f" #'web-mode-element-children-fold-or-unfold) ; Fold/Unfold Children
-    ("i" #'web-mode-element-insert)                  ; Insert
-    ("k" #'web-mode-element-kill)                    ; Kill
-    ("m" #'web-mode-element-mute-blanks)             ; Mute Blanks
-    ("n" #'web-mode-element-next)                    ; Next
-    ("p" #'web-mode-element-previous)                ; Previous
-    ("r" #'web-mode-element-rename)                  ; Rename
-    ("s" #'web-mode-element-select)                  ; Select
-    ("t" #'web-mode-element-transpose)               ; Transpose
-    ("u" #'web-mode-element-parent)                  ; Parent
-    ("v" #'web-mode-element-vanish)                  ; Vanish
-    ("w" #'web-mode-element-wrap))                   ; Wrap
+;;   ;;---
+;;   ;; Element
+;;   ;;---
+;;   (mantle:meow:keymap
+;;        mantle:meow/keymap/local:web/element
+;;        "`web-mode' \"ELEMENT\" keybinds"
+;;     ("/" #'web-mode-element-close)                   ; Close
+;;     ("a" #'web-mode-element-content-select)          ; Select Content
+;;     ("b" #'web-mode-element-beginning)               ; Beginning
+;;     ("c" #'web-mode-element-clone)                   ; Clone
+;;     ("d" #'web-mode-element-child)                   ; Child
+;;     ("e" #'web-mode-element-end)                     ; End
+;;     ("f" #'web-mode-element-children-fold-or-unfold) ; Fold/Unfold Children
+;;     ("i" #'web-mode-element-insert)                  ; Insert
+;;     ("k" #'web-mode-element-kill)                    ; Kill
+;;     ("m" #'web-mode-element-mute-blanks)             ; Mute Blanks
+;;     ("n" #'web-mode-element-next)                    ; Next
+;;     ("p" #'web-mode-element-previous)                ; Previous
+;;     ("r" #'web-mode-element-rename)                  ; Rename
+;;     ("s" #'web-mode-element-select)                  ; Select
+;;     ("t" #'web-mode-element-transpose)               ; Transpose
+;;     ("u" #'web-mode-element-parent)                  ; Parent
+;;     ("v" #'web-mode-element-vanish)                  ; Vanish
+;;     ("w" #'web-mode-element-wrap))                   ; Wrap
 
-  (mantle:meow:leader/local:key 'web-mode-map
-                                "e" 'mantle:meow/keymap/local:web/element)
+;;   (mantle:meow:leader/local:key 'web-mode-map
+;;                                 "e" 'mantle:meow/keymap/local:web/element)
 
-  ;;---
-  ;; Tag
-  ;;---
-  (mantle:meow:keymap
-       mantle:meow/keymap/local:web/tag
-       "`web-mode' \"tag\" keybinds"
-   ("a" #'web-mode-tag-attributes-sort) ; Sort Attributes
-   ("b" #'web-mode-tag-beginning)       ; Beginning
-   ("e" #'web-mode-tag-end)             ; End
-   ("m" #'web-mode-tag-match)           ; Match
-   ("n" #'web-mode-tag-next)            ; Next
-   ("p" #'web-mode-tag-previous)        ; Previous
-   ("s" #'web-mode-tag-select))         ; Select
+;;   ;;---
+;;   ;; Tag
+;;   ;;---
+;;   (mantle:meow:keymap
+;;        mantle:meow/keymap/local:web/tag
+;;        "`web-mode' \"tag\" keybinds"
+;;    ("a" #'web-mode-tag-attributes-sort) ; Sort Attributes
+;;    ("b" #'web-mode-tag-beginning)       ; Beginning
+;;    ("e" #'web-mode-tag-end)             ; End
+;;    ("m" #'web-mode-tag-match)           ; Match
+;;    ("n" #'web-mode-tag-next)            ; Next
+;;    ("p" #'web-mode-tag-previous)        ; Previous
+;;    ("s" #'web-mode-tag-select))         ; Select
 
-  (mantle:meow:leader/local:key 'web-mode-map
-                                "e" 'mantle:meow/keymap/local:web/tag)
+;;   (mantle:meow:leader/local:key 'web-mode-map
+;;                                 "e" 'mantle:meow/keymap/local:web/tag)
 
-  ;;---
-  ;; Local Leader: Misc.
-  ;;---
-  (mantle:meow:leader/local:keys 'web-mode-map
-                                 "h" #'web-mode-reload         ; Rehighlight Buffer
-                                 "i" #'web-mode-buffer-indent) ; Indent Buffer
+;;   ;;---
+;;   ;; Local Leader: Misc.
+;;   ;;---
+;;   (mantle:meow:leader/local:keys 'web-mode-map
+;;                                  "h" #'web-mode-reload         ; Rehighlight Buffer
+;;                                  "i" #'web-mode-buffer-indent) ; Indent Buffer
 
-  (mantle:meow:leader/local:keys 'web-mode-map
-                                 "]a" #'web-mode-attribute-next     ; Attribute: Next
-                                 "[a" #'web-mode-attribute-previous ; Attribute: Previous
-                                 "]t" #'web-mode-tag-next           ; Tag: Next
-                                 "[t" #'web-mode-tag-previous       ; Tag: Previous
-                                 "]T" #'web-mode-element-child      ; Child: Next
-                                 "[T" #'web-mode-element-parent)    ; Child: Previous
+;;   (mantle:meow:leader/local:keys 'web-mode-map
+;;                                  "]a" #'web-mode-attribute-next     ; Attribute: Next
+;;                                  "[a" #'web-mode-attribute-previous ; Attribute: Previous
+;;                                  "]t" #'web-mode-tag-next           ; Tag: Next
+;;                                  "[t" #'web-mode-tag-previous       ; Tag: Previous
+;;                                  "]T" #'web-mode-element-child      ; Child: Next
+;;                                  "[T" #'web-mode-element-parent)    ; Child: Previous
 
-  ;;------------------------------
-  :bind ; meow
-  ;;------------------------------
+;;   ;;------------------------------
+;;   :bind ; meow
+;;   ;;------------------------------
 
-  (:map web-mode-map
-   ;; TODO: Where is my comment/uncomment actually? Evil/Doom had it on "gc".
-   ("M-/" . web-mode-comment-or-uncomment) ; Comment/Uncomment
-   ;; TODO: Somewhere else?
-   ("za"  . web-mode-fold-or-unfold)))     ; Fold/Unfold
+;;   (:map web-mode-map
+;;    ;; TODO: Where is my comment/uncomment actually? Evil/Doom had it on "gc".
+;;    ("M-/" . web-mode-comment-or-uncomment) ; Comment/Uncomment
+;;    ;; TODO: Somewhere else?
+;;    ("za"  . web-mode-fold-or-unfold)))
+                                        ; Fold/Unfold
 
 
 ;;------------------------------

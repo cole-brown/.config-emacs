@@ -64,20 +64,20 @@
 ;; Keybinds : Meow
 ;;------------------------------
 
-(imp:use-package terraform-mode
-  :when  (imp:flag? :keybinds +meow)
-  :after meow
+;; (imp:use-package terraform-mode
+;;   :when  (imp:flag? :keybinds +meow)
+;;   :after meow
 
-  ;;------------------------------
-  :config
-  ;;------------------------------
-  (mantle:meow:leader/local:keys 'terraform-mode-map
-                                 "a" ; terraform apply
-                                 (elisp:cmd (compile (format "%s apply" mantle:terraform:runner) t))
-                                 "i" ; terraform init
-                                 (elisp:cmd (compile (format "%s init" mantle:terraform:runner)))
-                                 "p" ; terraform plan
-                                 (elisp:cmd (compile (format "%s plan" mantle:terraform:runner)))))
+;;   ;;------------------------------
+;;   :config
+;;   ;;------------------------------
+;;   (mantle:meow:leader/local:keys 'terraform-mode-map
+;;                                  "a" ; terraform apply
+;;                                  (elisp:cmd (compile (format "%s apply" mantle:terraform:runner) t))
+;;                                  "i" ; terraform init
+;;                                  (elisp:cmd (compile (format "%s init" mantle:terraform:runner)))
+;;                                  "p" ; terraform plan
+;;                                  (elisp:cmd (compile (format "%s plan" mantle:terraform:runner)))))
 
 
 ;;------------------------------
