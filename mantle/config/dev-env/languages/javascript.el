@@ -136,16 +136,16 @@
 ;; Keybinds : Meow
 ;;------------------------------
 
-(imp:use-package npm-mode
-  :when  (imp:flag? :keybinds +meow)
-  :after meow
-
-  ;;------------------------------
-  :config
-  ;;------------------------------
-
-  (mantle:meow:leader/local:keys npm-mode-keymap
-                                 "n" npm-mode-command-keymap))
+;; (imp:use-package npm-mode
+;;   :when  (imp:flag? :keybinds +meow)
+;;   :after meow
+;;
+;;   ;;------------------------------
+;;   :config
+;;   ;;------------------------------
+;;
+;;   (mantle:meow:leader/local:keys npm-mode-keymap
+;;                                  "n" npm-mode-command-keymap))
 
 
 ;;------------------------------
