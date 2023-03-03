@@ -78,14 +78,22 @@ MAP should be a keymap or nil(ish). Add to the global keymap if MAP is:
 KEY shoud be a string. It will be appended to `mantle:meow:leader/local:prefix'
 and then passed through `kbd'.
 
-FUNC should be the function/command to bind.
+FUNC should be the quoted function or unquoted keymap to bind.
+Example, Function:
+  (mantle:meow:leader/local:key 'org-mode-map \"x\" #'org-md-export-as-markdown)
+Example, Keymap:
+  (defvar test:org:keymap
+    (let ((map (make-sparse-keymap)))
+      (define-key map (kbd \"h\") (lambda () (interactive) (message \"Hello\")))))
+  (mantle:meow:leader/local:key 'org-mode-map \"y\" test:org:keymap)
 
-This will bind FUNC to a /Vanilla Emacs Keybind/! For example:
+Note that FUNC will be bound to a /Vanilla Emacs Keybind/! For example:
+  (mantle:meow:leader/local:key 'org-mode-map \"x\" #'org-md-export-as-markdown)
   (mantle:meow:leader/local:key 'org-mode-map \"x\" #'org-md-export-as-markdown)
 
-This actually technically binds `org-md-export-as-markdown' to \"C-c M-m x\",
+This actually technically binds `org-md-export-as-markdown' to \"C-x M-l x\",
 and if `mantle:meow:leader/local:init' has been run it will be Meow keybind
-\"SPC m x\" (assuming `mantle:meow:leader/local:prefix' hasn't changed from
+\"SPC l x\" (assuming `mantle:meow:leader/local:prefix' hasn't changed from
 default)."
     (let ((func/name "mantle:meow:leader/local:key")
           ;; Normalize global MAP to nil.
@@ -162,8 +170,9 @@ MAP should be a keymap or nil(ish). Add to the global keymap if MAP is:
 
 KEYBINDs should be should be a sequence of keys and functions:
   - key      : string fit for `kbd'
-  - function : quote function
-See `mantle:meow:leader/local:key'."
+  - function : quote function or unquoted keymap
+
+See `mantle:meow:leader/local:key' for more information."
     (let ((func/name "mantle:meow:leader/local:keys"))
       (unless keybind
         (nub:error
@@ -265,7 +274,7 @@ From: \"add mode and meow state specific keymaps\"
   ;;---
   ;; Meow "Local" Leader Entries
   ;;---
-  (mantle:meow:leader/local:init) ; "SPC m" -> mode/local keybinds
+  (mantle:meow:leader/local:init)
 
   ;;---
   ;; Engage!
