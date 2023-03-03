@@ -144,8 +144,8 @@
   :config
   ;;------------------------------
 
-  (mantle:meow:leader/local:keys 'npm-mode-keymap
-                                 "n" 'npm-mode-command-keymap))
+  (mantle:meow:leader/local:keys npm-mode-keymap
+                                 "n" npm-mode-command-keymap))
 
 
 ;;------------------------------

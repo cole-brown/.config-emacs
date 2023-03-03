@@ -60,7 +60,7 @@
   :config
   ;;------------------------------
 
-  (mantle:meow:leader/local:keys 'json-mode-map
+  (mantle:meow:leader/local:keys json-mode-map
                                  "p" #'json-mode-show-path ; Copy JSON Path
                                  "d" #'json-mode-kill-path ; Kill JSON Path
                                  "t" #'json-toggle-boolean
