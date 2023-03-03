@@ -207,8 +207,10 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   ;;---
   (transient-define-prefix mantle:meow/transient:elisp:debug ()
     "Debug commands in Meow \"Local\" Leader for Emacs Lisp Mode."
-    [("f" "`edebug' instrument enable"  mantle:user:emacs-lisp:edebug:instrument-defun/on)]
-    [("F" "`edebug' instrument disable" mantle:user:emacs-lisp:edebug:instrument-defun/off)])
+    ["Debug..."
+     ["`edebug'"
+      ("f" "`edebug' instrument enable"  mantle:user:emacs-lisp:edebug:instrument-defun/on)
+      ("F" "`edebug' instrument disable" mantle:user:emacs-lisp:edebug:instrument-defun/off)]])
 
   (mantle:meow:leader/local:key emacs-lisp-mode-map
                                 "d" #'mantle:meow/transient:elisp:debug)
@@ -218,12 +220,14 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   ;;---
   (transient-define-prefix mantle:meow/transient:elisp:eval ()
     "Eval commands in Meow \"Local\" Leader for Emacs Lisp Mode."
-    [("b" "eval-buffer"       eval-buffer)]
-    [("d" "eval-defun"        eval-defun)]
-    [("e" "eval-last-sexp"    eval-last-sexp)]
-    [("E" "pp-eval-last-sexp" pp-eval-last-sexp)]
-    [("r" "eval-region"       eval-region)]
-    [("l" "load-library"      load-library)])
+    [["Eval..."
+      ("b" "eval-buffer"       eval-buffer)
+      ("d" "eval-defun"        eval-defun)
+      ("e" "eval-last-sexp"    eval-last-sexp)
+      ("E" "pp-eval-last-sexp" pp-eval-last-sexp)
+      ("r" "eval-region"       eval-region)]
+     ["Load..."
+      ("l" "load-library"      load-library)]])
 
   (mantle:meow:leader/local:key emacs-lisp-mode-map
                                 "e" #'mantle:meow/transient:elisp:eval)
@@ -233,10 +237,11 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   ;;---
   (transient-define-prefix mantle:meow/transient:elisp:find ()
     "Find commands in Meow \"Local\" Leader for Emacs Lisp Mode."
-    [("f" "find-function"          find-function)]
-    [("F" "find-function-at-point" find-function-at-point)]
-    [("v" "find-variable"          find-variable)]
-    [("l" "find-library"           find-library)])
+    ["Find..."
+     ("f" "find-function"          find-function)
+     ("F" "find-function-at-point" find-function-at-point)
+     ("v" "find-variable"          find-variable)
+     ("l" "find-library"           find-library)])
 
   (mantle:meow:leader/local:key emacs-lisp-mode-map
                                 "g" #'mantle:meow/transient:elisp:find))
