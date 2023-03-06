@@ -116,7 +116,7 @@
 ;;   ;;------------------------------
 ;;
 ;;   ;; TODO: Replace `json-mode-show-path' with this?
-;;   (mantle:meow:leader/local:keys 'json-mode-map
+;;   (mantle:meow:leader/local:keys json-mode-map
 ;;                                  "p" #'jsons-print-path ; JSON Path
 ;;                                  ))
 ;;

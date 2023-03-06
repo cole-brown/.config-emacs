@@ -80,16 +80,16 @@ and then passed through `kbd'.
 
 FUNC should be the quoted function or unquoted keymap to bind.
 Example, Function:
-  (mantle:meow:leader/local:key 'org-mode-map \"x\" #'org-md-export-as-markdown)
+  (mantle:meow:leader/local:key org-mode-map \"x\" #'org-md-export-as-markdown)
 Example, Keymap:
   (defvar test:org:keymap
     (let ((map (make-sparse-keymap)))
       (define-key map (kbd \"h\") (lambda () (interactive) (message \"Hello\")))))
-  (mantle:meow:leader/local:key 'org-mode-map \"y\" test:org:keymap)
+  (mantle:meow:leader/local:key org-mode-map \"y\" test:org:keymap)
 
 Note that FUNC will be bound to a /Vanilla Emacs Keybind/! For example:
-  (mantle:meow:leader/local:key 'org-mode-map \"x\" #'org-md-export-as-markdown)
-  (mantle:meow:leader/local:key 'org-mode-map \"x\" #'org-md-export-as-markdown)
+  (mantle:meow:leader/local:key org-mode-map \"x\" #'org-md-export-as-markdown)
+  (mantle:meow:leader/local:key org-mode-map \"x\" #'org-md-export-as-markdown)
 
 This actually technically binds `org-md-export-as-markdown' to \"C-x M-l x\",
 and if `mantle:meow:leader/local:init' has been run it will be Meow keybind
@@ -201,9 +201,9 @@ Example:
   ;; leader \"toggle stuff\" entry.
   (mantle:meow:leader/local:key 'global
                                 \"l\" #'display-line-numbers-mode)
-  (mantle:meow:leader/local:key 'markdown-mode-map
+  (mantle:meow:leader/local:key markdown-mode-map
                                 \"i\" #'markdown-toggle-inline-images)
-  (mantle:meow:leader/local:key 'org-mode-map
+  (mantle:meow:leader/local:key org-mode-map
                                 \"i\" #'org-toggle-inline-images)
   ;; Define Meow \"Local\" Leader entrypoint keybind.
   (mantle:meow:leader/local:init)

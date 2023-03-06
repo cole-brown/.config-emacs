@@ -41,6 +41,7 @@
 ;;
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
+;; TODO-meow: only create these leaders if evil.
 (keybind:leader/local:def
   :keymaps 'python-mode-map
   :infix   "i"                      ; insert
@@ -259,7 +260,7 @@ MODULE should be a string of the module name."
   :config
   ;;------------------------------
 
-  (mantle:meow:leader/local:key 'python-mode-map
+  (mantle:meow:leader/local:key python-mode-map
                                 "i" 'mantle:meow/keymap/local:import-isort))
 
 
@@ -360,7 +361,7 @@ MODULE should be a string of the module name."
    ("s" #'pipenv-shell)      ; shell
    ("u" #'pipenv-uninstall)) ; uninstall
 
-  (mantle:meow:leader/local:key 'python-mode-map
+  (mantle:meow:leader/local:key python-mode-map
                                 "e" 'mantle:meow/keymap/local:python/pipenv))
 
 
@@ -719,7 +720,7 @@ MODULE should be a string of the module name."
     ("r" #'python-pytest-repeat)        ; Repeat tests
     ("p" #'python-pytest-dispatch))     ; Pytest Popup...
 
-  (mantle:meow:leader/local:key 'python-mode-map
+  (mantle:meow:leader/local:key python-mode-map
                                 "t" 'mantle:meow/keymap/local:python/pytest))
 
 

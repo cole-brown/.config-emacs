@@ -217,7 +217,7 @@
 ;;    ("p" #'web-mode-attribute-previous)   ; Previous
 ;;    ("t" #'web-mode-attribute-transpose)) ; Transpose
 
-;;   (mantle:meow:leader/local:key 'web-mode-map
+;;   (mantle:meow:leader/local:key web-mode-map
 ;;                                 "a" 'mantle:meow/keymap/local:web/attribute)
 
 ;;   ;;---
@@ -234,7 +234,7 @@
 ;;     ("p" #'web-mode-block-previous)  ; Previous
 ;;     ("s" #'web-mode-block-select))   ; Select
 
-;;   (mantle:meow:leader/local:key 'web-mode-map
+;;   (mantle:meow:leader/local:key web-mode-map
 ;;                                 "a" 'mantle:meow/keymap/local:web/block)
 
 ;;   ;;---
@@ -251,7 +251,7 @@
 ;;     ("t" #'web-mode-dom-traverse)            ; Traverse
 ;;     ("x" #'web-mode-dom-xpath))              ; XPath
 
-;;   (mantle:meow:leader/local:key 'web-mode-map
+;;   (mantle:meow:leader/local:key web-mode-map
 ;;                                 "d" 'mantle:meow/keymap/local:web/dom)
 
 ;;   ;;---
@@ -279,7 +279,7 @@
 ;;     ("v" #'web-mode-element-vanish)                  ; Vanish
 ;;     ("w" #'web-mode-element-wrap))                   ; Wrap
 
-;;   (mantle:meow:leader/local:key 'web-mode-map
+;;   (mantle:meow:leader/local:key web-mode-map
 ;;                                 "e" 'mantle:meow/keymap/local:web/element)
 
 ;;   ;;---
@@ -296,17 +296,17 @@
 ;;    ("p" #'web-mode-tag-previous)        ; Previous
 ;;    ("s" #'web-mode-tag-select))         ; Select
 
-;;   (mantle:meow:leader/local:key 'web-mode-map
+;;   (mantle:meow:leader/local:key web-mode-map
 ;;                                 "e" 'mantle:meow/keymap/local:web/tag)
 
 ;;   ;;---
 ;;   ;; Local Leader: Misc.
 ;;   ;;---
-;;   (mantle:meow:leader/local:keys 'web-mode-map
+;;   (mantle:meow:leader/local:keys web-mode-map
 ;;                                  "h" #'web-mode-reload         ; Rehighlight Buffer
 ;;                                  "i" #'web-mode-buffer-indent) ; Indent Buffer
 
-;;   (mantle:meow:leader/local:keys 'web-mode-map
+;;   (mantle:meow:leader/local:keys web-mode-map
 ;;                                  "]a" #'web-mode-attribute-next     ; Attribute: Next
 ;;                                  "[a" #'web-mode-attribute-previous ; Attribute: Previous
 ;;                                  "]t" #'web-mode-tag-next           ; Tag: Next
