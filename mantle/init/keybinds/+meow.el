@@ -124,17 +124,31 @@ default)."
 
       (cond ((commandp func)
              nil)
-            ;; Can't use keymaps in `meow' leader? Or, rather, it doesn't like a
-            ;; keymap of keymaps? Says "f f is not defined" for "SPC f f" where
-            ;; "SPC f" was a keymap and "f" was an entry in that keymap that was
-            ;; also a keymap.
-            ((keymapp func)
+
+            ;; Can't use (nested) keymaps in `meow' leader? Or, rather, KEYPAD
+            ;; mode doesn't like it. Says "f f is not defined" for "SPC f f"
+            ;; where "SPC f" was a keymap and "f" was an entry in that keymap
+            ;; that was also a keymap.
+            ;; KISS: No keymaps allowed at all:
+            ;;   ((keymapp func)
+            ;;    (nub:error
+            ;;        :innit
+            ;;        func/name
+            ;;      "FUNC cannot be a keymap; it must be a command (interactive function)! Got %S: %S"
+            ;;      (type-of func)
+            ;;      func))
+            ;; Or...: Check keymap, error only if it has a nested keymap.
+            ((seq-find (lambda (keymap/entry)
+                         (and (listp keymap/entry)
+                              (keymapp (cdr keymap/entry))))
+                       func)
              (nub:error
                  :innit
                  func/name
-               "FUNC cannot be a keymap; it must be a command (interactive function)! Got %S: %S"
+               "FUNC cannot be a keymap containing a nested keymap! Got %S: %S"
                (type-of func)
                func))
+
             (nil
              (nub:error
                  :innit
