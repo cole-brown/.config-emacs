@@ -159,69 +159,81 @@
 ;; Keybinds : Meow
 ;;------------------------------
 
-;; (imp:use-package markdown-mode
-;;   :when  (imp:flag? :keybinds +meow)
-;;   :after meow
+(imp:use-package markdown-mode
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
 
-;;   ;;------------------------------
-;;   :config
-;;   ;;------------------------------
-;;   ;;---
-;;   ;; Misc.
-;;   ;;---
-;;   (mantle:meow:leader/local:keys 'markdown-mode-map
-;;                                  "'" #'markdown-edit-code-block
-;;                                  "e" #'markdown-export
-;;                                  ;; "i" == insert menu
-;;                                  "o" #'markdown-open)
+  ;;------------------------------
+  :config
+  ;;------------------------------
+  ;;---
+  ;; Misc.
+  ;;---
+  (mantle:meow:leader/local:keys markdown-mode-map
+                                 "'" #'markdown-edit-code-block
+                                 "e" #'markdown-export
+                                 ;; "i" == insert menu
+                                 "o" #'markdown-open)
 
-;;   ;;---
-;;   ;; Preview...
-;;   ;;---
-;;   ;; `impatient-mode' will add more to this keymap
-;;   (mantle:meow:keymap
-;;       mantle:meow/keymap/local:markdown/preview
-;;       "Preview Markdown"
-;;     ("p" #'markdown-preview))
+  ;;---
+  ;; Preview...
+  ;;---
+  ;; `impatient-mode' will add more to this Transient.
+  (transient-define-prefix mantle:meow/transient:markdown/preview ()
+    "Markdown preview keybinds.
 
-;;   (mantle:meow:leader/local:key 'markdown-mode-map
-;;                                 "p" 'mantle:meow/keymap/local:markdown/preview)
+`markdown-mode' config creates this and `impatient-mode' config adds it."
+    ["Preview..."
+     ("p" "Preview Markdown" markdown-preview)])
+  ;; (mantle:meow/transient:markdown/preview)
 
-;;   ;;---
-;;   ;; Insert...
-;;   ;;---
-;;   (mantle:meow:keymap
-;;       mantle:meow/keymap/local:markdown/insert
-;;       "`markdown-mode' \"insert\" keybinds"
-;;     ("i" #'markdown-insert-image)          ; Image
-;;     ("l" #'markdown-insert-link)           ; Link
-;;     ("-" #'markdown-insert-hr)             ; <hr>
-;;     ("1" #'markdown-insert-header-atx-1)   ; Heading 1
-;;     ("2" #'markdown-insert-header-atx-2)   ; Heading 2
-;;     ("3" #'markdown-insert-header-atx-3)   ; Heading 3
-;;     ("4" #'markdown-insert-header-atx-4)   ; Heading 4
-;;     ("5" #'markdown-insert-header-atx-5)   ; Heading 5
-;;     ("6" #'markdown-insert-header-atx-6)   ; Heading 6
-;;     ("C" #'markdown-insert-gfm-code-block) ; Code Block
-;;     ("P" #'markdown-pre-region)            ; Pre Region
-;;     ("Q" #'markdown-blockquote-region)     ; Blockquote Region
-;;     ("[" #'markdown-insert-gfm-checkbox)   ; Checkbox
-;;     ("b" #'markdown-insert-bold)           ; Bold
-;;     ("c" #'markdown-insert-code)           ; Inline Code
-;;     ("e" #'markdown-insert-italic)         ; Italic
-;;     ("f" #'markdown-insert-footnote)       ; Footnote
-;;     ("h" #'markdown-insert-header-dwim)    ; Header DWIM
-;;     ("i" #'markdown-insert-italic)         ; Italic
-;;     ("k" #'markdown-insert-kbd)            ; kbd
-;;     ("l" #'markdown-insert-link)           ; Link
-;;     ("p" #'markdown-insert-pre)            ; Pre
-;;     ("q" #'markdown-insert-blockquote)     ; New Blockquote
-;;     ("s" #'markdown-insert-strike-through) ; Strike Through
-;;     ("t" #'markdown-insert-table)          ; Table
-;;     ("w" #'markdown-insert-wiki-link))     ; Wiki Link
+  (mantle:meow:leader/local:key markdown-mode-map
+                                "p" mantle:meow/transient:markdown/preview)
 
-;;   (mantle:meow:leader/local:key 'markdown-mode-map
-;;                                 "i" 'mantle:meow/keymap/local:markdown/insert))
+  ;;---
+  ;; Insert...
+  ;;---
+  (transient-define-prefix mantle:meow/transient:markdown/insert ()
+    "Markdown keybinds for inserting things..."
+    ["Insert..."
+     ["Text Formatting"
+      ("i" "Image" markdown-insert-image)
+      ("l" "Link" markdown-insert-link)
+      ("-" "Horizontal Rule (---)" markdown-insert-hr)
+
+      ("[" "Checkbox" markdown-insert-gfm-checkbox)
+      ("b" "Bold" markdown-insert-bold)
+      ("i" "Italic" markdown-insert-italic)
+      ("l" "Link" markdown-insert-link)
+      ("p" "Pre" markdown-insert-pre)
+      ("s" "Strike Through" markdown-insert-strike-through)]
+
+     ["Heading"
+      ("1" "Heading 1" markdown-insert-header-atx-1)
+      ("2" "Heading 2" markdown-insert-header-atx-2)
+      ("3" "Heading 3" markdown-insert-header-atx-3)
+      ("4" "Heading 4" markdown-insert-header-atx-4)
+      ("5" "Heading 5" markdown-insert-header-atx-5)
+      ("6" "Heading 6" markdown-insert-header-atx-6)]
+
+     ["Region"
+      ("c" "Inline Code" markdown-insert-code)
+      ("C" "Code Block" markdown-insert-gfm-code-block)
+      ("P" "Pre Region" markdown-pre-region)
+      ("Q" "Blockquote Region" markdown-blockquote-region)
+      ("q" "New Blockquote" markdown-insert-blockquote)]
+
+     ["Misc."
+      ("f" "Footnote" markdown-insert-footnote)
+      ("h" "Header DWIM" markdown-insert-header-dwim)
+      ("k" "kbd" markdown-insert-kbd)
+      ("t" "Table" markdown-insert-table)
+      ("w" "Wiki Link" markdown-insert-wiki-link)]])
+  ;; (mantle:meow/transient:markdown/insert)
+
+
+  (mantle:meow:leader/local:key markdown-mode-map
+                                "i" mantle:meow/transient:markdown/insert))
 
 
 ;;------------------------------
@@ -303,16 +315,18 @@
 ;; Keybinds : Meow
 ;;------------------------------
 
-;; (imp:use-package markdown-toc
-;;   :when  (imp:flag? :keybinds +meow)
-;;   :after (:and markdown-mode meow)
+(imp:use-package markdown-toc
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and markdown-mode meow)
 
-;;   ;;------------------------------
-;;   :bind ; meow
-;;   ;;------------------------------
-;;   ;; Add to "Insert" keybinds...
-;;   (:map mantle:meow/keymap/local:markdown/insert
-;;    ("T" . #'markdown-toc-generate-toc))) ; Table Of Content
+  ;;------------------------------
+  :config
+  ;;------------------------------
+  ;; Add to "Insert" keybinds...
+
+  ;; TODO HERE
+  (:map mantle:meow/keymap/local:markdown/insert
+   ("T" . #'markdown-toc-generate-toc))) ; Table Of Content
 
 
 ;;------------------------------
