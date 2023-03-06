@@ -76,6 +76,34 @@
   (autoload 'comint-truncate-buffer "comint" nil t))
 
 
+;;------------------------------
+;; Keybinds : Meow
+;;------------------------------
+
+(imp:use-package compile
+  :when  (imp:flag? :keybinds +meow)
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (defcustom mantle:meow/key:local/compile "c"
+    "Keybind for buffer's 'compile...' menu of commands, if any.
+
+Example: `terraform-mode' can use this to create its compile commands for
+`terraform apply' et al:
+  ;; `defhydra' or `transient-define-prefix' or something:
+  ;; Let's call its result `mantle:meow/terraform:compile'.
+  (mantle:meow:leader/local:keys terraform-mode-map
+                                 mantle:keybind/meow:local/compile
+                                 #'mantle:meow/terraform:compile)
+                                 (elisp:cmd (compile \"terraform apply\") t))
+
+  (mantle:keybind/meow:local/compile )"
+    :group 'innit:group
+    :type '(string)))
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
