@@ -35,6 +35,39 @@
   :init
   ;;------------------------------
 
+  (defcustom mantle:meow:visit/case-fold-search t
+    "Should `meow-visit' be case sensitive or not?
+
+nil      - Not case sensitive.
+t        - Case sensitive.
+:inherit - Leave `case-fold-search' alone!"
+    :group 'innit:group
+    :type  '(choice (const :tag "Case Insensitive" t)
+                    (const :tag "Case Sensitive"   nil)
+                    (const :tag "Inherit `case-fold-search' Sensitivity" :inherit)))
+
+
+  (define-advice meow--visit-point (:override (text reverse) mantle:advice:visit/case-insensitive)
+    "Case-insesitive `meow-visit'.
+
+I want `meow-visit' to be optionally case-sensitive, but `meow--visit-point'
+forces `case-fold-search' to nil, which forces the search to always be
+case-sensitive. See `mantle:meow:visit/case-fold-search' for case-sensitivity
+setting.
+
+Return the point of text for visit command.
+Argument TEXT current search text.
+Argument REVERSE if selection is reversed."
+    (let ((func (if reverse #'re-search-backward #'re-search-forward))
+          (func-2 (if reverse #'re-search-forward #'re-search-backward))
+          (case-fold-search (if (eq mantle:meow:visit/case-fold-search :inherit)
+                              case-fold-search
+                             mantle:meow:visit/case-fold-search)))
+      (save-mark-and-excursion
+        (or (funcall func text nil t 1)
+            (funcall func-2 text nil t 1)))))
+
+
   (defconst mantle:meow:orphan:prefix "C-c M-m M-e M-o M-w"
     "A prefix for commands we don't need/want bound but meow still does.
 
