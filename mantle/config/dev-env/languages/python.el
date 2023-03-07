@@ -240,28 +240,17 @@ MODULE should be a string of the module name."
   :after (:and python meow)
 
   ;;------------------------------
-  :init
-  ;;------------------------------
-
-  ;; Have to create early so `py-isort' can use this too...
-  (mantle:meow:keymap
-      mantle:meow/keymap/local:python/import-isort
-      "Python import & isort commands")
-
-  ;;------------------------------
-  :bind ; meow
-  ;;------------------------------
-
-  (:map mantle:meow/keymap/local:python/import-isort
-   ("i" . #'pyimport-insert-missing) ; Insert missing import for item at point.
-   ("r" . #'pyimport-remove-unused)) ; Remove unused imports from file.
-
-  ;;------------------------------
   :config
   ;;------------------------------
 
+  (transient-define-prefix mantle:meow/transient:python/import ()
+    "`python-mode' import menu"
+    ["Import..."
+     ("i" "Insert missing import for item at point." pyimport-insert-missing)
+     ("r" "Remove unused imports from file." pyimport-remove-unused)])
+
   (mantle:meow:leader/local:key python-mode-map
-                                "i" 'mantle:meow/keymap/local:import-isort))
+                                "i" 'mantle:meow/transient:python/import))
 
 
 (imp:use-package py-isort
@@ -269,11 +258,17 @@ MODULE should be a string of the module name."
   :after (:and python meow)
 
   ;;------------------------------
-  :bind ; meow
+  :config
   ;;------------------------------
-  (:map mantle:meow/keymap/local:python/import-isort
-   ("s" . #'py-isort-buffer)   ; Sort imports
-   ("r" . #'py-isort-region))) ; Sort region
+
+  (transient-define-prefix mantle:meow/transient:python/sort ()
+    "`python-mode' sort menu"
+    ["Sort..."
+     ("s" "Sort imports" py-isort-buffer)
+     ("r" "Sort region" py-isort-region)])
+
+  (mantle:meow:leader/local:key python-mode-map
+                                "s" 'mantle:meow/transient:python/sort))
 
 
 ;;------------------------------
@@ -349,20 +344,20 @@ MODULE should be a string of the module name."
   :config
   ;;------------------------------
 
-  (mantle:meow:keymap
-      mantle:meow/keymap/local:python/pipenv
-      "`web-mode' \"attribute\" keybinds"
-   ("a" #'pipenv-activate)   ; activate
-   ("d" #'pipenv-deactivate) ; deactivate
-   ("i" #'pipenv-install)    ; install
-   ("l" #'pipenv-lock)       ; lock
-   ("o" #'pipenv-open)       ; open module
-   ("r" #'pipenv-run)        ; run
-   ("s" #'pipenv-shell)      ; shell
-   ("u" #'pipenv-uninstall)) ; uninstall
+  (transient-define-prefix mantle:meow/transient:python/pipenv ()
+    "`pipenv' keybinds menu"
+    ["`pipenv`"
+     ("a" "activate" pipenv-activate)
+     ("d" "deactivate" pipenv-deactivate)
+     ("i" "install" pipenv-install)
+     ("l" "lock" pipenv-lock)
+     ("o" "open module" pipenv-open)
+     ("r" "run" pipenv-run)
+     ("s" "shell" pipenv-shell)
+     ("u" "uninstall" pipenv-uninstall)])
 
   (mantle:meow:leader/local:key python-mode-map
-                                "e" 'mantle:meow/keymap/local:python/pipenv))
+                                "e" 'mantle:meow/transient:python/pipenv))
 
 
 ;;------------------------------
@@ -624,18 +619,17 @@ MODULE should be a string of the module name."
       ;;------------------------------
       :config
       ;;------------------------------
-      (mantle:meow:keymap
-          mantle:meow/keymap/local:python/anaconda
-          "Python Anaconda keybinds"
-       ("d" #'anaconda-mode-find-definitions) ; Find Definitions
-       ("h" #'anaconda-mode-show-doc)         ; Show Doc
-       ("a" #'anaconda-mode-find-assignments) ; Find Assignments
-       ("f" #'anaconda-mode-find-file)        ; Find File
-       ("u" #'anaconda-mode-find-references)) ; Find References
+      (transient-define-prefix mantle:meow/transient:python/anaconda ()
+        "`anaconda' keybinds menu"
+        ["Anaconda..."
+         ("d" "Find Definitions" anaconda-mode-find-definitions)
+         ("h" "Show Doc" anaconda-mode-show-doc)
+         ("a" "Find Assignments" anaconda-mode-find-assignments)
+         ("f" "Find File" anaconda-mode-find-file)
+         ("u" "Find References" anaconda-mode-find-references)])
 
-      ;; TODO: Does this go under "g"?
-      (mantle:meow:leader/local:key 'anaconda-mode-map
-                                    "g" 'mantle:meow/keymap/local:python/anaconda))
+      (mantle:meow:leader/local:key python-mode-map
+                                    "a" 'mantle:meow/transient:python/anaconda))
 
 
     ;;------------------------------
@@ -709,19 +703,19 @@ MODULE should be a string of the module name."
   ;;------------------------------
   :config
   ;;------------------------------
-  (mantle:meow:keymap
-      mantle:meow/keymap/local:python/pytest
-      "Pytest keybinds"
-    ("a" #'python-pytest)               ; Run all tests
-    ("f" #'python-pytest-file-dwim)     ; DWIM: Run tests on file
-    ("F" #'python-pytest-file)          ; Run tests on file
-    ("t" #'python-pytest-function-dwim) ; DWIM: Run tests on function
-    ("T" #'python-pytest-function)      ; Run tests on function
-    ("r" #'python-pytest-repeat)        ; Repeat tests
-    ("p" #'python-pytest-dispatch))     ; Pytest Popup...
+  (transient-define-prefix mantle:meow/transient:python/pytest ()
+    "`pytest' keybinds menu"
+    ["Pytest..."
+     ("a" "Run all tests" python-pytest)
+     ("f" "DWIM: Run tests on file" python-pytest-file-dwim)
+     ("F" "Run tests on file" python-pytest-file)
+     ("t" "DWIM: Run tests on function" python-pytest-function-dwim)
+     ("T" "Run tests on function" python-pytest-function)
+     ("r" "Repeat tests" python-pytest-repeat)
+     ("p" "Pytest Popup..." python-pytest-dispatch)])
 
   (mantle:meow:leader/local:key python-mode-map
-                                "t" 'mantle:meow/keymap/local:python/pytest))
+                                "t" 'mantle:meow/transient:python/pytest))
 
 
 ;;------------------------------
