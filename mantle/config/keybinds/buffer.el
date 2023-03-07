@@ -36,60 +36,51 @@
 
   (transient-define-prefix mantle:meow/transient:buffer ()
     "Buffer commands that should be available globally."
-    ;;---
-    ;; Change Buffers
-    ;;---
-    ;; NOTE: The primary (lowercase) keybind for buffer switching should be
-    ;; perspective/workspace/whatever-aware. It should be replaced in a
-    ;; `use-package' for e.g. `persp-mode'.
-    [("b" "Switch Buffer"   switch-to-buffer)]
-    [("B" "Switch Buffer"   switch-to-buffer)]
+    ["Buffer..."
+     ["Change Buffers"
+      ;; NOTE: The primary (lowercase) keybind for buffer switching should be
+      ;; perspective/workspace/whatever-aware. It should be replaced in a
+      ;; `use-package' for e.g. `persp-mode'.
+      ("b" "Switch Buffer"   switch-to-buffer)
+      ("B" "Switch Buffer"   switch-to-buffer)
 
-    [("k" "Kill Buffer"     kill-current-buffer)]
+      ("k" "Kill Buffer"     kill-current-buffer)
 
-    [("z" "Bury Buffer"     bury-buffer)]
+      ("z" "Bury Buffer"     bury-buffer)
 
-    [("[" "Previous Buffer" previous-buffer)]
-    [("]" "Next Buffer"     next-buffer)]
+      ("[" "Previous Buffer" previous-buffer)
+      ("]" "Next Buffer"     next-buffer)
 
-    [("x" "Switch to '*scratch*'" mantle:meow/transient:buffer:switch-to/scratch)]
+      ("x" "Switch to '*scratch*'" mantle:meow/transient:buffer:switch-to/scratch)]
 
-    ;;---
-    ;; Indirect Buffers
-    ;;---
-    [("i" "Indirect Buffer" clone-indirect-buffer)]
+     ["Indirect Buffers"
+      ("i" "Indirect Buffer" clone-indirect-buffer)]
 
-    ;;---
-    ;; Narrow / Widen
-    ;;---
-    [("-" "Narrow / Widen" buffer:cmd:narrow/toggle)]
+     ["Narrow / Widen"
+      ("-" "Narrow / Widen" buffer:cmd:narrow/toggle)]
 
-    ;;---
-    ;; Saving & Naming
-    ;;---
-    [("R" "Rename Buffer" rename-buffer)]
-    [("s" "💾 Save"      save-buffer)]
+     ["Saving & Naming"
+      ("R" "Rename Buffer" rename-buffer)
+      ("s" "💾 Save"      save-buffer)]]
 
-  ;;------------------------------
-  ;; Bookmarks
-  ;;------------------------------
-  ;; Not sure if these should be here, in "File...", or in their own keybinds. Doom has
-  ;; them in with the "Buffer..." keybinds but you can't set a bookmark on a
-  ;; buffer with no backing file/directory so that feels like the wrong place
-  ;; other than "b" == "bookmark"?
-  ;;
-  ;; ...On the other hand, "b" == "bookmark" is a decent reason?
-
-   [("m" "Set Bookmark"     bookmark-set)]
-   [("M" "Delete Bookmark"  bookmark-delete)]
-   [("j" "Jump to Bookmark" bookmark-jump)])
+    ;; Not sure if these should be here, in "File...", or in their own keybinds. Doom has
+    ;; them in with the "Buffer..." keybinds but you can't set a bookmark on a
+    ;; buffer with no backing file/directory so that feels like the wrong place
+    ;; other than "b" == "bookmark"?
+    ;;
+    ;; ...On the other hand, "b" == "bookmark" is a decent reason?
+    ["Bookmarks..."
+     ("m" "Set Bookmark"     bookmark-set)
+     ("M" "Delete Bookmark"  bookmark-delete)
+     ("j" "Jump to Bookmark" bookmark-jump)])
+  ;; (mantle:meow/transient:buffer)
 
 
   ;;------------------------------
   ;; Entrypoint
   ;;------------------------------
 
-  ;; TODO-meow: Better at `SPC b' or at `b'?
+  ;; TODO-meow: Better at `SPC b' or at `b'? `b' already taken in certain mode maps...
   ;; "SPC b [...]" ; :which-key "Buffer..."
   (meow-leader-define-key
    '("b" . mantle:meow/transient:buffer)) ; :which-key "Buffer..."
