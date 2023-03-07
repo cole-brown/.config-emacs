@@ -194,136 +194,111 @@
 ;; Keybinds : Meow
 ;;------------------------------
 
-;; (imp:use-package web-mode
-;;   :when  (imp:flag? :keybinds +meow)
-;;   :after meow
+(imp:use-package web-mode
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
 
-;;   ;;------------------------------
-;;   :config
-;;   ;;------------------------------
+  ;;------------------------------
+  :config
+  ;;------------------------------
 
-;;   ;;---
-;;   ;; Attribute
-;;   ;;---
-;;   (mantle:meow:keymap
-;;       mantle:meow/keymap/local:web/attribute
-;;       "`web-mode' \"attribute\" keybinds"
-;;    ("b" #'web-mode-attribute-beginning)  ; Beginning
-;;    ("e" #'web-mode-attribute-end)        ; End
-;;    ("i" #'web-mode-attribute-insert)     ; Insert
-;;    ("n" #'web-mode-attribute-next)       ; Next
-;;    ("s" #'web-mode-attribute-select)     ; Select
-;;    ("k" #'web-mode-attribute-kill)       ; Kill
-;;    ("p" #'web-mode-attribute-previous)   ; Previous
-;;    ("t" #'web-mode-attribute-transpose)) ; Transpose
+  ;;---
+  ;; Local Leader: Insert...
+  ;;---
+  (transient-define-prefix mantle:meow/transient:markdown/insert ()
+    "`web-mode' insert menu"
+    ["Insert..."
+     ["Attribute"
+      ("b" "Beginning" web-mode-attribute-beginning)
+      ("e" "End" web-mode-attribute-end)
+      ("i" "Insert" web-mode-attribute-insert)
+      ("n" "Next" web-mode-attribute-next)
+      ("s" "Select" web-mode-attribute-select)
+      ("k" "Kill" web-mode-attribute-kill)
+      ("p" "Previous" web-mode-attribute-previous)
+      ("t" "Transpose" web-mode-attribute-transpose)]
 
-;;   (mantle:meow:leader/local:key web-mode-map
-;;                                 "a" 'mantle:meow/keymap/local:web/attribute)
+     ["Block"
+      ("b" "Beginning" web-mode-block-beginning)
+      ("c" "Close" web-mode-block-close)
+      ("e" "End" web-mode-block-end)
+      ("k" "Kill" web-mode-block-kill)
+      ("n" "Next" web-mode-block-next)
+      ("p" "Previous" web-mode-block-previous)
+      ("s" "Select" web-mode-block-select)]
 
-;;   ;;---
-;;   ;; Block
-;;   ;;---
-;;   (mantle:meow:keymap
-;;        mantle:meow/keymap/local:web/block
-;;        "`web-mode' \"block\" keybinds"
-;;     ("b" #'web-mode-block-beginning) ; Beginning
-;;     ("c" #'web-mode-block-close)     ; Close
-;;     ("e" #'web-mode-block-end)       ; End
-;;     ("k" #'web-mode-block-kill)      ; Kill
-;;     ("n" #'web-mode-block-next)      ; Next
-;;     ("p" #'web-mode-block-previous)  ; Previous
-;;     ("s" #'web-mode-block-select))   ; Select
+     ["DOM"
+      ("a" "Replace Apostrophies" web-mode-dom-apostrophes-replace)
+      ("d" "Show Errors" web-mode-dom-errors-show)
+      ("e" "Encode Entities" web-mode-dom-entities-encode)
+      ("n" "Normalize" web-mode-dom-normalize)
+      ("q" "Replace Quotes" web-mode-dom-quotes-replace)
+      ("t" "Traverse" web-mode-dom-traverse)
+      ("x" "XPath" web-mode-dom-xpath)]
 
-;;   (mantle:meow:leader/local:key web-mode-map
-;;                                 "a" 'mantle:meow/keymap/local:web/block)
+     ["Element"
+      ("/" "Close" web-mode-element-close)
+      ("a" "Select Content" web-mode-element-content-select)
+      ("b" "Beginning" web-mode-element-beginning)
+      ("c" "Clone" web-mode-element-clone)
+      ("d" "Child" web-mode-element-child)
+      ("e" "End" web-mode-element-end)
+      ("f" "Fold/Unfold Children" web-mode-element-children-fold-or-unfold)
+      ("i" "Insert" web-mode-element-insert)
+      ("k" "Kill" web-mode-element-kill)
+      ("m" "Mute Blanks" web-mode-element-mute-blanks)
+      ("n" "Next" web-mode-element-next)
+      ("p" "Previous" web-mode-element-previous)
+      ("r" "Rename" web-mode-element-rename)
+      ("s" "Select" web-mode-element-select)
+      ("t" "Transpose" web-mode-element-transpose)
+      ("u" "Parent" web-mode-element-parent)
+      ("v" "Vanish" web-mode-element-vanish)
+      ("w" "Wrap" web-mode-element-wrap)]
 
-;;   ;;---
-;;   ;; DOM
-;;   ;;---
-;;   (mantle:meow:keymap
-;;        mantle:meow/keymap/local:web/dom
-;;        "`web-mode' \"DOM\" keybinds"
-;;     ("a" #'web-mode-dom-apostrophes-replace) ; Replace Apostrophies
-;;     ("d" #'web-mode-dom-errors-show)         ; Show Errors
-;;     ("e" #'web-mode-dom-entities-encode)     ; Encode Entities
-;;     ("n" #'web-mode-dom-normalize)           ; Normalize
-;;     ("q" #'web-mode-dom-quotes-replace)      ; Replace Quotes
-;;     ("t" #'web-mode-dom-traverse)            ; Traverse
-;;     ("x" #'web-mode-dom-xpath))              ; XPath
+     ["Tag"
+      ("a" "Sort Attributes" web-mode-tag-attributes-sort)
+      ("b" "Beginning" web-mode-tag-beginning)
+      ("e" "End" web-mode-tag-end)
+      ("m" "Match" web-mode-tag-match)
+      ("n" "Next" web-mode-tag-next)
+      ("p" "Previous" web-mode-tag-previous)
+      ("s" "Select" web-mode-tag-select)]])
 
-;;   (mantle:meow:leader/local:key web-mode-map
-;;                                 "d" 'mantle:meow/keymap/local:web/dom)
+  (mantle:meow:leader/local:keys web-mode-map
+                                 "i" mantle:meow/transient:markdown/insert)
 
-;;   ;;---
-;;   ;; Element
-;;   ;;---
-;;   (mantle:meow:keymap
-;;        mantle:meow/keymap/local:web/element
-;;        "`web-mode' \"ELEMENT\" keybinds"
-;;     ("/" #'web-mode-element-close)                   ; Close
-;;     ("a" #'web-mode-element-content-select)          ; Select Content
-;;     ("b" #'web-mode-element-beginning)               ; Beginning
-;;     ("c" #'web-mode-element-clone)                   ; Clone
-;;     ("d" #'web-mode-element-child)                   ; Child
-;;     ("e" #'web-mode-element-end)                     ; End
-;;     ("f" #'web-mode-element-children-fold-or-unfold) ; Fold/Unfold Children
-;;     ("i" #'web-mode-element-insert)                  ; Insert
-;;     ("k" #'web-mode-element-kill)                    ; Kill
-;;     ("m" #'web-mode-element-mute-blanks)             ; Mute Blanks
-;;     ("n" #'web-mode-element-next)                    ; Next
-;;     ("p" #'web-mode-element-previous)                ; Previous
-;;     ("r" #'web-mode-element-rename)                  ; Rename
-;;     ("s" #'web-mode-element-select)                  ; Select
-;;     ("t" #'web-mode-element-transpose)               ; Transpose
-;;     ("u" #'web-mode-element-parent)                  ; Parent
-;;     ("v" #'web-mode-element-vanish)                  ; Vanish
-;;     ("w" #'web-mode-element-wrap))                   ; Wrap
+  ;;---
+  ;; Local Leader: Misc.
+  ;;---
+  (transient-define-prefix mantle:meow/transient:markdown/misc ()
+    "`web-mode' insert menu"
+    [["Buffer..."
+      ("h" "Rehighlight Buffer" web-mode-reload)
+      ("i" "Indent Buffer" web-mode-buffer-indent)
+      ;; TODO-meow: Somewhere else? This is an evil key for fold/unfold...
+      ;; TODO-meow: like... ([remap func-or-unfunc] . web-mode-fold-or-unfold) in a `:bind' section?
+      ("f"  "Fold/Unfold" web-mode-fold-or-unfold)]
+     ;; TODO-meow: move to actual movement keys or... somewhere you can spam repeat? Does transient have a no-exit hydra kinda thing?
+     ["Movement"
+      ("]a" "Attribute: Next" web-mode-attribute-next)
+      ("[a" "Attribute: Previous" web-mode-attribute-previous)
+      ("]t" "Tag: Next" web-mode-tag-next)
+      ("[t" "Tag: Previous" web-mode-tag-previous)
+      ("]T" "Child: Next" web-mode-element-child)
+      ("[T" "Child: Previous" web-mode-element-parent)]])
 
-;;   (mantle:meow:leader/local:key web-mode-map
-;;                                 "e" 'mantle:meow/keymap/local:web/element)
+  (mantle:meow:leader/local:keys web-mode-map
+                                 "l" mantle:meow/transient:markdown/misc)
 
-;;   ;;---
-;;   ;; Tag
-;;   ;;---
-;;   (mantle:meow:keymap
-;;        mantle:meow/keymap/local:web/tag
-;;        "`web-mode' \"tag\" keybinds"
-;;    ("a" #'web-mode-tag-attributes-sort) ; Sort Attributes
-;;    ("b" #'web-mode-tag-beginning)       ; Beginning
-;;    ("e" #'web-mode-tag-end)             ; End
-;;    ("m" #'web-mode-tag-match)           ; Match
-;;    ("n" #'web-mode-tag-next)            ; Next
-;;    ("p" #'web-mode-tag-previous)        ; Previous
-;;    ("s" #'web-mode-tag-select))         ; Select
+  ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
 
-;;   (mantle:meow:leader/local:key web-mode-map
-;;                                 "e" 'mantle:meow/keymap/local:web/tag)
+  (:map web-mode-map
+   ;; TODO-meow: Where is my comment/uncomment actually? Evil/Doom had it on "gc".
+   ("M-/" . web-mode-comment-or-uncomment))) ; Comment/Uncomment
 
-;;   ;;---
-;;   ;; Local Leader: Misc.
-;;   ;;---
-;;   (mantle:meow:leader/local:keys web-mode-map
-;;                                  "h" #'web-mode-reload         ; Rehighlight Buffer
-;;                                  "i" #'web-mode-buffer-indent) ; Indent Buffer
-
-;;   (mantle:meow:leader/local:keys web-mode-map
-;;                                  "]a" #'web-mode-attribute-next     ; Attribute: Next
-;;                                  "[a" #'web-mode-attribute-previous ; Attribute: Previous
-;;                                  "]t" #'web-mode-tag-next           ; Tag: Next
-;;                                  "[t" #'web-mode-tag-previous       ; Tag: Previous
-;;                                  "]T" #'web-mode-element-child      ; Child: Next
-;;                                  "[T" #'web-mode-element-parent)    ; Child: Previous
-
-;;   ;;------------------------------
-;;   :bind ; meow
-;;   ;;------------------------------
-
-;;   (:map web-mode-map
-;;    ;; TODO: Where is my comment/uncomment actually? Evil/Doom had it on "gc".
-;;    ("M-/" . web-mode-comment-or-uncomment) ; Comment/Uncomment
-;;    ;; TODO: Somewhere else?
-;;    ("za"  . web-mode-fold-or-unfold)))
-                                        ; Fold/Unfold
 
 
 ;;------------------------------

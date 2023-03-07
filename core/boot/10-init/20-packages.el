@@ -70,8 +70,11 @@
 ;;------------------------------------------------------------------------------
 ;; Keybind Menus
 ;;------------------------------------------------------------------------------
-
 ;; Need `transient' around early so it can be used to create keybind menus.
+
+;; Examples: https://github.com/positron-solutions/transient-showcase
+;; Manual:   https://magit.vc/manual/transient.html
+;; Repo:     https://github.com/magit/transient
 (imp:use-package transient)
 
 ;; TODO: Move hydra, pretty-hydra here?
