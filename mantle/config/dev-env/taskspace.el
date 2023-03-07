@@ -27,10 +27,10 @@
 
 (imp:use-package taskspace
   ;; This is my own package, so...
-  ;;   1) Don't try to install.
+  ;;   1. Don't try to install.
   :ensure nil
   ;; TODO: Probably need `taskspace' to be a real package?
-  ;;   2) Here's where it is; add this dir to the `load-path'.
+  ;;   2. Here's where it is; add this dir to the `load-path'.
   ;; :load-path innit:path:package:mis
 
   ;;------------------------------
@@ -153,7 +153,55 @@ and see what file it's defined in."
   ;;
   ;; I am :confused:, but ok whatever; pushing directly into `taskspace:groups'
   ;; during `:init' works.
+  )
 
+
+;;------------------------------
+;; Keybinds : Meow
+;;------------------------------
+
+(imp:use-package taskspace
+  ;; This is my own package, so...
+  ;;   1) Don't try to install.
+  :ensure nil
+  ;; TODO: Probably need `taskspace' to be a real package?
+  ;;   2) Here's where it is; add this dir to the `load-path'.
+  ;; :load-path innit:path:package:mis
+
+  ;; Defer loading; we'll load in a hook if we want this.
+  :defer t
+
+  ;; Only load if meowing...
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (taskspace:keybind:transient/def)
+  ;; TODO-meow: Put into the "notes" menu/transient instead.
+  (meow-leader-define-key '("t" . taskspace:keybind:transient))
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package taskspace
+  ;; This is my own package, so...
+  ;;   1) Don't try to install.
+  :ensure nil
+  ;; TODO: Probably need `taskspace' to be a real package?
+  ;;   2) Here's where it is; add this dir to the `load-path'.
+  ;; :load-path innit:path:package:mis
+
+  ;; Defer loading; we'll load in a hook if we want this.
+  :defer t
+
+  ;; Only load if very evil...
+  :when  (imp:flag? :keybinds +evil)
+  :after (:and python evil evil-collection)
 
   ;;------------------------------
   :config

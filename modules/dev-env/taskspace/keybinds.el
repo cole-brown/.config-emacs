@@ -25,6 +25,7 @@
 (require 'dash)
 (require 'org-element)
 
+
 (imp:require :dlv)
 
 (imp:require :nub)
@@ -143,6 +144,50 @@ Call this function with the desired keybind settings:
                          "d" (list #'taskspace:dired:task :which-key "task's dired buffer")
                          "r" (list #'taskspace:dired:root :which-key "root's dired buffer"))))
 ;; (taskspace:keybind:general
+;;     :prefix  "SPC n"
+;;     :states  '(normal visual motion)
+;;     :keymaps 'override)
+
+
+;;------------------------------------------------------------------------------
+;; Transient
+;;------------------------------------------------------------------------------
+
+
+(defmacro taskspace:keybind:transient/def (&rest args)
+  "Define a `transient' prefix named: `taskspace:keybind:transient'.
+
+Check for `transient' feature first and error if not provided. Done this way so
+that `transient' itself isn't a dependency package.
+
+You will need to bind this transient to whatever keys you want.
+Example:
+  (use-package taskspace
+    ;; ...
+    :config
+    (taskspace:keybind:transient/def)
+    (bind-key \"C-c C-t\" taskspace:keybind:transient))"
+  (unless (featurep 'transient)
+    (nub:error
+     :taskspace
+     "taskspace:keybind:transient"
+     "`transient' feature is not loaded/defined! Cannot create keybinds."))
+
+  `(transient-define-prefix taskspace:keybind:transient ()
+    "Taskspace Menu"
+    [["Taskspace..."
+     ("t" "New"   taskspace:create)
+     ("v" "Visit" taskspace:notes)
+     ("s" "Shell" taskspace:shell)]
+
+     ["Copy/Kill..."
+      ("k" "dir"   taskspace:dwim:dir)
+      ("n" "name"  taskspace:dwim:name)]
+
+     ["Dired..."
+      ("d" "task's dired buffer" taskspace:dired:task)
+      ("r" "root's dired buffer" taskspace:dired:root)]]))
+;; (taskspace:keybind:transient
 ;;     :prefix  "SPC n"
 ;;     :states  '(normal visual motion)
 ;;     :keymaps 'override)
