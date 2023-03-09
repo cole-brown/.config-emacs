@@ -75,7 +75,16 @@
 ;; Examples: https://github.com/positron-solutions/transient-showcase
 ;; Manual:   https://magit.vc/manual/transient.html
 ;; Repo:     https://github.com/magit/transient
-(imp:use-package transient)
+(imp:use-package transient
+  ;;------------------------------
+  :bind
+  ;;------------------------------
+  ;; Make "C-g" quit all instead of one, and "g" quit one transient.
+  ;; TODO-meow: How to actually make that happen? These make "g" and "C-g", but
+  ;; "f f C-g" still only backs out of one. Do I need to restart emacs or something?
+  (:map transient-base-map
+   ("g" . transient-quit-one)
+   ("C-g" . transient-quit-all)))
 
 ;; TODO: Move hydra, pretty-hydra here?
 
