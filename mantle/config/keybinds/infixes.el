@@ -22,6 +22,8 @@
 ;;------------------------------------------------------------------------------
 ;; NOTE: Keep in alphanumerical order!
 
+;; TODO-meow: hide evil infixes
+
 (keybind:leader/global:def
  :infix "i"                        ; insert
  "" '(nil :which-key "Insert...")) ; infix's title

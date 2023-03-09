@@ -179,9 +179,15 @@ and see what file it's defined in."
   :config
   ;;------------------------------
 
+  ;; Define the transient - will be `taskspace:keybind:transient'.
   (taskspace:keybind:transient/def)
-  ;; TODO-meow: Put into the "notes" menu/transient instead.
-  (meow-leader-define-key '("t" . taskspace:keybind:transient))
+  ;; Put into the "notes" menu/transient instead of directly in meow leader.
+  (transient-append-suffix 'mantle:meow/transient:notes
+    '(0 -1) ; Append after last group/suffix in the first group.
+    ["Taskspace"
+     ("t" "Taskspace..." taskspace:keybind:transient)])
+  ;; (meow-leader-define-key '("t" . taskspace:keybind:transient))
+  )
 
 
 ;;------------------------------

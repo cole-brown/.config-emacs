@@ -38,21 +38,6 @@
 ;; Org-Mode
 ;;------------------------------------------------------------------------------
 
-;; TODO: delete this lil block:
-;; ;;------------------------------
-;; ;; MUST PROCEED ORG SETUP?
-;; ;;------------------------------
-;;
-;; ;; DOOM-NOTE:
-;; ;; If you use `org' and don't want your org files in the default location below,
-;; ;; change `org-directory'. It must be set before org loads!
-;; (if-let (lily (jerky:get 'path 'lily))
-;;     ;; Set org to use lily dir if we have it.
-;;     (setq org-directory lily)
-;;   ;; Otherwise not sure... This is fine until something is figured out.
-;;   (setq org-directory "~/org/"))
-
-
 ;;------------------------------
 ;; Org-Mode Set-Up
 ;;------------------------------
@@ -238,22 +223,56 @@
   ;;               :after #'org:advice/org-indent/prefix-munger)
   )
 
+
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
-;; TODO-meow: Something for meow too?
-(imp:eval:after (:and (:keybinds user general)
-                      evil
-                      evil-collection
-                      org
-                      evil-org)
+
+(imp:use-package org
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; Creation of this Should be moved to "keybinds/notes.el" if any non-org
+  ;; stuff wants added.
+  (transient-define-prefix mantle:meow/transient:notes ()
+    "Notes commands like org-mode links, org-journal entries, etc."
+     [["Links"
+       ("s" "Link: Store"  org-store-link)
+       ("l" "Link: Insert" org-insert-link)
+       ("h" "Link: Insert as \"here\"/region" mode:cmd:org:here/link)
+       ("k" "Link: Yank as \"here\"/region"  mode:cmd:org:here/yank)]
+      ["Agenda"
+       ("A" "`org-agenda'" org-agenda)
+       ("t" "Tags Search" org-tags-view)
+       ("v" "View Search" org-search-view)]])
+  ;; (mantle:meow/transient:notes)
+
+  (meow-leader-define-key '("n" . mantle:meow/transient:notes)))
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:eval:after (:keybinds user general)
+  (imp:use-package org
+    :when  (imp:flag? :keybinds +evil)
+    :after (:and evil evil-collection evil-org)
+
+  ;;------------------------------
+  :general ; evil
+  ;;------------------------------
+
   ;; Override the usual `evil-open-below' with a Special Org Version.
   ;; See "mantle/config/keybinds/evil/evil.el" for the usual evil state keybinds.
-  (general-define-key
-   :states 'normal
+  (:states 'normal
    :keymaps '(evil-org-mode-map)
    :prefix "s"
-   "t" #'evil-org-open-below))
+   "t" #'evil-org-open-below)))
 
 
 ;; TODO-meow: Delete after checking org-mode to see if these can be deleted.
@@ -289,6 +308,30 @@
 ;;  (defun mode:org:speed-commands? ()
 ;;    "Allow speed keys when at any headline *, not just beginning of line."
 ;;    (and (looking-at org-outline-regexp) (looking-back "^\**")))
+
+
+;;------------------------------------------------------------------------------
+;; Org-Agenda
+;;------------------------------------------------------------------------------
+
+(imp:eval:after org-mode
+  ;;------------------------------
+  ;; Org-Agenda & the Billion Orphaned Org Buffers
+  ;;------------------------------
+  ;; Thanks to: https://emacs.stackexchange.com/a/20438
+  ;;---
+
+  ;; `org-agenda-quit' is evil - it leaves a billion org mode buffers open.
+  ;; And it's innocently sat there at "q" that apparently nothing in evil overrides...
+  (bind-key [remap org-agenda-quit]
+            #'org-agenda-exit
+            org-agenda-keymap)
+  ;; And this is at "Q".
+  (bind-key [remap org-agenda-Quit]
+            #'org-agenda-exit
+            org-agenda-keymap)
+  ;; Fuck y'all both.
+  )
 
 
 ;;------------------------------------------------------------------------------
@@ -342,60 +385,6 @@ Then runs COMMAND interactively with ARGS."
   ;; (mode:org/journal:namespaced :home #'message "%s %s" org-journal-file-format org-journal-dir)
   ;; (mode:org/journal:namespaced :work #'message "%s %s" org-journal-file-format org-journal-dir)
 
-
-  (defun mode:org/journal:keybind (namespace letter)
-    "Create keybinds for NAMESPACE in global leader under LETTER.
-
-NAMESPACE must be a keyword. NAMESPACE must exist as a namespace in Jerky.
-
-LETTER must be a 1-character string."
-    (if (not (jerky:namespace:has namespace))
-        ;; TODO: Raise `innit:error:???' instead of warn?
-        (nub:warning
-         :innit
-         (imp:path:join (imp:path:current:dir/relative :mantle)
-                        (imp:path:current:file))
-         "No `%1$S' namespace in Jerky; cannot set up `%2$S' keybinds for `%1$S'."
-         namespace
-         'org-journal)
-      (if (not (jerky:get 'path 'org 'journal :namespace namespace))
-          ;; TODO: Raise `innit:error:???' instead of warn?
-          (nub:warning
-           :innit
-           (imp:path:join (imp:path:current:dir/relative :mantle)
-                          (imp:path:current:file))
-           "No `%1$S' key in `%2$S' namespace in Jerky; cannot set up `%3$S' keybinds for `%2$S'."
-           (jerky:key:string 'path 'org 'journal)
-           namespace
-           'org-journal)
-
-        ;; Ok; make our NAMESPACE keybinds!
-        (keybind:leader/global:def
-         :infix (keybind:infix "n" letter) ;; notes -> NAMESPACE journal
-         "" (list nil :which-key (format "Journal: `%S'..." namespace)) ;; Infix Title
-
-         letter (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                              #'org-journal-new-entry
-                                                              current-prefix-arg))
-                      :which-key (format "`%S' - New Entry" namespace))
-         "j" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-new-entry
-                                                           current-prefix-arg))
-                   :which-key (format "`%S' - New Entry" namespace))
-
-         "J" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-new-scheduled-entry
-                                                           current-prefix-arg))
-                   :which-key (format "`%S' - New Scheduled Entry" namespace))
-
-         "v" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-open-current-journal-file))
-                   :which-key (format "`%S' - Visit Journal" namespace))
-
-         "s" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-search-forever
-                                                           nil))
-                   :which-key (format "`%S' - Search Journal" namespace))))))
 
   ;;------------------------------
   :custom
@@ -453,11 +442,263 @@ LETTER must be a 1-character string."
              'org-journal-mode
              (list 'org-journal-dir
                    (jerky:get 'path 'org 'journal :namespace namespace)
-                   :safe)))
+                   :safe))))
 
-    ;; Create the keybinds.
-    (mode:org/journal:keybind :work "w")
-    (mode:org/journal:keybind :home "h"))
+
+;;------------------------------
+;; Keybinds : Meow
+;;------------------------------
+
+(imp:use-package org-journal
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and meow
+          org)
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  ;;---
+  ;; Make sure we have requried namespaces and paths.
+  ;;---
+  ;; TODO-meow: Do I have an easy list of valid domains/namespaces for this
+  ;; system/machine/computer? Use that instead of hard-coding.
+  (dolist (namespace '(:work :home))
+    (unless (jerky:namespace:has namespace)
+      (nub:error
+          :innit
+          macro<imp>:path/file
+        "No `%1$S' namespace in Jerky; cannot set up `%2$S' keybinds for `%1$S'."
+        namespace
+        'org-journal))
+    (unless (jerky:get 'path 'org 'journal :namespace namespace)
+      (nub:error
+          :innit
+          macro<imp>:path/file
+        "No `%1$S' key in `%2$S' namespace in Jerky; cannot set up `%3$S' keybinds for `%2$S'."
+        (jerky:key:string 'path 'org 'journal)
+        namespace
+        'org-journal)))
+
+  ;;---
+  ;; Ok; create the keybinds.
+  ;;---
+  (transient-define-suffix mantle:meow/transient:notes/org-journal:entry/new:work ()
+    "`org-journal' new entry for `:work' domain"
+    :transient t
+    :key "w"
+    :description (format "`%S' - New Entry" :work)
+    (interactive)
+    (mode:org/journal:namespaced :work
+                                 #'org-journal-new-entry
+                                 current-prefix-arg))
+
+  (transient-define-suffix mantle:meow/transient:notes/org-journal:entry/new-scheduled:work ()
+    "`org-journal' new scheduledentry for `:work' domain"
+    :transient t
+    :key "W"
+    :description (format "`%S' - New Scheduled Entry" :work)
+    (interactive)
+    (mode:org/journal:namespaced :work
+                                 #'org-journal-new-scheduled-entry
+                                 current-prefix-arg))
+
+  (transient-define-suffix mantle:meow/transient:notes/org-journal:journal/visit:work ()
+    "`org-journal' visit journal for `:work' domain"
+    :transient t
+    :key "v"
+    :description (format "`%S' - Visit Journal" :work)
+    (interactive)
+    (mode:org/journal:namespaced :work
+                                 #'org-journal-open-current-journal-file))
+
+  (transient-define-suffix mantle:meow/transient:notes/org-journal:journal/search:work ()
+    "`org-journal' search journal for `:work' domain"
+    :transient t
+    :key "s"
+    :description (format "`%S' - Search Journal" :work)
+    (interactive)
+    (mode:org/journal:namespaced :work
+                                 #'org-journal-search-forever))
+
+  (transient-define-suffix mantle:meow/transient:notes/org-journal:entry/new:home ()
+    "`org-journal' new entry for `:home' domain"
+    :transient t
+    :key "h"
+    :description (format "`%S' - New Entry" :home)
+    (interactive)
+    (mode:org/journal:namespaced :home
+                                 #'org-journal-new-entry
+                                 current-prefix-arg))
+
+  (transient-define-suffix mantle:meow/transient:notes/org-journal:entry/new-scheduled:home ()
+    "`org-journal' new scheduledentry for `:home' domain"
+    :transient t
+    :key "H"
+    :description (format "`%S' - New Scheduled Entry" :home)
+    (interactive)
+    (mode:org/journal:namespaced :home
+                                 #'org-journal-new-scheduled-entry
+                                 current-prefix-arg))
+
+  (transient-define-suffix mantle:meow/transient:notes/org-journal:journal/visit:home ()
+    "`org-journal' visit journal for `:home' domain"
+    :transient t
+    :key "v"
+    :description (format "`%S' - Visit Journal" :home)
+    (interactive)
+    (mode:org/journal:namespaced :home
+                                 #'org-journal-open-current-journal-file))
+
+  (transient-define-suffix mantle:meow/transient:notes/org-journal:journal/search:home ()
+    "`org-journal' search journal for `:home' domain"
+    :transient t
+    :key "s"
+    :description (format "`%S' - Search Journal" :home)
+    (interactive)
+    (mode:org/journal:namespaced :home
+                                 #'org-journal-search-forever))
+
+  (transient-define-prefix mantle:meow/transient:notes/org-journal:work ()
+    "`org-journal' `:work' domain keybinds"
+    ["`org-journal' :work"
+     (mantle:meow/transient:notes/org-journal:entry/new:work)
+     (mantle:meow/transient:notes/org-journal:entry/new-scheduled:work)
+     (mantle:meow/transient:notes/org-journal:journal/visit:work)
+     (mantle:meow/transient:notes/org-journal:journal/search:work)])
+
+  (transient-define-prefix mantle:meow/transient:notes/org-journal:home ()
+    "`org-journal' `:home' domain keybinds"
+    ["`org-journal' :home"
+     (mantle:meow/transient:notes/org-journal:entry/new:home)
+     (mantle:meow/transient:notes/org-journal:entry/new-scheduled:home)
+     (mantle:meow/transient:notes/org-journal:journal/visit:home)
+     (mantle:meow/transient:notes/org-journal:journal/search:home)])
+
+  (transient-append-suffix 'mantle:meow/transient:notes
+    '(0 -1) ; Append after last group/suffix in the first group.
+     ["Journal"
+     ("w" "`org-journal' :work" mantle:meow/transient:notes/org-journal:work)
+     ("h" "`org-journal' :home" mantle:meow/transient:notes/org-journal:home)])
+  ;; (mantle:meow/transient:notes)
+
+  ;; TODO: Do I want this again?
+  ;; ;; 'C-c <tab>' to show headings only (no top parent notes, no
+  ;; ;; children notes, just headings). Org-Mode had 'C-c <tab>' as
+  ;; ;; outline-show-children, which only shows direct children
+  ;; ;; headings, not all descendants' headings.
+  ;; ;; https://yiufung.net/post/org-mode-hidden-gems-pt1/
+  ;; ("C-c <tab>" . #'org-kill-note-or-show-branches)
+
+  ;; TODO: Do I want/need this again?
+  ;; ;;------------------------------
+  ;; ;; Org-Mode & the Thousand Different "RET" Key Functions
+  ;; ;;------------------------------
+  ;;
+  ;; ;; Auto-indent is a bit odd... Try swapping around RET and S-RET these so the literal newline is on normal enter? Also, `evil-org-return'
+  ;; ;; is... fucked up. It's description says 'Pressing return twice cancels the continuation of the itemlist or table.', but it's not used for
+  ;; ;; continuing lists. "C-RET" is - `+org/insert-item-below'.
+  ;; ;; But you can do "C-RET C-u" to delete the indentation...
+  ;; ;; ...But you can keep doing that to delete previous lines. So - fuck that noise.
+  ;; ;; And it's attempt to detect that you're on an empty line (eolp) and (bolp) to do a literal `org-return' isn't working for me?
+  ;; ;; ...Am I using `evil-org-return' even? I don't think so...
+  ;; ;; +org/shift-return
+  ;;
+  ;; (after! evil-org
+  ;;         (map! :map evil-org-mode-map
+  ;;               ;; Fuck your "more intuitive RET keybinds", Doom.
+  ;;               :i [return]   #'+org/shift-return
+  ;;               :i "RET"      #'+org/shift-return
+  ;;               :i [S-return] (cmd! (org-return electric-indent-mode))
+  ;;               :i "S-RET"    (cmd! (org-return electric-indent-mode))
+  ;;               ))
+  )
+
+
+
+;;------------------------------
+;; Keybinds : Evil
+;;------------------------------
+
+(imp:use-package org-journal
+  :when  (imp:flag? :keybinds +evil)
+  :after (:and (:keybinds user general)
+               evil
+               evil-collection
+               org
+               evil-org)
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (defun mode:org/journal:keybind/evil (namespace letter)
+    "Create keybinds for NAMESPACE in global leader under LETTER.
+
+NAMESPACE must be a keyword. NAMESPACE must exist as a namespace in Jerky.
+
+LETTER must be a 1-character string."
+    (if (not (jerky:namespace:has namespace))
+        ;; TODO: Raise `innit:error:???' instead of warn?
+        (nub:warning
+         :innit
+         (imp:path:join (imp:path:current:dir/relative :mantle)
+                        (imp:path:current:file))
+         "No `%1$S' namespace in Jerky; cannot set up `%2$S' keybinds for `%1$S'."
+         namespace
+         'org-journal)
+      (if (not (jerky:get 'path 'org 'journal :namespace namespace))
+          ;; TODO: Raise `innit:error:???' instead of warn?
+          (nub:warning
+           :innit
+           (imp:path:join (imp:path:current:dir/relative :mantle)
+                          (imp:path:current:file))
+           "No `%1$S' key in `%2$S' namespace in Jerky; cannot set up `%3$S' keybinds for `%2$S'."
+           (jerky:key:string 'path 'org 'journal)
+           namespace
+           'org-journal)
+
+        ;; Ok; make our NAMESPACE keybinds!
+        (keybind:leader/global:def
+         :infix (keybind:infix "n" letter) ;; notes -> NAMESPACE journal
+         "" (list nil :which-key (format "Journal: `%S'..." namespace)) ;; Infix Title
+
+         letter (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                              #'org-journal-new-entry
+                                                              current-prefix-arg))
+                      :which-key (format "`%S' - New Entry" namespace))
+         "j" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                           #'org-journal-new-entry
+                                                           current-prefix-arg))
+                   :which-key (format "`%S' - New Entry" namespace))
+
+         "J" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                           #'org-journal-new-scheduled-entry
+                                                           current-prefix-arg))
+                   :which-key (format "`%S' - New Scheduled Entry" namespace))
+
+         "v" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                           #'org-journal-open-current-journal-file))
+                   :which-key (format "`%S' - Visit Journal" namespace))
+
+         "s" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                           #'org-journal-search-forever
+                                                           nil))
+                   :which-key (format "`%S' - Search Journal" namespace))))))
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; Create the keybinds.
+  (mode:org/journal:keybind/evil :work "w")
+  (mode:org/journal:keybind/evil :home "h"))
 
 
 ;;------------------------------------------------------------------------------
