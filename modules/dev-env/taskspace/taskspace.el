@@ -292,78 +292,73 @@ Else:
            (int<taskspace>:prompt:name group-prompt))))
 
   ;; Is DESCRIPTION ok as description part?
-  (if (not (int<taskspace>:naming:verify group description))
-      ;; fail w/ message and return nil?
-      ;; (progn
-      ;;   (message "Invalid description: %s" description)
-      ;;   nil)
-      ;; Trying out just erroring out instead.
-      ;; We are up to the interactive level now.
+  (unless (int<taskspace>:naming:verify group description)
+      ;; Error out; we are up to the interactive level now.
       (nub:error
           :taskspace
           "taskspace:create"
         "Invalid description: %s"
-        description)
+        description))
 
-    ;; Create the dir/project for today.
-    (let ((taskpath (int<taskspace>:dir:create group description 'today)))
-      (if (null taskpath)
-          ;; Couldn't create it for some reason...
-          ;; TODO: Better reasons if known. "already exists" would be nice for
-          ;; that case.
+  ;; Create the dir/project for today.
+  (let ((taskpath (int<taskspace>:dir:create group description 'today)))
+    (when (null taskpath)
+      ;; Couldn't create it for some reason...
+      ;; TODO: Better reasons if known. "already exists" would be nice for
+      ;; that case.
+      (nub:error
+          :taskspace
+          "taskspace:create"
+        "Error creating taskspace directory for: %s"
+        description))
+
+    ;; Copy files into new taskspace.
+    (when (path:exists? (int<taskspace>:config group :file/new/copy) :dir)
+      (apply #'int<taskspace>:file:copy
+             ;; arg 1: our new taskpath
+             taskpath
+             ;; arg &rest: all the files to copy with:
+             ;;   - full path name
+             ;;   - no dot files
+             ;;     - no '.', '..'
+             ;;     - yes actual dotfiles somehow?
+             ;;     - This is what I want, so... ok.
+             (path:children (int<taskspace>:config group :file/new/copy)
+                            :absolute-paths
+                            nil
+                            path:rx:dirs:not-parent-or-current-dot)))
+
+    ;; Generate files into new taskspace.
+    (when (int<taskspace>:config group :file/new/generate)
+      (let ((gen-errors (int<taskspace>:file:generate
+                         group
+                         taskpath
+                         (int<taskspace>:config group :file/new/generate))))
+        (when gen-errors
           (nub:error
               :taskspace
               "taskspace:create"
-            "Error creating taskspace directory for: %s"
-            description)
+            "Taskspace errors while generating file(s): %s"
+            gen-errors))))
 
-        ;; Copy files into new taskspace.
-        (when (path:exists? (int<taskspace>:config group :file/new/copy) :dir)
-          (apply #'int<taskspace>:file:copy
-                 ;; arg 1: our new taskpath
-                 taskpath
-                 ;; arg &rest: all the files to copy with:
-                 ;;   - full path name
-                 ;;   - no dot files
-                 ;;     - no '.', '..'
-                 ;;     - yes actual dotfiles somehow?
-                 ;;     - This is what I want, so... ok.
-                 (path:children (int<taskspace>:config group :file/new/copy)
-                                :absolute-paths
-                                nil
-                                path:rx:dirs:not-parent-or-current-dot)))
+    ;; Either of those can put a projectile file into the taskspace.
+    ;; Just name it: .projectile
+    ;;   See: https://projectile.readthedocs.io/en/latest/projects/#ignoring-files
 
-        ;; Generate files into new taskspace.
-        (when (int<taskspace>:config group :file/new/generate)
-          (let ((gen-errors (int<taskspace>:file:generate
-                             group
-                             taskpath
-                             (int<taskspace>:config group :file/new/generate))))
-            (when gen-errors
-              (nub:error
-                  :taskspace
-                  "taskspace:create"
-                "Taskspace file generation errors: %s"
-                gen-errors))))
+    ;; Can also put skeleton org file. Or just org file with yasnippet ready
+    ;; to go...
 
-        ;; Either of those can put a projectile file into the taskspace.
-        ;; Just name it: .projectile
-        ;;   See: https://projectile.readthedocs.io/en/latest/projects/#ignoring-files
+    ;; Copy taskpath to kill-ring.
+    (kill-new taskpath)
+    ;; Say something.
+    (message "Created taskspace: %s" (file:name taskpath))
+    ;; (message "Created taskspace: %s" taskpath)
 
-        ;; Can also put skeleton org file. Or just org file with yasnippet ready
-        ;; to go...
+    ;; Open the notes file.
+    (int<taskspace>:notes:open group taskpath nil t)
 
-        ;; Copy taskpath to kill-ring.
-        (kill-new taskpath)
-        ;; Say something.
-        (message "Created taskspace: %s" (file:name taskpath))
-        ;; (message "Created taskspace: %s" taskpath)
-
-        ;; Open the notes file.
-        (int<taskspace>:notes:open group taskpath nil t)
-
-        ;; Return the path.
-        taskpath))))
+    ;; Return the path.
+    taskpath))
 ;; M-x taskspace:create
 ;; (taskspace:create "testing-create")
 

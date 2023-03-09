@@ -165,7 +165,7 @@ NUMBER should be the day's monotonically increasing serial number.
 DESCRIPTION should be a string."
   ;; How long is the parts-alist we're looking for?
   ;;   - Stringify each (don't want nulls here...)
-  (let* ((func/name "int<taskspace>:dir:create")
+  (let* ((func/name "int<taskspace>:naming:make")
          (func/tags '(:create))
          (name-parts (seq-map (lambda (x) (format "%s" x))
                               ;; But take out nulls?

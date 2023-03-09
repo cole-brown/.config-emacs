@@ -112,7 +112,7 @@ Each entry in the alist is a list of: (keyword string settings-variable)
       "Note: `group', `taskname' and `taskpath' are supplied as the args to \n"
       "the generator functions. Taskpath is the fully expanded file path.\n"
       "Should return a string of the file's contents.\n"
-      "e.g.: (defun my/taskspace/gen-org-notes (taskname taskpath)\n"
+      "e.g.: (defun my/taskspace/gen-org-notes (group taskname taskpath)\n"
       "        (format ...))\n"))
 
     (:file/notes "_notes.org" "File for storing/recording notes about a task.")

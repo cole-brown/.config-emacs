@@ -109,7 +109,7 @@
 ;;   ;;---
 ;;   ;; General (Non-Per-Domain) Init...
 ;;   ;;---
-;;   (defun my/taskspace/generate (taskname taskpath)
+;;   (defun my/taskspace/generate (group taskname taskpath)
 ;;     "NOTE: Could be redefined later for more work-specific details, so check
 ;; e.g. 'finalize-domain-secret.el' for a redef. Or 'C-h f
 ;; my/taskspace/generate' and see what file it's defined
