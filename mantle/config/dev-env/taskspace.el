@@ -40,7 +40,7 @@
   ;;---
   ;; General (Non-Per-Domain) Init...
   ;;---
-  (defun mantle:user:taskspace:generate (taskname taskpath)
+  (defun mantle:user:taskspace:generate (group taskname taskpath)
     "NOTE: Could be redefined later for more work-specific details, so check
 e.g. 'finalize-domain-secret.el' for a redef. Or 'C-h f my/taskspace/generate'
 and see what file it's defined in."
