@@ -240,7 +240,9 @@
       ("." "`rg' @ default-directory"    mantle:user:deadgrep:default-directory)
       ;; TODO-meow: A deadgrep search that lets me choose the starting dir?
       ;; ("?" "`rg' @ ..."                  mantle:user:deadgrep:default-directory)
-      ("k" "Kill All 'deadgrep' Buffers" mantle:user:deadgrep:buffer:kill)]
+      ("K" "Kill All 'deadgrep' Buffers" mantle:user:deadgrep:buffer:kill)
+
+      ("?" "`consult-ripgrep'" consult-ripgrep)]
 
      ["Buffer:"
       ("s" "Search Forward"  isearch-forward)

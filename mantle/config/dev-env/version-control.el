@@ -84,16 +84,16 @@
   :config
   ;;------------------------------
 
-  (defvar mantle:meow/keymap/global:version-control
-    (let ((map (make-sparse-keymap)))
-      (define-key map "g" #'magit-status)
-      (define-key map "q" #'mantle:user:magit:buffer:kill)
+  (transient-define-prefix mantle:meow/transient:dev-env:version-control ()
+    "Notes commands like org-mode links, org-journal entries, etc."
+    ["Version Control..."
+     ["Git"
+      ("d" "magit: status" magit)
+      ("K" "magit: Kill all `magit' buffers" mantle:user:magit:buffer:kill)]])
+  ;; (mantle:meow/transient:notes)
 
-      map)
-    "Keymap for version control (`magit', etc) commands that should be available globally.")
-
-  (meow-leader-define-key
-   (cons "g" mantle:meow/keymap/global:version-control)))
+  ;; TODO: Make a `mantle:meow/transient:dev-env' transient for dev-env stuff in general?
+  (meow-normal-define-key '("d" . mantle:meow/transient:dev-env:version-control)))
 
 
 ;;------------------------------
@@ -261,28 +261,26 @@
   ;;------------------------------
   (global-git-gutter-mode +1))
 
-;; TODO-meow: More keybinds!
-;; TODO-evil: More keybinds!
-;; And use `:repeat' / `:jump', or are those evil?
-;;   https://github.com/noctuid/general.el#evil-command-properties
-;;   https://github.com/noctuid/evil-guide#command-properties
-;;
-;; (general-define-key
-;;  :keymaps 'normal
-;;  :prefix "SPC"
-;;  "gj" '(git-gutter:next-hunk :properties (:repeat t :jump t))
-;;  "gk" '(git-gutter:previous-hunk :repeat t :jump t))
-;;
-;; ;; they also work globally
-;; (general-define-key
-;;  :keymaps 'normal
-;;  :prefix "SPC"
-;;  :properties '(:repeat t :jump t)
-;;  ;; or
-;;  :repeat t
-;;  :jump t
-;;  "gj" 'git-gutter:next-hunk
-;;  "gk" 'git-gutter:previous-hunk)
+
+;;------------------------------
+;; Magit Keybinds: Meow
+;;------------------------------
+
+(imp:use-package git-gutter-fringe
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (transient-append-suffix 'mantle:meow/transient:dev-env:version-control
+    '(0 -1) ; Append after last group/suffix in the first group.
+     ["Git Hunks"
+      ("." "Hunk: Previous" git-gutter:previous-hunk)
+      ("e" "Hunk: Next"     git-gutter:next-hunk)])
+  ;; (mantle:meow/transient:dev-env:version-control)
+ )
 
 
 ;;------------------------------------------------------------------------------
