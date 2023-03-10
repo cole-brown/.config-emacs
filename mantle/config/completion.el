@@ -658,8 +658,6 @@
   ;;------------------------------
   :bind
   ;;------------------------------
-  ;; TODO: EVIL bindings?
-  ;; TODO-meow: meow bindings?
   (("C-." . embark-act)         ;; pick some comfortable binding
    ("C-;" . embark-dwim)        ;; good alternative: M-.
    ("C-h B" . embark-bindings))) ;; alternative for `describe-bindings'
@@ -676,7 +674,7 @@
   ;;------------------------------
   :bind ; meow
   ;;------------------------------
-  ;; TODO-meow: Meow bindings?
+  ;; TODO-meow: Meow bindings? 'C-.' is `scroll-down-command'...
   (("C-." . embark-act)         ;; pick some comfortable binding
    ("C-;" . embark-dwim)        ;; good alternative: M-.
    ("C-h B" . embark-bindings))) ;; alternative for `describe-bindings'

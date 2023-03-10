@@ -213,19 +213,25 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
   :after meow
 
   ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
+
+  ;; Bind something usable everywhere, like in meow insert mode.
+  ("C-=" . yas-expand)
+
+  ;;------------------------------
   :config
   ;;------------------------------
 
-  (defvar mantle:meow/keymap/normal:snippet
-    (let ((map (make-sparse-keymap)))
-      (define-key map "b" #'yas-expand)
-      (define-key map "h" #'yas-insert-snippet)
-      map)
-    "Keymap for `yasnippet' commands that should be available globally.")
+  (transient-define-prefix mantle:meow/transient:dev-env:snippets ()
+    "Snippet and template commands."
+    ["Snippets & Templates..."
+     [("=" "expand snippet" yas-expand)
+      ("i" "insert snippet..." yas-insert-snippet)]])
+  ;; (mantle:meow/transient:dev-env:snippets)
 
   ;; Snippets are quite common - put them outside the leader key.
-  (meow-leader-define-key
-   (cons "b" mantle:meow/keymap/normal:snippet)))
+  (meow-normal-define-key '("=" . mantle:meow/transient:dev-env:snippets)))
 
 
 ;;------------------------------
