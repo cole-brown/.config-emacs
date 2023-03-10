@@ -76,6 +76,10 @@
 ;; Manual:   https://magit.vc/manual/transient.html
 ;; Repo:     https://github.com/magit/transient
 (imp:use-package transient
+  ;; ...look `use-package'... Just because I added keybinds does /not/ mean you should break my init. :|
+  ;; Just always load this, kay?
+  :demand t
+  
   ;;------------------------------
   :bind
   ;;------------------------------

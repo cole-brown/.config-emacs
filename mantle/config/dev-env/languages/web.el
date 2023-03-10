@@ -26,34 +26,35 @@
 ;;
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
-(keybind:leader/local:def
- :keymaps 'web-mode-map
- :infix "a"
- "" '(nil :which-key "attribute..."))
+(imp:eval:after (:keybinds user general)
+  (keybind:leader/local:def
+   :keymaps 'web-mode-map
+   :infix "a"
+   "" '(nil :which-key "attribute..."))
 
 
-(keybind:leader/local:def
- :keymaps 'web-mode-map
- :infix "b"
- "" '(nil :which-key "block..."))
+  (keybind:leader/local:def
+   :keymaps 'web-mode-map
+   :infix "b"
+   "" '(nil :which-key "block..."))
 
 
-(keybind:leader/local:def
- :keymaps 'web-mode-map
- :infix "d"
- "" '(nil :which-key "dom..."))
+  (keybind:leader/local:def
+   :keymaps 'web-mode-map
+   :infix "d"
+   "" '(nil :which-key "dom..."))
 
 
-(keybind:leader/local:def
- :keymaps 'web-mode-map
- :infix "e"
- "" '(nil :which-key "element..."))
+  (keybind:leader/local:def
+   :keymaps 'web-mode-map
+   :infix "e"
+   "" '(nil :which-key "element..."))
 
 
-(keybind:leader/local:def
- :keymaps 'web-mode-map
- :infix "t"
- "" '(nil :which-key "tag..."))
+  (keybind:leader/local:def
+   :keymaps 'web-mode-map
+   :infix "t"
+   "" '(nil :which-key "tag...")))
 
 
 ;;------------------------------------------------------------------------------

@@ -29,16 +29,17 @@
 ;;
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
-(keybind:leader/local:def
- :keymaps 'markdown-mode-map
- :infix   "i"                      ; insert
- "" '(nil :which-key "insert...")) ; infix's title
+(imp:eval:after (:keybinds user general)
+  (keybind:leader/local:def
+   :keymaps 'markdown-mode-map
+   :infix   "i"                      ; insert
+   "" '(nil :which-key "insert...")) ; infix's title
 
-(keybind:leader/local:def
- :keymaps 'markdown-mode-map
- :infix "p"                         ; preview
- "" '(nil :which-key "preview...")) ; infix's title
-
+  (keybind:leader/local:def
+   :keymaps 'markdown-mode-map
+   :infix "p"                         ; preview
+   "" '(nil :which-key "preview...")) ; infix's title
+  )
 
 
 ;;------------------------------------------------------------------------------
@@ -188,7 +189,7 @@
   ;; (mantle:meow/transient:markdown/preview)
 
   (mantle:meow:leader/local:key markdown-mode-map
-                                "p" mantle:meow/transient:markdown/preview)
+                                "p" #'mantle:meow/transient:markdown/preview)
 
   ;;---
   ;; Insert...
@@ -233,7 +234,7 @@
 
 
   (mantle:meow:leader/local:key markdown-mode-map
-                                "i" mantle:meow/transient:markdown/insert))
+                                "i" #'mantle:meow/transient:markdown/insert))
 
 
 ;;------------------------------
@@ -325,8 +326,9 @@
   ;; Add to "Insert" keybinds...
 
   ;; TODO HERE
-  (:map mantle:meow/keymap/local:markdown/insert
-   ("T" . #'markdown-toc-generate-toc))) ; Table Of Content
+  (transient-append-suffix 'mantle:meow/transient:markdown/insert
+    '(0 3 -1)
+    '("T" . #'markdown-toc-generate-toc))) ; Table Of Content
 
 
 ;;------------------------------

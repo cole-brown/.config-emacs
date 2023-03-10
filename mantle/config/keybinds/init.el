@@ -18,86 +18,76 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Load Keybind Configs
+;; Prereqs
 ;;------------------------------------------------------------------------------
 
-(let ((path/here (imp:path:current:dir/relative :mantle)))
+;; Set up local & global leaders' common infix menus.
+(imp:load :feature  '(:mantle config user keybinds infixes)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "infixes")
 
-  ;; Just assume all keybinds in here need `general'. Most of them will.
-  (imp:eval:after (:keybinds user general)
+;;------------------------------------------------------------------------------
+;; Optional: Modal Input System?
+;;------------------------------------------------------------------------------
 
-    ;;------------------------------------------------------------------------------
-    ;; Prereqs
-    ;;------------------------------------------------------------------------------
+;; TODO: `imp:load' keyword for "if flagged"... like `:flagged?'?
+;;   (imp:load :if '(:flag? (:keybinds +evil)) ...)
+;;   (imp:load :flagged? '(:keybinds +evil) ...)
+;;   (imp:load :if '(:flagged? . (:keybinds +evil)) ...)
+;; TODO: May also an `:after' keyword for stuffing the load inside an `imp:eval:after'?
 
-    ;; Set up local & global leaders' common infix menus.
-    (imp:load :feature  '(:mantle config user keybinds infixes)
-              :path     path/here
-              :filename "infixes")
+;;------------------------------
+;; Evil?
+;;------------------------------
+(when (imp:flag? :keybinds +evil)
+  (imp:eval:after (:and evil evil-collection)
+    (imp:load :feature  '(:mantle config keybinds +evil)
+              :path     (imp:path:current:dir/relative :mantle)
+              :filename "+evil")))
 
-    ;;------------------------------------------------------------------------------
-    ;; Optional: Modal Input System?
-    ;;------------------------------------------------------------------------------
-
-    ;; TODO: `imp:load' keyword for "if flagged"... like `:flagged?'?
-    ;;   (imp:load :if '(:flag? (:keybinds +evil)) ...)
-    ;;   (imp:load :flagged? '(:keybinds +evil) ...)
-    ;;   (imp:load :if '(:flagged? . (:keybinds +evil)) ...)
-    ;; TODO: May also an `:after' keyword for stuffing the load inside an `imp:eval:after'?
-
-    ;;------------------------------
-    ;; Evil?
-    ;;------------------------------
-    (when (imp:flag? :keybinds +evil)
-      (imp:eval:after (:and evil evil-collection)
-        (imp:load :feature  '(:mantle config keybinds +evil)
-                  :path     path/here
-                  :filename "+evil")))
-
-    ;;------------------------------
-    ;; Meow?
-    ;;------------------------------
-    (when (imp:flag? :keybinds +meow)
-      (imp:eval:after meow
-        (imp:load :feature  '(:mantle config keybinds +meow)
-                  :path     path/here
-                  :filename "+meow")))
+;;------------------------------
+;; Meow?
+;;------------------------------
+(when (imp:flag? :keybinds +meow)
+  (imp:eval:after meow
+    (imp:load :feature  '(:mantle config keybinds +meow)
+              :path     (imp:path:current:dir/relative :mantle)
+              :filename "+meow")))
 
 
-    ;;------------------------------------------------------------------------------
-    ;; Common or Smart Keybinds
-    ;;------------------------------------------------------------------------------
-    ;; Keybinds that don't care about Emacs/Evil, or can figure out which kind to create.
+;;------------------------------------------------------------------------------
+;; Common or Smart Keybinds
+;;------------------------------------------------------------------------------
+;; Keybinds that don't care about Emacs/Evil, or can figure out which kind to create.
 
-    (imp:load :feature  '(:mantle config user keybinds signature)
-              :path     path/here
-              :filename "signature")
+(imp:load :feature  '(:mantle config user keybinds signature)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "signature")
 
-    (imp:load :feature  '(:mantle config user keybinds text)
-              :path     path/here
-              :filename "text")
+(imp:load :feature  '(:mantle config user keybinds text)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "text")
 
-    (imp:load :feature  '(:mantle config user keybinds file)
-              :path     path/here
-              :filename "file")
+(imp:load :feature  '(:mantle config user keybinds file)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "file")
 
-    (imp:load :feature  '(:mantle config user keybinds buffer)
-              :path     path/here
-              :filename "buffer")
+(imp:load :feature  '(:mantle config user keybinds buffer)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "buffer")
 
 
-    ;;------------------------------------------------------------------------------
-    ;; Emacs Keybinds
-    ;;------------------------------------------------------------------------------
-    ;; TODO: Do these need to be after anything?
-    ;; TODO:   - No `evil' to load...
-    ;; TODO:   - `general' is already loaded...
-    ;; (imp:eval:after TODO-something-or-other-maybe?
-    ;;
-    ;;  (imp:load :feature  '(:mantle config user keybinds emacs)
-    ;;            :path     (imp:path:join path/here "emacs")
-    ;;            :filename "init"))
-    ))
+;;------------------------------------------------------------------------------
+;; Emacs Keybinds
+;;------------------------------------------------------------------------------
+;; TODO: Do these need to be after anything?
+;; TODO:   - No `evil' to load...
+;; TODO:   - `general' is already loaded...
+;; (imp:eval:after TODO-something-or-other-maybe?
+;;
+;;  (imp:load :feature  '(:mantle config user keybinds emacs)
+;;            :path     (imp:path:join (imp:path:current:dir/relative :mantle) "emacs")
+;;            :filename "init"))
 
 
 ;;------------------------------------------------------------------------------

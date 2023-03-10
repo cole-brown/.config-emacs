@@ -24,28 +24,30 @@
 ;; Keybind Prefixes
 ;;------------------------------------------------------------------------------
 
-(keybind:leader/local:def
-  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-  :infix   "d"                     ; debug
-  "" '(nil :which-key "debug...")) ; infix's title
+(imp:eval:after (:keybinds user general)
+  (keybind:leader/local:def
+   :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+   :infix   "d"                     ; debug
+   "" '(nil :which-key "debug...")) ; infix's title
 
 
-(keybind:leader/local:def
-  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-  :infix   "e"                    ; eval
-  "" '(nil :which-key "eval...")) ; infix's title
+  (keybind:leader/local:def
+   :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+   :infix   "e"                    ; eval
+   "" '(nil :which-key "eval...")) ; infix's title
 
 
-(keybind:leader/local:def
-  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-  :infix   "g"                    ; goto
-  "" '(nil :which-key "goto...")) ; infix's title
+  (keybind:leader/local:def
+   :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+   :infix   "g"                    ; goto
+   "" '(nil :which-key "goto...")) ; infix's title
 
 
-(keybind:leader/local:def
-  :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-  :infix   "t"                    ; test
-  "" '(nil :which-key "test...")) ; infix's title
+  (keybind:leader/local:def
+   :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+   :infix   "t"                    ; test
+   "" '(nil :which-key "test...")) ; infix's title
+  )
 
 
 ;;------------------------------------------------------------------------------

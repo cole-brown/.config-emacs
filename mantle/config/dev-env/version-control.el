@@ -43,9 +43,10 @@
 ;;
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
-(keybind:leader/global:def
- :infix  "g"
- "" '(nil :which-key "Magit / Version Control"))
+(imp:eval:after (:keybinds user general)
+  (keybind:leader/global:def
+   :infix  "g"
+   "" '(nil :which-key "Magit / Version Control")))
 
 
 ;;------------------------------------------------------------------------------
@@ -221,10 +222,12 @@
   :after (:and magit meow)
 
   ;;------------------------------
-  :bind ; meow
+  :config
   ;;------------------------------
-  (:map mantle:meow/keymap/global:version-control
-   ("t" . magit-todos-list)))
+
+  (transient-append-suffix 'mantle:meow/transient:dev-env:version-control
+    '(0 0 -1)
+    '("t" "magit: List TOODs" magit-todos-list)))
 
 
 ;;------------------------------
