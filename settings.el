@@ -39,7 +39,6 @@
 ;;------------------------------------------------------------------------------
 ;; Feature Flags
 ;;------------------------------------------------------------------------------
-
 ;; Two ways to check for a feature:
 ;;   1. Desired:
 ;;      (when (imp:flag? :keybinds +evil)
@@ -56,15 +55,17 @@
 ;; section), you can use #2.
 ;;
 ;; If you are checking earlier, use #1.
+;;
+;; And it's not terrible to use both:
+;;   (imp:use-package general
+;;     :when  (imp:flag? :keybinds +evil)
+;;     :after (:and magit evil evil-collection)
+;;     ...)
 
 
 ;;------------------------------
-;; Manual
-;;------------------------------
-
-;;---
 ;; Input
-;;---
+;;------------------------------
 
 ;; (imp:flag :keyboard +qwerty)
 (imp:flag :keyboard +dvorak)
@@ -73,18 +74,31 @@
 ;; (imp:flag :keybinds +evil) ; https://github.com/emacs-evil/evil
 (imp:flag :keybinds +meow)    ; https://github.com/meow-edit/meow
 
-;;---
-;; Development
-;;---
 
+;;------------------------------
+;; Development
+;;------------------------------
+
+;;---
+;; Language Server Protocol
+;;---
 (imp:flag :dev-env +lsp)
 ;; (imp:flag :dev-env +eglot)
+
+;;---
+;; Language Servers
+;;---
 
 ;; So `:dev-env +lsp' or `:dev-env +eglot' are enabled, what languages should
 ;; have language servers enabled for them?
 (imp:flag :lsp +csharp)
 ;; (imp:flag :lsp +python)
 ;; (imp:flag :lsp +rust)
+
+;;---
+;; Debug Adapter Protocol
+;;---
+(imp:flag :dev-env +dap)
 
 
 ;;------------------------------
