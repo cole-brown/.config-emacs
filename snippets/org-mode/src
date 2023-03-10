@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# contributor: Cole Brown <code@brown.dev>
+# name: src: org-mode source code block
+# key: src
+# notes: Block of source code with syntax highlighting, etc.
+# --
+
+#+begin_src ${1}
+${2:`yas-selected-text`}
+#+end_src
+$0
