@@ -18,7 +18,9 @@
 
 
 (imp:use-package general
-   :demand t ;; Always load.
+  :when  (imp:flag? :keybinds +evil)
+  :after (:and magit evil evil-collection)
+  :demand t ;; Always load, if when/after/etc are valid.
 
   ;;------------------------------
   :init
