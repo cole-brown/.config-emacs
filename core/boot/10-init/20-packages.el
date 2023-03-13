@@ -79,7 +79,7 @@
   ;; ...look `use-package'... Just because I added keybinds does /not/ mean you should break my init. :|
   ;; Just always load this, kay?
   :demand t
-  
+
   ;;------------------------------
   :bind
   ;;------------------------------

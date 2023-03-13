@@ -936,7 +936,7 @@ targets."
   ;; https://github.com/minad/cape#configuration
   ;; "Alternative prefix keys: C-c p, M-p, M-+, ..."
 
-    (transient-define-prefix mantle:meow/transient:completion:at-point ()
+  (transient-define-prefix mantle:meow/transient:completion:at-point ()
     "Buffer commands that should be available globally."
     ["Completion..."
      ["At Point"
@@ -969,10 +969,10 @@ targets."
       ;; ("\\" "cape-tex" cape-tex)     ; tex (e.g. "\hbar")
       ("&" "cape-sgml" cape-sgml)       ; SGML (e.g. "&alpha")
       ("r" "cape-rfc1345" cape-rfc1345)]]) ; RFC-1345 (e.g. ...uh... weird? https://www.rfc-editor.org/rfc/rfc1345)
-    ;; (mantle:meow/transient:completion:at-point)
+  ;; (mantle:meow/transient:completion:at-point)
 
-    (meow-leader-define-key
-     '("p" . mantle:meow/transient:completion:at-point)))
+  (meow-leader-define-key
+   '("p" . mantle:meow/transient:completion:at-point)))
 
 
 ;;------------------------------------------------------------------------------
