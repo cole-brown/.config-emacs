@@ -583,8 +583,8 @@ Then runs COMMAND interactively with ARGS."
   (transient-append-suffix 'mantle:meow/transient:notes
     '(0 -1) ; Append after last group/suffix in the first group.
      ["Journal"
-     ("w" "`org-journal' :work" mantle:meow/transient:notes/org-journal:work)
-     ("h" "`org-journal' :home" mantle:meow/transient:notes/org-journal:home)])
+     ("jw" "`org-journal' :work" mantle:meow/transient:notes/org-journal:work)
+     ("jh" "`org-journal' :home" mantle:meow/transient:notes/org-journal:home)])
   ;; (mantle:meow/transient:notes)
 
   ;; TODO: Do I want this again?
