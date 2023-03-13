@@ -17,7 +17,137 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Keybinds
+;; Keybinds : Meow
+;;------------------------------------------------------------------------------
+
+(imp:use-package emacs
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; TODO-meow: A transient arg for `:home' or `:work' versions of things?
+
+
+  ;;------------------------------
+  ;; Signatures
+  ;;------------------------------
+
+  (transient-define-suffix mantle:meow/transient:insert:signature/todo ()
+    "\"TODO\" signature with timestamp; commented if needed."
+    :key "st"
+    :description (concat "TODO: " (signature:string 'sigil 'todo))
+    (interactive)
+    (signature:insert 'sigil 'todo :timestamp t :comment t))
+
+
+  (transient-define-suffix mantle:meow/transient:insert:signature/note ()
+    "Sigil for Note Prefix"
+    :key "sn"
+    :description (concat "Note: " (signature:string 'sigil 'note))
+    (interactive)
+    (signature:insert 'sigil 'note))
+
+
+  (transient-define-suffix mantle:meow/transient:insert:signature/sign ()
+    "Signature for the end of an email or something."
+    :key "ss"
+    :description (concat "Sign: " (signature:string 'name 'sign))
+    (interactive)
+    (signature:insert 'name 'sign))
+
+
+  (transient-define-suffix mantle:meow/transient:insert:signature/id ()
+    "Just the Sigil."
+    :key "is"
+    :description (concat "Sigil: " (signature:string 'id 'sigil))
+    (interactive)
+    (signature:insert 'id 'sigil))
+
+
+  (transient-define-suffix mantle:meow/transient:insert:signature/name ()
+    "Just the Name."
+    :key "in"
+    :description (concat "Name: " (signature:string 'id 'name))
+    (interactive)
+    (signature:insert 'id 'name))
+
+
+  (transient-define-prefix mantle:meow/transient:insert ()
+    "Buffer commands that should be available globally."
+    ["Insert..."
+     ["Signature"
+      (mantle:meow/transient:insert:signature/todo)
+      (mantle:meow/transient:insert:signature/note)
+      (mantle:meow/transient:insert:signature/sign)]
+     ["ID"
+      (mantle:meow/transient:insert:signature/id)
+      (mantle:meow/transient:insert:signature/name)]
+     ["Email"]])
+  ;; (mantle:meow/transient:insert)
+
+  (meow-leader-define-key '("i" . mantle:meow/transient:insert))
+
+  ;;------------------------------
+  ;; Emails
+  ;;------------------------------
+  ;; Only show if we have any.
+
+  ;; work namespace
+  (when (signature:exists? 'id 'email :namespace :work)
+    (transient-define-suffix mantle:meow/transient:insert:email/work ()
+      "Work Email"
+      :key "ew"
+      :description (concat "work: " (signature:string 'id 'email :namespace :work))
+      (interactive)
+      (signature:insert 'id 'email :namespace :work)))
+
+
+  ;; home namespace
+  (when (signature:exists? 'id 'email :namespace :home)
+    (transient-define-suffix mantle:meow/transient:insert:email/home ()
+      "Home Email"
+      :key "eh"
+      :description (concat "home: " (signature:string 'id 'email :namespace :home))
+      (interactive)
+      (signature:insert 'id 'email :namespace :home)))
+
+  ;; default namespace
+  (when (signature:exists? 'id 'email :namespace :default)
+    (transient-define-suffix mantle:meow/transient:insert:email/default ()
+      "Default Email"
+      :key "ed"
+      :description (concat "default: " (signature:string 'id 'email :namespace :default))
+      (interactive)
+      (signature:insert 'id 'email :namespace :default)))
+
+
+  ;; ...is there a better way to build transient groups dynamically like this?
+  (when (or (functionp #'mantle:meow/transient:insert:email/work)
+            (functionp #'mantle:meow/transient:insert:email/home)
+            (functionp #'mantle:meow/transient:insert:email/default))
+    (transient-append-suffix 'mantle:meow/transient:insert
+      '(0 -1) ; Append at end of first group...
+      (vector "Email"
+              '(mantle:meow/transient:insert:email/work)
+              '(mantle:meow/transient:insert:email/home)
+              '(mantle:meow/transient:insert:email/default))))
+  ;; (mantle:meow/transient:insert)
+
+
+  ;;------------------------------
+  ;; Search
+  ;;------------------------------
+
+  ;; TODO: Search for: sigil, todo...
+
+  )
+
+
+;;------------------------------------------------------------------------------
+;; Keybinds : Evil
 ;;------------------------------------------------------------------------------
 
 ;; TODO-meow: Evil/meow vs Emacs keybinds?
@@ -42,7 +172,6 @@
    ;; Sigil for Note Prefix.
    "n" (list (elisp:cmd (signature:insert 'sigil 'note))
              :which-key (concat "Note: " (signature:string 'sigil 'note)))
-
 
    ;; Signature for the end of an email or something.
    "s" (list (elisp:cmd (signature:insert 'name 'sign))
