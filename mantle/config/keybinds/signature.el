@@ -125,15 +125,22 @@
 
 
   ;; ...is there a better way to build transient groups dynamically like this?
+  ;; This seems a bit of a faff.
   (when (or (functionp #'mantle:meow/transient:insert:email/work)
             (functionp #'mantle:meow/transient:insert:email/home)
             (functionp #'mantle:meow/transient:insert:email/default))
     (transient-append-suffix 'mantle:meow/transient:insert
       '(0 -1) ; Append at end of first group...
-      (vector "Email"
-              '(mantle:meow/transient:insert:email/work)
-              '(mantle:meow/transient:insert:email/home)
-              '(mantle:meow/transient:insert:email/default))))
+      (apply #'vector
+             "Email"
+             (seq-filter #'identity
+                         (list
+                          (when (functionp #'mantle:meow/transient:insert:email/work)
+                            '(mantle:meow/transient:insert:email/work))
+                          (when (functionp #'mantle:meow/transient:insert:email/home)
+                            '(mantle:meow/transient:insert:email/home))
+                          (when (functionp #'mantle:meow/transient:insert:email/default)
+                            '(mantle:meow/transient:insert:email/default)))))))
   ;; (mantle:meow/transient:insert)
 
 
