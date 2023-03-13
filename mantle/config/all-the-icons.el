@@ -248,13 +248,14 @@ Return nil if no face found."
 
 
   (defun +modeline-format-icon (icon label &optional face help-echo voffset)
-  (propertize (concat (all-the-icons-material
-                       icon
-                       :face face
-                       :height 1.1
-                       :v-adjust (or voffset -0.225))
-                      (propertize label 'face face))
-              'help-echo help-echo))
+    (propertize (concat (all-the-icons-material
+                         icon
+                         :face face
+                         :height 1.1
+                         :v-adjust (or voffset -0.225))
+                        (propertize label 'face face))
+                'help-echo help-echo))
+
 
   ;; Advice via `define-advice' is named SYMBOL@NAME, so in this case the advice
   ;; function is `mantle:user:icon/font-awesome@mantle:override'.
@@ -320,10 +321,9 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
                                :v-adjust (or (plist-get plist :v-adjust) 0)
                                :height (or (plist-get plist :height) 1))
        " "
-              (if face
+       (if face
            (propertize str 'face face)
          str))))
-
 
 
   (define-advice mantle:user:icon/octicon (:override (icon str &rest plist) mantle:override)
@@ -353,7 +353,7 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
                               :v-adjust (or (plist-get plist :v-adjust) 0)
                               :height (or (plist-get plist :height) 1))
        " "
-              (if face
+       (if face
            (propertize str 'face face)
          str))))
 
@@ -386,10 +386,9 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
                                :v-adjust (or (plist-get plist :v-adjust) 0)
                                :height (or (plist-get plist :height) 1))
        " "
-              (if face
+       (if face
            (propertize str 'face face)
          str))))
-
 
 
   (define-advice mantle:user:icon:for-mode (:override (icon str &rest plist) mantle:override)
