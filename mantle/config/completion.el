@@ -856,19 +856,138 @@ targets."
 ;;   )
 
 
-;; ;;------------------------------------------------------------------------------
-;; ;; Dabbrev: Dynamic Abbrev Expansion: Dynamic Abbreviation Expansion
-;; ;;------------------------------------------------------------------------------
+;;------------------------------------------------------------------------------
+;; Cape: Completion At Point Extensions
+;;------------------------------------------------------------------------------
+;; Used in combination with `corfu' completion UI (or vanilla Emacs completion UI).
 
-;; ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Dynamic-Abbrevs.html
-;; (imp:use-package dabbrev
-;;   :ensure nil ; This is an Emacs built-in feature.
+;; https://github.com/minad/cape
+(imp:use-package cape
 
-;;   ;;------------------------------
-;;   :custom
-;;   ;;------------------------------
-;;   ;; Other useful Dabbrev configurations.
-;;   (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
+  ;;------------------------------
+  ;; NOTE: Potential issue with `cape-dabbrev'?
+  ;;------------------------------
+  ;; "In case you observe a performance issue with autocompletion and
+  ;; `cape-dabbrev' it is strongly recommended to disable scanning in other
+  ;; buffers. See the user options `cape-dabbrev-min-length' and
+  ;; `cape-dabbrev-check-other-buffers'."
+
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  ;;   - `cape-dabbrev': Complete word from current buffers (see also `dabbrev-capf' on Emacs 29)
+  ;;   - `cape-file'   : Complete file name
+  ;;   - `cape-history': Complete from Eshell, Comint or minibuffer history
+  ;;   - `cape-keyword': Complete programming language keyword
+  ;;   - `cape-symbol' : Complete Elisp symbol
+  ;;   - `cape-abbrev' : Complete abbreviation (`add-global-abbrev', `add-mode-abbrev')
+  ;;   - `cape-ispell' : Complete word from Ispell dictionary
+  ;;   - `cape-dict'   : Complete word from dictionary file
+  ;;   - `cape-line'   : Complete entire line from current buffer
+  ;;   - `cape-tex'    : Complete unicode char from TeX command, e.g. \hbar.
+  ;;   - `cape-sgml'   : Complete unicode char from Sgml entity, e.g., &alpha.
+  ;;   - `cape-rfc1345': Complete unicode char using RFC 1345 mnemonics.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  ;; (add-to-list 'completion-at-point-functions #'cape-history)
+  ;; (add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;; (add-to-list 'completion-at-point-functions #'cape-tex)
+  ;; (add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;; (add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;; (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;; (add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;; (add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;; (add-to-list 'completion-at-point-functions #'cape-line)
+  )
+
+
+;;------------------------------
+;; Keybinds : Any/All
+;;------------------------------
+
+(imp:use-package cape
+  ;;------------------------------
+  :bind ; rebinds
+  ;;------------------------------
+
+  ;; `cape-dabbrev' is `dabbrev-expand' / `dabbrev-completion' with a UI... Use it instead?
+  (([remap dabbrev-expand]     . cape-dabbrev)
+   ([remap dabbrev-completion] . cape-dabbrev)))
+
+
+;;------------------------------
+;; Keybinds : meow
+;;------------------------------
+
+(imp:use-package cape
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; Bind dedicated completion commands.
+  ;; Were all just bound to "C-c p [...]".
+  ;; https://github.com/minad/cape#configuration
+  ;; "Alternative prefix keys: C-c p, M-p, M-+, ..."
+
+    (transient-define-prefix mantle:meow/transient:completion:at-point ()
+    "Buffer commands that should be available globally."
+    ["Completion..."
+     ["At Point"
+      ;; Emacs Functions:
+      ("p" "completion-at-point" completion-at-point) ;; capf
+      ("t" "complete-tag" complete-tag)        ;; etags
+      ;; `cape' Functions:
+      ;;   - `cape-dabbrev': Complete word from current buffers (see also `dabbrev-capf' on Emacs 29)
+      ;;   - `cape-file'   : Complete file name
+      ;;   - `cape-history': Complete from Eshell, Comint or minibuffer history
+      ;;   - `cape-keyword': Complete programming language keyword
+      ;;   - `cape-symbol' : Complete Elisp symbol
+      ;;   - `cape-abbrev' : Complete abbreviation (`add-global-abbrev', `add-mode-abbrev')
+      ;;   - `cape-ispell' : Complete word from Ispell dictionary
+      ;;   - `cape-dict'   : Complete word from dictionary file
+      ;;   - `cape-line'   : Complete entire line from current buffer
+      ;;   - `cape-tex'    : Complete unicode char from TeX command, e.g. \hbar.
+      ;;   - `cape-sgml'   : Complete unicode char from Sgml entity, e.g., &alpha.
+      ;;   - `cape-rfc1345': Complete unicode char using RFC 1345 mnemonics.
+      ("d" "cape-dabbrev" cape-dabbrev)        ;; or dabbrev-completion
+      ("h" "cape-history" cape-history)
+      ("f" "cape-file" cape-file)
+      ("k" "cape-keyword" cape-keyword)
+      ("s" "cape-symbol" cape-symbol)
+      ("a" "cape-abbrev" cape-abbrev)
+      ("i" "cape-ispell" cape-ispell)
+      ("l" "cape-line" cape-line)
+      ("w" "cape-dict" cape-dict)
+      ;; Complete unicode from...
+      ;; ("\\" "cape-tex" cape-tex)     ; tex (e.g. "\hbar")
+      ("&" "cape-sgml" cape-sgml)       ; SGML (e.g. "&alpha")
+      ("r" "cape-rfc1345" cape-rfc1345)]]) ; RFC-1345 (e.g. ...uh... weird? https://www.rfc-editor.org/rfc/rfc1345)
+    ;; (mantle:meow/transient:completion:at-point)
+
+    (meow-leader-define-key
+     '("p" . mantle:meow/transient:completion:at-point)))
+
+
+;;------------------------------------------------------------------------------
+;; Dabbrev: Dynamic Abbrev Expansion: Dynamic Abbreviation Expansion
+;;------------------------------------------------------------------------------
+
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Dynamic-Abbrevs.html
+(imp:use-package dabbrev
+  :ensure nil ; This is an Emacs built-in feature.
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+  ;; Other useful Dabbrev configurations.
+  (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
 
 
 ;; ;;------------------------------
