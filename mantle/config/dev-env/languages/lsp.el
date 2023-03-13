@@ -132,7 +132,7 @@ Borrowed from Doom."
                                " "
                                (propertize
                                 ;; Just use an icon if possible, else
-                                (let ((icon (mantle:user:icon/material "rocket"
+                                (let ((icon (mantle:user:icon/octicon "rocket"
                                                                        ""
                                                                        :face     face
                                                                        :v-adjust -0.0575)))
@@ -376,8 +376,6 @@ From Doom's `+lsp-defer-server-shutdown-a' in \"modules/tools/lsp/lsp.el\"."
   ;; nil             - Do not explicitly set `load-path'.
   (flycheck-emacs-lisp-load-path 'inherit)
 
-    ;; Rerunning checks on every newline is a mote excessive.
-  (flycheck-check-syntax-automatically (delq 'new-line flycheck-check-syntax-automatically))
   ;; Don't recheck on idle as often; wait this many seconds (default: 0.5).
   (flycheck-idle-change-delay 1.0)
 
@@ -392,6 +390,10 @@ From Doom's `+lsp-defer-server-shutdown-a' in \"modules/tools/lsp/lsp.el\"."
   ;;------------------------------
   :config
   ;;------------------------------
+
+  ;; Rerunning checks on every newline is a mote excessive.
+  (innit:customize-set-variable flycheck-check-syntax-automatically
+                                (delq 'new-line flycheck-check-syntax-automatically))
 
   ;; TODO-lsp: How in the flying fuck to do this in vanilla without all of Doom's popup shit?
   ;;   - popup funcs: https://github.com/doomemacs/doomemacs/blob/master/modules/ui/popup/autoload/settings.el
