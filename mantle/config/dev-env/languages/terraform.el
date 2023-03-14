@@ -74,7 +74,6 @@
 
   (transient-define-suffix mantle:meow/transient:terraform/compile/apply ()
     "Terraform/Terragrunt 'apply' command."
-    :transient t
     :key "a"
     :description (format "%s apply" mantle:terraform:runner)
     (interactive)
@@ -83,7 +82,6 @@
 
   (transient-define-suffix mantle:meow/transient:terraform/compile/fmt ()
     "Terraform/Terragrunt 'fmt' command."
-    :transient t
     :key "f"
     :description (format "%s fmt" mantle:terraform:runner)
     (interactive)
@@ -92,7 +90,6 @@
 
   (transient-define-suffix mantle:meow/transient:terraform/compile/init ()
     "Terraform/Terragrunt 'init' command."
-    :transient t
     :key "i"
     :description (format "%s init --backend-config='_backend.tfvars'" mantle:terraform:runner)
     (interactive)
@@ -101,7 +98,6 @@
 
   (transient-define-suffix mantle:meow/transient:terraform/compile/plan ()
     "Terraform/Terragrunt 'plan' command."
-    :transient t
     :key "p"
     :description (format "%s plan" mantle:terraform:runner)
     (interactive)

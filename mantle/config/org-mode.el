@@ -490,7 +490,6 @@ Then runs COMMAND interactively with ARGS."
   ;;---
   (transient-define-suffix mantle:meow/transient:notes/org-journal:entry/new:work ()
     "`org-journal' new entry for `:work' domain"
-    :transient t
     :key "w"
     :description (format "`%S' - New Entry" :work)
     (interactive)
@@ -500,7 +499,6 @@ Then runs COMMAND interactively with ARGS."
 
   (transient-define-suffix mantle:meow/transient:notes/org-journal:entry/new-scheduled:work ()
     "`org-journal' new scheduledentry for `:work' domain"
-    :transient t
     :key "W"
     :description (format "`%S' - New Scheduled Entry" :work)
     (interactive)
@@ -510,7 +508,6 @@ Then runs COMMAND interactively with ARGS."
 
   (transient-define-suffix mantle:meow/transient:notes/org-journal:journal/visit:work ()
     "`org-journal' visit journal for `:work' domain"
-    :transient t
     :key "v"
     :description (format "`%S' - Visit Journal" :work)
     (interactive)
@@ -519,7 +516,6 @@ Then runs COMMAND interactively with ARGS."
 
   (transient-define-suffix mantle:meow/transient:notes/org-journal:journal/search:work ()
     "`org-journal' search journal for `:work' domain"
-    :transient t
     :key "s"
     :description (format "`%S' - Search Journal" :work)
     (interactive)
@@ -528,7 +524,6 @@ Then runs COMMAND interactively with ARGS."
 
   (transient-define-suffix mantle:meow/transient:notes/org-journal:entry/new:home ()
     "`org-journal' new entry for `:home' domain"
-    :transient t
     :key "h"
     :description (format "`%S' - New Entry" :home)
     (interactive)
@@ -538,7 +533,6 @@ Then runs COMMAND interactively with ARGS."
 
   (transient-define-suffix mantle:meow/transient:notes/org-journal:entry/new-scheduled:home ()
     "`org-journal' new scheduledentry for `:home' domain"
-    :transient t
     :key "H"
     :description (format "`%S' - New Scheduled Entry" :home)
     (interactive)
@@ -548,7 +542,6 @@ Then runs COMMAND interactively with ARGS."
 
   (transient-define-suffix mantle:meow/transient:notes/org-journal:journal/visit:home ()
     "`org-journal' visit journal for `:home' domain"
-    :transient t
     :key "v"
     :description (format "`%S' - Visit Journal" :home)
     (interactive)
@@ -557,7 +550,6 @@ Then runs COMMAND interactively with ARGS."
 
   (transient-define-suffix mantle:meow/transient:notes/org-journal:journal/search:home ()
     "`org-journal' search journal for `:home' domain"
-    :transient t
     :key "s"
     :description (format "`%S' - Search Journal" :home)
     (interactive)
