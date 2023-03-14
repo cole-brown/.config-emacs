@@ -13,10 +13,6 @@
 ;;; Code:
 
 
-(require 'hydra)
-(require 'dired)
-
-
 (imp:require :path)
 (imp:require :elisp 'utils 'functions)
 (imp:require :system)

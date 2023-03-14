@@ -18,15 +18,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Prereqs
-;;------------------------------------------------------------------------------
-
-;; Set up local & global leaders' common infix menus.
-(imp:load :feature  '(:mantle config user keybinds infixes)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "infixes")
-
-;;------------------------------------------------------------------------------
 ;; Optional: Modal Input System?
 ;;------------------------------------------------------------------------------
 
