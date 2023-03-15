@@ -24,11 +24,10 @@
   :when  (imp:flag? :keybinds +meow)
   :after meow
 
-  ;;------------------------------
   :config
-  ;;------------------------------
 
   ;; TODO-meow: A transient arg for `:home' or `:work' versions of things?
+  ;;            Like, instead of 2 functions & 2 keys for many of the things?
 
 
   ;;------------------------------
@@ -157,12 +156,7 @@
 ;; Keybinds : Evil
 ;;------------------------------------------------------------------------------
 
-;; TODO-meow: Evil/meow vs Emacs keybinds?
-
-;; TODO-meow: meow
 (imp:eval:after (:and evil evil-collection)
-
-  ;; NOTE: /mantle/config/keyboard.el has the new general defs
 
   ;;------------------------------
   ;; Signatures
@@ -214,8 +208,6 @@
   (when (signature:exists? 'id 'email :namespace :home)
     (keybind:leader/global:def
      :infix (keybind:infix "i" "s" "e") ;; insert -> signature -> email
-     ;; TODO: Do I need to redefine the title?
-     ;; "" '(nil :which-key "Email...")    ;; Infix Title
 
      "h" (list (elisp:cmd (signature:insert 'id 'email :namespace :home))
                :which-key (concat "home: " (signature:string 'id 'email :namespace :home)))))
@@ -224,8 +216,6 @@
   (when (signature:exists? 'id 'email :namespace :default)
     (keybind:leader/global:def
      :infix (keybind:infix "i" "s" "e") ;; insert -> signature -> email
-     ;; TODO: Do I need to redefine the title?
-     ;; "" '(nil :which-key "Email...")    ;; Infix Title
 
      "c" (list (elisp:cmd (signature:insert 'id 'email :namespace :default))
                :which-key (concat "default: " (signature:string 'id 'email :namespace :default)))))
