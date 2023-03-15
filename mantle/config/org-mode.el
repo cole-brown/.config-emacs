@@ -182,6 +182,12 @@
                             agenda-files
                             "My paths to search for agenda items."))
 
+  ;; Extra aliases for Org-Mode source blocks:
+  ;; (push '("shell" . sh) org-src-lang-modes) ; There's already a `shell-mode'; which is different from `sh-mode'.
+  (push '("console" . fundamental) org-src-lang-modes) ; shell/console output (not input!)
+  (push '("C#" . csharp)           org-src-lang-modes)
+  (push '("browser" . fundamental) org-src-lang-modes) ; Browser web page output
+
   ;;------------------------------
   ;; configuration
   ;;------------------------------

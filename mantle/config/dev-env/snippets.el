@@ -106,12 +106,43 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
 ;; YASnippets
 ;;------------------------------------------------------------------------------
 
+;; https://github.com/joaotavora/yasnippet
+;; Tutorial/Doc: https://joaotavora.github.io/yasnippet/snippet-development.html
+;; Reference: https://joaotavora.github.io/yasnippet/snippet-reference.html
 (imp:use-package yasnippet
   :demand t
 
   ;;------------------------------
   :init
   ;;------------------------------
+
+  ;;---
+  ;; Snippet Helpers
+  ;;---
+
+  (defvar int<mantle>:yas:choose/no-match/history nil
+    "History of recently chosen choices in `int<mantle>:yas:choose/no-match'.")
+
+  (defun mantle:yas:choose/no-match (&rest possibilities)
+    "Prompt for a string in POSSIBILITIES and return it.
+
+The last element of POSSIBILITIES may be a list of strings.
+
+Like `yas-choose-value' except does not require a match."
+    (unless (or yas-moving-away-p
+                yas-modified-p)
+      (let* ((last-link (last possibilities))
+             (last-elem (car last-link)))
+        (when (listp last-elem)
+          (setcar last-link (car last-elem))
+          (setcdr last-link (cdr last-elem))))
+      (completing-read "Choose: "
+                       possibilities
+                       nil
+                       ;; TODO: `confirm' if `confirm-after-completion' is meh.
+                       'confirm-after-completion
+                       nil
+                       int<mantle>:yas:choose/no-match/history)))
 
   ;;---
   ;; Default Snippets Location
