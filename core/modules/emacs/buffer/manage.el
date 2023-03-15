@@ -20,6 +20,7 @@
 (require 'cl-lib)
 
 
+(imp:require :nub)
 (imp:require :elisp 'utils)
 
 
@@ -297,49 +298,79 @@ On loan from Doom's \"core/autoload/buffers.el\"."
 ;; Overwrite Mode
 ;;------------------------------------------------------------------------------
 
+(defun buffer:overwriting? ()
+  "Is buffer in overwrite mode?
+
+Evil-Aware / Evil-Optional: Is buffer in `evil-replace-state'?
+Doesn't need to be Meow-Aware / Meow-Optional."
+  ;; Are you evil? Use `evil' functions, evil-doer.
+  (if (imp:mode? 'evil-mode)
+      (evil-replace-state-p)
+    (not (null overwrite-mode))))
+
+
 (defun buffer:overwrite:toggle ()
   "Toggle overwrite mode.
 
 Evil-Aware / Evil-Optional
-TODO-meow: Meow-Aware / Meow-Optional
+Doesn't need to be Meow-Aware / Meow-Optional
 
-Toggles between 'insert' and 'replace' evil states."
+Evil: Toggles between 'insert' and 'replace' evil states.
+Good: Toggles between 'insert' and 'overwrite'."
+  (interactive)
+  ;; Are you evil? Use `evil' functions, evil-doer.
+  (if (imp:mode? 'evil-mode)
+      (if (evil-replace-state-p)
+          (evil-append 0)
+        (evil-replace-state))
 
-  ;; Are you evil? Use evil functions, evil-doer.
-  (cond ((imp:mode? 'evil-mode)
-         (if (evil-replace-state-p)
-             (evil-append 0)
-           (evil-replace-state)))
-
-        ;; TODO-meow: does meow have replace/append things like evil?
-
-        ;; Vanilla Emacs
-        (t
-         (overwrite-mode))))
+    ;; `meow': Just use standard overwrite functions, cat.
+    ;; Vanilla Emacs: Carry on.
+    (overwrite-mode)))
 
 
 (defun buffer:insert-or-overwrite (character)
   "Insert or overwrite CHARACTER into active buffer at point.
 
 Evil-Aware / Evil-Optional
-TODO-meow: Meow-Aware / Meow-Optional
+Meow-Aware / Meow-Optional
 
 Need to fix the hydra's deleting before figuring out the integration into
 evil's replace state backspace 'undo' functionality."
-  ;; TODO-meow: if meow, etc...
-  ;; If overwriting, first delete a character at point so we end up "replacing" it.
-  (if (imp:mode? 'evil-mode)
-      (when (evil-replace-state-p)
-        ;; TODO: Will this let evil's backspace/delete 'undo' functionality work?
-        ;; (evil-replace-pre-command)
+  ;;------------------------------
+  ;; Error Checks
+  ;;------------------------------
+  (unless (or (characterp character)
+              (stringp character))
+    (nub:error
+        :innit
+        "buffer:insert-or-overwrite"
+      "CHARACTER must be a character or string. Got %S: %S"
+      (type-of character)
+      character))
 
-        ;; TODO: Will this work on its own to allow evil's 'undo' functionality?
-        (evil-delete-char (point) (1+ (point))))
+  ;;------------------------------
+  ;; Overwriting?
+  ;;------------------------------
+  ;; First delete a character at point so we end up "replacing" it.
 
+  ;; Evil has its own special overwrite mode called the "replace" state.
+  (if (and (imp:mode? 'evil-mode)
+           (evil-replace-state-p))
+      (progn
+      ;; TODO-evil: Will this let evil's backspace/delete 'undo' functionality work?
+      ;; (evil-replace-pre-command)
+
+      ;; TODO-evil: Will this work on its own to allow evil's 'undo' functionality?
+      (evil-delete-char (point) (1+ (point))))
+
+    ;; Meow just uses vanilla Emacs' `overwrite-mode'.
     (when overwrite-mode
       (delete-char  (point) (1+ (point)))))
 
-  ;; Now we can "replace" with the new char.
+  ;;------------------------------
+  ;; Now we can insert the new char.
+  ;;------------------------------
   (insert character))
 
 

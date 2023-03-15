@@ -162,7 +162,7 @@
 (defhydra art:hydra:box/single (:color amaranth ;; default to warn if non-hydra key
                                 ;;:color pink   ;; defaults to not exit unless explicit
                                 ;;:idle 0.75    ;; no help for x seconds
-                                :hint none)     ;; no hint - just docstr)
+                                :hint none)     ;; no hint - just docstr
   "
 Draw box characters.
 _'_: ?'?  _,_: ?,?  _._: ?.?   _p_: ?p?   ^ ^  ^ ^     ^ ^        _c_: up    ^ ^            _-_: undo     _d_: ?d?
@@ -226,37 +226,119 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Movement Keys
   ;;------------------------------
-  ;; TODO-meow: keybinds for meow
-  ("c" #'evil-previous-line "up")
-  ("h" #'evil-backward-char "left")
-  ("t" #'evil-next-line "down")
-  ("n" #'evil-forward-char "right")
+  ("c"
+   (if (imp:flag? :keybinds +evil)
+       (evil-previous-line)
+     (previous-line))
+   "up")
+  ("h"
+      (if (imp:flag? :keybinds +evil)
+          (evil-backward-char)
+        (backward-char))
+      "left")
+  ("t"
+      (if (imp:flag? :keybinds +evil)
+          (evil-next-line)
+        (next-line))
+      "down")
+  ("n"
+      (if (imp:flag? :keybinds +evil)
+          (evil-forward-char)
+        (forward-char))
+      "right")
 
   ;;------------------------------
   ;; Misc.
   ;;------------------------------
   ("<SPC>" (buffer:insert-or-overwrite " ") "insert space")
-  ;; TODO-meow: keybinds for meow
   ("<insert>"
-   (funcall #'mantle:evil:replace-state:toggle)
-   (if (evil-replace-state-p)
-       "insert state"
-     "replace state"))
-  ;; TODO-meow: keybinds for meow
-  ("x" #'evil-delete-char "delete char")
-  ("X" #'evil-delete-char "delete backwards char")
-  ("-" #'undo "undo")
-  ("_" #'undo "undo")
-  ("C-_" #'undo "undo")
+   #'buffer:overwrite:toggle
+   (if (buffer:overwriting?)
+       (if (imp:flag? :keybinds +evil) "insert state" "insert mode")
+     (if (imp:flag? :keybinds +evil) "replace state" "overwrite mode")))
+  ("x"
+   (if (imp:flag? :keybinds +evil)
+       (evil-delete-char)
+     (delete-char))
+   "delete char")
+  ("X"
+   (if (imp:flag? :keybinds +evil)
+       (evil-delete-backward-char)
+     (delete-backward-char))
+   "delete backwards char")
+  ;; TODO-meow: Check for `undo-tree'? Or use evil/meow undo (and redo?) command?
+  ("-"
+   (if (imp:flag? :emacs +undo-tree)
+       (undo-tree-undo)
+     (undo))
+   "undo")
+  ("_"
+   (if (imp:flag? :emacs +undo-tree)
+       (undo-tree-undo)
+     (undo))
+   "undo")
+  ("C-_"
+   (if (imp:flag? :emacs +undo-tree)
+       (undo-tree-undo)
+     (undo))
+   "undo")
 
   ;;------------------------------
   ;; Get Me Out Of Here!!!
   ;;------------------------------
-  ("d"   (hydra:nest 'hydra:art/box/double) "double lines (╬)" :exit t)
-  ("G"   nil                 "quit (to insert state)" :color blue)
-  ;; TODO-meow: keybinds for meow
-  ("g"   (evil-normal-state) "quit (to normal state)" :color blue)
-  ("C-g" (evil-normal-state) "quit (to normal state)" :color blue))
+  ("d"   (hydra:nest 'art:hydra:box/double) "double lines (╬)" :exit t)
+  ("G"
+   (cond ((imp:flag? :keybinds +evil)
+          ;; TODO-evil: this never did anything special when I was using evil,
+          ;; so I think it works right? Then again, I almost never use(d) it...
+          ;;
+          nil)
+         ((imp:flag? :keybinds +meow)
+          (unless (meow-insert-mode-p)
+            (meow-insert-mode)))
+         (t
+          nil))
+   (concat "quit"
+           (cond ((imp:flag? :keybinds +evil)
+                  " (to insert state)")
+                 ((imp:flag? :keybinds +meow)
+                  " (to insert mode)")
+                 (t
+                  nil)))
+   :color blue)
+  ("g"
+   (cond ((imp:flag? :keybinds +evil)
+          (evil-normal-state))
+         ((imp:flag? :keybinds +meow)
+          (unless (meow-normal-mode-p)
+            (meow-normal-mode)))
+         (t
+          nil))
+   (concat "quit"
+           (cond ((imp:flag? :keybinds +evil)
+                  " (to normal state)")
+                 ((imp:flag? :keybinds +meow)
+                  " (to normal mode)")
+                 (t
+                  nil)))
+   :color blue)
+  ("C-g"
+   (cond ((imp:flag? :keybinds +evil)
+          (evil-normal-state))
+         ((imp:flag? :keybinds +meow)
+          (unless (meow-normal-mode-p)
+            (meow-normal-mode)))
+         (t
+          nil))
+   (concat "quit"
+           (cond ((imp:flag? :keybinds +evil)
+                  " (to normal state)")
+                 ((imp:flag? :keybinds +meow)
+                  " (to normal mode)")
+                 (t
+                  nil)))
+   :color blue))
+;; (art:hydra:box/single/body)
 
 
 ;;------------------------------------------------------------------------------
@@ -306,36 +388,119 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ;;------------------------------
   ;; Movement Keys
   ;;------------------------------
-  ;; TODO-meow: keybinds for meow
-  ("c" #'evil-previous-line "up")
-  ("h" #'evil-backward-char "left")
-  ("t" #'evil-next-line "down")
-  ("n" #'evil-forward-char "right")
+  ("c"
+   (if (imp:flag? :keybinds +evil)
+       (evil-previous-line)
+     (previous-line))
+   "up")
+  ("h"
+      (if (imp:flag? :keybinds +evil)
+          (evil-backward-char)
+        (backward-char))
+      "left")
+  ("t"
+      (if (imp:flag? :keybinds +evil)
+          (evil-next-line)
+        (next-line))
+      "down")
+  ("n"
+      (if (imp:flag? :keybinds +evil)
+          (evil-forward-char)
+        (forward-char))
+      "right")
 
   ;;------------------------------
   ;; Misc.
   ;;------------------------------
   ("<SPC>" (buffer:insert-or-overwrite " ") "insert space")
   ("<insert>"
-   ;; TODO-meow: keybinds for meow
-   (funcall #'mantle:evil:replace-state:toggle)
-   (if (evil-replace-state-p)
-       "insert state"
-     "replace state"))
-  ;; TODO-meow: keybinds for meow
-  ("x" #'evil-delete-char "delete char")
-  ("X" #'evil-delete-char "delete backwards char")
-  ("-" #'undo "undo")
-  ("_" #'undo "undo")
-  ("C-_" #'undo "undo")
+   #'buffer:overwrite:toggle
+   (if (buffer:overwriting?)
+       (if (imp:flag? :keybinds +evil) "insert state" "insert mode")
+     (if (imp:flag? :keybinds +evil) "replace state" "overwrite mode")))
+  ("x"
+   (if (imp:flag? :keybinds +evil)
+       (evil-delete-char)
+     (delete-char))
+   "delete char")
+  ("X"
+   (if (imp:flag? :keybinds +evil)
+       (evil-delete-backward-char)
+     (delete-backward-char))
+   "delete backwards char")
+  ;; TODO-meow: Check for `undo-tree'? Or use evil/meow undo (and redo?) command?
+  ("-"
+   (if (imp:flag? :emacs +undo-tree)
+       (undo-tree-undo)
+     (undo))
+   "undo")
+  ("_"
+   (if (imp:flag? :emacs +undo-tree)
+       (undo-tree-undo)
+     (undo))
+   "undo")
+  ("C-_"
+   (if (imp:flag? :emacs +undo-tree)
+       (undo-tree-undo)
+     (undo))
+   "undo")
 
   ;;------------------------------
   ;; Get Me Out Of Here!!!
   ;;------------------------------
   ("d"   (hydra:nest 'art:hydra:box/single) "single lines (┼)" :exit t)
-  ("G"   nil                 "quit (to insert state)" :color blue)
-  ("g"   (evil-normal-state) "quit (to normal state)" :color blue)
-  ("C-g" (evil-normal-state) "quit (to normal state)" :color blue))
+  ("G"
+   (cond ((imp:flag? :keybinds +evil)
+          ;; TODO-evil: this never did anything special when I was using evil,
+          ;; so I think it works right? Then again, I almost never use(d) it...
+          ;;
+          nil)
+         ((imp:flag? :keybinds +meow)
+          (unless (meow-insert-mode-p)
+            (meow-insert-mode)))
+         (t
+          nil))
+   (concat "quit"
+           (cond ((imp:flag? :keybinds +evil)
+                  " (to insert state)")
+                 ((imp:flag? :keybinds +meow)
+                  " (to insert mode)")
+                 (t
+                  nil)))
+   :color blue)
+  ("g"
+   (cond ((imp:flag? :keybinds +evil)
+          (evil-normal-state))
+         ((imp:flag? :keybinds +meow)
+          (unless (meow-normal-mode-p)
+            (meow-normal-mode)))
+         (t
+          nil))
+   (concat "quit"
+           (cond ((imp:flag? :keybinds +evil)
+                  " (to normal state)")
+                 ((imp:flag? :keybinds +meow)
+                  " (to normal mode)")
+                 (t
+                  nil)))
+   :color blue)
+  ("C-g"
+   (cond ((imp:flag? :keybinds +evil)
+          (evil-normal-state))
+         ((imp:flag? :keybinds +meow)
+          (unless (meow-normal-mode-p)
+            (meow-normal-mode)))
+         (t
+          nil))
+   (concat "quit"
+           (cond ((imp:flag? :keybinds +evil)
+                  " (to normal state)")
+                 ((imp:flag? :keybinds +meow)
+                  " (to normal mode)")
+                 (t
+                  nil)))
+   :color blue))
+;; (art:hydra:box/double/body)
 
 
 ;;------------------------------------------------------------------------------
