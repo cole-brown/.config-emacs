@@ -1,0 +1,64 @@
+;;; mantle/config/org/version-control.el --- Configure version control stuff for Org-Mode -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2023-03-16
+;; Modified:   2023-03-16
+;; URL:        https://github.com/cole-brown/.config-emacs
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;  Configure version control stuff for Org-Mode.
+;;
+;;; Code:
+
+
+;;------------------------------------------------------------------------------
+;; Orgit: Link to Magit buffers from Org docs
+;;------------------------------------------------------------------------------
+;; https://github.com/magit/orgit
+;; Use the usual `org-store-link' & `org-insert-link' to link to Magit buffers.
+;;
+;;---
+;; Format
+;;---
+;; https://github.com/magit/orgit#format
+;;
+;; orgit:/path/to/repo/            links to a magit-status buffer
+;; orgit-log:/path/to/repo/::REV   links to a magit-log buffer
+;; orgit-rev:/path/to/repo/::ARGS  links to a magit-revision buffer
+;;
+;;---
+;; Export
+;;---
+;; https://github.com/magit/orgit#export
+;;
+;; When an Org file containing such links is exported, then the url of the
+;; remote configured with `orgit-remote' is used to generate a web url according
+;; to `orgit-export-alist'. That webpage should present approximately the same
+;; information as the Magit buffer would.
+;;
+;; Both the remote to be considered the public remote, as well as the actual web
+;; urls can be defined in individual repositories using Git variables.
+;;
+;; To use a remote different from `orgit-remote' but still use `orgit-export-alist'
+;; to generate the web urls, use:
+;;   git config orgit.remote REMOTE-NAME
+;;
+;; To explicitly define the web urls, use something like:
+;;   git config orgit.status http://example.com/repo/overview
+;;   git config orgit.log http://example.com/repo/history/%r
+;;   git config orgit.rev http://example.com/repo/revision/%r
+
+(imp:use-package orgit
+  :after (:and org magit))
+
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
+(imp:provide :mantle 'config 'user 'org 'version-control)

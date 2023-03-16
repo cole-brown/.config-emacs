@@ -34,6 +34,24 @@
 ;; Org-Journal
 ;;------------------------------------------------------------------------------
 
+(imp:load :feature  '(:mantle config user org journal)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "journal")
+
+
+;;------------------------------------------------------------------------------
+;; Exporters, Etc
+;;------------------------------------------------------------------------------
+
+
+;;------------------------------------------------------------------------------
+;; Integration with Other Packages
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config user org version-control)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "version-control")
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.
