@@ -20,7 +20,6 @@
 (require 'cl-lib)
 
 
-(imp:require :nub)
 (imp:require :elisp 'utils)
 
 
@@ -342,12 +341,10 @@ evil's replace state backspace 'undo' functionality."
   ;;------------------------------
   (unless (or (characterp character)
               (stringp character))
-    (nub:error
-        :innit
-        "buffer:insert-or-overwrite"
-      "CHARACTER must be a character or string. Got %S: %S"
-      (type-of character)
-      character))
+    (error "%s: CHARACTER must be a character or string. Got %S: %S"
+           "buffer:insert-or-overwrite: "
+           (type-of character)
+           character))
 
   ;;------------------------------
   ;; Overwriting?
