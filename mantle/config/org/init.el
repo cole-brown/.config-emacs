@@ -18,17 +18,21 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Note Taking and Pretty Much Everything Else...
+;; Org-Mode Itself
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user org-mode)
+(imp:load :feature  '(:mantle config user org mode)
           :path     (imp:path:current:dir/relative :mantle)
-          :filename "org-mode")
+          :filename "mode")
+
+(imp:load :feature  '(:mantle config user org agenda)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "agenda")
 
 
-;; (imp:load :feature  '(:mantle config user emacs)
-;;           :path     (imp:path:current:dir/relative :mantle)
-;;           :filename "emacs")
+;;------------------------------------------------------------------------------
+;; Org-Journal
+;;------------------------------------------------------------------------------
 
 
 ;;------------------------------------------------------------------------------
