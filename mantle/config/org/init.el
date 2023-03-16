@@ -40,12 +40,20 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Exporters, Etc
+;; Etc.
 ;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config user org contacts)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "contacts")
+
+(imp:load :feature  '(:mantle config user org pretty)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "pretty")
 
 
 ;;------------------------------------------------------------------------------
-;; Integration with Other Packages
+;; Integration with Other Parts of Emacs
 ;;------------------------------------------------------------------------------
 
 (imp:load :feature  '(:mantle config user org version-control)
