@@ -1,4 +1,4 @@
-;;; mantle/config/org-mode.el -*- lexical-binding: t; -*-
+;;; mantle/config/org/org-mode.el -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>

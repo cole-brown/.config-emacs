@@ -115,9 +115,10 @@
 ;; Modes
 ;;------------------------------
 
-(imp:load :feature  '(:mantle config user org-mode)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "org-mode")
+(imp:load :feature  '(:mantle config user org)
+          :path     (imp:path:join (imp:path:current:dir/relative :mantle)
+                                   "org")
+          :filename "init")
 
 
 ;;------------------------------
