@@ -17,10 +17,10 @@
 ;;; Code:
 
 
-;;------------------------------------------------------------------------------
-;; Org-Mode Beautification Project
-;;------------------------------------------------------------------------------
-;; WANT!, but... slow. :(
+;; ╔═══════════════════════════════════════════════════════════════════════════╗
+;; ║                    Org-Mode Beautification Project                        ║
+;; ╚═══════════════════════════════════════════════════════════════════════════╝
+;; WANT!, but... slow? :(
 ;; TODO-org: Try these out one at a time and see if the slowdown is noticible?
 ;;           I have plenty of 10k line files to check with...
 

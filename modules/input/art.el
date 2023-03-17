@@ -259,12 +259,12 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ("x"
    (if (imp:flag? :keybinds +evil)
        (evil-delete-char)
-     (delete-char))
+     (delete-char 1))
    "delete char")
   ("X"
    (if (imp:flag? :keybinds +evil)
        (evil-delete-backward-char)
-     (delete-backward-char))
+     (delete-backward-char 1))
    "delete backwards char")
   ;; TODO-meow: Check for `undo-tree'? Or use evil/meow undo (and redo?) command?
   ("-"
@@ -421,12 +421,12 @@ _;_: ?;?  _q_: ?q?  _j_: ?j?   ^ ^  ^ ^   ^ ^  ^ ^     ^ ^        ^ ^        ^ ^
   ("x"
    (if (imp:flag? :keybinds +evil)
        (evil-delete-char)
-     (delete-char))
+     (delete-char 1))
    "delete char")
   ("X"
    (if (imp:flag? :keybinds +evil)
        (evil-delete-backward-char)
-     (delete-backward-char))
+     (delete-backward-char 1))
    "delete backwards char")
   ;; TODO-meow: Check for `undo-tree'? Or use evil/meow undo (and redo?) command?
   ("-"
