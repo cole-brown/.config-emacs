@@ -478,10 +478,27 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
 (imp:use-package macrostep)
 
 ;;------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------
 
 (imp:use-package macrostep
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (mantle:meow:leader/local:keys emacs-lisp-mode-map
+                                 "m" #'macrostep-expand)) ;; Expand macro and enter macrostep-expand mode.
+
+
+;;------------------------------
+;; Keybinds : evil
+;;------------------------------
+
+(imp:use-package macrostep
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------
