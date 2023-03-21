@@ -386,6 +386,21 @@ LETTER must be a 1-character string."
   (mode:org/journal:keybind/evil :home "h"))
 
 
+
+;;------------------------------
+;; Org-Journal Hacks
+;;------------------------------
+
+(imp:use-package org-journal
+  :after org
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (advice-add #'org-journal-search-by-string :override #'mantle:advice:org/window:org-pop-to-buffer))
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------

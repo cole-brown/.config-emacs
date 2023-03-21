@@ -35,6 +35,14 @@
 
 
 ;;------------------------------------------------------------------------------
+;; NOTE: Org-Mode TODO Sequence Keywords
+;;------------------------------------------------------------------------------
+;; See "mantle/theme/<theme>/org-mode.el" (e.g.
+;; "mantle/theme/zenburn/org-mode.el") for set-up of org-mode TODO keywords,
+;; faces, and other such theme-related stuff.
+
+
+;;------------------------------------------------------------------------------
 ;; Org-Mode
 ;;------------------------------------------------------------------------------
 
@@ -319,6 +327,169 @@
 ;;  (defun mode:org:speed-commands? ()
 ;;    "Allow speed keys when at any headline *, not just beginning of line."
 ;;    (and (looking-at org-outline-regexp) (looking-back "^\**")))
+
+
+;;------------------------------
+;; Org-Mode Hacks
+;;------------------------------
+(imp:use-package org
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  ;; Also used by `org-journal'.
+  (defun mantle:advice:org/window:org-pop-to-buffer (buffer &optional norecord)
+    "`:override' advice for `org-pop-to-buffer'.
+
+Use `pop-to-buffer' instead of `switch-to-buffer' to open BUFFER.'
+
+Ensure todo, agenda, and other minor popups are delegated to the popup system.
+
+From Doom's `+popup--org-pop-to-buffer-a' in \"modules/ui/popup/+hacks.el\"."
+    (pop-to-buffer buffer nil norecord))
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (advice-add #'org-pop-to-buffer :override #'mantle:advice:org/window:org-pop-to-buffer)
+
+
+  (defun mantle:advice:org/window:suppress-delete-other-windows (fn &rest args)
+    "Org has a scorched-earth window management policy I'm not fond of. i.e. it
+kills all other windows just so it can monopolize the frame. No thanks. We can
+do better.
+
+From Doom's `+popup--suppress-delete-other-windows-a' in
+\"modules/ui/popup/+hacks.el\"."
+    (cl-letf (((symbol-function #'delete-other-windows) #'ignore)
+              ((symbol-function #'delete-window)        #'ignore))
+      (apply fn args)))
+
+  (advice-add #'org-add-log-note                       :around #'mantle:advice:org/window:suppress-delete-other-windows)
+  (advice-add #'org-capture-place-template             :around #'mantle:advice:org/window:suppress-delete-other-windows)
+  (advice-add #'org-export--dispatch-ui                :around #'mantle:advice:org/window:suppress-delete-other-windows)
+  (advice-add #'org-agenda-get-restriction-and-command :around #'mantle:advice:org/window:suppress-delete-other-windows)
+  (advice-add #'org-goto-location                      :around #'mantle:advice:org/window:suppress-delete-other-windows)
+  (advice-add #'org-fast-tag-selection                 :around #'mantle:advice:org/window:suppress-delete-other-windows)
+  (advice-add #'org-fast-todo-selection                :around #'mantle:advice:org/window:suppress-delete-other-windows)
+
+
+  ;; TODO-org: Do I need to fix `org-goto'? Don't currently use it, but seems like it could be quite useful?
+  ;; Save this in case I do start using `org-goto'...
+  ;;   (defun mantle:advice:org/window:fix-goto (fn &rest args)
+  ;;     "`org-goto' uses `with-output-to-temp-buffer' to display its help buffer,
+  ;; for some reason, which is very unconventional, and so requires these gymnastics
+  ;; to tame (i.e. to get the popup manager to handle it).
+  ;;
+  ;; From Doom's `+popup--org-fix-goto-a'  in \"modules/ui/popup/+hacks.el\"."
+  ;;     (letf! (defun internal-temp-output-buffer-show (buffer)
+  ;;                  (let ((temp-buffer-show-function
+  ;;                         (doom-rpartial #'+popup-display-buffer-stacked-side-window-fn nil)))
+  ;;                    (with-current-buffer buffer
+  ;;                      (+popup-buffer-mode +1))
+  ;;                    (funcall internal-temp-output-buffer-show buffer)))
+  ;;           (apply fn args))
+  ;;       (apply fn args))
+  ;;   (advice-add #'org-goto-location :around #'mantle:advice:org/window:fix-goto)
+
+
+  (defun mantle:advice:org/window:read-char-exclusive (&rest _args)
+    "`:before' advice for `read-char-exclusive'.
+
+Advice-ception for function `mantle:advice:org/window:fix-popup-shrinking'.
+
+From Doom's `+popup--org-fix-popup-window-shrinking-a' in
+\"modules/ui/popup/+hacks.el\"."
+    (message nil))
+
+
+  (defun mantle:advice:org/window:split-window-vertically (&optional _size)
+    "`:filter-args' advice for `split-window-vertically'.
+
+Advice-ception for function `mantle:advice:org/window:fix-popup-shrinking'.
+
+From Doom's `+popup--org-fix-popup-window-shrinking-a' in
+\"modules/ui/popup/+hacks.el\"."
+    ;; Have to return a list? Otherwise:
+    ;;   > Debugger entered--Lisp error: (wrong-type-argument listp -5)
+    ;;   >   apply(split-window-below -5)
+    ;;   >   split-window-vertically()
+    (list
+     ;; Ignore `_SIZE'...
+     (- 0 window-min-height 1)))
+
+
+  (defun mantle:advice:org/window:org-fit-window-to-buffer (&optional window _max-height _min-height _shrink-only)
+    "`:override' advice for `org-fit-window-to-buffer'.
+
+Advice-ception for function `mantle:advice:org/window:fix-popup-shrinking'.
+
+From Doom's `+popup--org-fix-popup-window-shrinking-a' in
+\"modules/ui/popup/+hacks.el\"."
+    ;; (when-let (buf (window-buffer window))
+    ;;   (with-current-buffer buf
+    ;;     (+popup-buffer-mode)))
+    (when (> (window-buffer-height window)
+             (window-height window))
+      (fit-window-to-buffer window (window-buffer-height window))))
+
+
+  (defun mantle:advice:org/window:fix-popup-shrinking (fn/orig &rest args)
+    "`:around' advice for org fast selection functions.
+
+Hide the mode-line in *Org tags* buffer so you can actually see its
+content and displays it in a side window without deleting all other windows.
+Ugh, such an ugly hack.
+
+From Doom's `+popup--org-fix-popup-window-shrinking-a' in
+\"modules/ui/popup/+hacks.el\"."
+    ;; Want to be able to remove our advice when we're done.
+    (unwind-protect
+        (progn
+          (advice-add #'read-char-exclusive      :before      #'mantle:advice:org/window:read-char-exclusive)
+          (advice-add #'split-window-vertically  :filter-args #'mantle:advice:org/window:split-window-vertically)
+          (advice-add #'org-fit-window-to-buffer :override    #'mantle:advice:org/window:org-fit-window-to-buffer)
+
+          (apply fn/orig args))
+
+      ;; Always remove our advice when we're done.
+      (advice-remove #'read-char-exclusive      #'mantle:advice:org/window:read-char-exclusive)
+      (advice-remove #'split-window-vertically  #'mantle:advice:org/window:split-window-vertically)
+      (advice-remove #'org-fit-window-to-buffer #'mantle:advice:org/window:org-fit-window-to-buffer)))
+
+
+  (advice-add #'org-fast-tag-selection  :around #'mantle:advice:org/window:fix-popup-shrinking)
+  (advice-add #'org-fast-todo-selection :around #'mantle:advice:org/window:fix-popup-shrinking)
+
+
+  (defun mantle:advice:org/window:org-edit-src-code (fn &rest args)
+    "`:after' advice for `org-edit-src-code'.
+
+Mark the `org-edit-src-code' buffer so we can kill it if needed.
+
+From Doom's `+popup--org-edit-src-exit-a' in \"modules/ui/popup/+hacks.el\"."
+    (let ((window (selected-window)))
+      (set-window-parameter window 'mantle:org/window:org-edit-src-code t)))
+
+
+  (defun mantle:advice:org/window:org-edit-src-exit (fn &rest args)
+    "`:around' advice for `org-edit-src-exit'.
+
+If you switch workspaces or the src window is recreated...
+delete the src window?
+
+From Doom's `+popup--org-edit-src-exit-a' in \"modules/ui/popup/+hacks.el\"."
+    (let ((window (selected-window)))
+      (prog1 (apply fn args)
+        (when (and (window-parameter window 'mantle:org/window:org-edit-src-code)
+                   (window-live-p window))
+          (delete-window window)))))
+
+
+  (advice-add #'org-edit-src-exit :around #'mantle:advice:org/window:org-edit-src-exit))
 
 
 ;;------------------------------------------------------------------------------

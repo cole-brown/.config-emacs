@@ -270,21 +270,21 @@
         ;; (wrap "「 」")
         )
     (setq org-todo-keywords
-          `((sequence  ;; Big Words sequence.
+          `((sequence
              ,(mode:org:todo/keyword "TODO"    wrap "t")             ; A task that needs doing & is ready to do
              ,(mode:org:todo/keyword "PROJECT" wrap "p")             ; A project, which usually contains other tasks
              ,(mode:org:todo/keyword "CURRENT" wrap "c" :timestamp)  ; A task that is in progress
-             ,(mode:org:todo/keyword "WAITING" wrap "w" :timestamp)  ; Something external is holding up this task
-             ,(mode:org:todo/keyword "HOLDING" wrap "h" :timestamp)  ; This task is paused/on hold because of me
+             ,(mode:org:todo/keyword "WAITING" wrap "w" :notes)      ; Something external is holding up this task
+             ,(mode:org:todo/keyword "HOLDING" wrap "h" :notes)      ; This task is paused/on hold because of me
              "|"
-             ,(mode:org:todo/keyword "───────" wrap "n" :timestamp) ; No one cares.
-             ,(mode:org:todo/keyword "INFO"    wrap "i" :timestamp) ; Info.
-             ,(mode:org:todo/keyword "MEETING" wrap "e" :timestamp) ; Meeting Notes.
-             ,(mode:org:todo/keyword "MOVED"   wrap "m" :timestamp) ; Moved somewhere else; no further action here.
-             ,(mode:org:todo/keyword "DONE"    wrap "d" :timestamp) ; Task completed... whatever.
-             ,(mode:org:todo/keyword "SUCCESS" wrap "s" :notes)     ; Task completed successfully!!!
-             ,(mode:org:todo/keyword "FAILURE" wrap "f" :notes)     ; Task was completed the bad way.
-             ,(mode:org:todo/keyword "KILLED"  wrap "k" :notes)))   ; Task was cancelled, aborted, or is no longer applicable.
+             ,(mode:org:todo/keyword "───────" wrap "n" :timestamp)  ; No one cares.
+             ,(mode:org:todo/keyword "INFO"    wrap "i" :timestamp)  ; Info.
+             ,(mode:org:todo/keyword "MEETING" wrap "e" :timestamp)  ; Meeting Notes.
+             ,(mode:org:todo/keyword "MOVED"   wrap "m" :timestamp)  ; Moved somewhere else; no further action here.
+             ,(mode:org:todo/keyword "DONE"    wrap "d" :timestamp)  ; Task completed... whatever.
+             ,(mode:org:todo/keyword "SUCCESS" wrap "s" :timestamp)  ; Task completed successfully!!!
+             ,(mode:org:todo/keyword "FAILURE" wrap "f" :notes)      ; Task was completed the bad way.
+             ,(mode:org:todo/keyword "KILLED"  wrap "k" :notes)))    ; Task was cancelled, aborted, or is no longer applicable.
 
           ;; And set some faces for these. strings.
           org-todo-keyword-faces

@@ -192,7 +192,7 @@ of `:notes' will only trigger if the next state doesn't have notes."
 
 
 (defun mode:cmd:org:convert/todo (skip-bare)
-  "Convert old TODO sequence to new"
+  "Convert old TODO sequence to new."
   (interactive
    (list (y-or-n-p "Skip bare->wrap? ")))
   (org-with-wide-buffer
