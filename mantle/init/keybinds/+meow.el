@@ -306,6 +306,40 @@ From: \"add mode and meow state specific keymaps\"
 
 
   ;;------------------------------
+  :custom
+  ;;------------------------------
+  ;; See 'meow-vars.el' in "packages/elpa/meow-<version>/meow-var.el".
+
+  ;; Use the system clipboard for `meow-kill', `meow-save', `meow-yank'...
+  (meow-use-clipboard t)
+
+  ;; Show meow keypad messages?
+  ;; For all the keypad messages:
+  ;;   - exit
+  ;;   - current key sequence you're building
+  ;;   - etc
+  ;; (meow-keypad-message nil) ; (default: t)
+
+  ;; Whether to use KEYPAD when the result of executing kbd string is a keymap.
+  ;; Well... this could have maybe solved my keymap-inside-of-keymap annoyance
+  ;; with KEYPAD, but that's in the past...
+  ;; (meow-use-keypad-when-execute-kbd nil) ; (default: t)
+
+  ;; Could get rid of meow special leader translation stuff (maybe?)?
+  ;; (meow-keypad-start-keys nil)
+
+  ;; Meow Cursor Types:
+  ;; (meow-cursor-type-<...> ???)
+
+  ;; TODO-meow: Currently meow-vars says the integration isn't working so good?
+  ;;   "Currently, keypad is not working well with which-key, so Meow ships a
+  ;;   default `meow-describe-keymap'."
+  ;;     - packages/elpa/meow-20230226.101/meow-var.el
+  ;; ;; Can we integrate `which-key' better?
+  ;; (meow-keypad-get-title ???)
+
+
+  ;;------------------------------
   :config
   ;;------------------------------
 
