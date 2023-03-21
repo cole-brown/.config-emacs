@@ -502,7 +502,7 @@ Popups can affect the cursor's position or cause disruptive input delays.
 Or, at least, in evil insert or replace mode the can?
 So treat the same in meow insert mode."
     (and (bound-and-true-p meow-mode)
-         (not (eq meow-insert-mode)))))
+         (not (meow-insert-mode-p)))))
 
 
 ;;------------------------------------------------------------------------------
