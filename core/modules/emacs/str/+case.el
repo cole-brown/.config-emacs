@@ -1356,6 +1356,62 @@ integers/marker according to CASES keywords."
 
 
 ;;------------------------------------------------------------------------------
+;; Characters
+;;------------------------------------------------------------------------------
+
+;; TODO: Alist of chars to toggled case?
+;;         - Because I know I've wanted to be able to "toggle" the "case" of
+;;           e.g. numbers before...
+
+(defun str:case/char:toggle (char)
+  "Toggle CHAR between upper and lower case."
+  (if (eq (upcase char) char)
+      (downcase char)
+    (upcase char)))
+;; (str:case/char:toggle ?h)
+;; (str:case/char:toggle ?H)
+;; (str:case/char:toggle ?1)
+
+
+(defun str:cmd:case/char:toggle ()
+  "Toggle the case of the character at point between upper and lower case."
+  (interactive)
+
+  (if (imp:mode? 'evil-mode)
+      ;; Evil has its own thing:
+      (evil-invert-case)
+    ;; DIY:
+    (let* ((char/orig (following-char))
+           (char/toggle (str:case/char:toggle char/orig)))
+      ;; Is it a char that has upper & lower cases?
+      (if (eq char/orig char/toggle)
+          ;; Just go to next char.
+          (forward-char)
+        ;; Replace w/ toggled char and end up at next char.
+        (delete-char 1 nil)
+        (insert-char char/toggle 1)))))
+
+
+(defun str:case/string:toggle (string)
+  "Toggle each character in STRING between upper and lower case."
+  (concat (seq-map #'str:case/char:toggle (append string nil))))
+;; (str:case/string:toggle "hello")
+;; (str:case/string:toggle "HeLlO")
+;; (str:case/string:toggle (str:case/string:toggle "hello"))
+
+
+(defun str:cmd:case/region:toggle (start end)
+  "Toggle the case of each character between START and END of region."
+  (interactive "r")
+
+  (if (imp:mode? 'evil-mode)
+      ;; Evil has its own thing:
+      (evil-invert-case)
+    ;; DIY:
+    (str:region->region start end #'str:case/string:toggle)))
+
+
+;;------------------------------------------------------------------------------
 ;; TODO: DWIM interactive funcs.
 ;;------------------------------------------------------------------------------
 

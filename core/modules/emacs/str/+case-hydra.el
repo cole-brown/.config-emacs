@@ -73,6 +73,7 @@ _t_: ?t? │ _st_:  ?st?^ │ ^ ^  ^ ^                        │ _ar_: ?ar? │
     ("al" #'str:case/region:to:alternating.lower (format int<str>:hydra:case:fmt "lOwEr AlTeRnAtInG cAsE") :exit t)
     ("au" #'str:case/region:to:alternating.upper (format int<str>:hydra:case:fmt "UpPeR aLtErNaTiNg CaSe") :exit t)
     ("ar" #'str:case/region:to:alternating.title (format int<str>:hydra:case:fmt "Random (lOwEr or UpPeR)") :exit t)
+    ("at" #'str:cmd:case/region:toggle           (format int<str>:hydra:case:fmt "Toggle") :exit t)
 
     ;;------------------------------
     ;; Multiple Cases
@@ -89,6 +90,7 @@ _t_: ?t? │ _st_:  ?st?^ │ ^ ^  ^ ^                        │ _ar_: ?ar? │
   ;; /Delay
   ;;------------------------------
   )
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.
