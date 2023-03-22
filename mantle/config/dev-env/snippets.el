@@ -18,6 +18,7 @@
 
 
 (imp:require :elisp 'utils 'functions)
+(imp:require :buffer 'region)
 
 
 ;;------------------------------------------------------------------------------
@@ -120,10 +121,33 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
   ;; Snippet Helpers
   ;;---
 
+  (defun int<mantle>:yas:prompt/format (prompt)
+    "Format PROMPT into a prompt string.
+
+Add \":\" and \" \" if not present at the end of PROMPT.
+
+Return \"Choose: \" when PROMPT is not a string."
+    (concat
+     ;; Prompt itself:
+     (if (not (stringp prompt))
+         "Choose"
+       (string-trim prompt))
+     ;; Suffixes:
+     (if (string-suffix-p ": " prompt)
+         ""
+       ":")
+     " "))
+  ;; (int<mantle>:yas:prompt/format nil)
+  ;; (int<mantle>:yas:prompt/format "Language")
+  ;; (int<mantle>:yas:prompt/format "Language ")
+  ;; (int<mantle>:yas:prompt/format "Language")
+
+
   (defvar int<mantle>:yas:choose/no-match/history nil
     "History of recently chosen choices in `int<mantle>:yas:choose/no-match'.")
 
-  (defun mantle:yas:choose/no-match (&rest possibilities)
+
+  (defun mantle:yas:choose/no-match (prompt &rest possibilities)
     "Prompt for a string in POSSIBILITIES and return it.
 
 The last element of POSSIBILITIES may be a list of strings.
@@ -136,13 +160,119 @@ Like `yas-choose-value' except does not require a match."
         (when (listp last-elem)
           (setcar last-link (car last-elem))
           (setcdr last-link (cdr last-elem))))
-      (completing-read "Choose: "
+      (completing-read (int<mantle>:yas:prompt/format prompt)
                        possibilities
                        nil
                        ;; TODO: `confirm' if `confirm-after-completion' is meh.
                        'confirm-after-completion
                        nil
                        int<mantle>:yas:choose/no-match/history)))
+
+
+  (defun mantle:yas:trim/lines (string)
+    "Trim newlines and carriage returns from beginning/end of STRING.
+
+Also remove STRING's properties.
+
+If STRING is not a string, return nil."
+    (if (stringp string)
+        (substring-no-properties
+         (string-trim string (rx (one-or-more (any "\n" "\r")))))
+      nil))
+
+
+  (defvar mantle:yas:text/saved nil
+    "Save some text for later.
+Intended for `yas-selected-text' and `mantle:yas:choose/options'.")
+
+
+  (defun mantle:yas:text/save (text)
+    "Save some TEXT for later.
+Intended for `yas-selected-text' and `mantle:yas:choose/options'."
+    (setq mantle:yas:text/saved text)
+    ;; Don't return text or it'll be in the template.
+    nil)
+
+
+  (defun mantle:yas:choose/options (prompt &rest options)
+    "Give keyword OPTIONS for what to use/choose from.
+
+If you want `yas-selected-text', use `:saved' and at some previous point in the
+snippet, do:
+  `(mantle:yas:text/save yas-selected-text)`
+
+OPTIONS:
+  - `:saved'     - Use `mantle:yas:text/saved'.
+  - `:clipboard' - Use clipboard's text.
+  - `:yank'      - Use kill ring's text.
+  - `:none'      - I choose... none of the above; nothing; go away.
+
+NOTE: Text of options will be deduplicated before being used."
+    (message "%S" options)
+    (unless (or yas-moving-away-p
+                yas-modified-p)
+      (let (choices
+            null-choice?)
+        (dolist (option options)
+          ;; Trim leading/trailing newlines.
+          (push (mantle:yas:trim/lines
+                 ;; Get text from wherever it is.
+                 (pcase option
+                   ((or :saved 'saved)
+                    (message ":saved (arg): %S" mantle:yas:text/saved)
+                    mantle:yas:text/saved
+                    ;; (when (buffer:region:active?)
+                    ;;   (buffer:region:get))
+                    )
+
+                   ((or :clipboard 'clipboard)
+                    ;; `let' values stolen from `clipboard-yank':
+                    (let ((select-enable-clipboard t)
+                          ;; Ensure that we defeat the DWIM login in `gui-selection-value'.
+                          (gui--last-selected-text-clipboard nil))
+                      (message ":clipboard: %S" (current-kill 0 'do-not-move))
+                      (current-kill 0 'do-not-move)))
+
+                   ((or :yank 'yank)
+                    (message ":yank: %S" (current-kill 0 'do-not-move))
+                    (current-kill 0 'do-not-move))
+
+                   ((or :none 'none)
+                    (setq null-choice? t))))
+                choices))
+
+        (message "raw: %s" choices)
+        (message "filtered: %s" (seq-filter (lambda (str)
+                                (and (stringp str)
+                                     (not (string-empty-p str))))
+                                            choices))
+        (message "uniq'd: %s" (seq-uniq (seq-filter (lambda (str)
+                                (and (stringp str)
+                                     (not (string-empty-p str))))
+                              choices)
+                  #'string=))
+
+        ;; Remove empties and deduplicate.
+        (setq choices (seq-uniq (seq-filter (lambda (str)
+                                              (and (stringp str)
+                                                   (not (string-empty-p str))))
+                                            choices)
+                                #'string=))
+
+        ;; Intentionally add an empty?
+        (when null-choice?
+          (push "" choices))
+
+        ;; Prompt user for choice.
+        (let* ((last-link (last choices))
+               (last-elem (car last-link)))
+          (when (listp last-elem)
+            (setcar last-link (car last-elem))
+            (setcdr last-link (cdr last-elem))))
+        (completing-read (int<mantle>:yas:prompt/format prompt)
+                         choices))))
+  ;; (mantle:yas:choose/options "prompt" :selected :clipboard :yank :none)
+
 
   ;;---
   ;; Default Snippets Location
