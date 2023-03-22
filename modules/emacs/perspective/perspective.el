@@ -72,13 +72,19 @@ Will be stored in `persp-save-dir'.")
 ;;------------------------------------------------------------------------------
 
 (defun int<perspective>:protected? (name)
-  "Is NAME a protected workspace?"
+  "Is NAME a protected workspace?
+
+From Doom's `+workspace--protected-p' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (equal name persp-nil-name))
 
 
 ;;;###autoload
 (defun perspective:exists? (name)
-  "Return t if NAME is the name of an existing workspace."
+  "Return t if NAME is the name of an existing workspace.
+
+From Doom's `+workspace-exists-p' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (member name (perspective:name:list)))
 
 
@@ -95,7 +101,10 @@ Will be stored in `persp-save-dir'.")
 (defun perspective:get (name &optional no-error?)
   "Return a workspace named NAME.
 
-Throw an error if NAME doesn't exist, unless NO-ERROR? is non-nil."
+Throw an error if NAME doesn't exist, unless NO-ERROR? is non-nil.
+
+From Doom's `+workspace-get' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (cl-check-type name string)
   (when-let (persp (persp-get-by-name name))
     (cond ((perspective-p persp) persp)
@@ -115,13 +124,19 @@ Throw an error if NAME doesn't exist, unless NO-ERROR? is non-nil."
 
 ;;;###autoload
 (defun perspective:name:current ()
-  "Get the name of the current workspace."
+  "Get the name of the current workspace.
+
+From Doom's `+workspace-current-name' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (safe-persp-name (perspective:current)))
 
 
 ;;;###autoload
 (defun perspective:list ()
-  "Return a list of workspace structs (satisifes `perspective-p')."
+  "Return a list of workspace structs (satisifes `perspective-p').
+
+From Doom's `+workspace-list' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   ;; We don't use `hash-table-values' because it doesn't ensure order in older
   ;; versions of Emacs
   (cl-loop for name in persp-names-cache
@@ -131,7 +146,10 @@ Throw an error if NAME doesn't exist, unless NO-ERROR? is non-nil."
 
 ;;;###autoload
 (defun perspective:name:list ()
-  "Return the list of names of open workspaces."
+  "Return the list of names of open workspaces.
+
+From Doom's `+workspace-list-names' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   persp-names-cache)
 
 
@@ -140,7 +158,10 @@ Throw an error if NAME doesn't exist, unless NO-ERROR? is non-nil."
   "Return a list of buffers in PERSP.
 
 PERSP can be a string (name of a workspace) or a workspace (satisfies
-`perspective-p'). If nil or omitted, it defaults to the current workspace."
+`perspective-p'). If nil or omitted, it defaults to the current workspace.
+
+From Doom's `+workspace-buffer-list' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (let ((persp (or persp (perspective:current))))
     (unless (perspective-p persp)
       (user-error "Not in a valid workspace (%s)" persp))
@@ -149,7 +170,10 @@ PERSP can be a string (name of a workspace) or a workspace (satisfies
 
 ;;;###autoload
 (defun perspective:buffer:list/orphaned ()
-  "Return a list of buffers that aren't associated with any perspective."
+  "Return a list of buffers that aren't associated with any perspective.
+
+From Doom's `+workspace-orphaned-buffer-list' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (cl-remove-if #'persp--buffer-in-persps (buffer-list)))
 
 
@@ -164,7 +188,10 @@ PERSP can be a string (name of a workspace) or a workspace (satisfies
 Can only retrieve perspectives that were explicitly saved with
 `persp:action:save'.
 
-Returns t if successful, nil otherwise."
+Returns t if successful, nil otherwise.
+
+From Doom's `+workspace-load' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (when (perspective:exists? name)
     (user-error "A workspace named '%s' already exists." name))
   (persp-load-from-file-by-names
@@ -181,7 +208,10 @@ Returns t if successful, nil otherwise."
 Can be loaded again with `perspective:action:load'. NAME can be the string name
 of a workspace or its perspective hash table.
 
-Return t on success, nil otherwise."
+Return t on success, nil otherwise.
+
+From Doom's `+workspace-save' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (unless (perspective:exists? name)
     (error "'%s' is an invalid workspace" name))
   (let ((fname (expand-file-name perspective:filename:data persp-save-dir)))
@@ -197,7 +227,10 @@ Return t on success, nil otherwise."
 Return:
   - nil - NAME already exists
   - t   - success
-  - nil - failure"
+  - nil - failure
+
+From Doom's `+workspace-new' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (when (int<perspective>:protected? name)
     (error "Can't create a new '%s' workspace" name))
   (when (perspective:exists? name)
@@ -220,7 +253,10 @@ Return:
 (defun perspective:action:rename (name new-name)
   "Rename the current workspace named NAME to NEW-NAME.
 
-Return non-nil on success, nil otherwise."
+Return non-nil on success, nil otherwise.
+
+From Doom's `+workspace-rename' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (when (int<perspective>:protected? name)
     (error "Can't rename '%s' workspace" name))
   (persp-rename new-name (perspective:get name)))
@@ -232,7 +268,10 @@ Return non-nil on success, nil otherwise."
 
 WORKSPACE can be the name of a perspective or its hash table.
 
-If INHIBIT-KILL? is non-nil, don't kill this workspace's buffers."
+If INHIBIT-KILL? is non-nil, don't kill this workspace's buffers.
+
+From Doom's `+workspace-delete' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (unless (stringp workspace)
     (setq workspace (persp-name workspace)))
   (when (int<perspective>:protected? workspace)
@@ -247,7 +286,10 @@ If INHIBIT-KILL? is non-nil, don't kill this workspace's buffers."
   "Switch to another workspace named NAME (a string).
 
 If AUTO-CREATE? is non-nil, create the workspace if it doesn't exist, otherwise
-throws an error."
+throws an error.
+
+From Doom's `+workspace-switch' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (unless (perspective:exists? name)
     (if auto-create?
         (perspective:action:new name)
@@ -263,13 +305,16 @@ throws an error."
 
 
 ;;;###autoload
-(defun perspective:action:new (&optional name clone?)
-  "Create a new workspace named NAME.
+(defun perspective:action:open (&optional name clone?)
+  "Open a (new?) workspace named NAME.
 
 If NAME is empty/nil, generate a unique name.
 
 If CLONE? is non-nil, clone the current workspace, otherwise the new workspace
-is blank."
+is blank.
+
+From Doom's `+workspace/new' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (unless name
     (setq name (int<perspective>:name:generate)))
   (condition-case e
@@ -291,7 +336,10 @@ is blank."
   "Load workspace NAME and switch to it.
 
 If called with the prefix argument, try to reload the current workspace from
-session files."
+session files.
+
+From Doom's `+workspace/load' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive
    (list
     (if current-prefix-arg
@@ -310,7 +358,10 @@ session files."
 (defun perspective:cmd:save (name)
   "Save the current workspace as NAME.
 
-If called with the prefix argument, autosave the current workspace."
+If called with the prefix argument, autosave the current workspace.
+
+From Doom's `+workspace/save' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive
    (list
     (if current-prefix-arg
@@ -323,7 +374,10 @@ If called with the prefix argument, autosave the current workspace."
 
 ;;;###autoload
 (defun perspective:cmd:rename (new-name)
-  "Rename the current workspace to NEW-NAME."
+  "Rename the current workspace to NEW-NAME.
+
+From Doom's `+workspace/rename' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive (list (read-from-minibuffer "New workspace name: ")))
   (condition-case-unless-debug ex
       (let* ((current-name (perspective:name:current))
@@ -339,7 +393,10 @@ If called with the prefix argument, autosave the current workspace."
   "Delete the NAME workspace.
 
 If called with the prefix argument, prompts you for the name of the workspace to
-delete."
+delete.
+
+From Doom's `+workspace/delete' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive
    (let ((current-name (perspective:name:current)))
      (list
@@ -388,7 +445,10 @@ delete."
 (defun perspective:cmd:kill (&optional message?)
   "Delete all workspaces, windows, and their buffers.
 
-If MESSAGE? is non-nil, output a message about how many of each were killed."
+If MESSAGE? is non-nil, output a message about how many of each were killed.
+
+From Doom's `+workspace/kill-session' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   ;; If we were called interactively, we should probably always output the message?
   (interactive (list t))
   (let ((windows (length (window-list)))
@@ -412,9 +472,12 @@ If MESSAGE? is non-nil, output a message about how many of each were killed."
 If NAME is empty/nil, generate a unique name.
 
 If CLONE? is non-nil, clone the current workspace, otherwise the new workspace
-is blank. CLONE? is the prefix argument when called interactively."
+is blank. CLONE? is the prefix argument when called interactively.
+
+From Doom's `+workspace/new' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive "sWorkspace Name (Optional): \nP")
-  (perspective:action:new name clone?))
+  (perspective:action:open name clone?))
 
 
 ;;;###autoload
@@ -422,16 +485,22 @@ is blank. CLONE? is the prefix argument when called interactively."
   "Create a new workspace with a generated, unique name.
 
 If CLONE? is non-nil, clone the current workspace, otherwise the new workspace
-is blank."
+is blank.
+
+From Doom's `+workspace/new' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive "P")
-  (perspective:action:new nil clone?))
+  (perspective:action:open nil clone?))
 
 
 ;;;###autoload
 (defun perspective:cmd:switch/index (index)
   "Switch to a workspace at a given INDEX.
 
-A negative number will start from the end of the workspace list."
+A negative number will start from the end of the workspace list.
+
+From Doom's `+workspace/switch-to' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive
    (list (or current-prefix-arg
              (completing-read "Switch to workspace: " (perspective:name:list)))))
@@ -466,14 +535,20 @@ A negative number will start from the end of the workspace list."
 
 ;;;###autoload
 (defun perspective:cmd:switch/final ()
-  "Switch to the final workspace in open workspaces."
+  "Switch to the final workspace in open workspaces.
+
+From Doom's `+workspace/switch-to-final' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive)
   (perspective:cmd:switch/index (car (last (perspective:name:list)))))
 
 
 ;;;###autoload
 (defun perspective:cmd:switch/last ()
-  "Switch to the last activated workspace."
+  "Switch to the last activated workspace.
+
+From Doom's `+workspace/other' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive)
   (perspective:cmd:switch/index int<perspective>:last))
 
@@ -483,7 +558,10 @@ A negative number will start from the end of the workspace list."
   "Cycle N workspaces to the right or left.
 
 N > 0: cycle right
-N < 0: cycle left"
+N < 0: cycle left
+
+From Doom's `+workspace/cycle' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive (list 1))
   (let ((current-name (perspective:name:current)))
     (if (equal current-name persp-nil-name)
@@ -503,21 +581,30 @@ N < 0: cycle left"
 
 ;;;###autoload
 (defun perspective:cmd:cycle/left ()
-  "Cycle one workspace to the left."
+  "Cycle one workspace to the left.
+
+From Doom's `+workspace/switch-left' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive)
   (perspective:cmd:cycle -1))
 
 
 ;;;###autoload
 (defun perspective:cmd:cycle/right ()
-  "Cycle one workspace to the left."
+  "Cycle one workspace to the left.
+
+From Doom's `+workspace/switch-right' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive)
   (perspective:cmd:cycle +1))
 
 
 ;;;###autoload
 (defun perspective:cmd:swap/left (&optional count)
-  "Swap the current workspace with the COUNTth workspace on its left."
+  "Swap the current workspace with the COUNTth workspace on its left.
+
+From Doom's `+workspace/swap-left' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive "p")
   (let* ((current-name (perspective:name:current))
          (count (or count 1))
@@ -537,7 +624,10 @@ N < 0: cycle left"
 
 ;;;###autoload
 (defun perspective:cmd:swap/right (&optional count)
-  "Swap the current workspace with the COUNTth workspace on its right."
+  "Swap the current workspace with the COUNTth workspace on its right.
+
+From Doom's `+workspace/swap-right' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive "p")
   (funcall-interactively #'perspective:cmd:swap/left (- count)))
 
@@ -547,7 +637,10 @@ N < 0: cycle left"
 ;;------------------------------------------------------------------------------
 
 (defun int<perspective>:format:tabline (&optional names)
-  "Format workspace NAMES into a display string."
+  "Format workspace NAMES into a display string.
+
+From Doom's `+workspace--tabline' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (let ((names (or names (perspective:name:list)))
         (current-name (perspective:name:current)))
     (mapconcat
@@ -564,7 +657,10 @@ N < 0: cycle left"
 
 ;;;###autoload
 (defun perspective:cmd:display ()
-  "Display a list of workspaces (like tabs) in the echo area."
+  "Display a list of workspaces (like tabs) in the echo area.
+
+From Doom's `+workspace/display' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (interactive)
   (let (message-log-max)
     (message "%s" (int<perspective>:format:tabline))))
@@ -583,7 +679,10 @@ Propertize MESSAGE according to TYPE:
   - `error'
   - `warn'
   - `success'
-  - `info'"
+  - `info'
+
+From Doom's `+workspace--message-body' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (concat (int<perspective>:format:tabline)
           (propertize " | " 'face 'font-lock-comment-face)
           (propertize (format "%s" message)
@@ -604,7 +703,10 @@ Propertize MESSAGE according to TYPE:
   - `error'
   - `warn'
   - `success'
-  - `info'"
+  - `info'
+
+From Doom's `+workspace-message' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (message "%s" (int<perspective>:out:body message type)))
 
 
@@ -621,7 +723,10 @@ Propertize MESSAGE according to TYPE:
   - `info'
 
 Will print using `error', unless NO-ERROR? is non-nil, in which case will print
-via `message'."
+via `message'.
+
+From Doom's `+workspace-error' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (funcall (if no-error? #'message #'error)
            "%s" (int<perspective>:out:body message 'error)))
 
@@ -644,7 +749,10 @@ Example for `use-package persp-mode' `:config' section:
         persp-interactive-init-frame-behaviour-override #'perspective:hook:associted/create
         persp-emacsclient-init-frame-behaviour-override #'perspective:hook:associted/create)
   (add-hook 'delete-frame-functions #'perspective:hook:associated/delete)
-  (add-hook 'server-done-hook #'perspective:hook:associated/delete)"
+  (add-hook 'server-done-hook #'perspective:hook:associated/delete)
+
+From Doom's `+workspaces-delete-associated-workspace-h' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (when (and persp-mode (not (bound-and-true-p with-editor-mode)))
     (unless frame
       (setq frame (selected-frame)))
@@ -664,7 +772,10 @@ Example for `use-package persp-mode' `:config' section:
         persp-interactive-init-frame-behaviour-override #'perspective:hook:associted/create
         persp-emacsclient-init-frame-behaviour-override #'perspective:hook:associted/create)
   (add-hook 'delete-frame-functions #'perspective:hook:associated/delete)
-  (add-hook 'server-done-hook #'perspective:hook:associated/delete)"
+  (add-hook 'server-done-hook #'perspective:hook:associated/delete)
+
+From Doom's `+workspaces-associate-frame-fn' in
+\"modules/ui/workspaces/autoload/workspaces.el\"."
   (when persp-mode
     (if (not (persp-frame-list-without-daemon))
         (perspective:action:switch perspective:name:default t)
