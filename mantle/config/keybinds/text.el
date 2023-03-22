@@ -154,7 +154,8 @@
      ["Misc"
       ("b" "Unicode Box..." art:cmd:box/draw) ; ASCII/Unicode Lines Box Art Hydra
       (mantle:meow/transient:text:join-lines) ; Join Lines Hydra
-      (mantle:meow/transient:text:case)]
+      (mantle:meow/transient:text:case)
+      ("SPC" "Just One Space™" just-one-space)]
 
      ])
   ;; (mantle:meow/transient:text)
