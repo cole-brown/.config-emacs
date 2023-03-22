@@ -115,7 +115,7 @@ Borrowed from Doom."
         ;;        slowdowns/freezes. Doom uses `gcmh' to enforce its GC strategy,
         ;;        so we modify its variables rather than `gc-cons-threshold'
         ;;        directly.
-        (setq-default gcmh-high-cons-threshold (* 2 mantle:lsp/ipc:gcmh-high-cons-threshold))
+        (setq-default gcmh-high-cons-threshold (* 2 mantle:lsp/ipc:cache/gcmh-high-cons-threshold))
         (gcmh-set-high-threshold)
         (setq mantle:lsp/ipc:optimized? t)))))
 
