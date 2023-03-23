@@ -351,12 +351,19 @@ CALLER should be calling function's name. It can be one of:
   - a list of the above, most recent first
     - e.g. '(#'error-caller \"parent\" 'grandparent)"
   (let* ((caller (list 'int<mis>:output:create caller)))
+    (int<mis>:debug caller
+                    "string: %S"
+                    string)
+
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
     (int<mis>:valid:string-or-nil? caller
                                    'string
                                    string)
+    (int<mis>:debug caller
+                    "string, valid: %S"
+                    string)
 
     (when (and (not (null metadata))
                (not (seq-every-p #'consp
@@ -365,19 +372,26 @@ CALLER should be calling function's name. It can be one of:
                       "Mis Output Metadata must be nil or a cons alist. Got %S: %S"
                       (type-of metadata)
                       metadata))
+    (int<mis>:debug caller
+                    "metadata, valid: %S"
+                    metadata)
 
     ;;------------------------------
     ;; Create the Mis Output Tree
     ;;------------------------------
     ;; Alist of `:output' to list of alists...
-    (list (cons :output
-                ;; List of alists...
-                (list
-                 ;; Alist with `:string' & `:metadata' keys, validated values.
-                 (apply #'int<mis>:output:create/entry
-                        caller
-                        string
-                        metadata))))))
+    (let ((output (list (cons :output
+                              ;; List of alists...
+                              (list
+                               ;; Alist with `:string' & `:metadata' keys, validated values.
+                               (apply #'int<mis>:output:create/entry
+                                      caller
+                                      string
+                                      metadata))))))
+    (int<mis>:debug caller
+                    "<--output: %S"
+                    output)
+      output)))
 ;; (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz))
 ;; (int<mis>:valid:output? 'test 'output (int<mis>:output:create 'test "foo" '(:buffer . "bar") '(:align . baz)))
 
@@ -827,9 +841,7 @@ CALLER should be calling function's name. It can be one of:
         (dotimes (i length)
           (let ((string/entry/line   (nth i string/entry/lines))
                 (metadata/entry/line metadata/entry)     ; Alias so the code is easier to read.
-                (newline?            (< i (1- length)))  ; Is this the end of a line?
-                ;; Merge last entry's metadata with this entry's?
-                (metadata/merge?     ))
+                (newline?            (< i (1- length)))) ; Is this the end of a line?
             (int<mis>:debug caller
                             '("\n-------"
                               "\n--#%02d--")
@@ -840,24 +852,6 @@ CALLER should be calling function's name. It can be one of:
             (int<mis>:debug caller
                             "newline?:          %S"
                             newline?)
-            (int<mis>:debug caller
-                            "metadata/merge?:   %S"
-                            metadata/merge?)
-
-            (int<mis>:debug caller
-                            "  - 1? %S"
-                            (= i 0))
-            (int<mis>:debug caller
-                            "  - 2? %S"
-                            (not (null string/line)))
-            (int<mis>:debug caller
-                            "  - 3? %S"
-                            (when (not (null string/line))
-                              (not (string-match-p (rx string-start
-                                                       (one-or-more not-newline)
-                                                       (zero-or-more "\n")
-                                                       string-end)
-                                                   string/line))))
 
             ;;---
             ;; Process metadata...
@@ -882,6 +876,7 @@ CALLER should be calling function's name. It can be one of:
                              metadata/line
                            metadata/entry/line))
 
+                        ;; First _entry_ we're processing and have existing string (therefore not first _line_)?
                         ;; Merge metadata together because merging strings together.
                         ((and (= i 0)
                               ;; Existing string must be something other than just empty/newline.
@@ -925,7 +920,7 @@ CALLER should be calling function's name. It can be one of:
             ;;   - "\n2"  -> '("" "2")
             ;;   - "1\n2" -> '("1" "2")
             (when (and newline?
-                       (not (string-empty-p string/line))) ; Ignore if it's just... nothing.
+                       (not (string-empty-p string/line))) ; Ignore if it's just... nothing. ;; TODO: Really?! I think empty lines might be important?
               ;; Add this line into our output and start anew.
               (setq output/line (int<mis>:output:append caller
                                                         output/line
@@ -942,14 +937,17 @@ CALLER should be calling function's name. It can be one of:
     ;;------------------------------
     ;; Return lines as a MOT
     ;;------------------------------
-    ;; Need to add the final output entry (if it's not nothing).
-    (when (not (string-empty-p string/line))
+    ;; Need to add the final output entry, maybe...
+    (when (or (not (string-empty-p string/line)) ; We have an actual string as the final entry...
+              (and (null output/line)            ; ...or nothing so far with any string (including nothing ("")) as the final output entry.
+                   (stringp string/line)))
       (setq output/line (int<mis>:output:append caller
                                                 output/line
                                                 (apply #'int<mis>:output:create
                                                        caller
                                                        string/line
                                                        metadata/line))))
+
     (int<mis>:debug caller
                     "<--output:      %S"
                     output/line)
