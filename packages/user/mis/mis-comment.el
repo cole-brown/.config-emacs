@@ -217,8 +217,10 @@ LANGUAGE should be nil, string, or symbol:
                  (if (> (comment-add nil) 0)
                      (int<mis>:format:repeat comment-start (comment-add nil))
                    "")
-                 ;; TODO-mis: avoid space padding via `mis:comment' param?
-                 " "))
+                 ;; TODO-mis: A way to have a padding/margin/whatever here.
+                 ;;           So far, we don't want a space here more often than we do want one, so skip for now.
+                 ;; " "
+                 ))
 
         ;;------------------------------
         ;; Fallthrough: Error
