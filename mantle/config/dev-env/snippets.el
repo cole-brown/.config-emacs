@@ -339,6 +339,12 @@ NOTE: Text of options will be deduplicated before being used."
   :config
   ;;------------------------------
 
+  ;; Suppress a warning about backquote behavior:
+  ;;   > Warning (yasnippet): ‘/sec//: section <width>: prog-mode comment header section w/ settable width’ modified buffer in a backquote expression.
+  ;;   > To hide this warning, add (yasnippet backquote-change) to ‘warning-suppress-types’.
+  (imp:eval:after warnings
+    (add-to-list 'warning-suppress-types '(yasnippet backquote-change)))
+
   ;;---
   ;; Snippet Paths
   ;;---
