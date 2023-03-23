@@ -210,9 +210,14 @@ LANGUAGE should be nil, string, or symbol:
         ;;------------------------------
         ;; Emacs already knows: If `comment-start' variable is set, that is the
         ;; correct thing to use.
-        (comment-start ;; TODO: block vs inline?
-         (concat (int<mis>:format:repeat comment-start (1+ (comment-add nil)))
-                 ;; TODO: avoid space padding via `mis:comment' param?
+        (comment-start ;; TODO-mis: block vs inline?
+         (concat comment-start
+                 ;; Add more `comment-start' characters if needed...
+                 ;; E.g. in Emacs Lisp `comment-start' is ";" but we want comments to be ";;".
+                 (if (> (comment-add nil) 0)
+                     (int<mis>:format:repeat comment-start (comment-add nil))
+                   "")
+                 ;; TODO-mis: avoid space padding via `mis:comment' param?
                  " "))
 
         ;;------------------------------

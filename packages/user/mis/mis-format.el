@@ -74,6 +74,7 @@ LENGTH should be an integer greater than zero."
                            "Got a %S: %S")
                          (type-of length)
                          length))
+
         ;;------------------------------
         ;; "Long" Strings
         ;;------------------------------
