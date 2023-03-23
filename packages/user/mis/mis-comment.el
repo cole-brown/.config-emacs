@@ -211,16 +211,19 @@ LANGUAGE should be nil, string, or symbol:
         ;; Emacs already knows: If `comment-start' variable is set, that is the
         ;; correct thing to use.
         (comment-start ;; TODO-mis: block vs inline?
-         (concat comment-start
-                 ;; Add more `comment-start' characters if needed...
-                 ;; E.g. in Emacs Lisp `comment-start' is ";" but we want comments to be ";;".
-                 (if (> (comment-add nil) 0)
-                     (int<mis>:format:repeat comment-start (comment-add nil))
-                   "")
-                 ;; TODO-mis: A way to have a padding/margin/whatever here.
-                 ;;           So far, we don't want a space here more often than we do want one, so skip for now.
-                 ;; " "
-                 ))
+         ;; `csharp-mode' has a space in their `comment-start'; `emacs-lisp-mode' does not...
+         ;; Normalize to no spaces.
+         (let ((comment-start (string-trim comment-start)))
+           (concat comment-start
+                   ;; Add more `comment-start' characters if needed...
+                   ;; E.g. in Emacs Lisp `comment-start' is ";" but we want comments to be ";;".
+                   (if (> (comment-add nil) 0)
+                       (int<mis>:format:repeat comment-start (comment-add nil))
+                     "")
+                   ;; TODO-mis: A way to have a padding/margin/whatever here.
+                   ;;           So far, we don't want a space here more often than we do want one, so skip for now.
+                   ;; " "
+                   )))
 
         ;;------------------------------
         ;; Fallthrough: Error
