@@ -208,7 +208,6 @@ OPTIONS:
   - `:none'      - I choose... none of the above; nothing; go away.
 
 NOTE: Text of options will be deduplicated before being used."
-    (message "%S" options)
     (unless (or yas-moving-away-p
                 yas-modified-p)
       (let (choices
@@ -219,7 +218,6 @@ NOTE: Text of options will be deduplicated before being used."
                  ;; Get text from wherever it is.
                  (pcase option
                    ((or :saved 'saved)
-                    (message ":saved (arg): %S" mantle:yas:text/saved)
                     mantle:yas:text/saved
                     ;; (when (buffer:region:active?)
                     ;;   (buffer:region:get))
@@ -230,27 +228,14 @@ NOTE: Text of options will be deduplicated before being used."
                     (let ((select-enable-clipboard t)
                           ;; Ensure that we defeat the DWIM login in `gui-selection-value'.
                           (gui--last-selected-text-clipboard nil))
-                      (message ":clipboard: %S" (current-kill 0 'do-not-move))
                       (current-kill 0 'do-not-move)))
 
                    ((or :yank 'yank)
-                    (message ":yank: %S" (current-kill 0 'do-not-move))
                     (current-kill 0 'do-not-move))
 
                    ((or :none 'none)
                     (setq null-choice? t))))
                 choices))
-
-        (message "raw: %s" choices)
-        (message "filtered: %s" (seq-filter (lambda (str)
-                                (and (stringp str)
-                                     (not (string-empty-p str))))
-                                            choices))
-        (message "uniq'd: %s" (seq-uniq (seq-filter (lambda (str)
-                                (and (stringp str)
-                                     (not (string-empty-p str))))
-                              choices)
-                  #'string=))
 
         ;; Remove empties and deduplicate.
         (setq choices (seq-uniq (seq-filter (lambda (str)
