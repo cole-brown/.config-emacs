@@ -241,6 +241,13 @@
   ;; Does nothing for in-the-file empty lines.
   (indicate-empty-lines nil)
 
+  ;;------------------------------
+  ;; Paragraphs
+  ;;------------------------------
+  ;; Flycheck uses this for Emacs Lisp docstring checking, but technically it's
+  ;; a paragraph commands setting. Regardless, "double-space between sentences"
+  ;; is a stupid thing to do/lint/think about.
+  (sentence-end-double-space nil)
 
   ;;------------------------------
   :config
