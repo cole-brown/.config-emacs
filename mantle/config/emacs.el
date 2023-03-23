@@ -249,6 +249,7 @@
   ;; is a stupid thing to do/lint/think about.
   (sentence-end-double-space nil)
 
+
   ;;------------------------------
   :config
   ;;------------------------------

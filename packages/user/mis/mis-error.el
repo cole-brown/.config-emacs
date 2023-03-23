@@ -31,6 +31,17 @@ Set to non-nil to enable.
 Set to nil to disable.")
 
 
+(defun mis:cmd:debug/toggle ()
+  "Enable/disable mis debug log statements."
+  (interactive)
+  (prog1
+      (setq int<mis>:debugging? (not int<mis>:debugging?))
+    (message "mis debugging %s"
+             (if int<mis>:debugging?
+                 "enabled!"
+               "disabled."))))
+
+
 ;;------------------------------------------------------------------------------
 ;; Error Formatting
 ;;------------------------------------------------------------------------------
