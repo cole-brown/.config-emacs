@@ -37,8 +37,9 @@
   ;;  (imp:feature:normalize:imp->emacs :mantle 'user 'init 'keybinds 'general 'ready)
   ;;    -> `keybinds:general:ready'
   (imp:load :feature  '(:mantle init keybinds general)
-            :path     (imp:path:current:dir/relative :mantle)
-            :filename "general")
+            :path     (imp:path:join (imp:path:current:dir/relative :mantle)
+                                     "general")
+            :filename "init")
 
 
   ;;------------------------------------------------------------------------------
