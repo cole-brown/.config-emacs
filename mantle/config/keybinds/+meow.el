@@ -56,6 +56,26 @@
   ;; ║ (Re)define Keys                                                         ║
   ;; ╚═════════════════════════════════════════════════════════════════════════╝
 
+  ;; TODO-meow: What do here for my/meow leader rebind?
+  ;; ;; ┌────────────────────────────────┐
+  ;; ;; │ Meow Leader                    │
+  ;; ;; └────────────────────────────────┘
+  ;; ;; Meow's behavoir in `meow-keypad-mode' is annoying me since it has so many
+  ;; ;; special cases in order to translate normal Emacs keybinds (e.g. "C-c C-t"
+  ;; ;; in `org-mode' for `org-todo' becomes "SPC c t").
+  ;; ;;
+  ;; ;; So... Steal "SPC" from `meow-keypad-mode', then put `meow-keypad-mode' in
+  ;; ;; as a keybind on /my/ SPC leader?
+  ;; (general- meow-normal-state-keymap
+  ;;   (let ((keymap (make-keymap)))
+  ;;     (suppress-keymap keymap t)
+  ;;     (define-key keymap (kbd "SPC") 'meow-keypad)
+  ;;     ))
+
+  ;; ┌────────────────────────────────┐
+  ;; │ Misc.                          │
+  ;; └────────────────────────────────┘
+
   (mantle:meow:orphan:bind "C-k"
                            kill-line
                            meow--kbd-kill-line)

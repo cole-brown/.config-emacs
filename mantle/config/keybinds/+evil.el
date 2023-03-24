@@ -87,7 +87,8 @@
 ;; But...
 ;; Obivously don't use standard Evil keybinds, use something totally different.
 
-(imp:eval:after (:keybinds user general)
+(imp:eval:after (:and (:keybinds user general)
+                      (:keybinds user general evil))
 
   ;; ╔═════════════════════════════════════════════════════════════════════════╗
   ;; ║ Undefine Keys                                                           ║

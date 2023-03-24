@@ -30,12 +30,13 @@
   ;; Fancy Keybind Helper `general'
   ;;----------------------------------------------------------------------------
   ;; All this stuff needs `general' and won't be loaded until after it has been.
-  ;; So if you use it, guard your code like so:
-  ;;   (imp:eval:after (:keybinds user general)
-  ;;     ...)
+  ;; So if you use it, guard your code something like...
+  ;;   1. (imp:eval:after (:keybinds user general) ...)
+  ;;   2. (imp:eval:after (:keybinds user general meow) ...)
+  ;;   3. (imp:eval:after (:keybinds user general evil) ...)
   ;; Or if you don't use `imp' for loading, the Emacs feature symbol is:
-  ;;  (imp:feature:normalize:imp->emacs :mantle 'user 'init 'keybinds 'general 'ready)
-  ;;    -> `keybinds:general:ready'
+  ;;  (imp:feature:normalize:imp->emacs :keybinds 'user 'general)
+  ;;    -> `keybinds:user:general'
   (imp:load :feature  '(:mantle init keybinds general)
             :path     (imp:path:join (imp:path:current:dir/relative :mantle)
                                      "general")

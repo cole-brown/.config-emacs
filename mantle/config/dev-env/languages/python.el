@@ -42,24 +42,25 @@
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
 ;; TODO-meow: only create these leaders if evil.
-(imp:eval:after (:keybinds user general)
-  (keybind:leader/local:def
-   :keymaps 'python-mode-map
-   :infix   "i"                      ; insert
-   "" '(nil :which-key "insert...")) ; infix's title
+(when (imp:flag? :keybinds +evil)
+  (imp:eval:after (:and evil evil-collection
+                        (:keybinds user general evil))
+    (keybind:leader/local:def
+      :keymaps 'python-mode-map
+      :infix   "i"                      ; insert
+      "" '(nil :which-key "insert...")) ; infix's title
 
 
-  (keybind:leader/local:def
-   :keymaps 'python-mode-map
-   :infix   "t"                    ; test
-   "" '(nil :which-key "test...")) ; infix's title
+    (keybind:leader/local:def
+      :keymaps 'python-mode-map
+      :infix   "t"                    ; test
+      "" '(nil :which-key "test...")) ; infix's title
 
 
-  (keybind:leader/local:def
-   :keymaps 'python-mode-map
-   :infix   "e"                           ; pipenv/conda/etc
-   "" '(nil :which-key "environment...")) ; infix's title
-  )
+    (keybind:leader/local:def
+      :keymaps 'python-mode-map
+      :infix   "e"                             ; pipenv/conda/etc
+      "" '(nil :which-key "environment...")))) ; infix's title
 
 
 ;;------------------------------------------------------------------------------

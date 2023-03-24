@@ -87,10 +87,17 @@
     :keymaps keybind:leader/global:keymaps)
 
 
-  ;; Give it its title.
-  (keybind:leader/global:def
-    ;; Unbind the prefix and give it a title for which-key.
-    "" '(nil :which-key "The Doyen of Keybind Leaders"))
+  ;; ;; Steal "SPC" for my own leader, give it its title, and I guess Meow's leader
+  ;; ;; can live inside "SPC"...
+  ;; (keybind:leader/global:def
+  ;;   ;; Unbind the prefix and give it a title for which-key.
+  ;;   "" '(nil :which-key "The Doyen of Keybind Leaders")
+  ;;
+  ;;   ;; Usually bound as:
+  ;;   ;;   `meow-motion-state-keymap SPC'
+  ;;   ;;   `meow-normal-state-keymap SPC'
+  ;;   ;; Rebind to be "SPC SPC":
+  ;;   "SPC" (list #'meow-keypad :which-key "Meow Leader"))
 
 
   ;;------------------------------------------------------------------------------
@@ -106,10 +113,10 @@
     :keymaps keybind:leader/local:keymaps)
 
 
-  ;; Give it its title.
-  (keybind:leader/local:def
-    ;; Unbind the prefix and give it a title for which-key.
-    "" '(nil :which-key "Local Mode Leader"))
+  ;; ;; Give it its title.
+  ;; (keybind:leader/local:def
+  ;;   ;; Unbind the prefix and give it a title for which-key.
+  ;;   "" '(nil :which-key "Local Mode Leader"))
 
 
   ;;------------------------------------------------------------------------------
@@ -117,7 +124,8 @@
   ;;------------------------------------------------------------------------------
   ;; TODO: Have imp provide all of everything to Emacs?
   ;;       - That is, replace `imp:provide' with `imp:provide:with-emacs' in imp.
-  (imp:provide:with-emacs :keybinds 'user 'general 'meow))
+  ;;(imp:provide:with-emacs :keybinds 'user 'general 'meow)
+  )
 
 
 ;;------------------------------------------------------------------------------

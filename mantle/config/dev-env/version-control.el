@@ -43,10 +43,12 @@
 ;;
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
-(imp:eval:after (:keybinds user general)
-  (keybind:leader/global:def
-   :infix  "g"
-   "" '(nil :which-key "Magit / Version Control")))
+(when (imp:flag? :keybinds +evil)
+  (imp:eval:after (:and evil evil-collection
+                        (:keybinds user general evil))
+    (keybind:leader/global:def
+      :infix  "g"
+      "" '(nil :which-key "Magit / Version Control"))))
 
 
 ;;------------------------------------------------------------------------------

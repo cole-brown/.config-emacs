@@ -80,14 +80,20 @@
   ;; Entrypoint
   ;;------------------------------
 
-  ;; TODO-meow: Better at `SPC b' or at `b'? `b' already taken in certain mode maps...
-  ;; "SPC b [...]" ; :which-key "Buffer..."
-  (meow-leader-define-key
-   '("b" . mantle:meow/transient:buffer)) ; :which-key "Buffer..."
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      ;; TODO-meow: Switch to just a `general' definer, instead of `general' using `transient'.
+      ;;            That is, put all the above in this?:
+      (keybind:leader/global:def
+        "b" (list #'mantle:meow/transient:buffer :which-key "Buffer..."))
 
-  ;; "b [...]"
-  (meow-normal-define-key
-   '("b" . mantle:meow/transient:buffer)))
+    ;; TODO-meow: Better at `SPC b' or at `b'? `b' already taken in certain mode maps...
+    ;; "SPC b [...]" ; :which-key "Buffer..."
+    (meow-leader-define-key
+     '("b" . mantle:meow/transient:buffer)) ; :which-key "Buffer..."
+
+    ;; "b [...]"
+    (meow-normal-define-key
+     '("b" . mantle:meow/transient:buffer))))
 
 
 ;;------------------------------

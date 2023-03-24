@@ -277,10 +277,10 @@
 ;; Keybinds : Evil
 ;;------------------------------
 
-(imp:eval:after (:keybinds user general)
-  (imp:use-package org
-    :when  (imp:flag? :keybinds +evil)
-    :after (:and evil evil-collection evil-org)
+(imp:use-package org
+  :when  (imp:flag? :keybinds +evil)
+  :after (:and (:keybinds user general evil)
+               evil evil-collection evil-org)
 
   ;;------------------------------
   :general ; evil
@@ -291,7 +291,7 @@
   (:states 'normal
    :keymaps '(evil-org-mode-map)
    :prefix "s"
-   "t" #'evil-org-open-below)))
+   "t" #'evil-org-open-below))
 
 
 ;; TODO-meow: Delete after checking org-mode to see if these can be deleted.

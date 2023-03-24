@@ -29,17 +29,18 @@
 ;;
 ;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
-(imp:eval:after (:keybinds user general)
-  (keybind:leader/local:def
-   :keymaps 'markdown-mode-map
-   :infix   "i"                      ; insert
-   "" '(nil :which-key "insert...")) ; infix's title
+(when (imp:flag? :keybinds +evil)
+  (imp:eval:after (:and evil evil-collection
+                        (:keybinds user general evil))
+    (keybind:leader/local:def
+      :keymaps 'markdown-mode-map
+      :infix   "i"                      ; insert
+      "" '(nil :which-key "insert...")) ; infix's title
 
-  (keybind:leader/local:def
-   :keymaps 'markdown-mode-map
-   :infix "p"                         ; preview
-   "" '(nil :which-key "preview...")) ; infix's title
-  )
+    (keybind:leader/local:def
+      :keymaps 'markdown-mode-map
+      :infix "p"                           ; preview
+      "" '(nil :which-key "preview...")))) ; infix's title
 
 
 ;;------------------------------------------------------------------------------
