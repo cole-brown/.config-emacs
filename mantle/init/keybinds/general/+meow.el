@@ -26,6 +26,24 @@
   :init
   ;;------------------------------
 
+  ;;--------------------------------------------------------------------------------
+  ;; Aliases
+  ;;--------------------------------------------------------------------------------
+  ;; Meow's 5 states: `normal', `insert', `motion', `keypad', and `beacon'.
+
+  ;; Short name aliases for meow state/mode keymaps. These will take over the
+  ;; pre-existing evil aliases if conflicted.
+  (push '((n normal) . meow-normal-state-keymap) general-keymap-aliases)
+  ;; (general--unalias 'normal)
+  ;; (general--unalias 'n)
+  (push '((b beacon) . meow-beacon-state-keymap) general-keymap-aliases)
+  (push '((i insert) . meow-insert-state-keymap) general-keymap-aliases)
+  (push '((k keypad) . meow-keypad-state-keymap) general-keymap-aliases)
+  (push '((m motion) . meow-motion-state-keymap) general-keymap-aliases)
+
+  ;; NOTE: Cannot alias multiple states? This doesn't work:
+  ;; (push '(command . (meow-normal-state-keymap meow-motion-state-keymap)) general-keymap-aliases)
+
 
   ;;------------------------------------------------------------------------------
   ;; Leader Keys
@@ -84,20 +102,21 @@
   ;; callers.
   (general-create-definer keybind:leader/global:def
     :prefix  keybind:leader/global:prefix
-    :keymaps keybind:leader/global:keymaps)
+    ;; Make sure not to steal insert mode's `self-insert' " " keybind!
+    :keymaps '(meow-normal-state-keymap meow-motion-state-keymap))
 
 
-  ;; ;; Steal "SPC" for my own leader, give it its title, and I guess Meow's leader
-  ;; ;; can live inside "SPC"...
-  ;; (keybind:leader/global:def
-  ;;   ;; Unbind the prefix and give it a title for which-key.
-  ;;   "" '(nil :which-key "The Doyen of Keybind Leaders")
-  ;;
-  ;;   ;; Usually bound as:
-  ;;   ;;   `meow-motion-state-keymap SPC'
-  ;;   ;;   `meow-normal-state-keymap SPC'
-  ;;   ;; Rebind to be "SPC SPC":
-  ;;   "SPC" (list #'meow-keypad :which-key "Meow Leader"))
+  ;; Steal "SPC" for my own leader, give it its title, and I guess Meow's leader
+  ;; can live inside "SPC"...
+  (keybind:leader/global:def
+    ;; Unbind the prefix and give it a title for which-key.
+    "" '(nil :which-key "The Doyen of Keybind Leaders")
+
+    ;; Usually bound as:
+    ;;   `meow-motion-state-keymap SPC'
+    ;;   `meow-normal-state-keymap SPC'
+    ;; Rebind to be "SPC SPC":
+    "SPC" (list #'meow-keypad :which-key "Meow Leader"))
 
 
   ;;------------------------------------------------------------------------------
@@ -124,7 +143,7 @@
   ;;------------------------------------------------------------------------------
   ;; TODO: Have imp provide all of everything to Emacs?
   ;;       - That is, replace `imp:provide' with `imp:provide:with-emacs' in imp.
-  ;;(imp:provide:with-emacs :keybinds 'user 'general 'meow)
+  (imp:provide:with-emacs :keybinds 'user 'general 'meow)
   )
 
 
