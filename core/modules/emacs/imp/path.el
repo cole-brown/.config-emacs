@@ -546,17 +546,21 @@ a directory path.
    ;;------------------------------
    ((bound-and-true-p byte-compile-current-file))
 
-   (load-file-name)
+   ((bound-and-true-p load-file-name))
 
    ((stringp (car-safe current-load-list))
     (car current-load-list))
 
-   (buffer-file-name)
+   ;; Indirect buffers don't have a `buffer-file-name'; you need to get their
+   ;; base buffer first. But direct buffers have a `nil' base buffer, so... this
+   ;; works for both direct and indirect buffers:
+   ((buffer-file-name (buffer-base-buffer)))
 
    ;;------------------------------
    ;; Error: Didn't find anything valid.
    ;;------------------------------
-   ((int<imp>:error "imp:path:current:file"
+   (t
+    (int<imp>:error "imp:path:current:file"
                     "Cannot get this file-path"))))
 ;; (imp:path:current:file)
 
