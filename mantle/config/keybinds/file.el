@@ -40,12 +40,12 @@
     "Proper function to use to open recent files."
     (interactive)
     (cond ((functionp #'consult-recent-file)
-           #'consult-recent-file)
+           (funcall-interactively #'consult-recent-file))
           ((and (bound-and-true-p ivy-mode)
                 (functionp #'counsel-recentf))
-           #'counsel-recentf)
+           (funcall-interactively #'counsel-recentf))
           ((featurep 'recentf)
-           #'recentf-openfiles)
+           (funcall-interactively #'recentf-openfiles))
           ;; Default: No keybind?
           (t
            nil)))
