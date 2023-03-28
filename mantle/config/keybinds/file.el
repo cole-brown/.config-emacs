@@ -57,7 +57,7 @@
   (defun mantle:meow/keybind/general:file ()
     "Create the \"File...\" keybinds in `general' for `meow'."
     (keybind:leader/global:def
-      :infix (keybind:infix "f")        ; file -> yank
+      :infix (keybind:infix "f")      ; file
       "" '(nil :which-key "File...")) ; infix title
 
     ;;------------------------------

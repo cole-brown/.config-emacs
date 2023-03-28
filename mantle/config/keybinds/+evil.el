@@ -100,7 +100,7 @@
   ;; └────────────────────────────────┘
   ;; Undefine some keys so we can redefine them later.
   ;;
-  ;; NOTE: Use `override' keymap and you won't have to undefine keys. TODO: Is that true?
+  ;; NOTE: Use `override' keymap and you won't have to undefine keys.
   ;; See also:
   ;;   - `keybind:keymaps:override'
   ;;   - `keybind:leader/global:keymaps'

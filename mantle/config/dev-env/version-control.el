@@ -93,7 +93,7 @@
      ["Git"
       ("d" "magit: status" magit)
       ("K" "magit: Kill all `magit' buffers" mantle:user:magit:buffer:kill)]])
-  ;; (mantle:meow/transient:notes)
+  ;; (mantle:meow/transient:dev-env:version-control)
 
   ;; TODO: Make a `mantle:meow/transient:dev-env' transient for dev-env stuff in general?
   (meow-normal-define-key '("d" . mantle:meow/transient:dev-env:version-control)))
@@ -406,7 +406,7 @@
 ;;     ;; TODO: like... idk... "g" is already taken by a lot of stuff but it's also our magit menu in all modes?
 ;;     :prefix  (keybind:prefix :local)
 ;;     ;; :states  evil-collection-magit-state
-;;     ;; :keymaps magit-mode-map-or-something ; keybind:leader/local:keymaps
+;;     ;; :keymaps magit-mode-map-or-something
 ;;     )
 ;;
 ;;   ;;------------------------------

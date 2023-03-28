@@ -107,7 +107,7 @@ Add keybinds to the leader using function `keybind:leader/local'.")
   (general-create-definer keybind:leader/global:def
     :prefix  keybind:leader/global:prefix
     :states  keybind:leader/global:states
-    :keymaps keybind:leader/global:keymaps)
+    :keymaps keybind:keymaps:override)
 
 
   ;; Give it its title.
@@ -127,7 +127,7 @@ Add keybinds to the leader using function `keybind:leader/local'.")
   (general-create-definer keybind:leader/local:def
     :prefix  keybind:leader/local:prefix
     :states  keybind:leader/local:states
-    :keymaps keybind:leader/local:keymaps)
+    :keymaps keybind:keymaps:override)
 
 
   ;; Give it its title.

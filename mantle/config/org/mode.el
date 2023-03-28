@@ -251,26 +251,63 @@
   :when  (imp:flag? :keybinds +meow)
   :after meow
 
-  ;;------------------------------
   :config
   ;;------------------------------
+  ;; `General'
+  ;;------------------------------
 
-  ;; Creation of this Should be moved to "keybinds/notes.el" if any non-org
-  ;; stuff wants added.
-  (transient-define-prefix mantle:meow/transient:notes ()
-    "Notes commands like org-mode links, org-journal entries, etc."
-     [["Links"
-       ("s" "Link: Store"  org-store-link)
-       ("l" "Link: Insert" org-insert-link)
-       ("h" "Link: Insert as \"here\"/region" mode:cmd:org:here/link)
-       ("k" "Link: Yank as \"here\"/region"  mode:cmd:org:here/yank)]
-      ["Agenda"
-       ("A" "`org-agenda'" org-agenda)
-       ("t" "Tags Search" org-tags-view)
-       ("v" "View Search" org-search-view)]])
-  ;; (mantle:meow/transient:notes)
+  (defun mantle:meow/keybind/general:notes ()
+    "Create the \"Notes...\" keybinds in `general' for `meow'."
+    (keybind:leader/global:def
+      :infix (keybind:infix "n")       ; notes
+      "" '(nil :which-key "Notes...")) ; infix title
 
-  (meow-leader-define-key '("n" . mantle:meow/transient:notes)))
+    (keybind:leader/global:def
+      :infix (keybind:infix "n" "l")  ; notes -> links
+      "" '(nil :which-key "Links...") ; infix title
+      "s" (list #'org-store-link         :which-key "Link: Store")
+      "l" (list #'org-insert-link        :which-key "Link: Insert")
+      "h" (list #'mode:cmd:org:here/link :which-key "Here: Insert Link")
+      "k" (list #'mode:cmd:org:here/yank :which-key "Here: Yank as Link"))
+
+    (keybind:leader/global:def
+      :infix (keybind:infix "n" "a")  ; notes -> agenda
+      "" '(nil :which-key "Agenda...") ; infix title
+      "A" (list #'org-agenda      :which-key "`org-agenda'")
+      "t" (list #'org-tags-view   :which-key "Tags Search")
+      "v" (list #'org-search-view :which-key "View Search")))
+
+
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:notes ()
+    "Create the \"File...\" keybinds in `transient' for `meow'."
+    ;; Creation of this Should be moved to "keybinds/notes.el" if any non-org
+    ;; stuff wants added.
+    (transient-define-prefix mantle:meow/transient:notes ()
+      "Notes commands like org-mode links, org-journal entries, etc."
+      [["Links"
+        ("s" "Link: Store"  org-store-link)
+        ("l" "Link: Insert" org-insert-link)
+        ("h" "Link: Insert as \"here\"/region" mode:cmd:org:here/link)
+        ("k" "Link: Yank as \"here\"/region"  mode:cmd:org:here/yank)]
+       ["Agenda"
+        ("A" "`org-agenda'" org-agenda)
+        ("t" "Tags Search" org-tags-view)
+        ("v" "View Search" org-search-view)]])
+    ;; (mantle:meow/transient:notes)
+
+    (meow-leader-define-key '("n" . mantle:meow/transient:notes)))
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:notes)
+    (mantle:meow/keybind/transient:notes)))
 
 
 ;;------------------------------

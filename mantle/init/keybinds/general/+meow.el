@@ -26,6 +26,19 @@
   :init
   ;;------------------------------
 
+
+  ;;------------------------------------------------------------------------------
+  ;; General Constants
+  ;;------------------------------------------------------------------------------
+
+  (defconst keybind:keymaps:meow/leader '(meow-normal-state-keymap meow-motion-state-keymap)
+    "Keymaps for `meow' keybinds in the leader.
+
+You probably don't want to use `override'! For example, you don't want keybind
+'t' to override the \"`self-insert' a letter 't' into the buffer here please\"
+command.")
+
+
   ;;--------------------------------------------------------------------------------
   ;; Aliases
   ;;--------------------------------------------------------------------------------
@@ -103,7 +116,7 @@
   (general-create-definer keybind:leader/global:def
     :prefix  keybind:leader/global:prefix
     ;; Make sure not to steal insert mode's `self-insert' " " keybind!
-    :keymaps '(meow-normal-state-keymap meow-motion-state-keymap))
+    :keymaps keybind:keymaps:meow/leader)
 
 
   ;; Steal "SPC" for my own leader, give it its title, and I guess Meow's leader
@@ -143,8 +156,7 @@
   ;;------------------------------------------------------------------------------
   ;; TODO: Have imp provide all of everything to Emacs?
   ;;       - That is, replace `imp:provide' with `imp:provide:with-emacs' in imp.
-  (imp:provide:with-emacs :keybinds 'user 'general 'meow)
-  )
+  (imp:provide:with-emacs :keybinds 'user 'general 'meow))
 
 
 ;;------------------------------------------------------------------------------

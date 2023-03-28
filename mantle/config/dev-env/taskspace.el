@@ -175,19 +175,30 @@ and see what file it's defined in."
   :when  (imp:flag? :keybinds +meow)
   :after meow
 
-  ;;------------------------------
   :config
   ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      ;;---
+      ;; Use `general':
+      ;;---
+      ;; Will put Taskspace stuff under infix "t".
+      (taskspace:keybind:general :prefix  (keybind:prefix :global "n")
+                                 :keymaps keybind:keymaps:meow/leader)
 
-  ;; Define the transient - will be `taskspace:keybind:transient'.
-  (taskspace:keybind:transient/def)
-  ;; Put into the "notes" menu/transient instead of directly in meow leader.
-  (transient-append-suffix 'mantle:meow/transient:notes
-    '(0 -1) ; Append after last group/suffix in the first group.
-    ["Taskspace"
-     ("t" "Taskspace..." taskspace:keybind:transient)])
-  ;; (meow-leader-define-key '("t" . taskspace:keybind:transient))
-  )
+    ;;---
+    ;; Use `transient':
+    ;;---
+    ;; Define the transient - will be `taskspace:keybind:transient'.
+    (taskspace:keybind:transient/def)
+    ;; Put into the "notes" menu/transient instead of directly in meow leader.
+    (transient-append-suffix 'mantle:meow/transient:notes
+      '(0 -1) ; Append after last group/suffix in the first group.
+      ["Taskspace"
+       ("t" "Taskspace..." taskspace:keybind:transient)])
+    ;; (meow-leader-define-key '("t" . taskspace:keybind:transient))
+    )
 
 
 ;;------------------------------
