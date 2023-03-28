@@ -29,11 +29,9 @@
   ;; TODO-meow: A transient arg for `:home' or `:work' versions of things?
   ;;            Like, instead of 2 functions & 2 keys for many of the things?
 
-
   ;;------------------------------
   ;; `General'
   ;;------------------------------
-
 
   (defun mantle:meow/keybind/general:insert ()
     "Create the \"Insert...\" keybinds in `general' for `meow'."
