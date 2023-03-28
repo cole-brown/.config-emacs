@@ -317,85 +317,102 @@ or on some buffer listing ops."
   :config
   ;;------------------------------
 
-  ;; Replace "Switch Buffer" with `persp-mode' aware function.
-  ;; See: "mantle/config/keybinds/buffer.el" for buffer transient.
-  (transient-replace-suffix 'mantle:meow/transient:buffer
-    "b"
-    '("b" "Switch Perspective Buffer" persp-switch-to-buffer))
-  ;; (transient-get-suffix 'mantle:meow/transient:buffer "b")
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
+  (defun mantle:meow/keybind/general:perspective ()
+    "Create the \"File...\" keybinds in `general' for `meow'."
+    ;;---
+    ;; "Buffer" Keybinds
+    ;;---
+    (keybind:leader/global:def
+      :infix   "b"
+      "b" (list #'persp-switch-to-buffer :which-key "Switch Perspective Buffer"))
 
-  ;; Transient for common persp-mode commands.
-  (transient-define-prefix mantle:meow/transient:perspective ()
-    "Keymap for perspective commands that should be available globally."
-    ["Perspectives..."
-     [:description ""
-      ("TAB" "List" perspective:cmd:display)
-      ("n"   "New..." perspective:cmd:new/named)
-      ("N"   "New Unnamed" perspective:cmd:new)
-      ("l"   "Load" perspective:cmd:load)
-      ("s"   "Save" perspective:cmd:save)
-      ;; ("x"   "Kill All" perspective:cmd:kill)
-      ("d"   "Delete" perspective:cmd:delete)
-      ("r"   "Rename" perspective:cmd:rename)
-      ("]"   "Cycle: Right" perspective:cmd:cycle/right)
-      ("["   "Cycle: Left" perspective:cmd:cycle/left)]
-     [:description "Switch Indexed..."
-      ("1"  "Switch: 1st"         perspective:cmd:switch/index:0)
-      ("2"  "Switch: 2nd"         perspective:cmd:switch/index:1)
-      ("3"  "Switch: 3rd"         perspective:cmd:switch/index:2)
-      ("4"  "Switch: 4th"         perspective:cmd:switch/index:3)
-      ("5"  "Switch: 5th"         perspective:cmd:switch/index:4)
-      ("6"  "Switch: 6th"         perspective:cmd:switch/index:5)
-      ("7"  "Switch: 7th"         perspective:cmd:switch/index:6)
-      ("8"  "Switch: 8th"         perspective:cmd:switch/index:7)
-      ("9"  "Switch: 9th"         perspective:cmd:switch/index:8)]
-     [:description "Switch..."
-      ("0"  "Switch to Final"       perspective:cmd:switch/final)
-      ("."  "Switch to index..." perspective:cmd:switch/index)
-      ("`"  "Switch to Previous"    perspective:cmd:switch/last)]])
-
-  (meow-leader-define-key
-   '("TAB" . mantle:meow/transient:perspective))
+    ;;---
+    ;; "Perspective" Keybinds
+    ;;---
+    (keybind:leader/global:def
+      :infix   "TAB"
+      "" (list nil :which-key "Perspectives...")
+      "TAB" (list #'perspective:cmd:display        :which-key "List")
+      "n"   (list #'perspective:cmd:new/named      :which-key "New...")
+      "N"   (list #'perspective:cmd:new            :which-key "New Unnamed")
+      "l"   (list #'perspective:cmd:load           :which-key "Load")
+      "s"   (list #'perspective:cmd:save           :which-key "Save")
+      ;; "x"   (list #'perspective:cmd:kill           :which-key "Kill All")
+      "d"   (list #'perspective:cmd:delete         :which-key "Delete")
+      "r"   (list #'perspective:cmd:rename         :which-key "Rename")
+      "]"   (list #'perspective:cmd:cycle/right    :which-key "Cycle: Right")
+      "["   (list #'perspective:cmd:cycle/left     :which-key "Cycle: Left")
+      "."   (list #'perspective:cmd:switch/index   :which-key "Switch: Index...")
+      "`"   (list #'perspective:cmd:switch/last    :which-key "Switch: Previous")
+      "1"   (list #'perspective:cmd:switch/index:0 :which-key "Switch: 1st")
+      "2"   (list #'perspective:cmd:switch/index:1 :which-key "Switch: 2nd")
+      "3"   (list #'perspective:cmd:switch/index:2 :which-key "Switch: 3rd")
+      "4"   (list #'perspective:cmd:switch/index:3 :which-key "Switch: 4th")
+      "5"   (list #'perspective:cmd:switch/index:4 :which-key "Switch: 5th")
+      "6"   (list #'perspective:cmd:switch/index:5 :which-key "Switch: 6th")
+      "7"   (list #'perspective:cmd:switch/index:6 :which-key "Switch: 7th")
+      "8"   (list #'perspective:cmd:switch/index:7 :which-key "Switch: 8th")
+      "9"   (list #'perspective:cmd:switch/index:8 :which-key "Switch: 9th")
+      "0"   (list #'perspective:cmd:switch/final   :which-key "Switch: Final")))
 
 
-  ;; TODO-meow: Do I prefer the new transient or the old keymap?
-  ;; (defvar mantle:meow/keymap/leader:perspectives
-  ;;   (let ((map (make-sparse-keymap)))
-  ;;     (define-key map "/" #'deadgrep) ; "`rg' @ project root"
-  ;;     (define-key map "." #'mantle:user:deadgrep:default-directory) ; "`rg' @ default-directory")
-  ;;     ;; TODO: A deadgrep search that lets me choose the starting dir?
-  ;;     ;; (define-key map "?" #'mantle:user:deadgrep:default-directory) ; "`rg' @...")
-  ;;     (define-key map "k" #'mantle:user:deadgrep:buffer:kill) ; "Kill All 'deadgrep' Buffers"
-  ;;
-  ;;     (define-key map "TAB" #'perspective:cmd:display)
-  ;;     (define-key map "n"   #'perspective:cmd:new/named)
-  ;;     (define-key map "N"   #'perspective:cmd:new)
-  ;;     (define-key map "l"   #'perspective:cmd:load)
-  ;;     (define-key map "s"   #'perspective:cmd:save)
-  ;;     ;; (define-key map "x"   #'perspective:cmd:kill)
-  ;;     (define-key map "d"   #'perspective:cmd:delete)
-  ;;     (define-key map "r"   #'perspective:cmd:rename)
-  ;;     (define-key map "]"   #'perspective:cmd:cycle/right)
-  ;;     (define-key map "["   #'perspective:cmd:cycle/left)
-  ;;     (define-key map "."   #'perspective:cmd:switch/index)
-  ;;     (define-key map "`"   #'perspective:cmd:switch/last )
-  ;;     (define-key map "1"   #'perspective:cmd:switch/index:0)
-  ;;     (define-key map "2"   #'perspective:cmd:switch/index:1)
-  ;;     (define-key map "3"   #'perspective:cmd:switch/index:2)
-  ;;     (define-key map "4"   #'perspective:cmd:switch/index:3)
-  ;;     (define-key map "5"   #'perspective:cmd:switch/index:4)
-  ;;     (define-key map "6"   #'perspective:cmd:switch/index:5)
-  ;;     (define-key map "7"   #'perspective:cmd:switch/index:6)
-  ;;     (define-key map "8"   #'perspective:cmd:switch/index:7)
-  ;;     (define-key map "9"   #'perspective:cmd:switch/index:8)
-  ;;     (define-key map "0"   #'perspective:cmd:switch/final)
-  ;;
-  ;;     map)
-  ;;   "Keymap for perspective commands that should be available globally.")
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
 
-  ;; (meow-leader-define-key
-  ;;  (cons "TAB" mantle:meow/keymap/leader:perspectives))
-  )
+  (defun mantle:meow/keybind/transient:perspective ()
+    "Create the \"File...\" keybinds in `transient' for `meow'."
+    ;; Replace "Switch Buffer" with `persp-mode' aware function.
+    ;; See: "mantle/config/keybinds/buffer.el" for buffer transient.
+    (transient-replace-suffix 'mantle:meow/transient:buffer
+      "b"
+      '("b" "Switch Perspective Buffer" persp-switch-to-buffer))
+    ;; (transient-get-suffix 'mantle:meow/transient:buffer "b")
+
+    ;; Transient for common persp-mode commands.
+    (transient-define-prefix mantle:meow/transient:perspective ()
+      "Keymap for perspective commands that should be available globally."
+      ["Perspectives..."
+       [:description ""
+        ("TAB" "List" perspective:cmd:display)
+        ("n"   "New..." perspective:cmd:new/named)
+        ("N"   "New Unnamed" perspective:cmd:new)
+        ("l"   "Load" perspective:cmd:load)
+        ("s"   "Save" perspective:cmd:save)
+        ;; ("x"   "Kill All" perspective:cmd:kill)
+        ("d"   "Delete" perspective:cmd:delete)
+        ("r"   "Rename" perspective:cmd:rename)
+        ("]"   "Cycle: Right" perspective:cmd:cycle/right)
+        ("["   "Cycle: Left" perspective:cmd:cycle/left)]
+       [:description "Switch Indexed..."
+        ("1"  "Switch: 1st"         perspective:cmd:switch/index:0)
+        ("2"  "Switch: 2nd"         perspective:cmd:switch/index:1)
+        ("3"  "Switch: 3rd"         perspective:cmd:switch/index:2)
+        ("4"  "Switch: 4th"         perspective:cmd:switch/index:3)
+        ("5"  "Switch: 5th"         perspective:cmd:switch/index:4)
+        ("6"  "Switch: 6th"         perspective:cmd:switch/index:5)
+        ("7"  "Switch: 7th"         perspective:cmd:switch/index:6)
+        ("8"  "Switch: 8th"         perspective:cmd:switch/index:7)
+        ("9"  "Switch: 9th"         perspective:cmd:switch/index:8)]
+       [:description "Switch..."
+        ("0"  "Switch to Final"       perspective:cmd:switch/final)
+        ("."  "Switch to index..." perspective:cmd:switch/index)
+        ("`"  "Switch to Previous"    perspective:cmd:switch/last)]])
+
+    (meow-leader-define-key
+     '("TAB" . mantle:meow/transient:perspective)))
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:perspective)
+    (mantle:meow/keybind/transient:perspective)))
 
 
 ;;------------------------------
