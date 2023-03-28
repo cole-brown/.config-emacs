@@ -222,38 +222,87 @@
    ("/" . deadgrep-restart)    ; "↺ Refresh" / rerun search
    ;; Normal Enter/Return is "visit in other window".
    ("RET"   . deadgrep-visit-result-other-window)
-   ("S-RET" . deadgrep-visit-result))
+   ;; BUG?: "S-RET" doesn't bind to "shift-enter"?! Why not? What does?
+   ;; > ("S-RET"   . deadgrep-visit-result)
+   ;;   - "S-<return>" works.
+   ;;   - "C-S-m" might works too?
+   ;;   - "C-S-j" might work too?
+   ;; But none of them are exactly the same return as the 'logical key' "RET"...
+   ;; ...I don't think?
+   ("S-<return>" . deadgrep-visit-result))
+
 
   ;;------------------------------
   :config
   ;;------------------------------
 
-  ;;---
-  ;; Global Keybinds
-  ;;---
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
 
-  (transient-define-prefix mantle:meow/transient:search ()
-    "Search commands that should be available globally."
-    ["Search..."
-     ["Project:"
-      ("/" "`rg' @ project root"         deadgrep)
-      ("." "`rg' @ default-directory"    mantle:user:deadgrep:default-directory)
-      ;; TODO-meow: A deadgrep search that lets me choose the starting dir?
-      ;; ("?" "`rg' @ ..."                  mantle:user:deadgrep:default-directory)
-      ("K" "Kill All 'deadgrep' Buffers" mantle:user:deadgrep:buffer:kill)
+  (defun mantle:meow/keybind/general:search ()
+    "Create the \"Search...\" keybinds in `general' for `meow'."
+    (keybind:leader/global:def
+      :infix (keybind:infix "/")      ; search
+      "" '(nil :which-key "Search...")) ; infix title
 
-      ("?" "`consult-ripgrep'" consult-ripgrep)]
+    ;;---
+    ;; Global Keybinds
+    ;;---
+    (keybind:global:def
+      :infix "/"
+      "/" (list #'deadgrep                               :which-key "`rg' @ project root")
+      "." (list #'mantle:user:deadgrep:default-directory :which-key "`rg' @ default-directory")
+      ;; TODO: A deadgrep search that lets me choose the starting dir?
+      ;; "?" (list #'mantle:user:deadgrep:default-directory :which-key "`rg' @...")
 
-     ["Buffer:"
-      ("s" "Search Forward"  isearch-forward)
-      ("r" "Search Backward" isearch-backward)]])
+      "k" (list #'mantle:user:deadgrep:buffer:kill       :which-key "Kill All 'deadgrep' Buffers")
 
-  ;;---
-  ;; Entrypoint
-  ;;---
+      "s" (list #'isearch-forward  "Search Forward")
+      "r" (list #'isearch-backward "Search Backward")))
 
-  (meow-normal-define-key
-   '("/" . mantle:meow/transient:search))) ; :which-key "Search..."
+
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:search ()
+    "Create the \"Search...\" keybinds in `transient' for `meow'."
+    ;;---
+    ;; Global Keybinds
+    ;;---
+
+    (transient-define-prefix mantle:meow/transient:search ()
+      "Search commands that should be available globally."
+      ["Search..."
+       ["Project:"
+        ("/" "`rg' @ project root"         deadgrep)
+        ("." "`rg' @ default-directory"    mantle:user:deadgrep:default-directory)
+        ;; TODO-meow: A deadgrep search that lets me choose the starting dir?
+        ;; ("?" "`rg' @ ..."                  mantle:user:deadgrep:default-directory)
+        ("k" "Kill All 'deadgrep' Buffers" mantle:user:deadgrep:buffer:kill)
+
+        ("?" "`consult-ripgrep'" consult-ripgrep)]
+
+       ["Buffer:"
+        ("s" "Search Forward"  isearch-forward)
+        ("r" "Search Backward" isearch-backward)]])
+
+    ;;---
+    ;; Entrypoint
+    ;;---
+
+    (meow-normal-define-key
+     '("/" . mantle:meow/transient:search))) ; :which-key "Search..."
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:search)
+    (mantle:meow/keybind/transient:search)))
 
 
 ;;------------------------------
