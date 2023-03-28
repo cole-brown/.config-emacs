@@ -283,7 +283,7 @@
   ;;------------------------------
 
   (defun mantle:meow/keybind/transient:notes ()
-    "Create the \"File...\" keybinds in `transient' for `meow'."
+    "Create the \"Notes...\" keybinds in `transient' for `meow'."
     ;; Creation of this Should be moved to "keybinds/notes.el" if any non-org
     ;; stuff wants added.
     (transient-define-prefix mantle:meow/transient:notes ()

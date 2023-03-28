@@ -936,13 +936,19 @@ targets."
   ;; https://github.com/minad/cape#configuration
   ;; "Alternative prefix keys: C-c p, M-p, M-+, ..."
 
-  (transient-define-prefix mantle:meow/transient:completion:at-point ()
-    "Buffer commands that should be available globally."
-    ["Completion..."
-     ["At Point"
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
+  (defun mantle:meow/keybind/general:completion ()
+    "Create the \"Completion...\" keybinds in `general' for `meow'."
+    (keybind:leader/global:def
+      :infix (keybind:infix "t" "c")        ; text -> completion
+      "" '(nil :which-key "Completion...") ; infix title
+
       ;; Emacs Functions:
-      ("p" "completion-at-point" completion-at-point) ;; capf
-      ("t" "complete-tag" complete-tag)        ;; etags
+      "p" #'completion-at-point ; capf
+      "t" #'complete-tag        ; etags
+
       ;; `cape' Functions:
       ;;   - `cape-dabbrev': Complete word from current buffers (see also `dabbrev-capf' on Emacs 29)
       ;;   - `cape-file'   : Complete file name
@@ -956,23 +962,75 @@ targets."
       ;;   - `cape-tex'    : Complete unicode char from TeX command, e.g. \hbar.
       ;;   - `cape-sgml'   : Complete unicode char from Sgml entity, e.g., &alpha.
       ;;   - `cape-rfc1345': Complete unicode char using RFC 1345 mnemonics.
-      ("d" "cape-dabbrev" cape-dabbrev)        ;; or dabbrev-completion
-      ("h" "cape-history" cape-history)
-      ("f" "cape-file" cape-file)
-      ("k" "cape-keyword" cape-keyword)
-      ("s" "cape-symbol" cape-symbol)
-      ("a" "cape-abbrev" cape-abbrev)
-      ("i" "cape-ispell" cape-ispell)
-      ("l" "cape-line" cape-line)
-      ("w" "cape-dict" cape-dict)
+      "d" #'cape-dabbrev ; or dabbrev-completion
+      "h" #'cape-history
+      "f" #'cape-file
+      "k" #'cape-keyword
+      "s" #'cape-symbol
+      "a" #'cape-abbrev
+      "i" #'cape-ispell
+      "l" #'cape-line
+      "w" #'cape-dict
       ;; Complete unicode from...
       ;; ("\\" "cape-tex" cape-tex)     ; tex (e.g. "\hbar")
-      ("&" "cape-sgml" cape-sgml)       ; SGML (e.g. "&alpha")
-      ("r" "cape-rfc1345" cape-rfc1345)]]) ; RFC-1345 (e.g. ...uh... weird? https://www.rfc-editor.org/rfc/rfc1345)
-  ;; (mantle:meow/transient:completion:at-point)
+      "&" #'cape-sgml    ; SGML (e.g. "&alpha")
+      "r" #'cape-rfc1345 ; RFC-1345 (e.g. ...uh... weird? https://www.rfc-editor.org/rfc/rfc1345)
+      ))
 
-  (meow-leader-define-key
-   '("p" . mantle:meow/transient:completion:at-point)))
+
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:completion ()
+    "Create the \"Completion...\" keybinds in `transient' for `meow'."
+
+    (transient-define-prefix mantle:meow/transient:completion:at-point ()
+      "Buffer commands that should be available globally."
+      ["Completion..."
+       ["At Point"
+        ;; Emacs Functions:
+        ("p" "completion-at-point" completion-at-point) ;; capf
+        ("t" "complete-tag" complete-tag)        ;; etags
+        ;; `cape' Functions:
+        ;;   - `cape-dabbrev': Complete word from current buffers (see also `dabbrev-capf' on Emacs 29)
+        ;;   - `cape-file'   : Complete file name
+        ;;   - `cape-history': Complete from Eshell, Comint or minibuffer history
+        ;;   - `cape-keyword': Complete programming language keyword
+        ;;   - `cape-symbol' : Complete Elisp symbol
+        ;;   - `cape-abbrev' : Complete abbreviation (`add-global-abbrev', `add-mode-abbrev')
+        ;;   - `cape-ispell' : Complete word from Ispell dictionary
+        ;;   - `cape-dict'   : Complete word from dictionary file
+        ;;   - `cape-line'   : Complete entire line from current buffer
+        ;;   - `cape-tex'    : Complete unicode char from TeX command, e.g. \hbar.
+        ;;   - `cape-sgml'   : Complete unicode char from Sgml entity, e.g., &alpha.
+        ;;   - `cape-rfc1345': Complete unicode char using RFC 1345 mnemonics.
+        ("d" "cape-dabbrev" cape-dabbrev)        ;; or dabbrev-completion
+        ("h" "cape-history" cape-history)
+        ("f" "cape-file" cape-file)
+        ("k" "cape-keyword" cape-keyword)
+        ("s" "cape-symbol" cape-symbol)
+        ("a" "cape-abbrev" cape-abbrev)
+        ("i" "cape-ispell" cape-ispell)
+        ("l" "cape-line" cape-line)
+        ("w" "cape-dict" cape-dict)
+        ;; Complete unicode from...
+        ;; ("\\" "cape-tex" cape-tex)     ; tex (e.g. "\hbar")
+        ("&" "cape-sgml" cape-sgml)       ; SGML (e.g. "&alpha")
+        ("r" "cape-rfc1345" cape-rfc1345)]]) ; RFC-1345 (e.g. ...uh... weird? https://www.rfc-editor.org/rfc/rfc1345)
+    ;; (mantle:meow/transient:completion:at-point)
+
+    (meow-leader-define-key
+     '("p" . mantle:meow/transient:completion:at-point)))
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:completion)
+    (mantle:meow/keybind/transient:completion)))
 
 
 ;;------------------------------------------------------------------------------
