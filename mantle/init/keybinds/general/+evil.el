@@ -93,7 +93,7 @@ Add keybinds to the leader using function `keybind:leader/local'.")
   ;; callers.
   (general-create-definer keybind:global:def
     :states  keybind:leader/global:states
-    :keymaps keybind:leader/global:keymaps)
+    :keymaps keybind:keymaps:override)
 
 
   ;;------------------------------------------------------------------------------

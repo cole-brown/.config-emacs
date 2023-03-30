@@ -198,7 +198,7 @@ and see what file it's defined in."
       ["Taskspace"
        ("t" "Taskspace..." taskspace:keybind:transient)])
     ;; (meow-leader-define-key '("t" . taskspace:keybind:transient))
-    )
+    ))
 
 
 ;;------------------------------

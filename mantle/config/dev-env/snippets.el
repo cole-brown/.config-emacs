@@ -352,12 +352,8 @@ NOTE: Text of options will be deduplicated before being used."
 
 
 ;;------------------------------------------------------------------------------
-;; Keybinds
+;; Keybinds : Meow
 ;;------------------------------------------------------------------------------
-
-;;------------------------------
-;; Meow
-;;------------------------------
 
 (imp:use-package yasnippet
   :demand t
@@ -371,24 +367,54 @@ NOTE: Text of options will be deduplicated before being used."
   ;; Bind something usable everywhere, like in meow insert mode.
   ("C-=" . yas-expand)
 
+
   ;;------------------------------
   :config
   ;;------------------------------
 
-  (transient-define-prefix mantle:meow/transient:dev-env:snippets ()
-    "Snippet and template commands."
-    ["Snippets & Templates..."
-     [("=" "expand snippet" yas-expand)
-      ("i" "insert snippet..." yas-insert-snippet)]])
-  ;; (mantle:meow/transient:dev-env:snippets)
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
 
-  ;; Snippets are quite common - put them outside the leader key.
-  (meow-normal-define-key '("=" . mantle:meow/transient:dev-env:snippets)))
+  (defun mantle:meow/keybind/general:snippets ()
+    "Create the \"Snippets...\" keybinds in `general' for `meow'."
+    (keybind:leader/global:def
+      :infix (keybind:infix "t" "s")                 ; text -> snippets
+      "" '(nil :which-key "Snippets & Templates...") ; infix title
+
+      "n" '(yas-expand         :which-key "Expand Snippet")
+      "s" '(yas-insert-snippet :which-key "Insert Snippet...")))
 
 
-;;------------------------------
-;; Evil
-;;------------------------------
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:snippets ()
+    "Create the \"Snippets...\" keybinds in `transient' for `meow'."
+    (transient-define-prefix mantle:meow/transient:dev-env:snippets ()
+      "Snippet and template commands."
+      ["Snippets & Templates..."
+       [("=" "expand snippet" yas-expand)
+        ("i" "insert snippet..." yas-insert-snippet)]])
+    ;; (mantle:meow/transient:dev-env:snippets)
+
+    ;; Snippets are quite common - put them outside the leader key.
+    (meow-normal-define-key '("=" . mantle:meow/transient:dev-env:snippets)))
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:snippets)
+    (mantle:meow/keybind/transient:snippets)))
+
+
+;;------------------------------------------------------------------------------
+;; Keybinds : Evil
+;;------------------------------------------------------------------------------
 
 (imp:use-package yasnippet
   :demand t
@@ -403,7 +429,7 @@ NOTE: Text of options will be deduplicated before being used."
   ;; Snippets are quite common - put them outside the leader key.
    :infix  "b"
    ;; Title
-   "" '(nil :which-key "Snippets")
+   "" '(nil :which-key "Snippets & Templates")
 
    ;;---
    ;; Snippet Menu

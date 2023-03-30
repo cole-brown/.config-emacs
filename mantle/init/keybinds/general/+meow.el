@@ -39,6 +39,14 @@ You probably don't want to use `override'! For example, you don't want keybind
 command.")
 
 
+  (defconst keybind:keymaps:meow/global '(meow-normal-state-keymap meow-motion-state-keymap)
+    "Keymaps for global keybinds when using `meow'.
+
+You probably don't want to use `override'! For example, you don't want keybind
+'t' to override the \"`self-insert' a letter 't' into the buffer here please\"
+command.")
+
+
   ;;--------------------------------------------------------------------------------
   ;; Aliases
   ;;--------------------------------------------------------------------------------
@@ -102,7 +110,7 @@ command.")
   ;; `general-def' with the arguments supplied here, which can be overridden by
   ;; callers.
   (general-create-definer keybind:global:def
-    :keymaps keybind:leader/global:keymaps)
+    :keymaps keybind:keymaps:meow/global)
 
 
   ;;------------------------------------------------------------------------------
@@ -142,13 +150,13 @@ command.")
   ;; callers.
   (general-create-definer keybind:leader/local:def
     :prefix  keybind:leader/local:prefix
-    :keymaps keybind:leader/local:keymaps)
+    :keymaps keybind:keymaps:meow/leader)
 
 
-  ;; ;; Give it its title.
-  ;; (keybind:leader/local:def
-  ;;   ;; Unbind the prefix and give it a title for which-key.
-  ;;   "" '(nil :which-key "Local Mode Leader"))
+  ;; Give it its title.
+  (keybind:leader/local:def
+    ;; Unbind the prefix and give it a title for which-key.
+    "" '(nil :which-key "Local Mode Leader"))
 
 
   ;;------------------------------------------------------------------------------

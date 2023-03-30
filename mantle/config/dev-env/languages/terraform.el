@@ -60,9 +60,9 @@
   (terraform-mode-hook . mantle:hook:json:settings))
 
 
-;;------------------------------
+;;--------------------------------------------------------------------------------
 ;; Keybinds : Meow
-;;------------------------------
+;;--------------------------------------------------------------------------------
 
 (imp:use-package terraform-mode
   :when  (imp:flag? :keybinds +meow)
@@ -72,55 +72,84 @@
   :config
   ;;------------------------------
 
-  (transient-define-suffix mantle:meow/transient:terraform/compile/apply ()
-    "Terraform/Terragrunt 'apply' command."
-    :key "a"
-    :description (format "%s apply" mantle:terraform:runner)
-    (interactive)
-    (compile (format "%s apply" mantle:terraform:runner) t))
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/general:terraform ()
+    "Create the `terraform-mode' keybinds in `general' for `meow'."
+    (keybind:leader/local:def
+      :keymaps 'terraform-mode-map
+      "a" (list (elisp:cmd (compile (format "%s apply" mantle:terraform:runner) t)) :which-key (format "%s apply" mantle:terraform:runner))
+      "i" (list (elisp:cmd (compile (format "%s init" mantle:terraform:runner)))    :which-key (format "%s init" mantle:terraform:runner))
+      "p" (list (elisp:cmd (compile (format "%s plan" mantle:terraform:runner)))    :which-key (format "%s plan" mantle:terraform:runner))))
 
 
-  (transient-define-suffix mantle:meow/transient:terraform/compile/fmt ()
-    "Terraform/Terragrunt 'fmt' command."
-    :key "f"
-    :description (format "%s fmt" mantle:terraform:runner)
-    (interactive)
-    (compile (format "%s fmt" mantle:terraform:runner) t))
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:terraform ()
+    "Create the `terraform-mode' keybinds in `transient' for `meow'."
+    (transient-define-suffix mantle:meow/transient:terraform/compile/apply ()
+      "Terraform/Terragrunt 'apply' command."
+      :key "a"
+      :description (format "%s apply" mantle:terraform:runner)
+      (interactive)
+      (compile (format "%s apply" mantle:terraform:runner) t))
 
 
-  (transient-define-suffix mantle:meow/transient:terraform/compile/init ()
-    "Terraform/Terragrunt 'init' command."
-    :key "i"
-    :description (format "%s init --backend-config='_backend.tfvars'" mantle:terraform:runner)
-    (interactive)
-    (compile (format "%s init --backend-config='_backend.tfvars'" mantle:terraform:runner) t))
+    (transient-define-suffix mantle:meow/transient:terraform/compile/fmt ()
+      "Terraform/Terragrunt 'fmt' command."
+      :key "f"
+      :description (format "%s fmt" mantle:terraform:runner)
+      (interactive)
+      (compile (format "%s fmt" mantle:terraform:runner) t))
 
 
-  (transient-define-suffix mantle:meow/transient:terraform/compile/plan ()
-    "Terraform/Terragrunt 'plan' command."
-    :key "p"
-    :description (format "%s plan" mantle:terraform:runner)
-    (interactive)
-    (compile (format "%s plan" mantle:terraform:runner) t))
+    (transient-define-suffix mantle:meow/transient:terraform/compile/init ()
+      "Terraform/Terragrunt 'init' command."
+      :key "i"
+      :description (format "%s init --backend-config='_backend.tfvars'" mantle:terraform:runner)
+      (interactive)
+      (compile (format "%s init --backend-config='_backend.tfvars'" mantle:terraform:runner) t))
 
 
-  (transient-define-prefix mantle:meow/transient:terraform/compile ()
-    "Compile-ish commands for terraform."
-    ["Compile..."
-     (mantle:meow/transient:terraform/compile/apply)
-     (mantle:meow/transient:terraform/compile/fmt)
-     (mantle:meow/transient:terraform/compile/init)
-     (mantle:meow/transient:terraform/compile/plan)])
-  ;; (mantle:meow/transient:terraform/compile)
-
-  (mantle:meow:leader/local:key terraform-mode-map
-                                mantle:meow/key:local/compile
-                                #'mantle:meow/transient:terraform/compile))
+    (transient-define-suffix mantle:meow/transient:terraform/compile/plan ()
+      "Terraform/Terragrunt 'plan' command."
+      :key "p"
+      :description (format "%s plan" mantle:terraform:runner)
+      (interactive)
+      (compile (format "%s plan" mantle:terraform:runner) t))
 
 
-;;------------------------------
+    (transient-define-prefix mantle:meow/transient:terraform/compile ()
+      "Compile-ish commands for terraform."
+      ["Compile..."
+       (mantle:meow/transient:terraform/compile/apply)
+       (mantle:meow/transient:terraform/compile/fmt)
+       (mantle:meow/transient:terraform/compile/init)
+       (mantle:meow/transient:terraform/compile/plan)])
+    ;; (mantle:meow/transient:terraform/compile)
+
+    (mantle:meow:leader/local:key terraform-mode-map
+                                  mantle:meow/key:local/compile
+                                  #'mantle:meow/transient:terraform/compile))
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:terraform)
+    (mantle:meow/keybind/transient:terraform)))
+
+
+
+;;--------------------------------------------------------------------------------
 ;; Keybinds : Evil
-;;------------------------------
+;;--------------------------------------------------------------------------------
 
 (imp:use-package terraform-mode
   :when  (imp:flag? :keybinds +evil)

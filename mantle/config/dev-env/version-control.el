@@ -19,12 +19,14 @@
 
 (require 'cl-lib)
 
+
 (imp:require :alist 'generic)
 
 
 ;;------------------------------------------------------------------------------
 ;; Magit & Friends
 ;;------------------------------------------------------------------------------
+;;
 ;; The best Git Porcelain:
 ;;   https://magit.vc/
 ;;   https://github.com/magit/magit
@@ -32,23 +34,6 @@
 ;; Plus some other version control things.
 ;; Whatever.
 ;; The important thing is: Magit.
-
-
-;;------------------------------------------------------------------------------
-;; Keybinds: General Infixes
-;;------------------------------------------------------------------------------
-;; Define the infix with the title here so we don't have to worry about what's
-;; defined in what order since you can only define the title once or else things
-;; overwrite each other?
-;;
-;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
-
-(when (imp:flag? :keybinds +evil)
-  (imp:eval:after (:and evil evil-collection
-                        (:keybinds user general evil))
-    (keybind:leader/global:def
-      :infix  "g"
-      "" '(nil :which-key "Magit / Version Control"))))
 
 
 ;;------------------------------------------------------------------------------
@@ -75,37 +60,86 @@
                           :process)))
 
 
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; Magit Keybinds: Meow
-;;------------------------------
+;;------------------------------------------------------------------------------
 
 (imp:use-package magit
   :when  (imp:flag? :keybinds +meow)
   :after meow
 
+
+  ;; TODO-meow: magit `:bind' section for fucking with magit keymap binds.
+
+
   ;;------------------------------
   :config
   ;;------------------------------
 
-  (transient-define-prefix mantle:meow/transient:dev-env:version-control ()
-    "Notes commands like org-mode links, org-journal entries, etc."
-    ["Version Control..."
-     ["Git"
-      ("d" "magit: status" magit)
-      ("K" "magit: Kill all `magit' buffers" mantle:user:magit:buffer:kill)]])
-  ;; (mantle:meow/transient:dev-env:version-control)
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
 
-  ;; TODO: Make a `mantle:meow/transient:dev-env' transient for dev-env stuff in general?
-  (meow-normal-define-key '("d" . mantle:meow/transient:dev-env:version-control)))
+  (defun mantle:meow/keybind/general:magit ()
+    "Create the \"Version Control...\" keybinds in `general' for `meow'."
+    ;; TODO-meow: Create this in dev-env/init.el or something so other dev-env guys can use?
+    (keybind:leader/global:def
+      :infix (keybind:infix "d")                                   ; "dev-env"? "devops"?
+      "" '(nil :which-key "Dev-Env, DevOps & Version Control...")) ; infix title
+
+    ;; And put magit commands straight into the Dev-Env/DevOps/VC keybind leader menu:
+    (keybind:leader/global:def
+      :infix (keybind:infix "d") ; "dev-env"
+
+      ;; TODO-meow: More magit keybinds!
+      "d" (list #'magit :which-key "magit: status")
+      "k" (list #'mantle:user:magit:buffer:kill :which-key "magit: Kill all `magit' buffers")))
 
 
-;;------------------------------
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:magit ()
+    "Create the \"Version Control...\" keybinds in `transient' for `meow'."
+    (transient-define-prefix mantle:meow/transient:dev-env:magit ()
+      "Notes commands like org-mode links, org-journal entries, etc."
+      ["Version Control..."
+       ["Git"
+        ("d" "magit: status" magit)
+        ("k" "magit: Kill all `magit' buffers" mantle:user:magit:buffer:kill)]])
+    ;; (mantle:meow/transient:dev-env:magit)
+
+    ;; TODO: Make a `mantle:meow/transient:dev-env' transient for dev-env stuff in general?
+    (meow-normal-define-key '("d" . mantle:meow/transient:dev-env:magit)))
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:magit)
+    (mantle:meow/keybind/transient:magit)))
+
+
+;;------------------------------------------------------------------------------
 ;; Magit Keybinds: evil
-;;------------------------------
+;;------------------------------------------------------------------------------
 
 (imp:use-package magit
   :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  ;; Create magit menu & title.
+  (keybind:leader/global:def
+    :infix  "g"
+    "" '(nil :which-key "Magit / Version Control"))
+
 
   ;;------------------------------
   :general ; evil
@@ -145,9 +179,9 @@
    ))
 
 
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; Magit Forge (GitHub, et al)
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; "Work with Git forges, such as Github and Gitlab, from the comfort of Magit
 ;; and the rest of Emacs."
 ;; https://github.com/magit/forge
@@ -157,9 +191,9 @@
   :after magit)
 
 
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; Magit Todos
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; https://github.com/alphapapa/magit-todos
 
 ;;---
@@ -215,9 +249,9 @@
   (magit-todos-mode +1))
 
 
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; Magit-Todos Keybinds: meow
-;;------------------------------
+;;------------------------------------------------------------------------------
 
 (imp:use-package magit-todos
   :when  (imp:flag? :keybinds +meow)
@@ -227,14 +261,43 @@
   :config
   ;;------------------------------
 
-  (transient-append-suffix 'mantle:meow/transient:dev-env:version-control
-    '(0 0 -1)
-    '("t" "magit: List TOODs" magit-todos-list)))
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/general:magit-todo ()
+    "Create the \"Magit TODOs...\" keybinds in `general' for `meow'."
+    (keybind:leader/global:def
+      :infix (keybind:infix "d") ; "dev-env"
+      "t" '(magit-todos-list :which-key "magit: List TODOs")))
 
 
-;;------------------------------
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:magit-todo ()
+    "Create the \"Magit TODOs...\" keybinds in `transient' for `meow'."
+    (transient-append-suffix 'mantle:meow/transient:dev-env:version-control
+      '(0 0 -1)
+      '("t" "magit: List TOODs" magit-todos-list))
+    ;; (mantle:meow/transient:dev-env:version-control)
+    )
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:magit-todo)
+    (mantle:meow/keybind/transient:magit-todo)))
+
+
+
+;;------------------------------------------------------------------------------
 ;; Magit-Todos Keybinds: evil
-;;------------------------------
+;;------------------------------------------------------------------------------
 
 (imp:use-package magit-todos
   :when  (imp:flag? :keybinds +evil)
@@ -267,9 +330,9 @@
   (global-git-gutter-mode +1))
 
 
-;;------------------------------
-;; Magit Keybinds: Meow
-;;------------------------------
+;;------------------------------------------------------------------------------
+;; Git Gutter Keybinds: Meow
+;;------------------------------------------------------------------------------
 
 (imp:use-package git-gutter-fringe
   :when  (imp:flag? :keybinds +meow)
@@ -279,13 +342,40 @@
   :config
   ;;------------------------------
 
-  (transient-append-suffix 'mantle:meow/transient:dev-env:version-control
-    '(0 -1) ; Append after last group/suffix in the first group.
-     ["Git Hunks"
-      ("." "Hunk: Previous" git-gutter:previous-hunk)
-      ("e" "Hunk: Next"     git-gutter:next-hunk)])
-  ;; (mantle:meow/transient:dev-env:version-control)
- )
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/general:git-gutter-fringe ()
+    "Create the `git-gutter-fringe' keybinds in `general' for `meow'."
+    (keybind:leader/global:def
+      :infix (keybind:infix "d") ; "dev-env"
+      "." (list #'git-gutter:previous-hunk :which-key "Git Hunk: Previous")
+      "e" (list #'git-gutter:next-hunk     :which-key "Git Hunk: Next")))
+
+
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:git-gutter-fringe ()
+    "Create the `git-gutter-fringe' keybinds in `transient' for `meow'."
+    (transient-append-suffix 'mantle:meow/transient:dev-env:version-control
+      '(0 -1) ; Append after last group/suffix in the first group.
+      ["Git Hunks"
+       ("." "Hunk: Previous" git-gutter:previous-hunk)
+       ("e" "Hunk: Next"     git-gutter:next-hunk)])
+    ;; (mantle:meow/transient:dev-env:version-control)
+    )
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:git-gutter-fringe)
+    (mantle:meow/keybind/transient:git-gutter-fringe)))
 
 
 ;;------------------------------------------------------------------------------
@@ -374,9 +464,9 @@
 ;;                                          (autogit:repos:list "~/path/to/repositories"))))
 
 
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; Autogit Requirement: Deferred
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; This is in Autogit's package requirements, so I'm not sure why it isn't loaded.
 ;;   - Is it because `:ensure' is nil for autogit so no dependencies are ensured
 ;;     either?

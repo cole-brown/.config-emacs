@@ -20,6 +20,25 @@
 (imp:require :jerky)
 
 
+;;--------------------------------------------------------------------------------
+;; Keybinds : Meow
+;;--------------------------------------------------------------------------------
+
+(imp:use-package emacs
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and meow
+               (:keybinds user general meow))
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  ;; Create the Dev-Env/DevOps/etc keybinds menu in `general' for `meow'."
+  (keybind:leader/global:def
+    :infix (keybind:infix "d")                                    ; "dev-env"? "devops"?
+    "" '(nil :which-key "Dev-Env, DevOps & Version Control..."))) ; infix title
+
+
 ;;------------------------------------------------------------------------------
 ;; Tabs
 ;;------------------------------------------------------------------------------
