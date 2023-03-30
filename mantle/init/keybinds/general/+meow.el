@@ -31,7 +31,7 @@
   ;; General Constants
   ;;------------------------------------------------------------------------------
 
-  (defconst keybind:keymaps:meow/leader '(meow-normal-state-keymap meow-motion-state-keymap)
+  (defconst keybinds:meow:keymaps/leader '(meow-normal-state-keymap meow-motion-state-keymap)
     "Keymaps for `meow' keybinds in the leader.
 
 You probably don't want to use `override'! For example, you don't want keybind
@@ -39,7 +39,7 @@ You probably don't want to use `override'! For example, you don't want keybind
 command.")
 
 
-  (defconst keybind:keymaps:meow/global '(meow-normal-state-keymap meow-motion-state-keymap)
+  (defconst keybinds:meow:keymaps/global '(meow-normal-state-keymap meow-motion-state-keymap)
     "Keymaps for global keybinds when using `meow'.
 
 You probably don't want to use `override'! For example, you don't want keybind
@@ -110,7 +110,7 @@ command.")
   ;; `general-def' with the arguments supplied here, which can be overridden by
   ;; callers.
   (general-create-definer keybind:global:def
-    :keymaps keybind:keymaps:meow/global)
+    :keymaps keybinds:meow:keymaps/global)
 
 
   ;;------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ command.")
   (general-create-definer keybind:leader/global:def
     :prefix  keybind:leader/global:prefix
     ;; Make sure not to steal insert mode's `self-insert' " " keybind!
-    :keymaps keybind:keymaps:meow/leader)
+    :keymaps keybinds:meow:keymaps/leader)
 
 
   ;; Steal "SPC" for my own leader, give it its title, and I guess Meow's leader

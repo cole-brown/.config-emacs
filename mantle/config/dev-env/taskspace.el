@@ -185,7 +185,7 @@ and see what file it's defined in."
       ;;---
       ;; Will put Taskspace stuff under infix "t".
       (taskspace:keybind:general :prefix  (keybind:prefix :global "n")
-                                 :keymaps keybind:keymaps:meow/leader)
+                                 :keymaps keybinds:meow:keymaps/leader)
 
     ;;---
     ;; Use `transient':

@@ -40,6 +40,8 @@ They will always take precedence over keys bound in other minor mode maps.
 NOTE: Cannot use in `use-package' macro's `:general' sections! It doesn't get
 replaced (soon enough) with whatever magic `general' does and then `override'
 gets flagged as an invalid/non-existant keymap.
+ADDENDUM: Is this true? Can use a definer in the `:general' section, anyways, I
+believe? And my definers use these override maps?
 
 See: https://github.com/noctuid/general.el#override-keymaps-and-buffer-local-keybindings")
 
