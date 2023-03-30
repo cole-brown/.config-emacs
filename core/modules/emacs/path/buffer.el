@@ -16,9 +16,80 @@
 
 (require 'cl-lib)
 (require 'dired)
+(require 'project)
 
 (imp:require :path 'path)
 (imp:require :path 'files)
+
+
+;;--------------------------------------------------------------------------------
+;; Buffer Path
+;;--------------------------------------------------------------------------------
+
+(defun path:buffer (&optional buffer)
+  "Get buffer's file path, if any.
+
+BUFFER should be a buffer object, a buffer name string, or nil for
+`current-buffer'.
+
+Return nil if no backing file.
+
+Some buffers have trouble knowing where they came from.
+
+Example 1: An indirect buffer will be called \"foo.el<2>\", be visiting
+\"foo.el\", but `buffer-file-truename` will be nil, `buffer-file-name` will
+return nil... I mean... WTF?
+
+Example 2: `dired' buffers... Sigh."
+  (let ((buffer (if buffer
+                    (get-buffer buffer)
+                  (current-buffer))))
+    (with-current-buffer buffer
+      (cond (buffer-file-truename) ;; Is it already all figured out for us?
+
+            ;; `dired' buffer? Use it's dir because... why does it not have a buffer file name?
+            ;; TODO: Why would the original version use `string-equal' instead of `eq'?!
+            ;;  > (string-equal major-mode 'dired-mode)
+            ((eq major-mode 'dired-mode)
+             default-directory)
+
+            ;; Not a Dired buffer: Return the buffer's file name, if it has one.
+            ((buffer-file-name (or (buffer-base-buffer buffer) ; indirect buffer?
+                                   buffer)))
+
+            ;; No wild guessing allowed.
+            (t
+             nil)))))
+;; (path:buffer)
+
+
+;;--------------------------------------------------------------------------------
+;; Buffer Path Relative to Project
+;;--------------------------------------------------------------------------------
+
+(defun path:buffer:project (&optional buffer)
+  "Get BUFFER's filepath as a relative path starting at project root directory.
+
+BUFFER should be a buffer object, a buffer name string, or nil for
+`current-buffer'.
+
+If in a project, return relative path starting with project's root directory.
+Example:
+  (path:buffer:project \"~/.config/project-root/path/to/file.txt\")
+    -> \"project-root/path/to/file.txt\"
+
+If not in a project, return nil.
+Example:
+  (path:buffer:project \"~/.config/no-root/path/to/file.txt\")
+    -> nil
+
+If not a file-backed buffer, return nil."
+  (when-let* ((path/buffer      (path:buffer buffer)) ;; Does buffer have a file and what is its actual name?
+              (path/project     (cdr-safe (project-current)))
+              (path/relative-to (path:parent (path:canonicalize:dir path/project))))
+    ;; Ok; have the pieces. What's the relative path now?
+    (path:canonicalize:relative path/file path/relative-to)))
+;; (path:buffer:project)
 
 
 ;;------------------------------------------------------------------------------
