@@ -79,7 +79,7 @@
   (defun mantle:meow/keybind/general:terraform ()
     "Create the `terraform-mode' keybinds in `general' for `meow'."
     (keybind:leader/local:def
-      :keymaps 'terraform-mode-map
+      ;; TODO:meow:local: :keymaps 'terraform-mode-map
       "a" (list (elisp:cmd (compile (format "%s apply" mantle:terraform:runner) t)) :which-key (format "%s apply" mantle:terraform:runner))
       "i" (list (elisp:cmd (compile (format "%s init" mantle:terraform:runner)))    :which-key (format "%s init" mantle:terraform:runner))
       "p" (list (elisp:cmd (compile (format "%s plan" mantle:terraform:runner)))    :which-key (format "%s plan" mantle:terraform:runner))))

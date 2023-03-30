@@ -21,38 +21,85 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Keybind Prefixes
+;; Keybind Prefixes : Meow
 ;;------------------------------------------------------------------------------
 
-(when (imp:flag? :keybinds +evil)
-  (imp:eval:after (:and evil evil-collection
-                        (:keybinds user general evil))
-    (keybind:leader/local:def
-      :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-      :infix   "d"                     ; debug
-      "" '(nil :which-key "debug...")) ; infix's title
+(imp:use-package emacs
+  :when  (imp:flag? :keybinds +meow)
+  :after  (:and meow
+           (:keybinds user general meow))
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (keybind:leader/local:def
+    ;; TODO:meow:local: :keymaps 'terraform-mode-map
+    ;; :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+    :infix   "d"                     ; debug
+    "" '(nil :which-key "debug...")) ; infix's title
 
 
-    (keybind:leader/local:def
-      :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-      :infix   "e"                    ; eval
-      "" '(nil :which-key "eval...")) ; infix's title
+  (keybind:leader/local:def
+    ;; TODO:meow:local: :keymaps 'terraform-mode-map
+    ;; :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+    :infix   "e"                    ; eval
+    "" '(nil :which-key "eval...")) ; infix's title
 
 
-    (keybind:leader/local:def
-      :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-      :infix   "g"                    ; goto
-      "" '(nil :which-key "goto...")) ; infix's title
+  (keybind:leader/local:def
+    ;; TODO:meow:local: :keymaps 'terraform-mode-map
+    ;; :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+    :infix   "g"                    ; goto
+    "" '(nil :which-key "goto...")) ; infix's title
 
 
-    (keybind:leader/local:def
-      :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-      :infix   "t"                      ; test
-      "" '(nil :which-key "test...")))) ; infix's title
+  (keybind:leader/local:def
+    ;; TODO:meow:local: :keymaps 'terraform-mode-map
+    ;; :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+    :infix   "t"                     ; test
+    "" '(nil :which-key "test..."))) ; infix's title
 
 
 ;;------------------------------------------------------------------------------
-;; Emacs Lisp
+;; Keybind Prefixes : Evil
+;;------------------------------------------------------------------------------
+
+(imp:use-package emacs
+  :when  (imp:flag? :keybinds +evil)
+  :after  (:and evil evil-collection
+           (:keybinds user general evil))
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (keybind:leader/local:def
+    :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+    :infix   "d"                     ; debug
+    "" '(nil :which-key "debug...")) ; infix's title
+
+
+  (keybind:leader/local:def
+    :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+    :infix   "e"                    ; eval
+    "" '(nil :which-key "eval...")) ; infix's title
+
+
+  (keybind:leader/local:def
+    :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+    :infix   "g"                    ; goto
+    "" '(nil :which-key "goto...")) ; infix's title
+
+
+  (keybind:leader/local:def
+    :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
+    :infix   "t"                     ; test
+    "" '(nil :which-key "test..."))) ; infix's title
+
+
+;;------------------------------------------------------------------------------
+;; Emacs Lisp Mode
 ;;------------------------------------------------------------------------------
 
 (imp:use-package elisp-mode
@@ -192,9 +239,9 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
         ret))))
 
 
-;;------------------------------
-;; Keybinds : Meow
-;;------------------------------
+;;------------------------------------------------------------------------------
+;; `elisp-mode' Keybinds : Meow
+;;------------------------------------------------------------------------------
 
 (imp:use-package elisp-mode
   :ensure nil ; This is an Emacs built-in feature.
@@ -205,54 +252,115 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   :config
   ;;------------------------------
 
-  ;;---
-  ;; Debug...
-  ;;---
-  (transient-define-prefix mantle:meow/transient:elisp:debug ()
-    "Debug commands in Meow \"Local\" Leader for Emacs Lisp Mode."
-    ["Debug..."
-     ["`edebug'"
-      ("f" "`edebug' instrument enable"  mantle:user:emacs-lisp:edebug:instrument-defun/on)
-      ("F" "`edebug' instrument disable" mantle:user:emacs-lisp:edebug:instrument-defun/off)]])
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
 
-  (mantle:meow:leader/local:key emacs-lisp-mode-map
-                                "d" #'mantle:meow/transient:elisp:debug)
+  (defun mantle:meow/keybind/general:elisp-mode ()
+    "Create the `elisp-mode' keybinds in `general' for `meow'."
+    ;;---
+    ;; Debug...
+    ;;---
+    (keybind:leader/local:def
 
-  ;;---
-  ;; Eval...
-  ;;---
-  (transient-define-prefix mantle:meow/transient:elisp:eval ()
-    "Eval commands in Meow \"Local\" Leader for Emacs Lisp Mode."
-    [["Eval..."
-      ("b" "eval-buffer"       eval-buffer)
-      ("d" "eval-defun"        eval-defun)
-      ("e" "eval-last-sexp"    eval-last-sexp)
-      ("E" "pp-eval-last-sexp" pp-eval-last-sexp)
-      ("r" "eval-region"       eval-region)]
-     ["Load..."
-      ("l" "load-library"      load-library)]])
+      :infix "d"
+      "f" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/on :which-key "`edebug' instrument enable")
+      "F" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/off :which-key "`edebug' instrument disable"))
 
-  (mantle:meow:leader/local:key emacs-lisp-mode-map
-                                "e" #'mantle:meow/transient:elisp:eval)
+    ;;---
+    ;; Eval...
+    ;;---
+    (keybind:leader/local:def
+      ;; TODO:meow:local: :keymaps 'terraform-mode-map
+      ;;:keymaps 'emacs-lisp-mode-map
+      :infix "e"
+      ;; TODO: Try these without "Display Names" and see if it actually is better?
+      ;; Doom doesn't bother with a pretty name.
+      "b" #'eval-buffer       ; (list #'eval-buffer       :which-key "Eval Buffer")
+      "d" #'eval-defun        ; (list #'eval-defun        :which-key "Eval Defun")
+      "e" #'eval-last-sexp    ; (list #'eval-last-sexp    :which-key "Eval Last Sexp")
+      "E" #'pp-eval-last-sexp ; (list #'pp-eval-last-sexp :which-key "Eval Last Sexp: Pretty Print")
+      "r" #'eval-region       ; (list #'eval-region       :which-key "Eval Region")
+      "l" #'load-library)     ; (list #'load-library      :which-key "Load Library")
 
-  ;;---
-  ;; Find...
-  ;;---
-  (transient-define-prefix mantle:meow/transient:elisp:find ()
-    "Find commands in Meow \"Local\" Leader for Emacs Lisp Mode."
-    ["Find..."
-     ("f" "find-function"          find-function)
-     ("F" "find-function-at-point" find-function-at-point)
-     ("v" "find-variable"          find-variable)
-     ("l" "find-library"           find-library)])
+    ;;---
+    ;; "Go To Considered Harmful"
+    ;;---
+    (keybind:leader/local:def
+      ;; TODO:meow:local: :keymaps 'terraform-mode-map
+      ;;:keymaps 'emacs-lisp-mode-map
+      :infix "g"
+      ;; TODO: Try these without "Display Names" and see if it actually is better?
+      ;; Doom doesn't bother with a pretty name.
+      "f" #'find-function
+      "F" #'find-function-at-point
+      "v" #'find-variable
+      "l" #'find-library))
 
-  (mantle:meow:leader/local:key emacs-lisp-mode-map
-                                "g" #'mantle:meow/transient:elisp:find))
+
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:elisp-mode ()
+    "Create the `elisp-mode' keybinds in `transient' for `meow'."
+    ;;---
+    ;; Debug...
+    ;;---
+    (transient-define-prefix mantle:meow/transient:elisp:debug ()
+      "Debug commands in Meow \"Local\" Leader for Emacs Lisp Mode."
+      ["Debug..."
+       ["`edebug'"
+        ("f" "`edebug' instrument enable"  mantle:user:emacs-lisp:edebug:instrument-defun/on)
+        ("F" "`edebug' instrument disable" mantle:user:emacs-lisp:edebug:instrument-defun/off)]])
+
+    (mantle:meow:leader/local:key emacs-lisp-mode-map
+                                  "d" #'mantle:meow/transient:elisp:debug)
+
+    ;;---
+    ;; Eval...
+    ;;---
+    (transient-define-prefix mantle:meow/transient:elisp:eval ()
+      "Eval commands in Meow \"Local\" Leader for Emacs Lisp Mode."
+      [["Eval..."
+        ("b" "eval-buffer"       eval-buffer)
+        ("d" "eval-defun"        eval-defun)
+        ("e" "eval-last-sexp"    eval-last-sexp)
+        ("E" "pp-eval-last-sexp" pp-eval-last-sexp)
+        ("r" "eval-region"       eval-region)]
+       ["Load..."
+        ("l" "load-library"      load-library)]])
+
+    (mantle:meow:leader/local:key emacs-lisp-mode-map
+                                  "e" #'mantle:meow/transient:elisp:eval)
+
+    ;;---
+    ;; Find...
+    ;;---
+    (transient-define-prefix mantle:meow/transient:elisp:find ()
+      "Find commands in Meow \"Local\" Leader for Emacs Lisp Mode."
+      ["Find..."
+       ("f" "find-function"          find-function)
+       ("F" "find-function-at-point" find-function-at-point)
+       ("v" "find-variable"          find-variable)
+       ("l" "find-library"           find-library)])
+
+    (mantle:meow:leader/local:key emacs-lisp-mode-map
+                                  "g" #'mantle:meow/transient:elisp:find))
 
 
-;;------------------------------
-;; Keybinds : Evil
-;;------------------------------
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:elisp-mode)
+    (mantle:meow/keybind/transient:elisp-mode)))
+
+
+;;------------------------------------------------------------------------------
+;; `elisp-mode' Keybinds : Evil
+;;------------------------------------------------------------------------------
 
 (imp:use-package elisp-mode
   :ensure nil ; This is an Emacs built-in feature.
@@ -297,9 +405,10 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
     "l" #'find-library))
 
 
-;;------------------------------
+
+;;------------------------------------------------------------------------------
 ;; Highlight Quoted Symbols
-;;------------------------------
+;;------------------------------------------------------------------------------
 
 ;; Make quoted symbols easier to distinguish from free variables
 ;; https://github.com/Fanael/highlight-quoted
@@ -310,14 +419,16 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   (emacs-lisp-mode-hook . highlight-quoted-mode))
 
 
-;; TODO: in `elisp-def' use-package:
-;; ;; Recenter window after following definition
-;;   (advice-add #'elisp-def :after #'doom-recenter-a)
+;; TODO-elisp: Add `elisp-def' package?
+;;   https://github.com/Wilfred/elisp-def
+;; TODO-elisp: in `elisp-def' use-package:
+;;   ;; Recenter window after following definition
+;;     (advice-add #'elisp-def :after #'doom-recenter-a)
 
 
-;;------------------------------
+;;------------------------------------------------------------------------------
 ;; REPL
-;;------------------------------
+;;------------------------------------------------------------------------------
 
 (imp:use-package ielm
   :defer t
@@ -352,12 +463,9 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
 
 
 ;;------------------------------------------------------------------------------
-;; Tests
+;; Tests: Overseer
 ;;------------------------------------------------------------------------------
 
-;;------------------------------
-;; Overseer
-;;------------------------------
 ;; https://github.com/tonini/overseer.el
 (imp:use-package overseer
   ;;------------------------------
@@ -373,9 +481,10 @@ restrictive. Instead, check if the word \"test\" is in the start of the file."
     (buffer:search:header "test" :case 'ignore)))
 
 
-;;------------------------------
-;; Buttercup
-;;------------------------------
+;;------------------------------------------------------------------------------
+;; Tests: Buttercup
+;;------------------------------------------------------------------------------
+
 ;; https://github.com/jorgenschaefer/emacs-buttercup
 (imp:use-package buttercup
   :defer t
@@ -383,7 +492,7 @@ restrictive. Instead, check if the word \"test\" is in the start of the file."
   ;;------------------------------
   :minor ; from `auto-minor-mode'
   ;;------------------------------
-  ;; TODO: Am I allowed to use `rx-to-string' directly?
+  ;; TODO:use-package: Am I allowed to use `rx-to-string' directly?
   ;; (rx-to-string
   ;;  '(sequence
   ;;    "/"
@@ -453,11 +562,32 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
     (add-hook 'buttercup-minor-mode-hook #'evil-normalize-keymaps)))
 
 
-;;------------------------------
-;; Keybinds
-;;------------------------------
+;;------------------------------------------------------------------------------
+;; Tests: Buttercup: Keybinds : Meow
+;;------------------------------------------------------------------------------
+;;todofoooo
+;; (imp:use-package buttercup
+;;   :when  (imp:flag? :keybinds +meow)
+;;   :after meow
+
+;;   ;;------------------------------
+;;   :config
+;;   ;;------------------------------
+;;   (keybind:leader/local:def
+;;    :infix(keybind:prefix :local "t") ; test
+;;    ;; TODO:meow:local: :keymaps 'terraform-mode-map
+;;    ;;:keymaps 'buttercup-minor-mode-map
+;;    "t" (list #'mantle:user:emacs-lisp:buttercup:run-file    :which-key "buttercup: run file")
+;;    "a" (list #'mantle:user:emacs-lisp:buttercup:run-project :which-key "buttercup: run project")
+;;    "s" (list #'buttercup-run-at-point                       :which-key "buttercup: run at point")))
+
+
+;;------------------------------------------------------------------------------
+;; Tests: Buttercup: Keybinds : Evil
+;;------------------------------------------------------------------------------
 
 (imp:use-package buttercup
+  :when  (imp:flag? :keybinds +evil)
   :after (:and evil evil-collection)
 
   ;;------------------------------
@@ -478,25 +608,26 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
 ;; Provides a very helpful elisp macro debugging tool: `macrostep-expand'
 (imp:use-package macrostep)
 
-;;------------------------------
-;; Keybinds : Meow
-;;------------------------------
+;;------------------------------------------------------------------------------
+;; `macrostep' Keybinds : Meow
+;;------------------------------------------------------------------------------
 
-(imp:use-package macrostep
-  :when  (imp:flag? :keybinds +meow)
-  :after meow
+;; (imp:use-package macrostep
+;;   :when  (imp:flag? :keybinds +meow)
+;;   :after meow
 
-  ;;------------------------------
-  :config
-  ;;------------------------------
+;;   ;;------------------------------
+;;   :config
+;;   ;;------------------------------
 
-  (mantle:meow:leader/local:keys emacs-lisp-mode-map
-                                 "m" #'macrostep-expand)) ;; Expand macro and enter macrostep-expand mode.
+;;   TODO:meow:macrostep: Make `macrostep' actually work again!!!
+;;   (mantle:meow:leader/local:keys emacs-lisp-mode-map
+;;                                  "m" #'macrostep-expand)) ;; Expand macro and enter macrostep-expand mode.
 
 
-;;------------------------------
-;; Keybinds : evil
-;;------------------------------
+;;------------------------------------------------------------------------------
+;; `macrostep' Keybinds : Evil
+;;------------------------------------------------------------------------------
 
 (imp:use-package macrostep
   :when  (imp:flag? :keybinds +evil)

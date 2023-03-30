@@ -70,6 +70,9 @@ command.")
   ;; Leader Keys
   ;;------------------------------------------------------------------------------
 
+  ;; TODO:meow:local: Need to figure out if we can use local leader with meow...
+  ;; Might need some sort of function that dynamically figures out what keymap to invoke based on local major mode?
+
   ;; Leader keys and their definer functions created here.
   ;;
   ;; To prevent your global leader keybindings from ever being overridden (e.g. an
@@ -148,9 +151,11 @@ command.")
   ;; This creates the macro `keybind:leader/global:def', which just calls
   ;; `general-def' with the arguments supplied here, which can be overridden by
   ;; callers.
-  (general-create-definer keybind:leader/local:def
-    :prefix  keybind:leader/local:prefix
-    :keymaps keybind:keymaps:meow/leader)
+  ;; TODO:meow:leader: Cannot use override or localoverride map here?!
+  ;; (general-create-definer keybind:leader/local:def
+  ;;   :prefix  keybind:leader/local:prefix
+  ;;   :keymaps keybinds:meow:keymaps/leader)
+  (defalias 'keybind:leader/local:def 'ignore)
 
 
   ;; Give it its title.
