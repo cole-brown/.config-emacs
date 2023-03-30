@@ -82,8 +82,8 @@
       :infix (keybind:infix "t" "a")      ; text -> alignment
       "" '(nil :which-key "Alignment...") ; Infix Title
 
-      "a" (list #'buffer:cmd:align-before :which-key "Align Before")
-      "o" (list #'buffer:cmd:align-after  :which-key "Align After")
+      "a" (list #'buffer:cmd:align/before :which-key "Align Before")
+      "o" (list #'buffer:cmd:align/after  :which-key "Align After")
       ";" (list #'align-regexp            :which-key "Align Regex")
       "q" (list (elisp:cmd
                  (setq current-prefix-arg '(4))
@@ -316,8 +316,8 @@
     :infix (keybind:infix "t" "a")      ; text -> alignment
     "" '(nil :which-key "Alignment...") ; Infix Title
 
-    "a" (list #'buffer:cmd:align-before :which-key "Align Before")
-    "o" (list #'buffer:cmd:align-after  :which-key "Align After")
+    "a" (list #'buffer:cmd:align/before :which-key "Align Before")
+    "o" (list #'buffer:cmd:align/after  :which-key "Align After")
     ";" (list #'align-regexp            :which-key "Align Regex")
     "q" (list (elisp:cmd
                (setq current-prefix-arg '(4))
