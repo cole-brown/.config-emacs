@@ -86,15 +86,23 @@ If STRING? is non-nil, return the message as a string instead of displaying it."
             (mapconcat (or innit:time:benchmark:message/indent-func
                            #'identity)
                        (seq-filter #'stringp
-                                   (list ""
+                                   (list "" ; Get off of the initial log line; it's something like: "[INFO    ]: innit:time:benchmark: "
                                          "┌──────────┤innit├──────────┐"
-                                         "├──────────┴─────┴──────────┤"
+                                         ;; No Timestamp:
+                                         ;; "├──────────┴─────┴──────────┤"
+                                         ;; Yes Timestamp:
+                                         "│  ┌───────┴─────┴───────┐  │"
+                                         (format "├──┤ %19s ├──┤" (datetime:string/get 'rfc-3339 'datetime))
+                                         "│  └─────────────────────┘  │"
+                                         ;; Stats:
                                          (format "│      init time: %8.03fs │" time)
                                          (when features/imp
                                            (format "│   imp features: %4d      │" features/imp))
                                          (format "│ emacs features: %4d      │" features/emacs)
                                          "└───────────────────────────┘"))
                        "\n")
+            ;; How's it look? (progn (eval-defun nil) (innit:time:benchmark))
+
             ;; ;;---
             ;; ;; Or... Plain Ole List:
             ;; ;;---
