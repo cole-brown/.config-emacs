@@ -251,15 +251,15 @@
     ;;---
     (keybind:global:def
       :infix "/"
-      "/" (list #'deadgrep                               :which-key "`rg' @ project root")
-      "." (list #'mantle:user:deadgrep:default-directory :which-key "`rg' @ default-directory")
+      "/" (list #'deadgrep                                  :which-key "`rg' @ project root")
+      "." (list #'mantle:user:deadgrep:default-directory    :which-key "`rg' @ default-directory")
       ;; TODO: A deadgrep search that lets me choose the starting dir?
       ;; "?" (list #'mantle:user:deadgrep:default-directory :which-key "`rg' @...")
 
-      "k" (list #'mantle:user:deadgrep:buffer:kill       :which-key "Kill All 'deadgrep' Buffers")
+      "k" (list #'mantle:user:deadgrep:buffer:kill          :which-key "Kill All 'deadgrep' Buffers")
 
-      "s" (list #'isearch-forward  "Search Forward")
-      "r" (list #'isearch-backward "Search Backward")))
+      "s" (list #'isearch-forward                           :which-key "Search Forward")
+      "r" (list #'isearch-backward                          :which-key "Search Backward")))
 
 
   ;;------------------------------
