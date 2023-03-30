@@ -86,9 +86,9 @@ Example:
 If not a file-backed buffer, return nil."
   (when-let* ((path/buffer      (path:buffer buffer)) ;; Does buffer have a file and what is its actual name?
               (path/project     (cdr-safe (project-current)))
-              (path/relative-to (path:parent (path:canonicalize:dir path/project))))
+              (path/relative-to (path:parent (path:canonicalize:file path/project))))
     ;; Ok; have the pieces. What's the relative path now?
-    (path:canonicalize:relative path/file path/relative-to)))
+    (path:canonicalize:relative path/buffer path/relative-to)))
 ;; (path:buffer:project)
 
 
@@ -122,19 +122,14 @@ http://xahlee.info/emacs/emacs/emacs_copy_file_path.html"
   ;; Find Path(s)
   ;;------------------------------
   (let ((paths
-         ;; In dired mode? Check for what exactly to return.
-         (cond ((string-equal major-mode 'dired-mode)
-                (let ((result (dired-get-marked-files)))
-                  (if (equal (length result) 0)
-                      default-directory
-                    result)))
-
-               ;; Not a Dired buffer: Return the buffer's file name, if it has one.
-               ((buffer-file-name))
-
-               ;; Fallback: `default-directory'
-               (t
-                (expand-file-name default-directory))))
+         ;; In dired mode? Figure out what exactly to return.
+         ;; TODO: Why would the original version use `string-equal' instead of `eq'?!
+         ;;  > (string-equal major-mode 'dired-mode)
+         (if (and (eq major-mode 'dired-mode)
+                  ;; Have marked files? Use all those instead.
+                  (> (length (dired-get-marked-files)) 0))
+             (dired-get-marked-files) ; a list of strings
+           (path:buffer))) ; a string
         ;; Need to normalize `paths' first.
         root)
 
