@@ -146,9 +146,37 @@ Example:
 ;; (unit:byte 100 'kb)
 
 
+;; TODO:units: Convert unit to human-readable value:
+;; (defun unit:byte:human (value unit)
+;;   "Convert VALUE of UNIT bytes to a pretty, human-readable value/unit.
+;;
+;; Return cons: (float . symbol)
+;;   - float will be new value
+;;   - symbol will be new unit
+;; Example:
+;;   (unit:byte:human 10822759 'b)
+;;     -> (10.822759 . 'megabytes)"
+;;
+;;   )
 
 
-;; TODO: Put/get the unit in this symbol's `unit' slot?
+;;--------------------------------------------------------------------------------
+;; Units in Symbol Properties
+;;--------------------------------------------------------------------------------
+
+(defconst int<unit>:symbol:property 'unit
+  "Symbol Property name for units.")
+
+
+(defun unit:set (symbol unit)
+  "Store UNIT in SYMBOL's properties."
+  (put symbol int<unit>:symbol:property unit))
+
+
+(defun unit:get (symbol)
+  "Get UNIT from SYMBOL's properties."
+  (get symbol int<unit>:symbol:property))
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.
