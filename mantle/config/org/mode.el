@@ -259,8 +259,10 @@
   (defun mantle:meow/keybind/general:notes ()
     "Create the \"Notes...\" keybinds in `general' for `meow'."
     (keybind:leader/global:def
-      :infix (keybind:infix "n")       ; notes
-      "" '(nil :which-key "Notes...")) ; infix title
+      :infix (keybind:infix "n")      ; notes
+      "" '(nil :which-key "Notes...") ; infix title
+      ;; Short(er)cuts
+      "s" (list #'org-store-link         :which-key "Link: Store"))
 
     (keybind:leader/global:def
       :infix (keybind:infix "n" "l")  ; notes -> links
