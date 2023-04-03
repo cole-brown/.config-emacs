@@ -89,9 +89,10 @@ other things and refuses to refer to it by name? *shrug*")
   ;;                          meow--kbd-kill-line)
 
 
-  (defconst mantle:meow:leader/local:prefix '(:emacs "C-x M-l" ; -> "SPC l"
+  (defconst mantle:meow:leader/local:prefix '(:emacs    "C-x M-l" ; -> "SPC l"
                                               ;; :emacs "C-x M-m" ; -> "SPC c m m"
-                                              :meow  "l")
+                                              :meow     "l"
+                                              :personal "l")
     "A prefix to bind commands to for Meow \"local\" leader.
 
 Have to avoid all the \"special\" keys that Meow Keypad state uses.
