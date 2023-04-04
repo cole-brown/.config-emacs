@@ -183,26 +183,27 @@ ARGS must be a sequence of key strings and funcs/lists/strings:
     - string: another key string to bind this key to
 See `general' docs for details; however we must tweak the key string so this is
 not the full `general-define-key' in that regard."
+    (declare (indent 1))
     (let ((func/name "keybind:meow:leader/local:bind-keys")
           current/key
           current/bind
           binds
           ;; Normalize global keymap to nil.
-          (keymaps (if (memq keymaps '(:global global))
-                       nil
-                     keymaps)))
+          (keymaps/orig keymaps)
+          (keymaps (int<keybind>:keymaps/normalize keymaps))) ; Normalize global MAP to nil.
 
       ;;------------------------------
       ;; KEYMAPS Error Checks
       ;;------------------------------
-      (unless (or (null keymaps)
-                  (keymapp keymaps))
-        (nub:error
-            :innit
-            func/name
-          "KEYMAPS must be a keymap (or nil/`:global'/`global' for global keymap)! Got %S: %S"
-          (type-of map)
-          map))
+      (dolist (keymap keymaps)
+        (unless (or (null keymap)
+                    (keymapp keymap))
+          (nub:error
+              :innit
+              func/name
+            "Each keymap must be a keymap or nil/`:global'/`global' for global keymap! Got %S -> %S"
+            keymaps/orig
+            keymaps)))
 
       (dolist (arg args)
         ;;------------------------------
@@ -229,9 +230,9 @@ not the full `general-define-key' in that regard."
                (nub:error
                    :innit
                    func/name
-                 "KEYMAPS must be a keymap (or nil/`:global'/`global' for global keymap)! Got %S: %S"
-                 (type-of map)
-                 map)))
+                 "Don't know how to parse ARGS. Got stuck on '%S' in %S"
+                 arg
+                 args)))
 
         ;;------------------------------
         ;; Save the keybind.
@@ -242,6 +243,7 @@ not the full `general-define-key' in that regard."
           (setq current/key  nil
                 current/bind nil)))
 
+      ;; Did we finish parsing cleanly?
       (when (or current/key current/bind)
         (nub:error
             :innit

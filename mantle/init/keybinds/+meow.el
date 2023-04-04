@@ -118,14 +118,22 @@ and if `mantle:meow:leader/local:init' has been run it will be Meow keybind
 \"SPC l x\" (assuming `(keybind:prefix :local)' hasn't changed from
 default)."
     (let ((func/name "mantle:meow:leader/local:key")
-          ;; Normalize global MAP to nil.
-          (keymap (if (memq map '(:global global))
-                      nil
-                    map)))
+          (keymap (int<keybind>:keymaps/normalize map))) ; Normalize global MAP to nil.
 
       ;;------------------------------
       ;; Error Checks
       ;;------------------------------
+      ;; TODO:meow:transient: Shouldn't we allow more than one keymap?
+      (if (> (length keymap) 1)
+          (nub:error
+              :innit
+              func/name
+            "MAP must be a (single) keymap (or nil/`:global'/`global' for global keymap)! Got %S: %S -normalize-> %S"
+            (type-of map)
+            map
+            keymap)
+        (setq keymap (nth 0 keymap)))
+
       ;; Check normalized `keymap', report error on original MAP.
       (unless (or (null keymap)
                   (keymapp keymap))

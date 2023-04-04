@@ -21,6 +21,9 @@
 ;;; Code:
 
 
+(require 'cl-lib)
+
+
 (imp:use-package general
   :demand t ;; Always load, if when/after/etc are valid.
 
@@ -112,6 +115,36 @@ Add keybinds to the leader using function `keybind:leader/local' or
   ;;------------------------------------------------------------------------------
   ;; Helpers
   ;;------------------------------------------------------------------------------
+
+
+  (defun int<keybind>:keymaps/normalize (args)
+    "Normalize ARGS to a list of keymaps.
+
+Convert `global' and `:global' to `nil' for adding to the global keymap."
+    (cl-flet ((normalize (keymap) ; Convert pretty 'global' keymap into its actual symbol.
+                         (if (memq keymap '(:global global))
+                             nil ; this is the global keymap
+                           keymap)))
+    (cond ((null args)
+           ;; Got nothing, which we assume to mean "the global keymap", so
+           ;; here's a list with that in it:
+           '(nil))
+
+          ((listp args)
+           (seq-map #'normalize args))
+
+          ((symbolp args)
+           (list (normalize args)))
+
+          (t
+           (nub:error
+               :innit
+               "keybind:prefix"
+             "Not sure what to do about local prefix...")))))
+  ;; (int<keybind>:keymaps/normalize 'global)
+  ;; (int<keybind>:keymaps/normalize '(global :global nil))
+  ;; (int<keybind>:keymaps/normalize '(emacs-lisp-mode-map lisp-interaction-mode-map))
+
 
   (defun keybind:prefix (prefix &rest infix)
     "Create a leader `:prefix' string from PREFIX and INFIX.
