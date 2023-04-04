@@ -17,6 +17,10 @@
 ;;; Code:
 
 
+
+(imp:require :nub)
+
+
 (imp:use-package general
   :when  (imp:flag? :keybinds +meow)
   :after meow
@@ -148,20 +152,132 @@ command.")
   ;;------------------------------------------------------------------------------
   ;; https://github.com/noctuid/general.el#evil-examples
 
-  ;; This creates the macro `keybind:leader/global:def', which just calls
-  ;; `general-def' with the arguments supplied here, which can be overridden by
-  ;; callers.
-  ;; TODO:meow:leader: Cannot use override or localoverride map here?!
-  ;; (general-create-definer keybind:leader/local:def
-  ;;   :prefix  keybind:leader/local:prefix
-  ;;   :keymaps keybinds:meow:keymaps/leader)
+  ;; TODO:meow: <delete-this>
+  ;; ;; This creates the macro `keybind:leader/global:def', which just calls
+  ;; ;; `general-def' with the arguments supplied here, which can be overridden by
+  ;; ;; callers.
+  ;; ;; TODO:meow:leader: Cannot use override or localoverride map here!?
+  ;; ;; (general-create-definer keybind:leader/local:def
+  ;; ;; :prefix  (concat keybind:leader/global:prefix " "
+  ;; ;;                  (keybind:leader/local:prefix :meow :personal))
+  ;; ;;   :keymaps keybinds:meow:keymaps/leader)
   (defalias 'keybind:leader/local:def 'ignore)
 
+  ;; ;; ;; Give the local leader its title.
+  ;; ;; (keybind:leader/local:def
+  ;; ;;   ;; Unbind the prefix and give it a title for which-key.
+  ;; ;;   "" '(nil :which-key "Local Mode Leader"))
+  ;; TODO:meow: </delete-this>
 
-  ;; Give it its title.
-  (keybind:leader/local:def
-    ;; Unbind the prefix and give it a title for which-key.
-    "" '(nil :which-key "Local Mode Leader"))
+
+  (defun keybind:meow:leader/local:bind-keys (keymaps &rest args)
+    "Bind ARGS in KEYMAPS under the `:personal' local leader prefix.
+
+KEYMAPS must be a keymap or list of keymaps.
+
+ARGS must be a sequence of key strings and funcs/lists/strings:
+  - key: string for sending into `kbd'
+  - func/list/string:
+    - func: command to bind
+    - list: list of: '(command-to-bind ...)
+    - string: another key string to bind this key to
+See `general' docs for details; however we must tweak the key string so this is
+not the full `general-define-key' in that regard."
+    (let ((func/name "keybind:meow:leader/local:bind-keys")
+          current/key
+          current/bind
+          binds
+          ;; Normalize global keymap to nil.
+          (keymaps (if (memq keymaps '(:global global))
+                       nil
+                     keymaps)))
+
+      ;;------------------------------
+      ;; KEYMAPS Error Checks
+      ;;------------------------------
+      (unless (or (null keymaps)
+                  (keymapp keymaps))
+        (nub:error
+            :innit
+            func/name
+          "KEYMAPS must be a keymap (or nil/`:global'/`global' for global keymap)! Got %S: %S"
+          (type-of map)
+          map))
+
+      (dolist (arg args)
+        ;;------------------------------
+        ;; ARGS Error Checks, Parsing
+        ;;------------------------------
+        ;; `nil' is a valid bind (unbinds the key), but we're ignoring it until we need it.
+        (cond ((stringp arg)
+               (if (null current/key)
+                   (setq current/key (concat (keybind:leader/local:prefix :meow :emacs)
+                                             " "
+                                             arg))
+                 (setq current/bind arg)))
+              ((or (functionp arg)
+                   (listp arg))
+               (if (null current/bind)
+                   (setq current/bind arg)
+                 (nub:error
+                     :innit
+                     func/name
+                   "Invalid arg '%S' in %S"
+                   arg
+                   args)))
+              (t
+               (nub:error
+                   :innit
+                   func/name
+                 "KEYMAPS must be a keymap (or nil/`:global'/`global' for global keymap)! Got %S: %S"
+                 (type-of map)
+                 map)))
+
+        ;;------------------------------
+        ;; Save the keybind.
+        ;;------------------------------
+        (when (and current/key current/bind)
+          (push current/bind binds)
+          (push current/key  binds)
+          (setq current/key  nil
+                current/bind nil)))
+
+      (when (or current/key current/bind)
+        (nub:error
+            :innit
+            func/name
+          "Incomplete parsing of args into keybinds. Left over from %S: key: %S bind: %S"
+          args
+          current/key
+          current/bind))
+
+      ;;------------------------------
+      ;; ...Done parsing; create these binds.
+      ;;------------------------------
+      (apply #'general-define-key
+             :keymaps keymaps
+             binds)))
+  ;; (keybind:meow:leader/local:bind-keys nil "x" #'message)
+  ;; (keybind:meow:leader/local:bind-keys nil "x" #'message "y" '(ignore :which-key "nothing"))
+
+
+  (defun keybind:meow:leader/local:get/all ()
+    "Return a list of the local leader keymaps/commands."
+    (interactive)
+    (setq this-command last-command)
+    (if-let ((cmds (lookup-key (current-local-map) (kbd (keybind:leader/local:prefix :meow :emacs)))))
+        cmds
+      (message "%S: No local keybinds." major-mode)))
+  ;; (keybind:meow:leader/local:get/all)
+
+
+  ;; Create the local leader and its title.
+  (general-define-key :prefix  keybind:leader/global:prefix
+                      :keymaps keybinds:meow:keymaps/leader
+                      ;; key in global leader:
+                      (keybind:leader/local:prefix :meow :personal)
+                      ;; Command that will just return all the local mode prefix binds:
+                      '(keybind:meow:leader/local:get/all :which-key "Local Mode Leader"))
 
 
   ;;------------------------------------------------------------------------------

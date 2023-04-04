@@ -89,18 +89,6 @@ other things and refuses to refer to it by name? *shrug*")
   ;;                          meow--kbd-kill-line)
 
 
-  (defconst mantle:meow:leader/local:prefix '(:emacs    "C-x M-l" ; -> "SPC l"
-                                              ;; :emacs "C-x M-m" ; -> "SPC c m m"
-                                              :meow     "l"
-                                              :personal "l")
-    "A prefix to bind commands to for Meow \"local\" leader.
-
-Have to avoid all the \"special\" keys that Meow Keypad state uses.
-See: https://github.com/meow-edit/meow/blob/master/TUTORIAL.org#keypad
-Example: 'SPC m' actual means 'M-', so you can't actually bind anything
-to 'm' in the Meow Leader.")
-
-
   (defun mantle:meow:leader/local:key (map key func)
     "Bind prefix + KEY to FUNC for Meow \"local \" leader.
 
@@ -109,8 +97,8 @@ MAP should be a keymap or nil(ish). Add to the global keymap if MAP is:
   - `global'
   - `:global'
 
-KEY shoud be a string. It will be appended to `mantle:meow:leader/local:prefix'
-and then passed through `kbd'.
+KEY shoud be a string. It will become `(keybind:prefix :local key)'
+and then be passed through `kbd'.
 
 FUNC should be the quoted function or unquoted keymap to bind.
 Example, Function:
@@ -127,7 +115,7 @@ Note that FUNC will be bound to a /Vanilla Emacs Keybind/! For example:
 
 This actually technically binds `org-md-export-as-markdown' to \"C-x M-l x\",
 and if `mantle:meow:leader/local:init' has been run it will be Meow keybind
-\"SPC l x\" (assuming `mantle:meow:leader/local:prefix' hasn't changed from
+\"SPC l x\" (assuming `(keybind:prefix :local)' hasn't changed from
 default)."
     (let ((func/name "mantle:meow:leader/local:key")
           ;; Normalize global MAP to nil.
@@ -196,13 +184,13 @@ default)."
       ;;------------------------------
       (if (null keymap)
           ;; Global keybind.
-          (global-set-key (kbd (concat (plist-get mantle:meow:leader/local:prefix :emacs)
+          (global-set-key (kbd (concat (keybind:leader/local:prefix :meow :emacs)
                                        " "
                                        key))
                           func)
         ;; Local keybind.
         (define-key keymap
-          (kbd (concat (plist-get mantle:meow:leader/local:prefix :emacs)
+          (kbd (concat (keybind:leader/local:prefix :meow :emacs)
                        " "
                        key))
           func))))
@@ -255,8 +243,8 @@ Example:
                                 \"i\" #'org-toggle-inline-images)
   ;; Define Meow \"Local\" Leader entrypoint keybind.
   (mantle:meow:leader/local:init)
-  ;; Now Meow has a global toggle \"SPC m l\" and two modes have a local toggle
-  ;; \"SPC m i\".
+  ;; Now Meow has a global toggle \"SPC l l\" and two modes have a local toggle
+  ;; \"SPC l i\".
 
 From: \"add mode and meow state specific keymaps\"
  │ So my recommendation is to bind keys in vanilla Emacs. For example:
@@ -280,8 +268,8 @@ From: \"add mode and meow state specific keymaps\"
  │
  └── https://github.com/meow-edit/meow/pull/126#issuecomment-992004368"
     ;; Add entry to the (global) leader.
-    (meow-leader-define-key (cons (plist-get mantle:meow:leader/local:prefix :meow)
-                                  (plist-get mantle:meow:leader/local:prefix :emacs))))
+    (meow-leader-define-key (cons (keybind:prefix :local)
+                                  (keybind:leader/local:prefix :meow :emacs))))
 
 
   ;; TODO-meow: Patch these into meow itself?

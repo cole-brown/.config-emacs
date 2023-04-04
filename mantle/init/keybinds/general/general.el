@@ -55,6 +55,7 @@ See: https://github.com/noctuid/general.el#override-keymaps-and-buffer-local-key
 
 Add keybinds to the leader using function `keybind:leader/global'.")
 
+
   ;; TODO:meow:leader: Move this to `evil' if not usable by `meow'.
   (defconst keybind:leader/global:keymaps 'override
     "Keymap to use so that (non-local-leader) keybinds override others.
@@ -74,25 +75,38 @@ See: https://github.com/noctuid/general.el#override-keymaps-and-buffer-local-key
   ;; Local Leader
   ;;------------------------------------------------------------------------------
 
-  (defconst keybind:leader/local:prefix "SPC m"
+  (defconst int<keybind>:leader/local:prefix '((:evil . "SPC m")
+                                               (:meow . ((:emacs    . "C-x M-l") ; -> "SPC l"
+                                                         ;; (:emacs . "C-x M-m") ; -> "SPC c m m"
+                                                         (:meow     . "l")
+                                                         (:personal . "l"))))
     "`kbd' type string to use as the primary keybinds leader key.
 
-Add keybinds to the leader using function `keybind:leader/local'.")
+Use function `keybind:leader/local:prefix' to get the correct prefix.")
 
 
-  ;; TODO:meow:leader: Move this to `evil' if not usable by `meow'.
-  (defconst keybind:leader/local:keymaps 'local
-    "Keymap to use so that (local-leader) keybinds override others.
+  (defun keybind:leader/local:prefix (&rest args)
+    "`kbd' type string to use as the primary keybinds leader key.
 
-They will always take precedence over keys bound in .
-
-NOTE: Cannot use in `use-package' macro's `:general' sections! It doesn't get
-replaced (soon enough) with whatever magic `general' does and then `override'
-gets flagged as an invalid/non-existant keymap.
-ADDENDUM: Is this true? Can use a definer in the `:general' section, anyways, I
-believe? And my definers use these override maps?
-
-See: https://github.com/noctuid/general.el#override-keymaps-and-buffer-local-keybindings")
+Add keybinds to the leader using function `keybind:leader/local' or
+`keybind:meow:leader/local:bind-keys`"
+    (let ((prefix int<keybind>:leader/local:prefix))
+      (dolist (arg args)
+        (message "arg: %S -> %S" arg (alist-get arg prefix))
+        (setq prefix (alist-get arg prefix)))
+      ;; Failure?
+      (unless (stringp prefix)
+        (nub:error
+            :innit
+            "keybind:leader/local:prefix"
+          "Did not find a (single) prefix string for arg '%S' in %S."
+          args
+          int<keybind>:leader/local:prefix))
+      ;; Success; return the prefix.
+      prefix))
+  ;; (keybind:leader/local:prefix :evil)
+  ;; (keybind:leader/local:prefix :meow)
+  ;; (keybind:leader/local:prefix :meow :emacs)
 
 
   ;;------------------------------------------------------------------------------
@@ -108,7 +122,15 @@ INFIX must be a string.
 
 See also function `keybind:infix'."
     (let ((prefix/keywords (list :global keybind:leader/global:prefix
-                                 :local  keybind:leader/local:prefix)))
+                                 :local  (cond ((imp:flag? :keybinds +meow)
+                                                (concat "SPC " (keybind:leader/local:prefix :meow :personal)))
+                                               ((imp:flag? :keybinds +evil)
+                                                (keybind:leader/local:prefix :evil))
+                                               (t
+                                                (nub:error
+                                                    :innit
+                                                    "keybind:prefix"
+                                                  "Not sure what to do about local prefix..."))))))
       ;;------------------------------
       ;; Validate
       ;;------------------------------

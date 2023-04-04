@@ -17,6 +17,7 @@
 ;;; Code:
 
 
+(imp:require :nub)
 (imp:require :elisp 'utils 'functions)
 (imp:require :buffer 'region)
 
