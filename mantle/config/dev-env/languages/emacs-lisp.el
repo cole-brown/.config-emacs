@@ -21,47 +21,6 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Keybind Prefixes : Meow
-;;------------------------------------------------------------------------------
-
-(imp:use-package emacs
-  :when  (imp:flag? :keybinds +meow)
-  :after  (:and meow
-           (:keybinds user general meow))
-
-  ;;------------------------------
-  :init
-  ;;------------------------------
-
-  (keybind:leader/local:def
-    ;; TODO:meow:local: :keymaps 'terraform-mode-map
-    ;; :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-    :infix   "d"                     ; debug
-    "" '(nil :which-key "debug...")) ; infix's title
-
-
-  (keybind:leader/local:def
-    ;; TODO:meow:local: :keymaps 'terraform-mode-map
-    ;; :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-    :infix   "e"                    ; eval
-    "" '(nil :which-key "eval...")) ; infix's title
-
-
-  (keybind:leader/local:def
-    ;; TODO:meow:local: :keymaps 'terraform-mode-map
-    ;; :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-    :infix   "g"                    ; goto
-    "" '(nil :which-key "goto...")) ; infix's title
-
-
-  (keybind:leader/local:def
-    ;; TODO:meow:local: :keymaps 'terraform-mode-map
-    ;; :keymaps '(emacs-lisp-mode-map lisp-interaction-mode-map)
-    :infix   "t"                     ; test
-    "" '(nil :which-key "test..."))) ; infix's title
-
-
-;;------------------------------------------------------------------------------
 ;; Keybind Prefixes : Evil
 ;;------------------------------------------------------------------------------
 
@@ -258,44 +217,35 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
 
   (defun mantle:meow/keybind/general:elisp-mode ()
     "Create the `elisp-mode' keybinds in `general' for `meow'."
-    ;;---
-    ;; Debug...
-    ;;---
-    (keybind:leader/local:def
+    (keybind:meow:leader/local:bind-keys
+        '(emacs-lisp-mode-map lisp-interaction-mode-map)
+      ;;---
+      ;; Debug...
+      ;;---
+      "d f" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/on :which-key "`edebug' instrument enable")
+      "d F" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/off :which-key "`edebug' instrument disable")
 
-      :infix "d"
-      "f" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/on :which-key "`edebug' instrument enable")
-      "F" (list #'mantle:user:emacs-lisp:edebug:instrument-defun/off :which-key "`edebug' instrument disable"))
-
-    ;;---
-    ;; Eval...
-    ;;---
-    (keybind:leader/local:def
-      ;; TODO:meow:local: :keymaps 'terraform-mode-map
-      ;;:keymaps 'emacs-lisp-mode-map
-      :infix "e"
-      ;; TODO: Try these without "Display Names" and see if it actually is better?
+      ;;---
+      ;; Eval...
+      ;;---
+      ;; TODO:meow: Try these without "Display Names" and see if it actually is better?
       ;; Doom doesn't bother with a pretty name.
-      "b" #'eval-buffer       ; (list #'eval-buffer       :which-key "Eval Buffer")
-      "d" #'eval-defun        ; (list #'eval-defun        :which-key "Eval Defun")
-      "e" #'eval-last-sexp    ; (list #'eval-last-sexp    :which-key "Eval Last Sexp")
-      "E" #'pp-eval-last-sexp ; (list #'pp-eval-last-sexp :which-key "Eval Last Sexp: Pretty Print")
-      "r" #'eval-region       ; (list #'eval-region       :which-key "Eval Region")
-      "l" #'load-library)     ; (list #'load-library      :which-key "Load Library")
+      "e b" #'eval-buffer       ; (list #'eval-buffer       :which-key "Eval Buffer")
+      "e d" #'eval-defun        ; (list #'eval-defun        :which-key "Eval Defun")
+      "e e" #'eval-last-sexp    ; (list #'eval-last-sexp    :which-key "Eval Last Sexp")
+      "e E" #'pp-eval-last-sexp ; (list #'pp-eval-last-sexp :which-key "Eval Last Sexp: Pretty Print")
+      "e r" #'eval-region       ; (list #'eval-region       :which-key "Eval Region")
+      "e l" #'load-library      ; (list #'load-library      :which-key "Load Library")
 
-    ;;---
-    ;; "Go To Considered Harmful"
-    ;;---
-    (keybind:leader/local:def
-      ;; TODO:meow:local: :keymaps 'terraform-mode-map
-      ;;:keymaps 'emacs-lisp-mode-map
-      :infix "g"
-      ;; TODO: Try these without "Display Names" and see if it actually is better?
+      ;;---
+      ;; "Go To Considered Harmful"
+      ;;---
+      ;; TODO:meow: Try these without "Display Names" and see if it actually is better?
       ;; Doom doesn't bother with a pretty name.
-      "f" #'find-function
-      "F" #'find-function-at-point
-      "v" #'find-variable
-      "l" #'find-library))
+      "g f" #'find-function
+      "g F" #'find-function-at-point
+      "g v" #'find-variable
+      "g l" #'find-library))
 
 
   ;;------------------------------
