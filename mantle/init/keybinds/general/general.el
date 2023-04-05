@@ -95,7 +95,6 @@ Add keybinds to the leader using function `keybind:leader/local' or
 `keybind:meow:leader/local:bind-keys`"
     (let ((prefix int<keybind>:leader/local:prefix))
       (dolist (arg args)
-        (message "arg: %S -> %S" arg (alist-get arg prefix))
         (setq prefix (alist-get arg prefix)))
       ;; Failure?
       (unless (stringp prefix)

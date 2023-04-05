@@ -197,13 +197,17 @@ not the full `general-define-key' in that regard."
       ;;------------------------------
       (dolist (keymap keymaps)
         (unless (or (null keymap)
-                    (keymapp keymap))
+                    (keymapp keymap)
+                    (and (symbolp keymap)
+                         (keymapp (symbol-value keymap))))
           (nub:error
               :innit
               func/name
-            "Each keymap must be a keymap or nil/`:global'/`global' for global keymap! Got %S -> %S"
+            '("Each keymap must be a keymap, or nil/`:global'/`global' for global keymap! "
+             "%S -normalize-> %S: %S is invalid")
             keymaps/orig
-            keymaps)))
+            keymaps
+            keymap)))
 
       (dolist (arg args)
         ;;------------------------------
@@ -266,9 +270,13 @@ not the full `general-define-key' in that regard."
   (defun keybind:meow:leader/local:get/all ()
     "Return a list of the local leader keymaps/commands."
     (interactive)
-    (setq this-command last-command)
     (if-let ((cmds (lookup-key (current-local-map) (kbd (keybind:leader/local:prefix :meow :emacs)))))
-        cmds
+        (progn
+          (set-transient-map cmds)
+          ;; (set-transient-map cmds
+          ;;                    nil ; predicate for staying in the keymap
+          ;;                    (lambda () (message "Goodbye %S" major-mode))) ; on-exit callback
+          (which-key--show-keymap "Local Leader:" cmds :prior-args :all))
       (message "%S: No local keybinds." major-mode)))
   ;; (keybind:meow:leader/local:get/all)
 
