@@ -26,8 +26,6 @@
 ;; Define the infix with the title here so we don't have to worry about what's
 ;; defined in what order since you can only define the title once or else things
 ;; overwrite each other?
-;;
-;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
 (when (imp:flag? :keybinds +evil)
   (imp:eval:after (:and evil evil-collection
@@ -168,29 +166,21 @@
   ;;------------------------------
   :config
   ;;------------------------------
-  ;;---
-  ;; Misc.
-  ;;---
-  (mantle:meow:leader/local:keys markdown-mode-map
-                                 "'" #'markdown-edit-code-block
-                                 "e" #'markdown-export
-                                 ;; "i" == insert menu
-                                 "o" #'markdown-open)
+
+  ;;------------------------------
+  ;; Common
+  ;;------------------------------
+  ;; Some big menus - use a transient for better control of layout?
 
   ;;---
   ;; Preview...
   ;;---
   ;; `impatient-mode' will add more to this Transient.
   (transient-define-prefix mantle:meow/transient:markdown/preview ()
-    "Markdown preview keybinds.
-
-`markdown-mode' config creates this and `impatient-mode' config adds it."
+    "Markdown preview keybinds."
     ["Preview..."
      ("p" "Preview Markdown" markdown-preview)])
   ;; (mantle:meow/transient:markdown/preview)
-
-  (mantle:meow:leader/local:key markdown-mode-map
-                                "p" #'mantle:meow/transient:markdown/preview)
 
   ;;---
   ;; Insert...
@@ -234,8 +224,55 @@
   ;; (mantle:meow/transient:markdown/insert)
 
 
-  (mantle:meow:leader/local:key markdown-mode-map
-                                "i" #'mantle:meow/transient:markdown/insert))
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/general:markdown-mode ()
+    "Create the `markdown-mode' keybinds in `general' for `meow'."
+    (keybind:meow:leader/local:bind-keys
+        'markdown-mode-map
+      ;;---
+      ;; Transients
+      ;;---
+      "p" (list #'mantle:meow/transient:markdown/preview :which-key "Preview...")
+      "i" (list #'mantle:meow/transient:markdown/insert  :which-key "Insert...")
+
+      ;;---
+      ;; Misc.
+      ;;---
+      "'" (list #'markdown-edit-code-block :which-key "Edit Code Block")
+      "e" (list #'markdown-export          :which-key "Export")
+      "o" (list #'markdown-open            :which-key "Open")))
+
+
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:markdown-mode ()
+    "Create the `markdown-mode' keybinds in `transient' for `meow'."
+    ;; Misc.
+    (mantle:meow:leader/local:keys markdown-mode-map
+                                   "'" #'markdown-edit-code-block
+                                   "e" #'markdown-export
+                                   ;; "i" == insert menu
+                                   "o" #'markdown-open)
+    ;; Preview...
+    (mantle:meow:leader/local:key markdown-mode-map
+                                  "p" #'mantle:meow/transient:markdown/preview)
+    ;; Insert...
+    (mantle:meow:leader/local:key markdown-mode-map
+                                  "i" #'mantle:meow/transient:markdown/insert))
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:markdown-mode)
+    (mantle:meow/keybind/transient:markdown-mode)))
 
 
 ;;------------------------------
@@ -324,12 +361,11 @@
   ;;------------------------------
   :config
   ;;------------------------------
-  ;; Add to "Insert" keybinds...
 
-  ;; TODO HERE
+  ;; Add to the "Insert" Transient...
   (transient-append-suffix 'mantle:meow/transient:markdown/insert
     '(0 3 -1)
-    '("T" . #'markdown-toc-generate-toc))) ; Table Of Content
+    '("T" "Generate Table of Contents" markdown-toc-generate-toc))) ; Table Of Content
 
 
 ;;------------------------------
@@ -513,19 +549,26 @@ You can then:
 ;; Keybinds : Meow
 ;;------------------------------
 
-;; (imp:use-package impatient-mode
-;;   :when  (imp:flag? :keybinds +meow)
-;;   :after (:and markdown-mode meow)
+(imp:use-package impatient-mode
+  :when  (imp:flag? :keybinds +meow)
+  :after (:and markdown-mode meow)
 
-;;   ;;------------------------------
-;;   :bind ; meow
-;;   ;;------------------------------
-;;   (:map mantle:meow/keymap/local:markdown/preview
-;;    ;; `markdown-mode' package puts `markdown-preview' as "p".
-;;    ;; Steal "p", but add `markdown-preview' back somewhere else.
-;;    ("p" . #'mantle:cmd:markdown:preview-live/start)  ; Preview (Live)
-;;    ("P" . #'markdown-preview)                        ; Preview (Static)
-;;    ("s" . #'mantle:cmd:markdown:preview-live/stop))) ; Stop Preview (Live)
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; Redefine entire transient since it only has one keybind and now we're
+  ;; replacing that one and adding more?
+  (transient-define-prefix mantle:meow/transient:markdown/preview ()
+    "Markdown preview keybinds."
+    ["Preview..."
+    ;; `markdown-mode' package puts `markdown-preview' as "p".
+    ;; Steal "p", but add `markdown-preview' back somewhere else.
+    ("p" "Preview (Live)"      mantle:cmd:markdown:preview-live/start)
+    ("P" "Preview (Static)"    markdown-preview)
+    ("s" "Stop Preview (Live)" mantle:cmd:markdown:preview-live/stop)])
+  ;; (mantle:meow/transient:markdown/preview)
+  )
 
 
 ;;------------------------------

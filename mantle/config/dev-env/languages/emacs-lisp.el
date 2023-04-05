@@ -515,21 +515,19 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
 ;;------------------------------------------------------------------------------
 ;; Tests: Buttercup: Keybinds : Meow
 ;;------------------------------------------------------------------------------
-;;todofoooo
-;; (imp:use-package buttercup
-;;   :when  (imp:flag? :keybinds +meow)
-;;   :after meow
 
-;;   ;;------------------------------
-;;   :config
-;;   ;;------------------------------
-;;   (keybind:leader/local:def
-;;    :infix(keybind:prefix :local "t") ; test
-;;    ;; TODO:meow:local: :keymaps 'terraform-mode-map
-;;    ;;:keymaps 'buttercup-minor-mode-map
-;;    "t" (list #'mantle:user:emacs-lisp:buttercup:run-file    :which-key "buttercup: run file")
-;;    "a" (list #'mantle:user:emacs-lisp:buttercup:run-project :which-key "buttercup: run project")
-;;    "s" (list #'buttercup-run-at-point                       :which-key "buttercup: run at point")))
+(imp:use-package buttercup
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+  (keybind:meow:leader/local:bind-keys
+      'buttercup-minor-mode-map
+    "t t" (list #'mantle:user:emacs-lisp:buttercup:run-file    :which-key "buttercup: run file")
+    "t a" (list #'mantle:user:emacs-lisp:buttercup:run-project :which-key "buttercup: run project")
+    "t s" (list #'buttercup-run-at-point                       :which-key "buttercup: run at point")))
 
 
 ;;------------------------------------------------------------------------------
@@ -562,17 +560,18 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
 ;; `macrostep' Keybinds : Meow
 ;;------------------------------------------------------------------------------
 
-;; (imp:use-package macrostep
-;;   :when  (imp:flag? :keybinds +meow)
-;;   :after meow
+(imp:use-package macrostep
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
 
-;;   ;;------------------------------
-;;   :config
-;;   ;;------------------------------
+  ;;------------------------------
+  :config
+  ;;------------------------------
 
-;;   TODO:meow:macrostep: Make `macrostep' actually work again!!!
-;;   (mantle:meow:leader/local:keys emacs-lisp-mode-map
-;;                                  "m" #'macrostep-expand)) ;; Expand macro and enter macrostep-expand mode.
+  ;; TODO:meow:macrostep: Make `macrostep' actually work again!!!
+  (keybind:meow:leader/local:bind-keys
+      '(emacs-lisp-mode-map lisp-interaction-mode-map)
+    "m" #'macrostep-expand)) ;; Expand macro and enter macrostep-expand mode.
 
 
 ;;------------------------------------------------------------------------------

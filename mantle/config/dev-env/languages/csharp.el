@@ -151,9 +151,6 @@
   :config
   ;;------------------------------
 
-  (mantle:meow:leader/local:key csharp-mode-map
-                                "c" #'sharper-main-transient)
-
   ;; TODO: Doom also mapped these; do we want any?
   ;; (map! (:map sharper--solution-management-mode-map
   ;;        :nv "RET" #'sharper-transient-solution
@@ -166,7 +163,38 @@
   ;;        :nv "gr" #'sharper--project-packages-refresh)
   ;;       (:map sharper--nuget-results-mode-map
   ;;        :nv "RET" #'sharper--nuget-search-install))
-  )
+
+
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/general:sharper ()
+    "Create `sharper' binds in the `csharp-mode' keybinds in `general' for `meow'."
+    (keybind:meow:leader/local:bind-keys
+        'csharp-mode-map
+      ;; TODO: "compile" or some such infix?
+      ;; `sharper-main-transient' is the entrypoint.
+      "c" '(sharper-main-transient :which-key "`dotnet' CLI...")))
+
+
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:csharp-mode ()
+    "Create the `sharper' binds in `csharp-mode' keybinds in `transient' for `meow'."
+    (mantle:meow:leader/local:key csharp-mode-map
+                                  "c" #'sharper-main-transient))
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:csharp-mode)
+    (mantle:meow/keybind/transient:csharp-mode)))
 
 
 ;;------------------------------

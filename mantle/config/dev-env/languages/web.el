@@ -23,8 +23,6 @@
 ;; Define the infix with the title here so we don't have to worry about what's
 ;; defined in what order since you can only define the title once or else things
 ;; overwrite each other?
-;;
-;; TODO: Make sure that's a correct assumption. Currently only 87% sure.
 
 (when (imp:flag? :keybinds +evil)
   (imp:eval:after (:and evil evil-collection
@@ -202,13 +200,27 @@
   :after meow
 
   ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
+
+  (:map web-mode-map
+   ;; TODO-meow: Where is my comment/uncomment actually? Evil/Doom had it on "gc".
+   ("M-/" . web-mode-comment-or-uncomment)) ; Comment/Uncomment
+
+
+  ;;------------------------------
   :config
   ;;------------------------------
+
+  ;;------------------------------
+  ;; Common
+  ;;------------------------------
+  ;; Some big menus - use transients for better control of layout?
 
   ;;---
   ;; Local Leader: Insert...
   ;;---
-  (transient-define-prefix mantle:meow/transient:markdown/insert ()
+  (transient-define-prefix mantle:meow/transient:web/insert ()
     "`web-mode' insert menu"
     ["Insert..."
      ["Attribute"
@@ -268,40 +280,73 @@
       ("p" "Previous" web-mode-tag-previous)
       ("s" "Select" web-mode-tag-select)]])
 
-  (mantle:meow:leader/local:keys web-mode-map
-                                 "i" mantle:meow/transient:markdown/insert)
 
-  ;;---
-  ;; Local Leader: Misc.
-  ;;---
-  (transient-define-prefix mantle:meow/transient:markdown/misc ()
-    "`web-mode' insert menu"
-    [["Buffer..."
-      ("h" "Rehighlight Buffer" web-mode-reload)
-      ("i" "Indent Buffer" web-mode-buffer-indent)
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/general:web ()
+    "Create the `web' keybinds in `general' for `meow'."
+    (keybind:meow:leader/local:bind-keys
+        'python-mode-map
+      "i"   (list #'mantle:meow/transient:web/insert :which-key "Insert...")
+      "b h" (list #'web-mode-reload                  :which-key "Rehighlight Buffer")
+      "b i" (list #'web-mode-buffer-indent           :which-key "Indent Buffer")
       ;; TODO-meow: Somewhere else? This is an evil key for fold/unfold...
       ;; TODO-meow: like... ([remap func-or-unfunc] . web-mode-fold-or-unfold) in a `:bind' section?
-      ("f"  "Fold/Unfold" web-mode-fold-or-unfold)]
-     ;; TODO-meow: move to actual movement keys or... somewhere you can spam repeat? Does transient have a no-exit hydra kinda thing?
-     ["Movement"
-      ("]a" "Attribute: Next" web-mode-attribute-next)
-      ("[a" "Attribute: Previous" web-mode-attribute-previous)
-      ("]t" "Tag: Next" web-mode-tag-next)
-      ("[t" "Tag: Previous" web-mode-tag-previous)
-      ("]T" "Child: Next" web-mode-element-child)
-      ("[T" "Child: Previous" web-mode-element-parent)]])
-
-  (mantle:meow:leader/local:keys web-mode-map
-                                 "l" mantle:meow/transient:markdown/misc)
+      "b f"  (list #'web-mode-fold-or-unfold         :which-key "Fold/Unfold")
+      ;; TODO-meow: move to actual movement keys or... somewhere you can spam repeat?
+      "] a" (list #'web-mode-attribute-next          :which-key "Attribute: Next")
+      "[ a" (list #'web-mode-attribute-previous      :which-key "Attribute: Previous")
+      "] t" (list #'web-mode-tag-next                :which-key "Tag: Next")
+      "[ t" (list #'web-mode-tag-previous            :which-key "Tag: Previous")
+      "] T" (list #'web-mode-element-child           :which-key "Child: Next")
+      "[ T" (list #'web-mode-element-parent          :which-key "Child: Previous")))
 
   ;;------------------------------
-  :bind ; meow
+  ;; `Transient'
   ;;------------------------------
 
-  (:map web-mode-map
-   ;; TODO-meow: Where is my comment/uncomment actually? Evil/Doom had it on "gc".
-   ("M-/" . web-mode-comment-or-uncomment))) ; Comment/Uncomment
+  (defun mantle:meow/keybind/transient:web ()
+    "Create the `web' keybinds in `transient' for `meow'."
 
+    ;;---
+    ;; Local Leader: Insert...
+    ;;---
+    (mantle:meow:leader/local:keys web-mode-map
+                                   "i" mantle:meow/transient:web/insert)
+
+    ;;---
+    ;; Local Leader: Misc.
+    ;;---
+    (transient-define-prefix mantle:meow/transient:web/misc ()
+      "`web-mode' insert menu"
+      [["Buffer..."
+        ("h" "Rehighlight Buffer" web-mode-reload)
+        ("i" "Indent Buffer" web-mode-buffer-indent)
+        ;; TODO-meow: Somewhere else? This is an evil key for fold/unfold...
+        ;; TODO-meow: like... ([remap func-or-unfunc] . web-mode-fold-or-unfold) in a `:bind' section?
+        ("f"  "Fold/Unfold" web-mode-fold-or-unfold)]
+       ;; TODO-meow: move to actual movement keys or... somewhere you can spam repeat? Does transient have a no-exit hydra kinda thing?
+       ["Movement"
+        ("]a" "Attribute: Next" web-mode-attribute-next)
+        ("[a" "Attribute: Previous" web-mode-attribute-previous)
+        ("]t" "Tag: Next" web-mode-tag-next)
+        ("[t" "Tag: Previous" web-mode-tag-previous)
+        ("]T" "Child: Next" web-mode-element-child)
+        ("[T" "Child: Previous" web-mode-element-parent)]])
+
+    (mantle:meow:leader/local:keys web-mode-map
+                                   "l" mantle:meow/transient:web/misc))
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:web)
+    (mantle:meow/keybind/transient:web)))
 
 
 ;;------------------------------
