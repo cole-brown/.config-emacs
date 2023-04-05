@@ -144,8 +144,34 @@
   :config
   ;;------------------------------
 
-  (mantle:meow:leader/local:keys npm-mode-keymap
-                                 "n" npm-mode-command-keymap))
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/general:npm ()
+    "Create the `npm-mode' keybinds in `general' for `meow'."
+    (keybind:meow:leader/local:bind-keys
+        'npm-mode-keymap
+      "n" '(npm-mode-command-keymap :which-key "NPM Commands...")))
+
+
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:npm ()
+    "Create the `npm-mode' keybinds in `transient' for `meow'."
+    (mantle:meow:leader/local:keys npm-mode-keymap
+                                   "n" npm-mode-command-keymap))
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:npm)
+    (mantle:meow/keybind/transient:npm)))
 
 
 ;;------------------------------

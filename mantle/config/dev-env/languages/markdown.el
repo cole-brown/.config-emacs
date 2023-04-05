@@ -228,8 +228,8 @@
   ;; `General'
   ;;------------------------------
 
-  (defun mantle:meow/keybind/general:markdown-mode ()
-    "Create the `markdown-mode' keybinds in `general' for `meow'."
+  (defun mantle:meow/keybind/general:markdown ()
+    "Create the `markdown' keybinds in `general' for `meow'."
     (keybind:meow:leader/local:bind-keys
         'markdown-mode-map
       ;;---
@@ -250,8 +250,8 @@
   ;; `Transient'
   ;;------------------------------
 
-  (defun mantle:meow/keybind/transient:markdown-mode ()
-    "Create the `markdown-mode' keybinds in `transient' for `meow'."
+  (defun mantle:meow/keybind/transient:markdown ()
+    "Create the `markdown' keybinds in `transient' for `meow'."
     ;; Misc.
     (mantle:meow:leader/local:keys markdown-mode-map
                                    "'" #'markdown-edit-code-block
@@ -271,8 +271,8 @@
   ;;------------------------------
 
   (if (imp:provided? :keybinds 'user 'general 'meow)
-      (mantle:meow/keybind/general:markdown-mode)
-    (mantle:meow/keybind/transient:markdown-mode)))
+      (mantle:meow/keybind/general:markdown)
+    (mantle:meow/keybind/transient:markdown)))
 
 
 ;;------------------------------

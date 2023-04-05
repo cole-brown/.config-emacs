@@ -152,24 +152,6 @@ command.")
   ;;------------------------------------------------------------------------------
   ;; https://github.com/noctuid/general.el#evil-examples
 
-  ;; TODO:meow: <delete-this>
-  ;; ;; This creates the macro `keybind:leader/global:def', which just calls
-  ;; ;; `general-def' with the arguments supplied here, which can be overridden by
-  ;; ;; callers.
-  ;; ;; TODO:meow:leader: Cannot use override or localoverride map here!?
-  ;; ;; (general-create-definer keybind:leader/local:def
-  ;; ;; :prefix  (concat keybind:leader/global:prefix " "
-  ;; ;;                  (keybind:leader/local:prefix :meow :personal))
-  ;; ;;   :keymaps keybinds:meow:keymaps/leader)
-  (defalias 'keybind:leader/local:def 'ignore)
-
-  ;; ;; ;; Give the local leader its title.
-  ;; ;; (keybind:leader/local:def
-  ;; ;;   ;; Unbind the prefix and give it a title for which-key.
-  ;; ;;   "" '(nil :which-key "Local Mode Leader"))
-  ;; TODO:meow: </delete-this>
-
-
   (defun keybind:meow:leader/local:bind-keys (keymaps &rest args)
     "Bind ARGS in KEYMAPS under the `:personal' local leader prefix.
 

@@ -59,15 +59,45 @@
   ;;------------------------------
   :config
   ;;------------------------------
+  ;;------------------------------
+  ;; `General'
+  ;;------------------------------
 
-  (mantle:meow:leader/local:keys json-mode-map
-                                 "p" #'json-mode-show-path ; Copy JSON Path
-                                 "d" #'json-mode-kill-path ; Kill JSON Path
-                                 "t" #'json-toggle-boolean
-                                 "x" #'json-nullify-sexp
-                                 "+" #'json-increment-number-at-point
-                                 "-" #'json-decrement-number-at-point
-                                 "f" #'json-mode-beautify))
+  (defun mantle:meow/keybind/general:elisp-mode ()
+    "Create the `elisp-mode' keybinds in `general' for `meow'."
+    (keybind:meow:leader/local:bind-keys
+        'json-mode-map
+      "p" (list #'json-mode-show-path :which-key "Copy JSON Path")
+      "d" (list #'json-mode-kill-path :which-key "Kill JSON Path")
+      "t" #'json-toggle-boolean
+      "x" #'json-nullify-sexp
+      "+" #'json-increment-number-at-point
+      "-" #'json-decrement-number-at-point
+      "f" #'json-mode-beautify))
+
+  ;;------------------------------
+  ;; `Transient'
+  ;;------------------------------
+
+  (defun mantle:meow/keybind/transient:elisp-mode ()
+    "Create the `elisp-mode' keybinds in `transient' for `meow'."
+    (mantle:meow:leader/local:keys json-mode-map
+                                   "p" #'json-mode-show-path ; Copy JSON Path
+                                   "d" #'json-mode-kill-path ; Kill JSON Path
+                                   "t" #'json-toggle-boolean
+                                   "x" #'json-nullify-sexp
+                                   "+" #'json-increment-number-at-point
+                                   "-" #'json-decrement-number-at-point
+                                   "f" #'json-mode-beautify))
+
+
+  ;;------------------------------
+  ;; Actually Create Keybinds:
+  ;;------------------------------
+
+  (if (imp:provided? :keybinds 'user 'general 'meow)
+      (mantle:meow/keybind/general:elisp-mode)
+    (mantle:meow/keybind/transient:elisp-mode)))
 
 
 ;;------------------------------
