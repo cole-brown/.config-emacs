@@ -169,7 +169,7 @@
   ;; `General'
   ;;------------------------------
 
-  (defun mantle:meow/keybind/general:sharper ()
+  (defun mantle:meow/keybind/general:csharp/sharper ()
     "Create `sharper' binds in the `csharp-mode' keybinds in `general' for `meow'."
     (keybind:meow:leader/local:bind-keys
         'csharp-mode-map
@@ -182,7 +182,7 @@
   ;; `Transient'
   ;;------------------------------
 
-  (defun mantle:meow/keybind/transient:csharp-mode ()
+  (defun mantle:meow/keybind/transient:csharp/sharper ()
     "Create the `sharper' binds in `csharp-mode' keybinds in `transient' for `meow'."
     (mantle:meow:leader/local:key csharp-mode-map
                                   "c" #'sharper-main-transient))
@@ -193,8 +193,8 @@
   ;;------------------------------
 
   (if (imp:provided? :keybinds 'user 'general 'meow)
-      (mantle:meow/keybind/general:csharp-mode)
-    (mantle:meow/keybind/transient:csharp-mode)))
+      (mantle:meow/keybind/general:csharp/sharper)
+    (mantle:meow/keybind/transient:csharp/sharper)))
 
 
 ;;------------------------------
