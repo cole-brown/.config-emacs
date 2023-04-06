@@ -245,21 +245,39 @@ not the full `general-define-key' in that regard."
       (apply #'general-define-key
              :keymaps keymaps
              binds)))
-  ;; (keybind:meow:leader/local:bind-keys nil "x" #'message)
+  ;; (keybind:meow:leader/local:bind-keys 'emacs-lisp-mode-map "x" (elisp:cmd (message "hello x")))
+  ;; (keybind:meow:leader/local:bind-keys 'emacs-lisp-mode-map "x" (elisp:cmd (message "hello x")) "y" (elisp:cmd (message "hello y")))
   ;; (keybind:meow:leader/local:bind-keys nil "x" #'message "y" '(ignore :which-key "nothing"))
 
 
+  (defvar int<keybind>:meow:leader/local:get/all:keymap nil
+    "`which-key-show-keymap' needs a global symbol for what keymap to show.")
+
+
+  (defvar keybind:meow:leader/local:get/all:exit
+      (list (cons :no-commands (lambda () (message "Local Leader: No local keybinds for `%S'." major-mode)))
+            (cons :commands    nil))
+    "Functions to run in `keybind:meow:leader/local:get/all' when done.
+
+Should be an alist of cons of: (keyword . function(symbol/lambda/etc))
+Keywords are: `:no-commands', `:commands'")
+
+
   (defun keybind:meow:leader/local:get/all ()
-    "Return a list of the local leader keymaps/commands."
+    "Command to show local leader keybinds in `which-key' and set those keybinds as a transient map."
     (interactive)
-    (if-let ((cmds (lookup-key (current-local-map) (kbd (keybind:leader/local:prefix :meow :emacs)))))
-        (progn
-          (set-transient-map cmds)
-          ;; (set-transient-map cmds
-          ;;                    nil ; predicate for staying in the keymap
-          ;;                    (lambda () (message "Goodbye %S" major-mode))) ; on-exit callback
-          (which-key--show-keymap "Local Leader:" cmds :prior-args :all))
-      (message "%S: No local keybinds." major-mode)))
+    (let ((cmds (lookup-key (current-local-map) (kbd (keybind:leader/local:prefix :meow :emacs)))))
+      (if (or (null cmds)     ; prefix is undefined in `current-local-map'
+              (numberp cmds)) ; First bit of prefix exists, but at some point you walked off the edge of the world (of local keybinds).
+          ;; No commands found; is there a func to run for that?
+          (when-let ((func (alist-get :no-commands keybind:meow:leader/local:get/all:exit)))
+            (funcall func))
+        ;; Found some commands. Show them in `which-key' and set as the overriding keymap so we can call them.
+        (setq int<keybind>:meow:leader/local:get/all:keymap cmds)
+        (which-key-show-keymap 'int<keybind>:meow:leader/local:get/all:keymap t)
+        (set-transient-map cmds
+                           nil ; predicate for staying in the keymap
+                           (alist-get :commands keybind:meow:leader/local:get/all:exit)))))
   ;; (keybind:meow:leader/local:get/all)
 
 
@@ -269,7 +287,7 @@ not the full `general-define-key' in that regard."
                       ;; key in global leader:
                       (keybind:leader/local:prefix :meow :personal)
                       ;; Command that will just return all the local mode prefix binds:
-                      '(keybind:meow:leader/local:get/all :which-key "Local Mode Leader"))
+                      '(keybind:meow:leader/local:get/all :which-key "Local Leader"))
 
 
   ;;------------------------------------------------------------------------------
