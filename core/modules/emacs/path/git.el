@@ -34,6 +34,37 @@ the path lib require `magit'."
 
 
 ;;------------------------------------------------------------------------------
+;; Branch Name
+;;------------------------------------------------------------------------------
+
+(defun path:vc/git:branch (path &optional require-magit?)
+  "Get name of current branch, or else current head.
+
+PATH should be an absolute path string.
+
+If REQUIRE-MAGIT? is nil, do not load `magit' if not found; just return nil.
+
+Returned string will be either:
+  - Name of branch.
+  - First seven of hash."
+  ;; Should we require `magit'?
+  (unless (featurep 'magit)
+    (when require-magit?
+      (require 'magit)))
+
+  ;; Can we even try to figure out a branch name?
+  (when (featurep 'magit)
+    ;; TODO: Does this work in a brand new git repo?
+    (let* (;; (path (downcase path)) ; Don't downcase blindly... some file systems are case-sensitive.
+           (default-directory (path:parent path))
+           (headish (magit-headish))
+           (branch (magit-name-branch headish)))
+      (or branch headish))))
+;; (path:vc/git:branch (path:buffer))
+;; (path:vc/git:branch (path:buffer) t)
+
+
+;;------------------------------------------------------------------------------
 ;; Git: Root Directory
 ;;------------------------------------------------------------------------------
 

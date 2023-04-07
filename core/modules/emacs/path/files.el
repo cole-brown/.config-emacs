@@ -1,6 +1,6 @@
 ;;; -*- lexical-binding: t; -*-
 
-;;-------------------------------------spy--------------------------------------
+;;------------------------------------file--------------------------------------
 ;;--                             File Functions                               --
 ;;----------------------------/mnt/hello/there.txt------------------------------
 
@@ -24,6 +24,7 @@ Example:
     -> \"bar.tar.gz\""
   (file-name-nondirectory (apply #'path:join path segment)))
 ;; (file:name "/foo" "bar.tar.gz")
+;; (file:name "/path/to/foo/")
 
 
 (defun file:name:base (path &rest segment)

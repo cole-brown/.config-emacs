@@ -19,7 +19,7 @@
 (require 'project)
 
 (imp:require :path 'path)
-(imp:require :path 'files)
+(imp:require :path 'git)
 
 
 ;;--------------------------------------------------------------------------------
@@ -46,6 +46,7 @@ Example 2: `dired' buffers... Sigh."
                   (current-buffer))))
     (with-current-buffer buffer
       (cond (buffer-file-truename) ;; Is it already all figured out for us?
+            (list-buffers-directory)
 
             ;; `dired' buffer? Use it's dir because... why does it not have a buffer file name?
             ;; TODO: Why would the original version use `string-equal' instead of `eq'?!
@@ -67,29 +68,59 @@ Example 2: `dired' buffers... Sigh."
 ;; Buffer Path Relative to Project
 ;;--------------------------------------------------------------------------------
 
-(defun path:buffer:project (&optional buffer)
-  "Get BUFFER's filepath as a relative path starting at project root directory.
+(defun path:buffer:project/alist (&optional buffer)
+  "Get an alist about BUFFER's filepath relative to its project root.
 
 BUFFER should be a buffer object, a buffer name string, or nil for
 `current-buffer'.
 
-If in a project, return relative path starting with project's root directory.
-Example:
-  (path:buffer:project \"~/.config/project-root/path/to/file.txt\")
-    -> \"project-root/path/to/file.txt\"
+If in a project, return an alist:
+  '((:project/type . symbol)                 ; e.g. `projectile'
+    (:project/name . \"dir-name\")           ; e.g. \".emacs.d\"
+    (:path         . \"path/to/buffer.el\")) ; relative to `:project/name' root
 
 If not in a project, return nil.
-Example:
-  (path:buffer:project \"~/.config/no-root/path/to/file.txt\")
-    -> nil
 
 If not a file-backed buffer, return nil."
   (when-let* ((path/buffer      (path:buffer buffer)) ;; Does buffer have a file and what is its actual name?
-              (path/project     (cdr-safe (project-current)))
-              (path/relative-to (path:parent (path:canonicalize:file path/project))))
+              (path/project     (cdr-safe (project-current))))
     ;; Ok; have the pieces. What's the relative path now?
-    (path:canonicalize:relative path/buffer path/relative-to)))
+    (list (cons :project/type (car-safe (project-current)))
+          (cons :project/name (dir:name path/project))
+          (cons :path  (path:canonicalize:relative path/buffer path/project)))))
+;; (path:buffer:project/alist)
+
+
+(defun path:buffer:project (&optional buffer pretty?)
+  "Return BUFFER's filepath relative to the project root.
+
+If not in a project, return nil.
+If not a file-backed buffer, return nil.
+
+If in a project, return:
+  - If PRETTY? is non-nil:
+    \"<project-name>:/relative/path/to/file.el\"
+  - If PRETTY? is nil:
+    \"<project-name>/relative/path/to/file.el\""
+  (when-let* ((alist (path:buffer:project/alist buffer))
+              (root (alist-get :project/name alist))
+              (path (alist-get :path alist))
+              (branch (path:vc/git:branch (path:buffer buffer))))
+    ;; Return the fancy/pretty version, or just the relative path string?
+    (concat (if pretty? "" "")
+            (if pretty?
+                (concat
+                 (propertize root 'face 'underline)
+                 (if branch
+                     (concat "⎇(" branch ")")
+                   nil))
+              root)
+            ;; Git uses ":/" as "the root of this git repo.
+            (if pretty? ":" "")
+            "/"
+            path)))
 ;; (path:buffer:project)
+;; (path:buffer:project nil :pretty)
 
 
 ;;------------------------------------------------------------------------------

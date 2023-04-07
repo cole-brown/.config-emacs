@@ -815,29 +815,6 @@ Returned PLIST will have these keys (if their values are non-nil).
 
 
 ;;------------------------------------------------------------------------------
-;; Names
-;;------------------------------------------------------------------------------
-
-(defun path:name:base (path &rest segment)
-  "Join PATH & any SEGMENTs, then remove any file extensions/suffixes.
-
-Example:
-  (path:name:base \"/foo\" \"bar.baz\")
-    -> \"/foo/bar\""
-  (file-name-sans-extension (path:join path segment)))
-
-
-(defun path:name:dir (path &rest segment)
-  "Join PATH & any SEGMENTs, then ensure it is a directory path.
-
-Example:
-  (path:name:dir \"/foo\" \"bar.baz\")
-    -> \"/foo/bar.baz/\""
-  (file-name-sans-extension (path:join path segment)))
-
-
-
-;;------------------------------------------------------------------------------
 ;; Normalize / Canonicalize
 ;;------------------------------------------------------------------------------
 

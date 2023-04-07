@@ -38,6 +38,8 @@
             :filename "path")
   (imp:load :feature  '(:path files)
             :filename "files")
+  (imp:load :feature  '(:path dir)
+            :filename "dir")
   (imp:load :feature  '(:path regex)
             :filename "regex")
   (imp:load :feature  '(:path git)
