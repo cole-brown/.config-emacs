@@ -177,6 +177,18 @@ See `int<path>:system:types' for system types it can handle."
 ;; (path:absolute? "/")
 
 
+(defun path:relative? (path)
+  "Return non-nil if PATH is a relative path.
+
+`file-name-absolute-p' only cares about current system; it is not able to
+say \"we're on linux but yeah, 'C:/' is absolute.\"
+
+This understands paths regardless of current system type.
+
+See `int<path>:system:types' for system types it can handle."
+  (not (path:absolute? path)))
+
+
 (defun path:exists? (path &optional type)
   "Return non-nil if PATH exists.
 
@@ -818,6 +830,23 @@ Returned PLIST will have these keys (if their values are non-nil).
 ;; Normalize / Canonicalize
 ;;------------------------------------------------------------------------------
 
+(defun path:directory (path &rest segment)
+  "Join PATH and SEGMENTs, then ensure it is a directory path."
+   (file-name-as-directory (apply #'path:join path segment)))
+;; (path:directory "/path/to/dir.ectory")
+;; (path:dir "/path/to/dir.ectory")
+
+(defalias 'path:dir 'path:directory)
+
+
+(defun path:file (path &rest segment)
+  "Join PATH and SEGMENTs, then ensure it is _NOT_ a directory path."
+  ;; Force the return value to be a file path by ensuring trailing "/" and then
+  ;; removing it.
+  (directory-file-name (apply #'path:directory path segment)))
+;; (path:file "/path/to/file.txt/")
+
+
 (defun path:canonicalize:file (path &rest segment)
   "Canonicalize/normalize a file PATH and path SEGMENTS.
 
@@ -825,14 +854,11 @@ Return an absolute path.
 
 Does not fix or validate PATH or SEGMENT components; they are expected to be
 valid."
-  ;; Force the return value to be a file path by ensuring trailing "/" and then
-  ;; removing it.
-  (directory-file-name
-   (file-name-as-directory
-    ;; Get a normalized path.
-    (expand-file-name (apply #'path:join
-                             path
-                             segment)))))
+  (path:file
+   ;; Get a normalized path.
+   (expand-file-name (apply #'path:join
+                            path
+                            segment))))
 ;; (path:canonicalize:file "~" "personal" "something.exe" "zort.txt")
 ;; (path:canonicalize:file "~" "personal" "something.exe" ".")
 ;; (path:canonicalize:file "~" "personal" "something.exe" "..")
@@ -850,7 +876,7 @@ Return an absolute path.
 Does not fix or validate PATH or SEGMENT components; they are expected to be
 valid."
   ;; Fully qualify base as start of return value.
-  (file-name-as-directory (apply #'path:canonicalize:file path segment)))
+  (path:directory (apply #'path:canonicalize:file path segment)))
 ;; (path:canonicalize:dir "~" "personal" "something" "zort")
 
 
