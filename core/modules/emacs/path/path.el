@@ -310,11 +310,17 @@ Special Cases:
    ;;   (file-name-directory "relative")
    ;;     -> nil
    ;; Avoid that; use empty string instead of nil.
-   (or (file-name-directory path)
+   (or (file-name-directory
+        ;; But first make sure PATH doesn't have a trailing slash.
+        ;; Otherwise all we do is strip the slash.
+        ;; Example: "/path/to/foo/" should have a parent of:
+        ;; "/path/to" aka "/path/to/", not "/path/to/foo".
+        (path:file path))
        "")))
 ;; (path:parent "relative/path/to/foo.test")
 ;; (path:parent "relative")
 ;; (path:parent "/")
+;; (path:parent "/path/to/foo/")
 
 
 ;; TODO: Move to regex.el?
