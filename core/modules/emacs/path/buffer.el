@@ -116,8 +116,9 @@ If in a project, return:
                    nil))
               root)
             ;; Git uses ":/" as "the root of this git repo.
-            (if pretty? ":" "")
-            "/"
+            (if pretty?
+                path:vc/git:rooted
+              "/")
             path)))
 ;; (path:buffer:project)
 ;; (path:buffer:project nil :pretty)
@@ -142,8 +143,8 @@ Optional keys:
     - If non-nil, copy the buffer's parent directory path instead of the
       buffer's own path.
   - `:relative?' (RELATIVE?)
-    - If non-nil, copy the buffer's path relative to the project root instead of
-      the absolute path.
+    - If non-nil, copy the buffer's path relative to & including the project
+      root, instead of the absolute path.
 
 Return a string: either a path name or a newline separated list of path names.
 
@@ -172,20 +173,12 @@ http://xahlee.info/emacs/emacs/emacs_copy_file_path.html"
     (when relative?
       (setq root (path:project:root (nth 0 paths)))
       (unless root
-        (error "path:buffer:copy: No project root for path! Cannot determine relative path(s) for: %s" paths)))
+        (error "path:buffer:copy: No project root for path! Cannot determine relative path(s) for: %s"
+               paths)))
 
     ;;------------------------------
     ;; What Part of Path(s) to Copy?
     ;;------------------------------
-    (when relative?
-      ;; Swap `paths' out for relative paths.
-      (let (paths/rel)
-        (dolist (path paths)
-          (push (path:canonicalize:relative path
-                                            (path:project:root path))
-                paths/rel))
-        (setq paths paths/rel)))
-
     (when parent?
       ;; Swap `paths' out for their parents.
       (let (paths/parent)
@@ -193,6 +186,16 @@ http://xahlee.info/emacs/emacs/emacs_copy_file_path.html"
           (push (path:parent path)
                 paths/parent))
         (setq paths paths/parent)))
+
+    (when relative?
+      ;; Swap `paths' out for relative paths.
+      (let ((project (file:name root))
+            paths/rel)
+        (dolist (path paths)
+          (push (path:vc/git:rooted project
+                                    (path:canonicalize:relative path root))
+                paths/rel))
+        (setq paths paths/rel)))
 
     ;;------------------------------
     ;; Copy Path(s)
@@ -230,8 +233,8 @@ Return a path string."
   (path:buffer:copy :parent? parent?))
 
 
-(defun path:cmd:buffer:copy:relative (&optional parent?)
-  "Copy the buffer's current path to `kill-ring'.
+(defun path:cmd:buffer:copy:project (&optional parent?)
+  "Copy the buffer's path, relative to/including project root, to `kill-ring'.
 
 If in a file buffer, copy the file's path.
 

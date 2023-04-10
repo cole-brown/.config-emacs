@@ -20,6 +20,43 @@
 ;; TODO: how to autoload / lazy require magit for these functions?
 
 
+;;--------------------------------------------------------------------------------
+;; Pretty Repo Paths
+;;--------------------------------------------------------------------------------
+
+(defcustom path:vc/git:rooted ":/"
+  "String to use to indicate a path is relative to the project/repository root.
+
+Default is \":/\". Why \":/\"? It's 'git pathspec' speak for \"the root of the
+working tree\" aka the repository's root.
+
+See Git's Pathspec:
+https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec"
+  :group 'path:group
+  :type '(string))
+
+
+(defun path:vc/git:rooted (project-name &rest relative-path)
+  "Return a path rooted at the PROJECT-NAME/repository.
+
+PROJECT-NAME should be a string of the project's name aka the name of the
+directory that has the '.git' folder.
+
+RELATIVE-PATH should be string(s) of the path relative to the PROJECT directory.
+
+Return a string of PROJECT-NAME + \":/\" + RELATIVE-PATH
+
+Why \":/\"? It's 'git pathspec' speak for \"the root of the working tree\" aka
+the repository's root.
+
+See Git's Pathspec:
+https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec"
+  (concat project-name
+          path:vc/git:rooted
+          (apply #'path:join relative-path)))
+;; (path:vc/git:rooted "foo" "path/to/bar")
+
+
 ;;------------------------------------------------------------------------------
 ;; Require `magit'
 ;;------------------------------------------------------------------------------

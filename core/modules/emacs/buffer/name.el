@@ -185,7 +185,7 @@ Special buffers are:
 ;; See `:path' module functions:
 ;;   - `path:buffer:copy'
 ;;   - `path:cmd:buffer:copy:absolute'
-;;   - `path:cmd:buffer:copy:relative'
+;;   - `path:cmd:buffer:copy:project'
 
 
 ;;------------------------------------------------------------------------------

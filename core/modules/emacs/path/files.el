@@ -22,7 +22,7 @@ Example:
   (file:name \"/foo/bar.tar.gz\")
   (file:name \"c:/foo/bar.tar.gz\")
     -> \"bar.tar.gz\""
-  (file-name-nondirectory (apply #'path:join path segment)))
+  (file-name-nondirectory (apply #'path:file path segment)))
 ;; (file:name "/foo" "bar.tar.gz")
 ;; (file:name "/path/to/foo/")
 
