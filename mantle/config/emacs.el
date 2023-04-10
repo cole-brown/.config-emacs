@@ -23,6 +23,7 @@
 (imp:require :datetime 'format)
 (imp:require :buffer 'type)
 (imp:provide :innit 'vars)
+(imp:require :path 'buffer)
 
 
 ;;------------------------------------------------------------------------------
@@ -92,10 +93,23 @@
   ;; This variable has the same structure as `mode-line-format', except that
   ;; the %c, %C, and %l constructs are ignored.  It is used only on frames for
   ;; which no explicit name has been set (see `modify-frame-parameters').
-  (frame-title-format '("｢%b｣" ; buffer name
-                        " @" ; system/host name
-                        (:eval (or (file-remote-p default-directory 'host) system-name))
-                        " — Emacs " ; And I guess we should say what we are...
+  ;;
+  ;; Basic Frame Title:
+  ;;   (frame-title-format '("｢%b｣" ; buffer name
+  ;;                         " @" ; system/host name
+  ;;                         (:eval (or (file-remote-p default-directory 'host) system-name))
+  ;;                         " — Emacs " ; And I guess we should say what we are...
+  ;;                         emacs-version))
+  ;; Bit Fancier:
+  ;; Can't propertize text in the frame title? :'(
+  (frame-title-format '(;; Buffer Name
+                        (:eval (or (path:buffer:project nil :pretty)
+                                   "%b"))
+                        ;; Remote Host Name
+                        (:eval (when-let ((host/remote (file-remote-p default-directory 'host)))
+                                 (concat " ⊶ " host/remote)))
+                        ;; Program Name/Version
+                        " — Emacs "
                         emacs-version))
 
   ;; This is for the Emacs icon thingy in the OS app list/taskbar.
