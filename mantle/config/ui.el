@@ -14,6 +14,7 @@
 ;;; Code:
 
 
+(imp:require :path)
 (imp:require :buffer 'name)
 (imp:require :datetime 'format)
 
@@ -32,14 +33,16 @@
   ;;---
   ;; Buffer Name
   ;;---
-  ;; Set uniquify buffer/path separator to e.g. "file.txt:path/to"
-  (uniquify-buffer-name-style 'post-forward)
+  ;; Set uniquify style to e.g. "file.txt:path/to"
+  ;;   (uniquify-buffer-name-style 'post-forward)
+  ;; Set uniquify style to a custom thing:
+  (uniquify-buffer-name-style #'path:project:uniquify)
 
   ;; I think ':' is better than '|' for `post-forward' style.
   (uniquify-separator ":")
 
   ;; Have at least this many dirs in buffer names.
-  (uniquify-min-dir-content 1)
+  (uniquify-min-dir-content 3)
 
   ;; Add path separator to dired buffer names.
   (uniquify-trailing-separator-p t)
