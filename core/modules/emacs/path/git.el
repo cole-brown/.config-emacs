@@ -189,79 +189,94 @@ If PATH is not in the `current-project' path, return nil."
 ;; (path:project:current/alist "/tmp")
 
 
+;;------------------------------------------------------------------------------
+;; Uniquify
+;;------------------------------------------------------------------------------
+
 (defun path:project:uniquify (base extra-strings)
   "`uniquify-buffer-name-style' function for unique-by-project-path buffer names.
 
 BASE should be a string.
 EXTRA-STRINGS should be a string.
 
-Return a string that `uniquify' should use to name the buffer."
-  ;; Detect `dired', etc paths and do not append the base name?
-  (if-let* ((path (cond
-                   ;; If we have no BASE, um... assume it's just a dir maybe? IDK.
-                   ;; When does this come up? It's a check in the `uniquify' source code...
-                   ;; I think it's when it's a directory? See help for `uniquify-get-proposed-name'.
-                   ((or (not (stringp base))
-                        (string-empty-p base))
-                    default-directory)
+Return a string that `uniquify' should use to name the buffer.
 
-                   ;; `uniquify' has been set up to notify us about dirs? Perfect!
-                   ((and uniquify-trailing-separator-p
-                         (path:directory? base))
-                    ;; Have a directory... just use `default-directory'.
-                    default-directory)
+NOTE: Cannot use a lot of very useful functions here, as the buffer is likely
+nascent and doesn't have things like variable `buffer-file-name' or `major-mode'
+defined yet."
+  (cond
+   ;;------------------------------
+   ;; Special Modes
+   ;;------------------------------
+   ;; NOTE: Cannot use e.g. `major-mode' as it's not been set yet... :|
 
-                   ((and uniquify-trailing-separator-p
-                         (not (path:directory? base)))
-                    (path:join default-directory base))
+   ;; Magit already does a lot to uniquify its buffer names.
+   ((string-match-p (rx-to-string '(sequence string-start
+                                             "magit"
+                                             (optional "-"
+                                                       (one-or-more alphanumeric))
+                                             ": "
+                                             (one-or-more printing)
+                                             string-end)
+                                  :no-group)
+                    base)
+    ;; Just use the base name.
+    base)
 
-                   ;; ???
-                   (t
-                    "/TODO/this/path/???")))
-            (project      (path:project:current/alist path))
-            (project/root (alist-get :project/name project))
-            (project/path (alist-get :path         project)))
-      (let ((project/branch (path:vc/git:branch path)))
-        ;; Return the fancy/pretty version, or just the relative path string?
-        (concat (propertize project/root 'face 'underline)
-                ;; (if project/branch
-                ;;     (concat "⎇(" project/branch ")")
-                ;;   nil)
-                ;; Git uses ":/" as "the root of this git repo.
-                ":/"
-                project/path))
+   ;;------------------------------
+   ;; File-Visiting Buffers
+   ;;------------------------------
+   ;; Do the full buffer naming shenanigans... if possible, else skip down to fallback.
+   ((when-let* ((path (cond
+                       ;; If we have no BASE, um... assume it's just a dir maybe? IDK.
+                       ;; When does this come up? It's a check in the `uniquify' source code...
+                       ;; I think it's when it's a directory? See help for `uniquify-get-proposed-name'.
+                       ((or (not (stringp base))
+                            (string-empty-p base))
+                        default-directory)
 
+                       ;; `uniquify' has been set up to notify us about dirs? Perfect!
+                       ((and uniquify-trailing-separator-p
+                             (path:directory? base))
+                        ;; Have a directory... just use `default-directory'.
+                        default-directory)
+
+                       ((and uniquify-trailing-separator-p
+                             (not (path:directory? base)))
+                        (path:join default-directory base))
+
+                       ;; Not our problem; goto to the `cond' fallback.
+                       (t
+                        nil)))
+                (project      (path:project:current/alist path))
+                (project/root (alist-get :project/name project))
+                (project/path (alist-get :path         project)))
+      ;; Return the fancy/pretty version, or just the relative path string?
+      (concat (propertize project/root 'face 'underline)
+              path:vc/git:rooted
+              project/path)))
+
+   ;;------------------------------
+   ;; Default/Fallback
+   ;;------------------------------
+   (t
+    ;;---
+    ;; Default
+    ;;---
     ;; No simple fallback for using `uniquify' itself... So just do something
     ;; dumb and simple?
-    (concat (mapconcat #'identity extra-strings "/") "/" base)))
+    (concat (mapconcat #'identity extra-strings "/") "/" base)
+
+    ;;---
+    ;; Alternatives:
+    ;;---
+    ;; Do something similar to `uniquify-buffer-name-style' `post-forward'?
+    ;;     (concat base ":" (mapconcat #'identity extra-strings "/"))
+
+    ;; Just use the base? IDK?
+    ;; base
+    )))
 ;; (path:project:uniquify "base.txt" '("path" "to"))
-
-
-;; (defun path:buffer:project (&optional buffer pretty?)
-;;   "Return BUFFER's filepath relative to the project root.
-
-;; If not in a project, return nil.
-;; If not a file-backed buffer, return nil.
-
-;; If in a project, return:
-;;   - If PRETTY? is non-nil:
-;;     \"｢<project-name>｣:/relative/path/to/file.el\"
-;;   - If PRETTY? is nil:
-;;     \"<project-name>/relative/path/to/file.el\""
-;;   (when-let* ((alist (path:buffer:project/alist buffer))
-;;               (root (alist-get :project/name alist))
-;;               (path (alist-get :path alist)))
-;;     ;; Return the fancy/pretty version, or just the relative path string?
-;;     (concat (if pretty? "｢" "")
-;;             root
-;;             ;; Git uses ":/" as "the root of this git repo.
-;;             (if pretty? "｣:" "")
-;;             "/"
-;;             path)))
-;; ;; (path:buffer:project)
-;; ;; (path:buffer:project nil :pretty)
-;; ;; "｢emacs-sn004｣:/core/modules/emacs/path/buffer.el"
-;; ;; emacs-sn004:/core/modules/emacs/path/buffer.el"
 
 
 ;;------------------------------------------------------------------------------
