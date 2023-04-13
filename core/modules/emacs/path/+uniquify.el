@@ -35,7 +35,7 @@
   :type  'boolean)
 
 
-(defcustom path:uniquify:ignore/buffer:name/rx
+(defconst path:uniquify:ignore/buffer:name/rx:defaults
   '(;;---
     ;; Magit Buffers
     ;;---
@@ -43,7 +43,13 @@
     (optional "-"
               (one-or-more alphanumeric))
     ": "
-    (one-or-more printing))
+    (one-or-more printing)))
+
+
+(defcustom path:uniquify:ignore/buffer:name/rx
+  (append '(and string-start)
+          path:uniquify:ignore/buffer:name/rx:defaults
+          '(string-end))
   "`rx' Regular Expression Sexpr for buffer names that we should _not_ mess with.
 
 Will get `string-start' and `string-end' added to it before being compiled to a
@@ -68,10 +74,9 @@ Add on to this variable like so:
 
 (defun path:uniquify:ignore/buffer:name/rx ()
   "Compile variable `path:uniquify:ignore/buffer:name/rx' to a regex string."
-  (rx-to-string (append '(sequence string-start)
-                        path:uniquify:ignore/buffer:name/rx
-                        '(string-end))
-                      :no-group))
+  (rx-to-string path:uniquify:ignore/buffer:name/rx :no-group))
+;; path:uniquify:ignore/buffer:name/rx
+;; (pp path:uniquify:ignore/buffer:name/rx)
 ;; (path:uniquify:ignore/buffer:name/rx)
 
 

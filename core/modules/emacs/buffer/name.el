@@ -79,37 +79,37 @@ Will need to update (or make smarter) if get more actual priority levels."
 
 (defcustom buffer:regex:specials
   (list
-   (list 'or
-    ;;---
-    ;; Emacs
-    ;;---
-    ;; Special buffers start with "*", optionally with leading space.
-    '(group
+   'or
+   ;;---
+   ;; Emacs
+   ;;---
+   ;; Special buffers start with "*", optionally with leading space.
+   '(group
      (optional " ")
      "*" ;; literal asterisk
      (one-or-more printing)
      "*")
 
-    ;;---
-    ;; :emacs/buffer
-    ;;---
-    ;; Bookended Buffer Names are special
-    (list 'group
-     '(optional " ") ;; Allow optional make-less-visible leading space.
-     ;; Start Bookend
-     (list 'or
-           (nth 0 buffer:format:bookend/normal)
-           (nth 0 buffer:format:bookend/high)
-           (nth 0 buffer:format:bookend/info))
+   ;;---
+   ;; :emacs/buffer
+   ;;---
+   ;; Bookended Buffer Names are special
+   (list 'group
+         '(optional " ") ;; Allow optional make-less-visible leading space.
+         ;; Start Bookend
+         (list 'or
+               (nth 0 buffer:format:bookend/normal)
+               (nth 0 buffer:format:bookend/high)
+               (nth 0 buffer:format:bookend/info))
 
-     ;; Actual Buffer Name
-     '(one-or-more printing)
+         ;; Actual Buffer Name
+         '(one-or-more printing)
 
-     ;; End Bookend
-     (list 'or
-           (nth 1 buffer:format:bookend/normal)
-           (nth 1 buffer:format:bookend/high)
-           (nth 1 buffer:format:bookend/info)))))
+         ;; End Bookend
+         (list 'or
+               (nth 1 buffer:format:bookend/normal)
+               (nth 1 buffer:format:bookend/high)
+               (nth 1 buffer:format:bookend/info))))
   "`rx' Regular Expression Sexpr for matching a special buffer name string.
 
 Special buffers are:
@@ -124,9 +124,10 @@ Special buffers are:
 
 (defun buffer:regex:specials ()
   "Compile variable `buffer:regex:specials' to a regex string."
-  (rx-to-string (append '(sequence line-start)
-                        buffer:regex:specials
-                        '(line-end))
+  (rx-to-string (list 'and
+                      'line-start
+                      buffer:regex:specials
+                      'line-end)
                 :no-group))
 ;; (buffer:regex:specials)
 
