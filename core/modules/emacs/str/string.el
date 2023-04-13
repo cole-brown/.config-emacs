@@ -71,7 +71,7 @@ FUNC should be a function that returns a string and should have parameters:
   (defun FUNC (string [optional-args]) ...)"
   (save-excursion
     (replace-region-contents start end
-                             (apply func (buffer-substring-no-properties (point-min) (point-max)) args))))
+                             (apply func (buffer-substring-no-properties start end) args))))
 
 
 ;; TODO: (str:thing-at-point->region thing-type ...)
