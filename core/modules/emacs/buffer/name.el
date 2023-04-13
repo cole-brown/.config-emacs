@@ -78,17 +78,13 @@ Will need to update (or make smarter) if get more actual priority levels."
 
 
 (defcustom buffer:regex:specials
-  (rx
-   ;;---
-   ;; Begin
-   ;;---
-   line-start
-   (or
+  (list
+   (list 'or
     ;;---
     ;; Emacs
     ;;---
     ;; Special buffers start with "*", optionally with leading space.
-    (group
+    '(group
      (optional " ")
      "*" ;; literal asterisk
      (one-or-more printing)
@@ -98,30 +94,41 @@ Will need to update (or make smarter) if get more actual priority levels."
     ;; :emacs/buffer
     ;;---
     ;; Bookended Buffer Names are special
-    (group
-     (optional " ") ;; Allow optional make-less-visible leading space.
+    (list 'group
+     '(optional " ") ;; Allow optional make-less-visible leading space.
      ;; Start Bookend
-     (or (eval (nth 0 buffer:format:bookend/normal))
-         (eval (nth 0 buffer:format:bookend/high))
-         (eval (nth 0 buffer:format:bookend/info)))
+     (list 'or
+           (nth 0 buffer:format:bookend/normal)
+           (nth 0 buffer:format:bookend/high)
+           (nth 0 buffer:format:bookend/info))
 
      ;; Actual Buffer Name
-     (one-or-more printing)
+     '(one-or-more printing)
 
      ;; End Bookend
-     (or (eval (nth 1 buffer:format:bookend/normal))
-         (eval (nth 1 buffer:format:bookend/high))
-         (eval (nth 1 buffer:format:bookend/info)))))
-   ;;---
-   ;; Done
-   ;;---
-   line-end)
-  "Regexp for matching a special buffer name string. Special buffers are:
+     (list 'or
+           (nth 1 buffer:format:bookend/normal)
+           (nth 1 buffer:format:bookend/high)
+           (nth 1 buffer:format:bookend/info)))))
+  "`rx' Regular Expression Sexpr for matching a special buffer name string.
+
+Special buffers are:
   - Emacs' special, visible \"*<name>*\" buffers.
   - Emacs' special, less-visible \" *<name>*\" buffers (leading space).
   - :emacs/buffer's special bookended buffers: \"§- <name> -§\" (and other bookends)."
   :group 'buffer:group
-  :type 'regexp)
+  :type 'sexp)
+;; buffer:regex:specials
+;; (rx-to-string buffer:regex:specials :no-group)
+
+
+(defun buffer:regex:specials ()
+  "Compile variable `buffer:regex:specials' to a regex string."
+  (rx-to-string (append '(sequence line-start)
+                        buffer:regex:specials
+                        '(line-end))
+                :no-group))
+;; (buffer:regex:specials)
 
 
 ;;-----------------------------------------------------------------------------
@@ -170,7 +177,7 @@ Special buffers are:
   - Emacs' special, less-visible \" *<name>*\" buffers (leading space).
   - :emacs/buffer's special bookended buffers: \"§- <name> -§\" (and other bookends)."
   (string-match-p
-   buffer:regex:specials
+   (buffer:regex:specials)
    (if (bufferp buffer-or-name)
        (buffer-name buffer-or-name)
      buffer-or-name)))

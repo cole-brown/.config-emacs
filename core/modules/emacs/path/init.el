@@ -56,6 +56,8 @@
             :filename "git")
   (imp:load :feature  '(:path buffer)
             :filename "buffer")
+  (imp:load :feature  '(:path +uniquify)
+            :filename "+uniquify")
 
 
   ;; End load timing.

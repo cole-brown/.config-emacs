@@ -162,6 +162,34 @@ If PATH is in a git repo, return:
 
 
 ;;--------------------------------------------------------------------------------
+;; Git
+;;--------------------------------------------------------------------------------
+
+(defun path:git:current/alist (path)
+  "Get an alist about PATH's filepath relative to the current Git repository root.
+
+PATH should be an absolute path string.
+
+If in a Git repository, return an alist:
+  '((:project/type . `git')                  ; Always `git'.
+    (:project/name . \"root-dir-name\")      ; e.g. \".emacs.d\"
+    (:path         . \"path/to/buffer.el\")) ; relative to `:project/name' root
+
+If PATH is not in a Git repository, return nil."
+  (when-let* ((path/project  (path:vc/git:root/path))
+              (path/relative (path:canonicalize:relative path path/project))
+              ;; If we don't end up with a relative path, we're not in the
+              ;; current project and we have no idea what's going on, so...
+              ;; return nil.
+              (path-is-relative? (path:relative? path/relative)))
+    (list (cons :project/type 'git)
+          (cons :project/name (dir:name path/project))
+          (cons :path         path/relative))))
+;; (path:git:current/alist (path:buffer))
+;; (path:git:current/alist "/tmp")
+
+
+;;--------------------------------------------------------------------------------
 ;; Project
 ;;--------------------------------------------------------------------------------
 
@@ -189,94 +217,23 @@ If PATH is not in the `current-project' path, return nil."
 ;; (path:project:current/alist "/tmp")
 
 
-;;------------------------------------------------------------------------------
-;; Uniquify
-;;------------------------------------------------------------------------------
+(defun path:project:buffer/name (project-alist &optional pretty?)
+  "Return a buffer name string based off of PROJECT-ALIST.
 
-(defun path:project:uniquify (base extra-strings)
-  "`uniquify-buffer-name-style' function for unique-by-project-path buffer names.
+PROJECT-ALIST should be the return value of `path:project:current/alist'.
 
-BASE should be a string.
-EXTRA-STRINGS should be a string.
-
-Return a string that `uniquify' should use to name the buffer.
-
-NOTE: Cannot use a lot of very useful functions here, as the buffer is likely
-nascent and doesn't have things like variable `buffer-file-name' or `major-mode'
-defined yet."
-  (cond
-   ;;------------------------------
-   ;; Special Modes
-   ;;------------------------------
-   ;; NOTE: Cannot use e.g. `major-mode' as it's not been set yet... :|
-
-   ;; Magit already does a lot to uniquify its buffer names.
-   ((string-match-p (rx-to-string '(sequence string-start
-                                             "magit"
-                                             (optional "-"
-                                                       (one-or-more alphanumeric))
-                                             ": "
-                                             (one-or-more printing)
-                                             string-end)
-                                  :no-group)
-                    base)
-    ;; Just use the base name.
-    base)
-
-   ;;------------------------------
-   ;; File-Visiting Buffers
-   ;;------------------------------
-   ;; Do the full buffer naming shenanigans... if possible, else skip down to fallback.
-   ((when-let* ((path (cond
-                       ;; If we have no BASE, um... assume it's just a dir maybe? IDK.
-                       ;; When does this come up? It's a check in the `uniquify' source code...
-                       ;; I think it's when it's a directory? See help for `uniquify-get-proposed-name'.
-                       ((or (not (stringp base))
-                            (string-empty-p base))
-                        default-directory)
-
-                       ;; `uniquify' has been set up to notify us about dirs? Perfect!
-                       ((and uniquify-trailing-separator-p
-                             (path:directory? base))
-                        ;; Have a directory... just use `default-directory'.
-                        default-directory)
-
-                       ((and uniquify-trailing-separator-p
-                             (not (path:directory? base)))
-                        (path:join default-directory base))
-
-                       ;; Not our problem; goto to the `cond' fallback.
-                       (t
-                        nil)))
-                (project      (path:project:current/alist path))
-                (project/root (alist-get :project/name project))
-                (project/path (alist-get :path         project)))
-      ;; Return the fancy/pretty version, or just the relative path string?
-      (concat (propertize project/root 'face 'underline)
-              path:vc/git:rooted
-              project/path)))
-
-   ;;------------------------------
-   ;; Default/Fallback
-   ;;------------------------------
-   (t
-    ;;---
-    ;; Default
-    ;;---
-    ;; No simple fallback for using `uniquify' itself... So just do something
-    ;; dumb and simple?
-    (concat (mapconcat #'identity extra-strings "/") "/" base)
-
-    ;;---
-    ;; Alternatives:
-    ;;---
-    ;; Do something similar to `uniquify-buffer-name-style' `post-forward'?
-    ;;     (concat base ":" (mapconcat #'identity extra-strings "/"))
-
-    ;; Just use the base? IDK?
-    ;; base
-    )))
-;; (path:project:uniquify "base.txt" '("path" "to"))
+If PRETTY? is non-nil, return a pretty, propertized string.
+Otherwise, return an unpropertized string."
+  (concat
+   ;; project's name
+   (if pretty?
+       (propertize (alist-get :project/name project-alist) 'face 'underline)
+     (alist-get :project/name project-alist))
+   ;; separator
+   path:vc/git:rooted
+   ;; relative path
+   (alist-get :path project-alist)))
+;; (path:project:buffer/name (path:project:current/alist (path:abbreviate (path:current:file))))
 
 
 ;;------------------------------------------------------------------------------
