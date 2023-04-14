@@ -55,26 +55,31 @@
 
 
 (defcustom buffer:regex:bookend
-  (rx
-   ;; Start Bookend
-   ;; Will need to update (or make smarter) if get more actual priority levels.
-   (or (eval (nth 0 buffer:format:bookend/normal))
-       (eval (nth 0 buffer:format:bookend/high))
-       (eval (nth 0 buffer:format:bookend/info)))
+  (list 'group
+        '(optional " ") ; Allow optional make-less-visible leading space.
 
-   ;; Actual Buffer Name
-   (one-or-more printing)
+        ;; Start Bookend
+        (list 'or
+              (nth 0 buffer:format:bookend/normal)
+              (nth 0 buffer:format:bookend/high)
+              (nth 0 buffer:format:bookend/info))
 
-   ;; End Bookend
-   ;; Will need to update (or make smarter) if get more actual priority levels.
-   (or (eval (nth 1 buffer:format:bookend/normal))
-       (eval (nth 1 buffer:format:bookend/high))
-       (eval (nth 1 buffer:format:bookend/info))))
+        '(optional " ") ; Optional padding space before name.
 
+        ;; Actual Buffer Name
+        '(one-or-more printing)
+
+        '(optional " ") ; Optional padding space after name.
+
+        ;; End Bookend
+        (list 'or
+              (nth 1 buffer:format:bookend/normal)
+              (nth 1 buffer:format:bookend/high)
+              (nth 1 buffer:format:bookend/info)))
   "Regex for matching a bookended buffer name string.
 Will need to update (or make smarter) if get more actual priority levels."
   :group 'buffer:group
-  :type 'regexp)
+  :type  'sexp)
 
 
 (defcustom buffer:regex:specials
@@ -94,22 +99,7 @@ Will need to update (or make smarter) if get more actual priority levels."
    ;; :emacs/buffer
    ;;---
    ;; Bookended Buffer Names are special
-   (list 'group
-         '(optional " ") ;; Allow optional make-less-visible leading space.
-         ;; Start Bookend
-         (list 'or
-               (nth 0 buffer:format:bookend/normal)
-               (nth 0 buffer:format:bookend/high)
-               (nth 0 buffer:format:bookend/info))
-
-         ;; Actual Buffer Name
-         '(one-or-more printing)
-
-         ;; End Bookend
-         (list 'or
-               (nth 1 buffer:format:bookend/normal)
-               (nth 1 buffer:format:bookend/high)
-               (nth 1 buffer:format:bookend/info))))
+   buffer:regex:bookend)
   "`rx' Regular Expression Sexpr for matching a special buffer name string.
 
 Special buffers are:
@@ -117,7 +107,7 @@ Special buffers are:
   - Emacs' special, less-visible \" *<name>*\" buffers (leading space).
   - :emacs/buffer's special bookended buffers: \"§- <name> -§\" (and other bookends)."
   :group 'buffer:group
-  :type 'sexp)
+  :type  'sexp)
 ;; buffer:regex:specials
 ;; (rx-to-string buffer:regex:specials :no-group)
 
