@@ -69,19 +69,26 @@ Will get `string-start' and `string-end' added to it before being compiled to a
 regex string.
 
 Add on to this variable like so:
-
 \(customize-set-variable
  path:uniquify:ignore/buffer:name/rx
- (list 'or
-       ;; Be more idempotent; use the original value:
-       (list 'and (default-value 'path:uniquify:ignore/buffer:name/rx))
-       ;; Add my custom buffer regexes on:
-       ;; say... ignore the asterisk buffers?
-       '(group
-         (optional \" \")
-         \"*\" ;; literal asterisk
-         (one-or-more printing)
-         \"*\")))"
+ (list 'and
+       'string-start
+       (list 'or
+             ;; The defaults...
+             path:uniquify:ignore/buffer:name/rx:defaults
+             ;; Or my special buffers.
+             '(group
+               (optional \" \")
+               (or \"§-\" \"§!\" \"ⓘ-\")
+               (optional \" \")
+               (one-or-more printing)
+               (optional \" \")
+               (or \"-§\" \"!§\" \"-ⓘ\"))
+             buffer:regex:bookend)
+       'string-end))
+
+Use function `path:uniquify:ignore/buffer:name/rx' to see if what you created
+compiles to a regex string or not."
   :group 'path:group
   :type  'sexp)
 
