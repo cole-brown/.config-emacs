@@ -23,40 +23,73 @@
 ;; Buffer Names
 ;;------------------------------------------------------------------------------
 
-(imp:use-package uniquify
-  :ensure nil ; This is an Emacs built-in feature.
+;;------------------------------
+;; `uniquify'
+;;------------------------------
+;; (imp:use-package uniquify
+;;   :ensure nil ; This is an Emacs built-in feature.
+;;
+;;   ;;------------------------------
+;;   :custom
+;;   ;;------------------------------
+;;
+;;   ;;---
+;;   ;; Buffer Name
+;;   ;;---
+;;   ;; Set uniquify style to e.g. "file.txt:path/to"
+;;   (uniquify-buffer-name-style 'post-forward)
+;;   ;; Set uniquify style to a custom thing:
+;;   ;;   (uniquify-buffer-name-style #'path:project:uniquify)
+;;
+;;   ;; I think ':' is better than '|' for `post-forward' style.
+;;   (uniquify-separator ":")
+;;
+;;   ;; Have at least this many dirs in buffer names.
+;;   (uniquify-min-dir-content 3)
+;;
+;;   ;; Add path separator to dired buffer names.
+;;   (uniquify-trailing-separator-p t)
+;;
+;;   ;;---
+;;   ;; Other uniquify Settings
+;;   ;;---
+;;   ;; Rename buffers after killing a buffer. E.g. de-uniquify others as possible.
+;;   (uniquify-after-kill-buffer-p t)
+;;
+;;   ;; Ignored for uniquifying.
+;;   ;; Don't muck with my or Emacs' special buffers.
+;;   (uniquify-ignore-buffers-re (buffer:regex:specials)))
 
-  ;;------------------------------
-  :custom
-  ;;------------------------------
 
-  ;;---
-  ;; Buffer Name
-  ;;---
-  ;; Set uniquify style to e.g. "file.txt:path/to"
-  ;;   (uniquify-buffer-name-style 'post-forward)
-  ;; Set uniquify style to a custom thing:
-  (uniquify-buffer-name-style #'path:project:uniquify)
+;;------------------------------
+;; `path:uniquify'
+;;------------------------------
+;; NOTE: Not (currently) intended to be used in combination with `uniquify'.
 
-  ;; I think ':' is better than '|' for `post-forward' style.
-  (uniquify-separator ":")
+;; For debugging when `uniquify' may be in the mix...
+(when (bound-and-true-p uniquify-buffer-name-style)
+  (innit:customize-set-variable uniquify-buffer-name-style nil)
+  (uniquify-unload-function))
 
-  ;; Have at least this many dirs in buffer names.
-  (uniquify-min-dir-content 3)
+(imp:require :path '+uniquify)
 
-  ;; Add path separator to dired buffer names.
-  (uniquify-trailing-separator-p t)
+;; Add our special buffers regex to the ignored-by-name regex.
+(innit:customize-set-variable path:uniquify:ignore/buffer:name/rx
+                              (list 'and
+                                    'string-start
+                                    (list 'or
+                                          ;; The defaults...
+                                          path:uniquify:ignore/buffer:name/rx:defaults ; Be more idempotent; use the original value.
+                                          ;; Or my special buffers.
+                                          buffer:regex:bookend)
+                                    'string-end))
+;; path:uniquify:ignore/buffer:name/rx
+;; (pp path:uniquify:ignore/buffer:name/rx)
+;; (path:uniquify:ignore/buffer:name/rx)
 
-  ;;---
-  ;; Other uniquify Settings
-  ;;---
-  ;; Rename buffers after killing a buffer. E.g. de-uniquify others as possible.
-  (uniquify-after-kill-buffer-p t)
 
-  ;; Ignored for uniquifying.
-  ;; Don't muck with my or Emacs' special buffers.
-  (uniquify-ignore-buffers-re buffer:regex:specials))
-
+(path:uniquify:set-up)
+;; (path:uniquify:tear-down)
 
 
 ;;------------------------------------------------------------------------------
