@@ -36,26 +36,40 @@
 
 
 (defconst path:uniquify:ignore/buffer:name/rx:defaults
-  '(;;---
+  '(or
+    ;;---
+    ;; Emacs
+    ;;---
+    ;; Special buffers start with "*", optionally with leading space.
+    (group
+      (optional " ")
+      "*" ;; literal asterisk
+      (one-or-more printing)
+      "*")
+
+    ;;---
     ;; Magit Buffers
     ;;---
-    "magit"
-    (optional "-"
-              (one-or-more alphanumeric))
-    ": "
-    (one-or-more printing)))
+    (group
+      "magit"
+      (optional "-"
+                (one-or-more alphanumeric))
+      ": "
+      (one-or-more printing))))
 
 
 (defcustom path:uniquify:ignore/buffer:name/rx
-  (append '(and string-start)
-          path:uniquify:ignore/buffer:name/rx:defaults
-          '(string-end))
+  (list 'and
+        'string-start
+        path:uniquify:ignore/buffer:name/rx:defaults
+        'string-end)
   "`rx' Regular Expression Sexpr for buffer names that we should _not_ mess with.
 
 Will get `string-start' and `string-end' added to it before being compiled to a
 regex string.
 
 Add on to this variable like so:
+
 \(customize-set-variable
  path:uniquify:ignore/buffer:name/rx
  (list 'or
@@ -111,6 +125,7 @@ Value should be an alist of keys:
   - `:name'             - string: actual buffer name decided by us
   - `:name/propertized' - string: propertized NAME string")
 (put 'path:uniquify:settings/local 'permanent-local t) ; Always a buffer-local variable.
+;; (get 'path:uniquify:settings/local 'permanent-local)
 
 
 (defun path:uniquify:settings/path/normalize (path &rest segments)
@@ -120,6 +135,7 @@ Value should be an alist of keys:
   (let ((path (apply #'path:abbreviate:file path segments)))
     ;; Do we actually want this to be a directory path?
     (if (and path:uniquify:directory/end-in-slash?
+             ;; Is this, like, really actually a directory? Go find out.
              (file-directory-p path))
         (path:directory path)
       path)))
@@ -130,7 +146,8 @@ Value should be an alist of keys:
 
 
 (defun int<path>:uniquify:settings/create (path/absolute/directory
-                                           name/requested)
+                                           name/requested
+                                           buffer)
   "Create and return settings alist from args.
 NOTE: Does not set `path:uniquify:settings/local'!
 
@@ -139,31 +156,35 @@ NAME/REQUESTED should be a string of the buffer name that Emacs (via
 
 PATH/ABSOLUTE/DIRECTORY should be a string of the absolute path to the file's
 parent directory."
-  ;; Figure out new buffer name.
-  (if-let* ((path/absolute/file (path:uniquify:settings/path/normalize path/absolute/directory name/requested))
-            (project            (path:project:current/alist path/absolute/file)))
-      ;; We have a project, so we can figure out a name.
+  (with-current-buffer buffer
+    ;; Figure out new buffer name.
+    (if-let* ((path/absolute/file (path:uniquify:settings/path/normalize path/absolute/directory
+                                                                         name/requested
+                                                                         buffer))
+              (project            (path:project:current/alist path/absolute/file)))
+        ;; We have a project, so we can figure out a name.
+        (list (cons :path/parent      path/absolute/directory)
+              (cons :path             path/absolute/file)
+              (cons :project          project)
+              (cons :name/requested   name/requested)
+              ;; And the actual name:
+              (cons :name             (path:project:buffer/name project))
+              (cons :name/propertized (path:project:buffer/name project :pretty)))
+
+      ;; No project... Fallback to full path?
       (list (cons :path/parent      path/absolute/directory)
             (cons :path             path/absolute/file)
             (cons :project          project)
             (cons :name/requested   name/requested)
             ;; And the actual name:
-            (cons :name             (path:project:buffer/name project))
-            (cons :name/propertized (path:project:buffer/name project :pretty)))
-
-    ;; No project... Fallback to full path?
-    (list (cons :path/parent      path/absolute/directory)
-          (cons :path             path/absolute/file)
-          (cons :project          project)
-          (cons :name/requested   name/requested)
-          ;; And the actual name:
-          (cons :name             path/absolute/file)
-          (cons :name/propertized path/absolute/file))))
+            (cons :name             path/absolute/file)
+            (cons :name/propertized path/absolute/file)))))
 ;; (int<path>:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)))
 
 
 (defun path:uniquify:settings/create (path/absolute/directory
-                                      name/requested)
+                                      name/requested
+                                      buffer)
   "Create settings alist from args.
 
 NAME/REQUESTED should be a string of the buffer name that Emacs (via
@@ -171,25 +192,30 @@ NAME/REQUESTED should be a string of the buffer name that Emacs (via
 
 PATH/ABSOLUTE/DIRECTORY should be a string of the absolute path to the file's
 parent directory."
-  (setq path:uniquify:settings/local
-        (int<path>:uniquify:settings/create path/absolute/directory
-                                            name/requested)))
+  (with-current-buffer buffer
+    (setq path:uniquify:settings/local
+          (int<path>:uniquify:settings/create buffer
+                                              path/absolute/directory
+                                              name/requested))))
 
 
-(defun path:uniquify:settings/clear ()
+(defun path:uniquify:settings/clear (buffer)
   "Clear `path:uniquify:settings/local' by setting it to nil."
-  (setq path:uniquify:settings/local nil))
+  (with-current-buffer buffer
+    (setq path:uniquify:settings/local nil)))
 
 
-(defun path:uniquify:settings/get (keyword)
+(defun path:uniquify:settings/get (keyword buffer)
   "Get KEYWORD's value from the local variable `path:uniquify:settings/local'."
-  (alist-get keyword path:uniquify:settings/local))
+  (with-current-buffer buffer
+    (alist-get keyword path:uniquify:settings/local)))
 
 
-(defun path:uniquify:settings/set (keyword value)
+(defun path:uniquify:settings/set (keyword value buffer)
   "Set KEYWORD to VALUE in the local variable `path:uniquify:settings/local'."
-  (setf (alist-get keyword path:uniquify:settings/local)
-        value))
+  (with-current-buffer buffer
+    (setf (alist-get keyword path:uniquify:settings/local)
+          value)))
 
 
 ;;--------------------------------------------------------------------------------
@@ -213,6 +239,7 @@ BUFFER should be a buffer object.
 Will check settings:
   - `path:uniquify:ignore/buffer:name/rx'
   - `path:uniquify:ignore/buffer:mode/major'"
+  ;; Our settings are of the "ignore this?" variety, so there's not a small number of nots.
   (and (not
         ;; Should we ignore due to buffer name regexes?
         (and path:uniquify:ignore/buffer:name/rx
@@ -229,7 +256,7 @@ Will check settings:
 BUFFER should be a buffer object.
 `path:uniquify:settings/local' should be up-to-date."
   (with-current-buffer buffer
-    (let ((name (path:uniquify:settings/get :name)))
+    (let ((name (path:uniquify:settings/get :name buffer)))
       (unless (equal name (buffer-name buffer))
         ;; Use non-nil `unique' arg in order to avoid infinite loop recursion.
         (rename-buffer name :unique)))))
@@ -265,7 +292,7 @@ Other buffers return nil."
     ;; Say what we're already doing:
     (cond ((path:uniquify:buffer/managed? buffer)
            (message "Buffer is managed; name: %S"
-                    (path:uniquify:settings/get :name)))
+                    (path:uniquify:settings/get :name buffer)))
 
           ;; Say why we wouldn't do anything.
           ((not (path:uniquify:buffer/should-manage? buffer))
@@ -307,7 +334,7 @@ Other buffers return nil."
 Indended as alias for `uniquify-buffer-base-name'."
     ;; Return something if we have something, nil otherwise.
     (and (path:uniquify:buffer/managed? (current-buffer))
-         (path:uniquify:settings/get :name/base)))
+         (path:uniquify:settings/get :name/base (current-buffer))))
 
 
 (defun path:advice:uniquify:uniquify-buffer-base-name (func &rest args)
@@ -326,27 +353,6 @@ ARGS are just for future-proofing call to `uniquify-buffer-base-name'."
 ;; Buffer (Re)Naming
 ;;------------------------------
 
-(defun path:uniquify:rename/create (name/requested path/absolute/directory buffer)
-  "Create file-backed BUFFER's full name given the args.
-
-NAME/REQUESTED should be a string of the buffer name that Emacs (via
- `rename-buffer') desires.
-
-PATH/ABSOLUTE/DIRECTORY should be a string of the absolute path to the file's
-parent directory.
-
-BUFFER should be the buffer's buffer object."
-  ;; Clear any old settings.
-  (with-current-buffer buffer
-    (path:uniquify:settings/clear))
-
-  ;; Figure out new buffer name.
-  (path:uniquify:settings/create path/absolute/directory
-                                 name/requested)
-
-  ;; Return the buffer name we created.
-  (path:uniquify:settings/get :name/propertized))
-
 
 (defun path:advice:uniquify:rename-buffer (func name/requested &optional unique? &rest args)
   "Uniquify file-backed buffer names with parts their path.
@@ -355,7 +361,7 @@ Indended as `:around' advice for FUNC `rename-buffer'.
 
 NAME/REQUESTED should be a string of the buffer's intended new name.
 UNIQUE should be nil/non-nil.
-ARGS are just for future-proofing call to `create-file-buffer'.
+ARGS are just for future-proofing call to `rename-buffer'.
 
 Return a string of the name actually given to the buffer."
   ;; Find out what Emacs wants to call this buffer.
@@ -364,30 +370,30 @@ Return a string of the name actually given to the buffer."
         name/actual)
 
     ;; Tweak this buffer's (re)name?
-    (if (not (or unique?
-                 (path:uniquify:buffer/should-manage? buffer)))
-        ;;------------------------------
-        ;; Ignore Buffer
-        ;;------------------------------
+    (if (and (not unique?)
+             (path:uniquify:buffer/should-manage? buffer))
         (progn
-          ;; Don't mess  with it; mark this buffer as not-named-by-us and leave its name alone.
-          (path:uniquify:settings/clear)
-          (setq name/actual name/proposed))
+          ;;------------------------------
+          ;; Tweak Buffer (Re)Name
+          ;;------------------------------
+          ;; Clear any old settings.
+          (path:uniquify:settings/clear buffer)
+
+          ;; Figure (& save) out /our/ name for this buffer.
+          (path:uniquify:settings/create (path:parent (path:current:file))
+                                         name/proposed
+                                         buffer)
+
+          ;; Actually set the buffer's new name.
+          (path:uniquify:buffer:name/set buffer)
+          (setq name/actual (buffer-name buffer)))
 
       ;;------------------------------
-      ;; Tweak Buffer (Re)Name
+      ;; Ignore Buffer
       ;;------------------------------
-      ;; Clear any old settings.
-      (with-current-buffer buffer
-        (path:uniquify:settings/clear))
-
-      ;; Figure (& save) out /our/ name for this buffer.
-      (path:uniquify:settings/create path/absolute/directory
-                                     name/requested)
-
-      ;; Actually set the buffer's new name.
-      (path:uniquify:buffer:name/set buffer)
-      (setq name/actual (buffer-name buffer)))
+      ;; Don't mess  with it; mark this buffer as not-named-by-us and leave its name alone.
+      (path:uniquify:settings/clear buffer)
+      (setq name/actual name/proposed))
 
     ;;------------------------------
     ;; Return Name
@@ -410,34 +416,30 @@ ARGS are just for future-proofing call to `create-file-buffer'.
 Return the buffer created by `create-file-buffer'."
   ;; Get a name from `create-file-buffer'...
   ;; But mainly the rest of the stuff it does.
-  (let ((name/proposed (apply func filepath args))
-        (buffer        (current-buffer))
-        name/actual)
-    (if (not (path:uniquify:buffer/should-manage? buffer))
+  (let ((buffer (apply func filepath args)))
+    (if (path:uniquify:buffer/should-manage? buffer)
         ;;------------------------------
-        ;; Ignore This Buffer
+        ;; Tweak Buffer Name
         ;;------------------------------
         (progn
-          ;; Don't mess  with it; mark this buffer as not-named-by-us and leave its name alone.
-          (path:uniquify:settings/clear)
-          (setq name/actual name/proposed))
+          ;; Figure out a buffer name.
+          (path:uniquify:settings/create (path:parent filepath)
+                                         (file:name filepath)
+                                         buffer)
+
+          ;; Actually set the buffer's new name (& return it).
+          (path:uniquify:buffer:name/set buffer))
 
       ;;------------------------------
-      ;; Tweak Buffer Name
+      ;; Ignore This Buffer
       ;;------------------------------
-      ;; Figure out a buffer name.
-      (path:uniquify:settings/create (path:parent filepath) name/proposed)
-
-      ;; Actually set the buffer's new name (& return it).
-      (path:uniquify:buffer:name/set buffer)
-
-      ;; Return the buffer name we created.
-      (setq name/actual (path:uniquify:settings/get :name/propertized)))
+      ;; Don't mess  with it; mark this buffer as not-named-by-us and leave its name alone.
+      (path:uniquify:settings/clear buffer))
 
     ;;------------------------------
-    ;; Return Name
+    ;; Return Buffer Object
     ;;------------------------------
-    name/actual))
+    buffer))
 
 
 ;;--------------------------------------------------------------------------------
@@ -504,7 +506,7 @@ signalled.  If NOERROR, the non-loop parts of the chain is returned."
       (dolist (buffer (buffer-list))
         (set-buffer buffer)
         (when (path:uniquify:buffer/managed? (current-buffer))
-          (push (cons buffer (path:uniquify:settings/get :name/requested))
+          (push (cons buffer (path:uniquify:settings/get :name/requested buffer))
                 buffers/managed)))
 
       ;;------------------------------
@@ -528,6 +530,7 @@ signalled.  If NOERROR, the non-loop parts of the chain is returned."
         (rename-buffer (cdr buffer) t))))
 
   nil)
+;; (path:uniquify:tear-down)
 
 
 ;;------------------------------------------------------------------------------
