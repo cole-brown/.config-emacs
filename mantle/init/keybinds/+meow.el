@@ -321,6 +321,18 @@ From: \"add mode and meow state specific keymaps\"
 
 
   ;;------------------------------
+  ;; Point & Mark
+  ;;------------------------------
+
+  (defun mantle:meow-reverse:dwim ()
+    "Make `meow-reverse' also do something when a selection isn't active."
+    (interactive)
+     (if (region-active-p)
+         (meow-reverse)
+       (exchange-point-and-mark)))
+
+
+  ;;------------------------------
   :custom
   ;;------------------------------
   ;; See 'meow-vars.el' in "packages/elpa/meow-<version>/meow-var.el".

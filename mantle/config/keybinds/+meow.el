@@ -305,7 +305,7 @@
    ;; region / selection...
    '("m"  . meow-mark-word)
    '("M"  . meow-mark-symbol)
-   '(";"  . meow-reverse)
+   '(";"  . mantle:meow-reverse:dwim) ; meow-reverse)
    '("g"  . meow-cancel-selection)
    '("z"  . meow-pop-selection) ; aka "undo selection"
    ;; I guess "d" is some meow command menu?
