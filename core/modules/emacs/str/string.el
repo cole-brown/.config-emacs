@@ -1,4 +1,15 @@
-;;; emacs/str/string.el -*- lexical-binding: t; -*-
+;;; emacs/str/string.el --- Useful String Functions -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <code@brown.dev>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2023-04-17
+;; Modified:   2023-04-17
+;;
+;;; Commentary:
+;;
+;; String Functions for Strings
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------
@@ -56,39 +67,6 @@ See `str:trim' for TRIM-ARGS. TL;DR:
 ;; (str:empty? "")
 ;; (str:empty? " ")
 ;; (str:empty? " " :full)
-
-
-;;------------------------------------------------------------------------------
-;; Regions
-;;------------------------------------------------------------------------------
-
-;; TODO: move to 'buffer.el'?
-(defun str:region->region (start end func &rest args)
-  "Convert region from START to END by appling FUNC to that substring and then
-replacing the region with the function's results.
-
-FUNC should be a function that returns a string and should have parameters:
-  (defun FUNC (string [optional-args]) ...)"
-  (save-excursion
-    (replace-region-contents start end
-                             (apply func (buffer-substring-no-properties start end) args))))
-
-
-;; TODO: (str:thing-at-point->region thing-type ...)
-
-
-(defun str:word-at-point->region (func &rest cases)
-  "Get word at point, then use `str:region->region' to apply the FUNC and ARGS."
-  (save-excursion
-    ;; We might be in the middle of the word, so go to the end, save that point, and then go back to the start of the word.
-    (forward-word)
-     (let (start
-           (end (point)))
-       (backward-word)
-       (setq start (point))
-
-       ;; Have a region now, so just call `str:case/region:to'.
-       (apply #'str:region->region start end func cases))))
 
 
 ;;------------------------------------------------------------------------------

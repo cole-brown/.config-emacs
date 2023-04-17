@@ -44,6 +44,8 @@
             :filename "normalize")
   (imp:load :feature  '(:str regex)
             :filename "regex")
+  (imp:load :feature  '(:str buffer)
+            :filename "buffer")
   (imp:load :feature  '(:str string)
             :filename "string")
   (imp:load :feature  '(:str hash)
