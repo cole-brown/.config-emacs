@@ -73,6 +73,7 @@
   :config
   ;;------------------------------
 
+  ;; https://github.com/justbur/emacs-which-key#special-features-and-configuration-options
   ;; Can change where the which-key windows shows up with one of these:
   ;;   (which-key-setup-side-window-bottom) ;; This is the default.
   ;;   (which-key-setup-side-window-right)
@@ -84,11 +85,14 @@
   ;;   > which-key can’t show keys: There is not enough space based on your
   ;;   > settings and frame size.
   ;; Try `which-key-setup-side-window-right-bottom' and see if that makes it happier?
-  (which-key-setup-side-window-right-bottom)
+  ;; (which-key-setup-side-window-right-bottom)
   ;; If I don't like that, try tweaking these variables:
   ;;   `which-key-side-window-max-height'
   ;;   `which-key-side-window-max-width'
-  ;; https://github.com/justbur/emacs-which-key#special-features-and-configuration-options
+  ;; [2023-04-18] Don't like it...
+  ;;   1. Just too far over to look most of the time.
+  ;;   2. Doesn't jive with everyone else defaulting to popping up on the bottom.
+  ;;   3. Changing buffer widths all the time makes word-wrapped buffers jitter, sometimes.
 
   (when (imp:feature? 'evil)
     ;; https://github.com/justbur/emacs-which-key#evil-operators
