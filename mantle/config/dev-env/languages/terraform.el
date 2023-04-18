@@ -20,6 +20,25 @@
 ;;; Code:
 
 
+(imp:require :path)
+
+
+;;------------------------------------------------------------------------------
+;; Sanity Check
+;;------------------------------------------------------------------------------
+
+;; Lodge a complaint if 'terraform' isn't installed on the system. But don't skip
+;; the `use-package', since it only needs the exe for the compile stuff.
+(unless (executable-find "terraform")
+  (nub:warning
+      :innit
+      (imp:path:join (imp:path:current:dir/relative :mantle)
+                     (imp:path:current:file))
+    '("Could not find 'terraform' executable. Is it installed? "
+      "My helpers around `terraform-mode' want it (`mantle:terraform:runner'). "
+      "NOTE: `terragrunt' could be needed too, depending on if you need it or not...")))
+
+
 ;;------------------------------------------------------------------------------
 ;; Syntax Highlighting
 ;;------------------------------------------------------------------------------
@@ -31,27 +50,85 @@
   :init
   ;;------------------------------
 
-  (defvar mantle:terraform:runner
-    (if (executable-find "terragrunt")
-        "terragrunt"
-      "terraform")
-  "The default runner - `terraform' or `terragrunt'")
+  (defun mantle:terraform:runner (&optional path)
+    "Figure out what should run the terraform commands based on PATH.
 
-  ;; Lodge a complaint if 'terraform' isn't installed on the system. But don't skip
-  ;; the `use-package', since it only needs the exe for the compile stuff.
-  (unless (executable-find mantle:terraform:runner)
-    (nub:warning
-        :innit
-        (imp:path:join (imp:path:current:dir/relative :mantle)
-                       (imp:path:current:file))
-      '("Could not find 'ripgrep' (`rg') executable. Is it installed? "
-        "`magit-todos' wants it.")))
+PATH should be:
+  - string - an absolute path to the terraform config directory
+  - nil    - `default-directory' for `current-buffer'
+
+Return a string:
+  - \"terraform\"
+  - \"terragrunt\""
+    (let ((func-name "mantle:terraform:runner")
+          (path/input path)
+          (path (or path
+                    default-directory)))
+
+      ;;------------------------------
+      ;; Error Checks
+      ;;------------------------------
+
+      ;; NOTE:
+      ;;   a) `path' should no longer be null.
+      ;;   b) Use `path/input' for feedback to user.
+      (cond ((null path)
+             (error "%s: `path' is unexpectedly null..? Supplied PATH: %S => `path': %S"
+                    func/name
+                    path/input
+                    path))
+            ((not (stringp path))
+             (error "%s: PATH must be a string or nil. Supplied PATH: %S => `path' of %S: %S"
+                    func/name
+                    path/input
+                    (type-of path)
+                    path))
+            ((not (path:exists? path))
+             (error "%s: `path' does not exist; cannot determine a Terraform command runner: '%s'"
+                    func-name
+                    path)))
+
+      ;;------------------------------
+      ;; Look for Canary
+      ;;------------------------------
+      ;; Look in this directory and above for canary file 'terragrunt.hcl',
+      ;; which indicates we should use `terragrunt'. Otherwise use `terraform'.
+      (if (file:find:in-ancestors path ; Start here...
+                                  "terragrunt.hcl"
+                                  (path:project:root path)) ; Quit at project root if there is one.
+          "terragrunt"
+        "terraform")))
+  ;; (mantle:terraform:runner)
+
+
+  (defun mantle:terraform:command (command &rest args)
+    "Get the full string to use to invoke `terragrunt' or `terraform', depending."
+    (interactive)
+    (format "%s %s%s"
+            (mantle:terraform:runner) ; Who runs this?
+            command
+            (if args
+                (concat " "
+                        (string-join args " "))
+              "")))
+  ;; (mantle:terraform:command "apply")
+  ;; (mantle:terraform:command "apply" "--hello=there")
+
+
+  (defun mantle:terraform:run (command &rest args)
+    "Run a Terraform command using either `terragrunt' or `terraform', depending."
+    (interactive)
+    (compile (mantle:terraform:command command args) ; What's the full command to run?
+             ;; Run in Comint mode?
+             ;; TODO: Dunno why only "apply" runs in comint mode.
+             (string= command "apply")))
+
 
   (innit:hook:defun
       (:name   'terraform:settings
        :file   macro<imp>:path/file
        :docstr "Settings for Terraform mode. Non-LSP stuff.")
-    (setq compile-command mantle:terraform:runner))
+    (setq compile-command (mantle:terraform:runner)))
 
 
   ;;------------------------------
@@ -80,9 +157,16 @@
     "Create the `terraform-mode' keybinds in `general' for `meow'."
     (keybind:meow:leader/local:bind-keys
         'terraform-mode-map
-      "a" (list (elisp:cmd (compile (format "%s apply" mantle:terraform:runner) t)) :which-key (format "%s apply" mantle:terraform:runner))
-      "i" (list (elisp:cmd (compile (format "%s init" mantle:terraform:runner)))    :which-key (format "%s init" mantle:terraform:runner))
-      "p" (list (elisp:cmd (compile (format "%s plan" mantle:terraform:runner)))    :which-key (format "%s plan" mantle:terraform:runner))))
+      "a" (list (elisp:cmd (mantle:terraform:run "apply")) :which-key "apply") ; (mantle:terraform:command "apply"))
+      "i" (list (elisp:cmd (mantle:terraform:run "init"))  :which-key (format "%s" (mantle:terraform:command "init")))
+      "I" (list (elisp:cmd (mantle:terraform:run "init" "--backend-config='_backend.tfvars'"))
+                :which-key (mantle:terraform:command "init" "--backend-config='_backend.tfvars'"))
+      "p" (list (elisp:cmd (mantle:terraform:run "plan"))  :which-key (mantle:terraform:command "plan"))
+      "f" (list (elisp:cmd (mantle:terraform:run "fmt"))   :which-key (mantle:terraform:command "fmt"))
+      "x" (list #'mantle:terraform:run :which-key "apply") ; (mantle:terraform:command "apply"))
+      "y" (list (elisp:cmd (mantle:terraform:run "init"))  :which-key (format "%s" (mantle:terraform:command "init")))
+      ;; TODO: "console" command in... eshell or something?
+      ))
 
 
   ;;------------------------------
@@ -94,33 +178,33 @@
     (transient-define-suffix mantle:meow/transient:terraform/compile/apply ()
       "Terraform/Terragrunt 'apply' command."
       :key "a"
-      :description (format "%s apply" mantle:terraform:runner)
+      :description (mantle:terraform:command "apply")
       (interactive)
-      (compile (format "%s apply" mantle:terraform:runner) t))
+      (mantle:terraform:run "apply"))
 
 
     (transient-define-suffix mantle:meow/transient:terraform/compile/fmt ()
       "Terraform/Terragrunt 'fmt' command."
       :key "f"
-      :description (format "%s fmt" mantle:terraform:runner)
+      :description (mantle:terraform:command "fmt")
       (interactive)
-      (compile (format "%s fmt" mantle:terraform:runner) t))
+      (mantle:terraform:run "fmt"))
 
 
     (transient-define-suffix mantle:meow/transient:terraform/compile/init ()
       "Terraform/Terragrunt 'init' command."
       :key "i"
-      :description (format "%s init --backend-config='_backend.tfvars'" mantle:terraform:runner)
+      :description (mantle:terraform:command "init" "--backend-config='_backend.tfvars'")
       (interactive)
-      (compile (format "%s init --backend-config='_backend.tfvars'" mantle:terraform:runner) t))
+      (mantle:terraform:run "init" "--backend-config='_backend.tfvars'"))
 
 
     (transient-define-suffix mantle:meow/transient:terraform/compile/plan ()
       "Terraform/Terragrunt 'plan' command."
       :key "p"
-      :description (format "%s plan" mantle:terraform:runner)
+      :description (mantle:terraform:run "plan" mantle:terraform:runner)
       (interactive)
-      (compile (format "%s plan" mantle:terraform:runner) t))
+      (compile (mantle:terraform:run "plan" mantle:terraform:runner) t))
 
 
     (transient-define-prefix mantle:meow/transient:terraform/compile ()
@@ -160,9 +244,9 @@
   ;;------------------------------
   (keybind:leader/local:def
     :map terraform-mode-map
-    "a" (list (elisp:cmd (compile (format "%s apply" mantle:terraform:runner) t)) :which-key "apply")
-    "i" (list (elisp:cmd (compile (format "%s init" mantle:terraform:runner)))    :which-key "init")
-    "p" (list (elisp:cmd (compile (format "%s plan" mantle:terraform:runner)))    :which-key "plan")))
+    "a" (list (mantle:terraform:run "apply") :which-key (mantle:terraform:command "apply"))
+    "i" (list (mantle:terraform:run "init")  :which-key (mantle:terraform:command "init"))
+    "p" (list (mantle:terraform:run "plan")  :which-key (mantle:terraform:command "plan"))))
 
 
 ;; ;;------------------------------------------------------------------------------
