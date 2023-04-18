@@ -36,14 +36,24 @@
 ;;------------------------------------------------------------------------------
 
 (defconst path:types
-  ;; Directory
-  '(:dir
+  '(;;---
+    ;; Real Actual Types
+    ;;---
+
+    ;; Directory
+    :dir
 
     ;; File
     :file
 
     ;; Symbolic Link
-    :symlink)
+    :symlink
+
+    ;;---
+    ;; Error / Failure Types?
+    ;;---
+    ;; Used when we don't have enough path types yet to figure out what this is...
+    :unknown)
   "Types of files that Emacs can reason about.
 
 https://www.gnu.org/software/emacs/manual/html_node/elisp/Kinds-of-Files.html")
@@ -232,26 +242,56 @@ If TYPE is provided, PATH must exist \and\ be the correct type."
 ;; (path:exists? (path:current:dir))
 
 
+(defun path:type? (path)
+  "What type of thing is PATH?
+
+Return a `path:types' keyword if PATH exists or nil if PATH does not."
+  ;; No attributes mean it doesn't exist means we can just return nil.
+  (when-let ((attrs (file-attributes path)))
+    ;; Have attributes; figure out what this path is based off them:
+    (cond ((eq (file-attribute-type attrs) t)    ; t == directory
+           :dir)
+          ((eq (file-attribute-type attrs) nil)  ; nil == file
+           :file)
+          ((stringp (file-attribute-type attrs)) ; string == symlink
+           :symlink)
+          ;; Well...
+          ;; PATH exists but we don't know exactly _what_ it is...
+          (t
+           :unknown))))
+;; (path:type? (path:current:file))
+;; (path:type? (path:current:dir))
+;; (path:type? "does-not-exist.el")
+
+
 (defun path:readable? (path)
   "Return non-nil if PATH exists and is readable."
   (file-readable-p path))
 
 
-(defun path:descendant? (descendant parent)
-  "Return non-nil if DESCENDANT path is a descendant of PARENT path.
+(defun path:descendant? (descendant ancestor)
+  "Return non-nil if DESCENDANT path is a descendant of ANCESTOR path.
 
-DESCENDANT and PARENT cannot be the same path.
+DESCENDANT and ANCESTOR cannot be the same path.
 
 Will convert the paths to absolute/canonical values before comparing."
-  ;; Convert both to dir or file paths so that a dir and a file path work correctly.
-  ;; e.g.:
-  ;;   (path:descendant? "/foo/" "/foo")
-  ;;     -> nil
   (let ((descendant/abs (path:canonicalize:dir descendant))
-        (parent/abs (path:canonicalize:dir parent)))
-    (unless (string= descendant/abs parent/abs)
-      (string-prefix-p parent/abs
+        (ancestor/abs (path:canonicalize:dir ancestor)))
+    (unless (string= descendant/abs ancestor/abs)
+      (string-prefix-p ancestor/abs
                        descendant/abs))))
+;; (path:descendant? "/foo/bar" "/foo")
+
+
+(defun path:ancestor? (ancestor descendant)
+  "Return non-nil if ANCESTOR path is an ancestor of DESCENDANT path.
+
+DESCENDANT and ANCESTOR cannot be the same path.
+
+Will convert the paths to absolute/canonical values before comparing."
+  ;; Just translate into the thing we already have.
+  (path:descendant? descendant ancestor))
+;; (path:ancestor? "/foo/" "/foo/bar")
 
 
 (defun path:child? (child parent)
@@ -490,7 +530,7 @@ If REGEX is non-nil, return only children whose filename matches the REGEX."
 (defun int<path>:walk (root dir callback)
   "Helper for walking a directory tree.
 
-Gets children from ROOT subdirectory DIR, calls CALLBACk for each child.
+Gets children from ROOT subdirectory DIR, calls CALLBACK for each child.
 
 CALLBACK should accept params:
   1) string - root (absolute)

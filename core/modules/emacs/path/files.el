@@ -158,7 +158,7 @@ If TYPES is nil, all file types are vaild for returning.
 TYPES can also be a list with these valid members:
   - :dir - allow directories
   - :file - allow files
-  - :link - symbolic links
+  - :symlink - symbolic links
 Any file type matching a member of TYPES will be returned if not ignored.
 
 If IGNORES is non-nil, it should be a list of regex strings to use. Any absolute
@@ -210,7 +210,7 @@ path matching any of the filters will not be included in return values."
                 ((stringp (file-attribute-type attrs)) ;; string == symlink
                  ;; Save if TYPES allows.
                  (when (or (not types)
-                           (memq :link types))
+                           (memq :symlink types))
                    (push path paths/return)))
 
                 ;; Default case - ehm... dunno how you got here.
@@ -226,6 +226,71 @@ path matching any of the filters will not be included in return values."
 ;; (files:in-directory ".." t '(:dir))
 ;; (files:in-directory ".." t '(:dir :file))
 ;; (files:in-directory ".." t nil (list (files:ignore/string "init.el")))
+
+
+(defun file:find:in-ancestors (path filename &optional root)
+  "Search for FILENAME in PATH's directory and parent directories up to ROOT.
+
+If ROOT is nil, search up to the root of the filesystem.
+If ROOT is non-nil and not an ancestor of PATH, raise an error signal.
+
+Return absolute filepath string of found FILENAME, or nil."
+  (let* ((path/current "placeholder for first loop :;',.@!#$%&*(){}][")
+         (path/next (if (eq (path:type? path) :file)
+                        (path:parent path)
+                      path))
+         path/found)
+
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (when root
+      (cond ((not (eq (path:type? root) :dir))
+             (error "file:find:in-ancestors: Expected a directory as ROOT! Got '%S' for root: %S"
+                    (path:type? root)
+                    root))
+            ((not (path:ancestor? root path/next))
+             (error "file:find:in-ancestors: PATH is not a descendant of ROOT! path: %S, root: %S"
+                    path
+                    root))
+            (t
+             ;; ok good!
+             nil)))
+
+    ;;------------------------------
+    ;; Search for FILENAME
+    ;;------------------------------
+    ;; Did we find it or do we keep searching?
+    (while (and
+            ;; Continue if we haven't found it yet.
+            (not path/found)
+            ;; Continue if we have no explicit root...
+            (or (not root)
+                ;; ...or if we do and we haven't reached it yet.
+                (and root
+                     (path:ancestor? root path/next)))
+            ;; Continue if we haven't reached the filesystem root yet.
+            (not (string= path/current path/next)))
+
+      ;; Prep for this loop.
+      (setq path/current path/next)
+
+      ;; Search in this directory's files for a matching filename.
+      (setq path/found (seq-find (lambda (filepath)
+                                   "Is this directory file the one we're searching for?"
+                                   (string= filename (file:name filepath)))
+                                 (files:in-directory path/current)))
+
+      ;; Prep for next loop.
+      (setq path/next (path:parent path/current)))
+
+    ;; Return path of thing we found, or nil.
+    path/found))
+;; (file:find:in-ancestors (path:current:file) (file:name (path:current:file)))
+;; (file:find:in-ancestors (path:current:dir) (file:name (path:current:file)))
+;; (file:find:in-ancestors (path:current:dir) "str")
+;; (file:find:in-ancestors (path:current:dir) "shouldnt-exist-probably")
+;; (file:find:in-ancestors (path:current:dir) "shouldnt-exist-probably" (path:project:root))
 
 
 ;;------------------------------------------------------------------------------
