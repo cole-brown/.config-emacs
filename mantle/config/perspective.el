@@ -299,6 +299,23 @@ or on some buffer listing ops."
   ;; Enable `persp-mode'!
   (persp-mode +1))
 
+;;------------------------------
+;; `marginalia' & `persp-mode'
+;;------------------------------
+(imp:use-package persp-mode
+  :unless noninteractive
+  :after marginalia
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; `persp-switch-to-buffer', by default, is not getting sent through
+  ;; `marginalia' for additional annotations in the minibuffer. Tell
+  ;; `marginalia' that `persp-switch-to-buffer' is a buffer command, since it
+  ;; doesn't have metadata about itself or something?
+  (add-to-list 'marginalia-command-categories '(persp-switch-to-buffer . buffer)))
+
 
 ;;------------------------------------------------------------------------------
 ;; Keybinds : Meow
