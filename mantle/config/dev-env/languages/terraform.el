@@ -157,14 +157,12 @@ Return a string:
     "Create the `terraform-mode' keybinds in `general' for `meow'."
     (keybind:meow:leader/local:bind-keys
         'terraform-mode-map
-      "a" (list (elisp:cmd (mantle:terraform:run "apply")) :which-key "apply") ; (mantle:terraform:command "apply"))
-      "i" (list (elisp:cmd (mantle:terraform:run "init"))  :which-key (format "%s" (mantle:terraform:command "init")))
+      "a" (list (elisp:cmd (mantle:terraform:run "apply")) :which-key "terraform apply") ; (mantle:terraform:command "apply"))
+      "i" (list (elisp:cmd (mantle:terraform:run "init"))  :which-key "terraform init")  ; (mantle:terraform:command "init")))
       "I" (list (elisp:cmd (mantle:terraform:run "init" "--backend-config='_backend.tfvars'"))
-                :which-key (mantle:terraform:command "init" "--backend-config='_backend.tfvars'"))
-      "p" (list (elisp:cmd (mantle:terraform:run "plan"))  :which-key (mantle:terraform:command "plan"))
-      "f" (list (elisp:cmd (mantle:terraform:run "fmt"))   :which-key (mantle:terraform:command "fmt"))
-      "x" (list #'mantle:terraform:run :which-key "apply") ; (mantle:terraform:command "apply"))
-      "y" (list (elisp:cmd (mantle:terraform:run "init"))  :which-key (format "%s" (mantle:terraform:command "init")))
+                :which-key "terraform init --backend-config='_backend.tfvars'")         ; (mantle:terraform:command "init" "--backend-config='_backend.tfvars'"))
+      "p" (list (elisp:cmd (mantle:terraform:run "plan"))  :which-key "terraform plan") ; (mantle:terraform:command "plan"))
+      "f" (list (elisp:cmd (mantle:terraform:run "fmt"))   :which-key "terraform fmt")  ; (mantle:terraform:command "fmt"))
       ;; TODO: "console" command in... eshell or something?
       ))
 
