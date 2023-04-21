@@ -48,6 +48,8 @@
             :filename "buffer")
   (imp:load :feature  '(:str string)
             :filename "string")
+  (imp:load :feature  '(:str propertize)
+            :filename "propertize")
   (imp:load :feature  '(:str hash)
             :filename "hash")
 
