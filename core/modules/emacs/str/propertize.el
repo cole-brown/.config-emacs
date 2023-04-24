@@ -29,7 +29,9 @@ properties to add to the result.
 See Info node `(elisp) Text Properties' for more information.
 
 Other relevant functions are documented in the text-properties group."
-  (apply #'propertize string properties))
+  (if properties
+      (apply #'propertize string properties)
+    string))
 
 
 (cl-defun str:propertize:face/add (string &key start end face append)
