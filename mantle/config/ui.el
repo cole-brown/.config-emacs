@@ -174,7 +174,12 @@
   ;; NOTE: `relative-from-project' is good enough for the modeline, but the
   ;; buffer names themselves /need/ to be uniquify'd. And having different
   ;; actual buffer name and displayed buffer names is just confusing.
-  (doom-modeline-buffer-file-name-style 'buffer-name)
+  ;;   (doom-modeline-buffer-file-name-style 'buffer-name)
+  ;; NOTE [2023-04-21]: Testing out a custom buffer naming style?
+  (doom-modeline-buffer-file-name-style 'mantle:doom-modeline:project/truncate-path)
+  ;; (setq doom-modeline-buffer-file-name-style 'mantle:doom-modeline:project/truncate-path)
+  ;; (setq doom-modeline-buffer-file-name-style 'buffer-name)
+
 
   ;;---
   ;; Icons
@@ -218,7 +223,39 @@
   :config
   ;;------------------------------
 
-  (doom-modeline-mode 1))
+  (define-advice doom-modeline-buffer-file-name (:around (fn &rest args) mantle:advice/override)
+    "Propertize file name based on `doom-modeline-buffer-file-name-style'.
+
+Check `doom-modeline-buffer-file-name-style' for custom styles; pass on to
+original function if not custom."
+    (pcase doom-modeline-buffer-file-name-style
+      ;;------------------------------
+      ;; Custom Style?
+      ;;------------------------------
+      ('mantle:doom-modeline:project/truncate-path
+       (let* ((buffer        (current-buffer))
+              (project/alist (if (path:uniquify:buffer/managed? buffer)
+                                 ;; Use the pre-existing data for this buffer.
+                                 (path:uniquify:settings/get :project buffer)
+                               ;; We don't have anything saved for this buffer; we'll have to figure it out.
+                               (path:project:current/alist (path:buffer buffer)))))
+         (path:project:buffer/name:propertize :project/name (list (alist-get :project/name project/alist)
+                                                                  'face 'underline)
+                                              :project/path (list (alist-get :path project/alist))
+                                              :truncate 'path
+                                              :modeline? t)))
+      ;;------------------------------
+      ;; Standard Style?
+      ;;------------------------------
+       ;; Otherwise dunno what that style is; pass through to original function.
+       (_
+        (apply fn args))))
+
+
+  ;;------------------------------
+  ;; Enable
+  ;;------------------------------
+  (doom-modeline-mode +1))
 
 
 ;;------------------------------------------------------------------------------
