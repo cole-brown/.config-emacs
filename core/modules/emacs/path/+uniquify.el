@@ -175,8 +175,17 @@ parent directory."
               (cons :project          project)
               (cons :name/requested   name/requested)
               ;; And the actual name:
-              (cons :name             (path:project:buffer/name project))
-              (cons :name/propertized (path:project:buffer/name project :pretty)))
+              (cons :name             (path:project:buffer/name:propertize
+                                       :buffer       buffer
+                                       ;; Do not provide any text properteries in these!
+                                       :project/name (list (alist-get :project/name project))
+                                       :project/path (list (alist-get :path project))))
+              (cons :name/propertized (path:project:buffer/name:propertize
+                                       :buffer       buffer
+                                       ;; Do propertize these as desired.
+                                       :project/name (list (alist-get :project/name project)
+                                                           'face 'underline)
+                                       :project/path (list (alist-get :path project)))))
 
       ;; No project... Fallback to full path?
       (list (cons :path/parent      path/absolute/directory)
@@ -186,7 +195,7 @@ parent directory."
             ;; And the actual name:
             (cons :name             path/absolute/file)
             (cons :name/propertized path/absolute/file)))))
-;; (int<path>:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)))
+;; (int<path>:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
 
 
 (defun path:uniquify:settings/create (path/absolute/directory
@@ -207,19 +216,25 @@ parent directory."
 
 
 (defun path:uniquify:settings/clear (buffer)
-  "Clear `path:uniquify:settings/local' by setting it to nil."
+  "Clear `path:uniquify:settings/local' by setting it to nil.
+
+BUFFER should be a buffer object."
   (with-current-buffer buffer
     (setq path:uniquify:settings/local nil)))
 
 
 (defun path:uniquify:settings/get (keyword buffer)
-  "Get KEYWORD's value from the local variable `path:uniquify:settings/local'."
+  "Get KEYWORD's value from the local variable `path:uniquify:settings/local'.
+
+BUFFER should be a buffer object."
   (with-current-buffer buffer
     (alist-get keyword path:uniquify:settings/local)))
 
 
 (defun path:uniquify:settings/set (keyword value buffer)
-  "Set KEYWORD to VALUE in the local variable `path:uniquify:settings/local'."
+  "Set KEYWORD to VALUE in the local variable `path:uniquify:settings/local'.
+
+BUFFER should be a buffer object."
   (with-current-buffer buffer
     (setf (alist-get keyword path:uniquify:settings/local)
           value)))
@@ -236,6 +251,7 @@ Return nil/non-nil."
   (with-current-buffer buffer
     ;; If our local var is non-nil, we are managing this buffer's name.
     path:uniquify:settings/local))
+;; (path:uniquify:buffer/managed? (current-buffer))
 
 
 (defun path:uniquify:buffer/should-manage? (buffer)

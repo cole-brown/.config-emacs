@@ -24,18 +24,6 @@
 ;; Pretty Repo Paths
 ;;--------------------------------------------------------------------------------
 
-(defcustom path:vc/git:rooted ":/"
-  "String to use to indicate a path is relative to the project/repository root.
-
-Default is \":/\". Why \":/\"? It's 'git pathspec' speak for \"the root of the
-working tree\" aka the repository's root.
-
-See Git's Pathspec:
-https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec"
-  :group 'path:group
-  :type '(string))
-
-
 (defun path:vc/git:rooted (project-name &rest relative-path)
   "Return a path rooted at the PROJECT-NAME/repository.
 
@@ -217,23 +205,67 @@ If PATH is not in the `current-project' path, return nil."
 ;; (path:project:current/alist "/tmp")
 
 
-(defun path:project:buffer/name (project-alist &optional pretty?)
-  "Return a buffer name string based off of PROJECT-ALIST.
+(cl-defun path:project:buffer/name:propertize (&key project/name
+                                                    project/path
+                                                    buffer
+                                                    truncate
+                                                    modeline?)
+  "Return a buffer name string based off of params.
 
-PROJECT-ALIST should be the return value of `path:project:current/alist'.
+Keyword Parameters:
+  - BUFFER     - Buffer object, buffer name string, or nil for `current-buffer'.
+  - conses:
+    - PROJECT/NAME - (string . properties)
+    - PROJECT/PATH - (string . properties)
+  - Flags / Options:
+    - TRUNCATE   - integer > 0: Truncate name if its length would be more than this value.
+                 - `path':      Always truncate the path part of the name.
+    - MODELINE   - nil/non-nil: Add modeline properties to returned name string."
+  (let ((buffer (if buffer
+                    (get-buffer buffer)
+                  (current-buffer)))
+        name)
+    (with-current-buffer buffer
+      ;;------------------------------
+      ;; Propertize Buffer Name
+      ;;------------------------------
+      ;; Project
+      (setq name (concat (apply #'str:propertize (car project/name) (cdr project/name))
+                         path:vc/git:rooted))
+      ;; Path
+      (cond ((eq truncate 'path)
+             (setq name (concat name
+                                (apply #'str:propertize
+                                       (path:join path:name:truncate (file:name (car project/path)))
+                                       (cdr project/path)))))
+            ;; Currently no other truncates...
+            (t
+             (setq name (concat name
+                                (apply #'str:propertize
+                                       (car project/path)
+                                       (cdr project/path))))))
 
-If PRETTY? is non-nil, return a pretty, propertized string.
-Otherwise, return an unpropertized string."
-  (concat
-   ;; project's name
-   (if pretty?
-       (propertize (alist-get :project/name project-alist) 'face 'underline)
-     (alist-get :project/name project-alist))
-   ;; separator
-   path:vc/git:rooted
-   ;; relative path
-   (alist-get :path project-alist)))
-;; (path:project:buffer/name (path:project:current/alist (path:abbreviate (path:current:file))))
+      ;;------------------------------
+      ;; Propertize for Modeline?
+      ;;------------------------------
+      (when modeline?
+        ;; Shouldn't overwrite any propertize, as these are non-dispaly properties for modeline help.
+        (setq name (str:propertize name
+                                   'mouse-face 'mode-line-highlight
+                                   'help-echo (concat buffer-file-truename
+                                                      (unless (string= (file-name-nondirectory buffer-file-truename)
+                                                                       (buffer-name))
+                                                        (concat "\n" (buffer-name)))
+                                                      "\nmouse-1: Previous buffer\nmouse-3: Next buffer")
+                                   'local-map mode-line-buffer-identification-keymap)))
+
+      ;;------------------------------
+      ;; Done; here's your buffer name:
+      ;;------------------------------
+      name)))
+;; (path:project:buffer/name:propertize :project/name '("hello"  face underline) :project/path '("path/to/file.txt". nil))
+;; (path:project:buffer/name:propertize :project/name '("hello"  face underline) :project/path '("path/to/file.txt". nil) :truncate 'path)
+;; (path:project:buffer/name:propertize :project/name '("hello"  face underline) :project/path '("path/to/file.txt". nil) :modeline? t)
 
 
 ;;------------------------------------------------------------------------------
