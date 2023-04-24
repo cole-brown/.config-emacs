@@ -197,8 +197,65 @@
 
 (imp:use-package marginalia
   ;; The :init configuration is always executed (Not lazy!)
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+  (marginalia-field-width 310)
+
   ;;------------------------------
   :init
+  ;;------------------------------
+
+  ;;------------------------------
+  ;; Field Width Fixes
+  ;;------------------------------
+
+  (define-advice marginalia--affixate (:around (fn &rest args) mantle:advice:fix-max-width)
+    "Fix Marginalia to allow correct max width of its fields.
+
+As of v20230217.2050, Marginalia incorrect assumes that its width is limited by
+windows. It is not. It is a minibuffer thing. It's limited by the width of the
+frame.
+
+FN should be `marginalia--affixate'. We do not modify its args, so ARGS are just
+passed along to it as-is."
+    ;; Use `frame-width' instead of `window-width'?
+    ;; TODO:marginalia: This is a bug anyways, though, as it gets the max of all
+    ;; windows(/frames). Really you ought to just get the width of THE GOD DAMN
+    ;; THING YOU'RE DISPLAYING IN!!!
+    (cl-letf (((symbol-function 'window-width) (lambda (&optional _window _pixelwise)
+                                                 "Ignore input params and return frame width in characters."
+                                                 (frame-width))))
+      ;; (window-width)
+      (apply fn args)))
+
+  (define-advice marginalia-annotate-buffer (:override (cand &rest args) mantle:advice:bigger-filename)
+    "Fix Marginalia's buffer annotations to have less wasted empty space.
+
+NOTE: This is compounded by the `marginalia--affixate' bug above, so beware of
+the interplay...
+
+As of v20230217.2050, Marginalia wants to truncate the buffer filename to `-0.5'
+aka 50%, right justified/truncated. And that's 50% _of the remaining half_!!!
+`marginalia--annotate' automatically divides its max width by 2 so that I assume
+the main thingy gets at least half of the minibuffer?
+
+So it truncates filenames to 25% of the width, which is super useful as that's
+almost enough to display the filename and one or two parent directories, most of
+the time... :eyeroll:
+
+Be greedier. Lots of shit truncates to 100% aka 1.0."
+    (when-let (buffer (get-buffer cand))
+      (marginalia--fields
+       ((marginalia--buffer-status buffer))
+       ((marginalia--buffer-file buffer)
+        :truncate 0.94 :face 'marginalia-file-name))))
+  ;; (advice-remove 'marginalia-annotate-buffer 'marginalia-annotate-buffer@mantle:advice:bigger-filename)
+
+
+  ;;------------------------------
+  ;; Enable!
   ;;------------------------------
 
   ;; Must be in the :init section of use-package such that the mode gets
