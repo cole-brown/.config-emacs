@@ -114,9 +114,9 @@
       "" '(nil :which-key "Fill...") ; Infix Title
 
       ;; Regions
-      "r" (list #'fill-region              :which-key "Region")
-      "a" (list #'fill-region-as-paragraph :which-key "Region as Paragraph")
-      "l" (list #'buffer                   :cmd:fill/region/single-line :which-key "Line")
+      "r" (list #'fill-region                        :which-key "Region")
+      "a" (list #'fill-region-as-paragraph           :which-key "Region as Paragraph")
+      "l" (list #'buffer:cmd:fill/region/single-line :which-key "Line")
 
       ;; Paragraphs
       "p" (list #'buffer:cmd:fill/paragraph/per-mode

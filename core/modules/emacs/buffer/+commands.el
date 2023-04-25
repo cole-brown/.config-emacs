@@ -162,9 +162,7 @@ So I only have to bind one thing in the fill prefix map.
 If optional JUSTIFY? is non-nil, justify the text filled (see function
 `fill-paragraph')."
   (interactive "P")
-  (if (called-interactively-p)
-      (funcall-interactively (int<buffer>:fill/paragraph/fn-for-mode) justify?)
-    (funcall (int<buffer>:fill/paragraph/fn-for-mode) justify?)))
+  (funcall (int<buffer>:fill/paragraph/fn-for-mode) justify?))
 
 
 (defun buffer:cmd:fill/region/single-line (&optional justify?)
@@ -175,12 +173,9 @@ That is: \"'Fill Region' on just this line, please.\"
 If optional JUSTIFY? is non-nil, justify the text filled (see function
 `fill-region')."
   (interactive "P")
-
   (let ((from (save-excursion (beginning-of-line) (point)))
         (to   (save-excursion (end-of-line)       (point))))
-    (if (called-interactively-p)
-        (funcall-interactively #'fill-region from to justify?)
-      (fill-region from to justify?))))
+    (fill-region from to justify?)))
 
 
 (defun buffer:cmd:fill/dwim/to-column (fill-to-column &optional justify?)
@@ -195,7 +190,7 @@ If optional JUSTIFY? is non-nil, justify the text filled (see function
 `fill-region')."
   (interactive (list
                 (read-number "Fill to Column: " 80)
-                "P"))
+                current-prefix-arg)) ;; (interactive "P") == `current-prefix-arg'
 
   (let ((fill-column fill-to-column))
     ;; DWIM: Region? Fill that.
