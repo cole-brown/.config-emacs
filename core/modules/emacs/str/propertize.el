@@ -34,6 +34,19 @@ Other relevant functions are documented in the text-properties group."
     string))
 
 
+(defun str:propertize:remove (string)
+  "Remove all text properties from STRING and return the plain string."
+  (when (stringp string)
+    (set-text-properties 0
+                         (length string)
+                         nil
+                         string))
+  string)
+;; (str:propertize:remove #("hello there" 0 5 (fontified t)))
+;; (str:propertize:remove nil)
+;; (str:propertize:remove 42)
+
+
 (cl-defun str:propertize:face/add (string &key start end face append)
   "Add the FACE property from START to END of STRING.
 
