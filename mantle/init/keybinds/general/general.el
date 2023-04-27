@@ -82,7 +82,9 @@ See: https://github.com/noctuid/general.el#override-keymaps-and-buffer-local-key
                                                (:meow . ((:emacs    . "C-x M-l") ; -> "SPC l"
                                                          ;; (:emacs . "C-x M-m") ; -> "SPC c m m"
                                                          (:meow     . "l")
-                                                         (:personal . "l"))))
+                                                         ;; [2023-04-27] Try "SPC SPC" instead of "SPC l" for local leader...
+                                                         ;; (:personal . "l"))))
+                                                         (:personal . "SPC"))))
     "`kbd' type string to use as the primary keybinds leader key.
 
 Use function `keybind:leader/local:prefix' to get the correct prefix.")
@@ -109,6 +111,7 @@ Add keybinds to the leader using function `keybind:leader/local' or
   ;; (keybind:leader/local:prefix :evil)
   ;; (keybind:leader/local:prefix :meow)
   ;; (keybind:leader/local:prefix :meow :emacs)
+  ;; (keybind:leader/local:prefix :meow :personal)
 
 
   ;;------------------------------------------------------------------------------
