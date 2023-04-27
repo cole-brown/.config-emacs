@@ -87,8 +87,12 @@
        :docstr  "Set up buffer local vars."
        :squelch t)
     (setq-local yas-indent-line 'auto)
+
     ;; Automatically becomes buffer local.
-    (setq tab-width (jerky:get 'docs 'tab 'short)))
+    (setq tab-width (jerky:get 'docs 'tab 'short))
+
+    ;; Auto-indentation is more annoying than useful in org, I think.
+    (electric-indent-local-mode -1))
 
 
   ;;------------------------------
@@ -267,7 +271,31 @@
   :when  (imp:flag? :keybinds +meow)
   :after meow
 
+  ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
+  (:map org-mode-map
+   ;;---
+   ;; Return of the +Jedi+ Enter Key:
+   ;; Fix how various enter keys work in org.
+   ;;---
+   ;; 1. "RET" should be a boring, plain, and unsurprising "\n".
+   ("RET" . newline)
+   ;; 2. Move "newline and maybe indent for me?".
+   ("S-RET" . org-newline-and-indent)
+   ;; 3. These are useful in lists to make more list items.
+   ;; TODO:keybind:org: make/find a smarter function for:
+   ;;   - "create first list item" or
+   ;;   - "toggle an empty list item between checkbox or no"
+   ;;   - "create another list item, with or without checkbox depending on current list item"
+   ("C-RET" . org-insert-todo-heading) ; TODO heading or a checkbox list item
+   ("M-RET" . org-meta-return)) ; Normal heading, normal list item, or various other things
+
+
+  ;;------------------------------
   :config
+  ;;------------------------------
+
   ;;------------------------------
   ;; `General'
   ;;------------------------------
