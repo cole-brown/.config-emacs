@@ -128,8 +128,9 @@
       "d" (list #'fill-paragraph             :which-key "Default ¶")
 
       ;; DWIM
-      "8" (list (elisp:cmd (buffer:cmd:fill/dwim/to-column 80)) :which-key "Fill to 80 (line/region)")
-      "?" (list #'buffer:cmd:fill/dwim/to-column                :which-key "Fill to... (line/region)")
+      "8" (list (elisp:cmd (buffer:cmd:fill/dwim/to-column 80))  :which-key "Fill to  80 (line/region)")
+      "0" (list (elisp:cmd (buffer:cmd:fill/dwim/to-column 100)) :which-key "Fill to 100 (line/region)")
+      "?" (list #'buffer:cmd:fill/dwim/to-column                 :which-key "Fill to...  (line/region)")
 
       ;; Unfill
       "u" (list #'buffer:cmd:fill/paragraph/unfill :which-key "Unfill ¶"))
