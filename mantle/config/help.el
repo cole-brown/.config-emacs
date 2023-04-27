@@ -144,32 +144,6 @@
   ;; :after helm
   ;; :after ivy
 
-  ;;------------------------------
-  :bind ; emacs
-  ;;------------------------------
-  ;;---
-  ;; global
-  ;;---
-  (("C-h f" . helpful-callable)
-   ("C-h v" . helpful-variable)
-   ("C-h k" . helpful-key)
-   ("C-h o" . helpful-symbol)
-   ;; replaces `finder-by-keyword' but I've never used that...
-   ("C-h p" . helpful-at-point)
-   ;; replaces `describe-coding-system' but I've never used that...
-   ("C-h C" . helpful-command)
-
-   ;;---
-   ;; helpful-mode-map
-   ;;---
-   :map helpful-mode-map
-   ;; kill-this-buffer instead of quit (bury)
-   ;; TRIAL: [2019-10-28]
-   ;; kill-or-quit instead of original quit-or-kill?
-   ;;  - "quit" as in bury...
-   ("q" . window:kill-or-quit))
-
-
   ;; ;;------------------------------
   ;; :custom
   ;; ;;------------------------------
@@ -193,6 +167,55 @@
   (when (imp:feature? 'helm)
     (setq helm-describe-function-function 'helpful-callable
           helm-describe-variable-function 'helpful-variable)))
+
+
+;;------------------------------
+;; Keybinds : Emacs, Always
+;;------------------------------
+;; `C-h [...]' is muscle memory, so we need to allow that still.
+
+(imp:use-package helpful
+
+  ;;------------------------------
+  :bind ; emacs
+  ;;------------------------------
+  ;;---
+  ;; global
+  ;;---
+  (("C-h f" . helpful-callable)
+   ("C-h v" . helpful-variable)
+   ("C-h k" . helpful-key)
+   ("C-h o" . helpful-symbol)
+   ;; replaces `finder-by-keyword' but I've never used that...
+   ("C-h p" . helpful-at-point)
+   ;; replaces `describe-coding-system' but I've never used that...
+   ("C-h C" . helpful-command)
+
+   ;;---
+   ;; helpful-mode-map
+   ;;---
+   :map helpful-mode-map
+   ;; kill-this-buffer instead of quit (bury)
+   ;; TRIAL: [2019-10-28]
+   ;; kill-or-quit instead of original quit-or-kill?
+   ;;  - "quit" as in bury...
+   ("q" . window:kill-or-quit)))
+
+
+;;------------------------------
+;; Keybinds : Meow
+;;------------------------------
+
+(imp:use-package helpful
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  :general
+  ;;------------------------------
+  ;; Global Keybinds
+  ;;------------------------------
+  (keybind:leader/global:def
+    "h" '(:keymap help-map :which-key "Help...")))
 
 
 ;;------------------------------------------------------------------------------
