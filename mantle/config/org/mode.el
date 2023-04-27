@@ -32,7 +32,7 @@
 (imp:require :buffer 'search)
 (imp:require :buffer 'name)
 (imp:require :mode 'org)
-
+(imp:require :template)
 
 ;;------------------------------------------------------------------------------
 ;; NOTE: Org-Mode TODO Sequence Keywords
@@ -53,6 +53,22 @@
   ;;------------------------------
   :init
   ;;------------------------------
+
+  ;;---
+  ;; Non-interactive Snippets
+  ;;---
+  (template:define :src 'org-mode
+    "#+begin_src %s" ; language
+    "%s"             ; yank/region
+    "#+end_src"
+    "")
+
+  (template:define :quote 'org-mode
+    "#+begin_quote"
+    "%s"            ; yank/region
+    "#+end_quote"
+    "")
+
 
   ;;---
   ;; Create Org-Mode Hooks
@@ -258,6 +274,9 @@
 
   (defun mantle:meow/keybind/general:notes ()
     "Create the \"Notes...\" keybinds in `general' for `meow'."
+    ;;------------------------------
+    ;; Global Keybinds
+    ;;------------------------------
     (keybind:leader/global:def
       :infix (keybind:infix "n")      ; notes
       "" '(nil :which-key "Notes...") ; infix title
@@ -277,7 +296,36 @@
       "" '(nil :which-key "Agenda...") ; infix title
       "A" (list #'org-agenda      :which-key "`org-agenda'")
       "t" (list #'org-tags-view   :which-key "Tags Search")
-      "v" (list #'org-search-view :which-key "View Search")))
+      "v" (list #'org-search-view :which-key "View Search"))
+
+    ;;------------------------------
+    ;; Local (`org-mode') Keybinds
+    ;;------------------------------
+    (keybind:meow:leader/local:bind-keys
+        'org-mode-map
+      "t" #'org-todo
+      "c" #'org-toggle-checkbox ; TODO:org: Could do `org-ctrl-c-ctrl-c' here instead?
+      "u" (list #'org-metaright :which-key "Indent/Demote")
+      "o" (list #'org-metaleft  :which-key "Outdent/Promote")
+      ;; TODO:org: More?
+      )
+
+  ;; TODO:meow: Make this function able to process infixes:
+  ;; (keybind:meow:leader/local:bind-keys
+  ;;     'org-mode-map
+  ;;   :infix (keybind:infix "i")        ; insert
+  ;;   "" '(nil :which-key "Insert...")) ; infix title
+
+  (keybind:meow:leader/local:bind-keys
+      'org-mode-map
+    ;; TODO:meow: Make this function able to process infixes:
+    ;; :infix (keybind:infix "i" "t")                 ; insert -> template
+    ;; "" '(nil :which-key "Templates...") ; infix title
+
+    ;; TODO:template: Better way to do an arg that will change but is generally the same?
+    ;;                Like a history variable or something? Or saving what mode something was killed from?
+    "it s" (template:cmd:insert :src "placeholder" :yank)
+    "it q" (template:cmd:insert :quote :yank)))
 
 
   ;;------------------------------
