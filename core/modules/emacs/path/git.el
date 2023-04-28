@@ -24,6 +24,12 @@
 ;; Pretty Repo Paths
 ;;--------------------------------------------------------------------------------
 
+(defcustom path:vc/git:rooted ":/"
+  "Git uses ':/' as \"the root of this repo\" in its pathspec."
+  :group 'path:group
+  :type 'string)
+
+
 (defun path:vc/git:rooted (project-name &rest relative-path)
   "Return a path rooted at the PROJECT-NAME/repository.
 

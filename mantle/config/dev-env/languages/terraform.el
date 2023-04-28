@@ -242,9 +242,9 @@ Return a string:
   ;;------------------------------
   (keybind:leader/local:def
     :map terraform-mode-map
-    "a" (list (mantle:terraform:run "apply") :which-key (mantle:terraform:command "apply"))
-    "i" (list (mantle:terraform:run "init")  :which-key (mantle:terraform:command "init"))
-    "p" (list (mantle:terraform:run "plan")  :which-key (mantle:terraform:command "plan"))))
+    "a" (list (elisp:cmd (mantle:terraform:run "apply")) :which-key "terraform apply")  ; (mantle:terraform:command "apply"))
+    "i" (list (elisp:cmd (mantle:terraform:run "init"))  :which-key "terraform init")   ; (mantle:terraform:command "init"))
+    "p" (list (elisp:cmd (mantle:terraform:run "plan"))  :which-key "terraform plan"))) ; (mantle:terraform:command "plan"))))
 
 
 ;; ;;------------------------------------------------------------------------------
