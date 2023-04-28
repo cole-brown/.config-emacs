@@ -242,9 +242,9 @@ Check `:face' and `:color:icon'.
 Return nil if no face found."
     (cond ((plist-get plist :face))
           ((plist-member plist :color:icon)
-           (list :foreground (plist-get plist :color:icon))
+           (list :foreground (plist-get plist :color:icon)))
            (t
-            nil))))
+            nil)))
 
 
   (defun +modeline-format-icon (icon label &optional face help-echo voffset)
