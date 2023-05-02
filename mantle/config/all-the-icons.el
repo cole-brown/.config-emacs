@@ -236,25 +236,42 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 (imp:eval:after all-the-icons
 
   (defun int<mantle>:user:icon:face (plist)
-    "Get face to use from PLIST.
+    "Get face to use for icon from PLIST.
 
-Check `:face' and `:color:icon'.
+Check `:face', `:face:icon', and `:color:icon'.
 Return nil if no face found."
-    (cond ((plist-get plist :face))
+    ;; Options specific to the icon first.
+    (cond ((plist-get plist :face:icon))
           ((plist-member plist :color:icon)
            (list :foreground (plist-get plist :color:icon)))
-           (t
-            nil)))
+          ((plist-get plist :face))
+          (t
+           nil)))
 
 
-  (defun +modeline-format-icon (icon label &optional face help-echo voffset)
-    (propertize (concat (all-the-icons-material
-                         icon
-                         :face face
-                         :height 1.1
-                         :v-adjust (or voffset -0.225))
-                        (propertize label 'face face))
-                'help-echo help-echo))
+  (defun int<mantle>:user:icon:text (plist)
+    "Get face to use for text from PLIST.
+
+Check `:face', `:face:text', and `:color:text'.
+Return nil if no face found."
+    ;; Options specific to the text first.
+    (cond ((plist-get plist :face:text))
+          ((plist-member plist :color:text)
+           (list :foreground (plist-get plist :color:text)))
+          ((plist-get plist :face))
+          (t
+           nil)))
+
+
+  ;; TODO:all-the-icons: `help-echo' and others from the optional PLIST?
+  ;; (defun +modeline-format-icon (icon label &optional face help-echo voffset)
+  ;;   (propertize (concat (all-the-icons-material
+  ;;                        icon
+  ;;                        :face face
+  ;;                        :height 1.1
+  ;;                        :v-adjust (or voffset -0.225))
+  ;;                       (propertize label 'face face))
+  ;;               'help-echo help-echo))
 
 
   ;; Advice via `define-advice' is named SYMBOL@NAME, so in this case the advice
@@ -280,15 +297,16 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
     ;; Only bother propertizing if we need to.
-    (let ((face (int<mantle>:user:icon:face plist)))
+    (let ((face/icon (int<mantle>:user:icon:face plist))
+          (face/text (int<mantle>:user:icon:text plist)))
       (concat
        (all-the-icons-faicon icon
-                             :face face
+                             :face face/icon
                              :v-adjust (or (plist-get plist :v-adjust) 0)
                              :height (or (plist-get plist :height) 1))
        " "
-       (if face
-           (propertize str 'face face)
+       (if face/text
+           (propertize str 'face face/text)
          str))))
   ;; (mantle:user:icon/font-awesome "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05)
   ;; (insert (mantle:user:icon/font-awesome "spotify" "Spotify" :color:icon "limegreen" :height 1 :v-adjust -0.05))
@@ -314,15 +332,16 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
     ;; Only bother propertizing if we need to.
-    (let ((face (int<mantle>:user:icon:face plist)))
+    (let ((face/icon (int<mantle>:user:icon:face plist))
+          (face/text (int<mantle>:user:icon:text plist)))
       (concat
        (all-the-icons-fileicon icon
-                               :face face
+                               :face face/icon
                                :v-adjust (or (plist-get plist :v-adjust) 0)
                                :height (or (plist-get plist :height) 1))
        " "
        (if face
-           (propertize str 'face face)
+           (propertize str 'face face/text)
          str))))
 
 
@@ -346,15 +365,16 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
     ;; Only bother propertizing if we need to.
-    (let ((face (int<mantle>:user:icon:face plist)))
+    (let ((face/icon (int<mantle>:user:icon:face plist))
+          (face/text (int<mantle>:user:icon:text plist)))
       (concat
        (all-the-icons-octicon icon
-                              :face face
+                              :face face/icon
                               :v-adjust (or (plist-get plist :v-adjust) 0)
                               :height (or (plist-get plist :height) 1))
        " "
        (if face
-           (propertize str 'face face)
+           (propertize str 'face face/text)
          str))))
 
 
@@ -379,15 +399,16 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
 
 [2022-02-04] https://gist.github.com/mbuczko/e15d61363d31cf78ff17427072e0c325"
     ;; Only bother propertizing if we need to.
-    (let ((face (int<mantle>:user:icon:face plist)))
+    (let ((face/icon (int<mantle>:user:icon:face plist))
+          (face/text (int<mantle>:user:icon:text plist)))
       (concat
        (all-the-icons-material icon
-                               :face face
+                               :face face/icon
                                :v-adjust (or (plist-get plist :v-adjust) 0)
                                :height (or (plist-get plist :height) 1))
        " "
        (if face
-           (propertize str 'face face)
+           (propertize str 'face face/text)
          str))))
 
 
@@ -432,26 +453,27 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
                           (if (eq major-mode 'emacs-lisp-mode)
                               0.0
                             0.05)))
-           (face (int<mantle>:user:icon:face plist))
+           (face/icon (int<mantle>:user:icon:face plist))
+           (face/text (int<mantle>:user:icon:text plist))
            (separator (if (stringp (plist-get plist :separator))
                           (plist-get plist :separator)
                         " "))
            (icon      (all-the-icons-icon-for-mode mode
-                                                   :face     face
+                                                   :face     face/icon
                                                    :height   height
                                                    :v-adjust v-adjust))
            (icon      (if (symbolp icon)
                           ;; Failed to find a specific icon for the mode; fallback:
                           (all-the-icons-octicon "file-text"
-                                                 :face     face
+                                                 :face     face/icon
                                                  :height   height
                                                  :v-adjust v-adjust)
                         icon)))
 
       (concat icon
               separator
-              (if face
-                  (propertize str 'face face)
+              (if face/text
+                  (propertize str 'face face/text)
                 str)))))
 
 
