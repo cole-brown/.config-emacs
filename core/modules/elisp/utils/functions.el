@@ -121,16 +121,40 @@ Proudly nicked from Doom's `cmd!' in \"core/core-lib.el\"."
 A factory for quickly producing interaction commands, particularly for keybinds
 or aliases.
 
+For \"just the standard prefix arg please\" PREFIX-PARAM should be one of:
+  - `:prefix/always'
+  - `prefix/always'
+  - `(list 4)'
+    - This is what `universal-argument' sets `current-prefix-arg' to for the
+      `interactive' \"P\" spec.
+
+For \"maybe a prefix, maybe not\" PREFIX-PARAM sholud be:
+  - nil
+
 Like `elisp:cmd', but allows you to change `current-prefix-arg'arguments to
 COMMAND. This macro is meant to be used as a target for keybinds (e.g. with
 `define-key' or `general-def').
 
 Originally from Doom's `cmd!!' in \"core/core-lib.el\"."
-  (declare (doc-string 1) (pure t) (side-effect-free t))
+  (declare (doc-string 1)
+           (pure t)
+           (side-effect-free t))
   `(lambda (&optional arg &rest _) (interactive "P")
-     (let ((current-prefix-arg (or ,prefix-param arg)))
-       (call-interactively
-        ,command))))
+     (let* ((prefix ,prefix-param)
+            (current-prefix-arg (cond
+                                 ;; Translate pretty PREFIX-PARAM to something Emacs understands?
+                                 ((memq prefix '(:prefix/always prefix/always))
+                                  '(4))
+                                 ;; PREFIX-PARAM exists; use it.
+                                 (prefix)
+                                 ;; No PREFIX-PARAM, so this is just a
+                                 ;; "prefix-maybe" command; use whatever
+                                 ;; was supplied with this command
+                                 ;; invocation.
+                                 (t
+                                  arg))))
+       (call-interactively ,command))))
+;; (let ((cmd (elisp:cmd/prefix (lambda (&optional x) (interactive "P") (message "prefix: %S" x)) :prefix))) (call-interactively cmd))
 
 
 (defmacro elisp:cmd/args (command &rest args)

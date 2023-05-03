@@ -76,11 +76,11 @@
       ;; Names / Paths
       ;;---
       "y" (list #'path:cmd:buffer:copy:absolute :which-key "Path: Copy")
-      "Y" (list (elisp:cmd/prefix #'path:cmd:buffer:copy:absolute '(4)) ;; Call with simulated C-u prefix arg.
+      "Y" (list (elisp:cmd/prefix #'path:cmd:buffer:copy:absolute :prefix/always) ;; Call with simulated C-u prefix arg.
                 :which-key "Path: Copy Parent")
 
       "r" (list #'path:cmd:buffer:copy:project :which-key "Path @ Project: Copy")
-      "R" (list (elisp:cmd/prefix #'path:cmd:buffer:copy:project '(4)) ;; Call with simulated C-u prefix arg.
+      "R" (list (elisp:cmd/prefix #'path:cmd:buffer:copy:project :prefix/always) ;; Call with simulated C-u prefix arg.
                 :which-key "Path @ Project: Copy Parent"))
 
     ;;------------------------------
@@ -157,12 +157,12 @@
     ;;------------------------------
 
     (defalias 'mantle:meow/transient:file/copy:path/copy/parent/absolute
-      (elisp:cmd/prefix #'path:cmd:buffer:copy:absolute '(4))
+      (elisp:cmd/prefix #'path:cmd:buffer:copy:absolute :prefix/always)
       "Copy parent's absolute path.")
 
 
     (defalias 'mantle:meow/transient:file/copy:path/copy/parent/relative
-      (elisp:cmd/prefix #'path:cmd:buffer:copy:project '(4))
+      (elisp:cmd/prefix #'path:cmd:buffer:copy:project :prefix/always)
       "Copy parent's relative path.")
 
 
@@ -319,11 +319,11 @@
    ;; Names / Paths
    ;;---
    "y" (list #'path:cmd:buffer:copy:absolute :which-key "Path: Copy")
-   "Y" (list (elisp:cmd/prefix #'path:cmd:buffer:copy:absolute '(4)) ;; Call with simulated C-u prefix arg.
+   "Y" (list (elisp:cmd/prefix #'path:cmd:buffer:copy:absolute :prefix/always) ;; Call with simulated C-u prefix arg.
              :which-key "Path: Copy Parent")
 
    "r" (list #'path:cmd:buffer:copy:project :which-key "Path, Relative: Copy")
-   "R" (list (elisp:cmd/prefix #'path:cmd:buffer:copy:project '(4)) ;; Call with simulated C-u prefix arg.
+   "R" (list (elisp:cmd/prefix #'path:cmd:buffer:copy:project :prefix/always) ;; Call with simulated C-u prefix arg.
              :which-key "Path, Relative: Copy Parent"))
 
   ;;------------------------------
