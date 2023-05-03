@@ -83,9 +83,21 @@
   ;; TODO: Or... allow to define as "just use the functions"? (This is in meow + my code.)
 
 
-  ;; Using 'C-u' for other things; need to be able to use prefix args still:
+  ;; Using 'C-u' for other things; need to be able to use prefix args still.
+  ;; Define in meow's leader:
   (meow-leader-define-key
-   '("u" . universal-argument))
+   ;; 'SPC u' makes a lot of sense for taking over from 'C-u', but "u" is a premium home-row
+   ;; key in Dvorak. So try something else.
+   ;; '("u" . universal-argument)
+   '("p" . universal-argument))
+
+  ;; Define in my leader:
+  (keybind:leader/global:def
+    ;; 'SPC u' makes a lot of sense for taking over from 'C-u', but "u" is a premium home-row
+    ;; key in Dvorak. So try something else.
+    ;; '("u" . universal-argument)
+    ;; "u" (list #'universal-argument :which-key "Prefix Arg"))
+    "p" (list #'universal-argument :which-key "Prefix Arg"))
 
 
   ;; ╔═════════════════════════════════════════════════════════════════════════╗
@@ -189,6 +201,7 @@
   ;; │ Misc.                          │
   ;; └────────────────────────────────┘
 
+  ;; Define in Meow's leader:
   (meow-leader-define-key
    '("1" . meow-digit-argument)
    '("2" . meow-digit-argument)
@@ -204,6 +217,19 @@
    ;; '("Hh" . meow-cheatsheet)
    ;; '("Hk" . meow-keypad-describe-key)
    )
+
+  ;; Define in my leader:
+  (keybind:leader/global:def
+   "1" (list #'meow-digit-argument :which-key "Meow Digit 1")
+   "2" (list #'meow-digit-argument :which-key "Meow Digit 2")
+   "3" (list #'meow-digit-argument :which-key "Meow Digit 3")
+   "4" (list #'meow-digit-argument :which-key "Meow Digit 4")
+   "5" (list #'meow-digit-argument :which-key "Meow Digit 5")
+   "6" (list #'meow-digit-argument :which-key "Meow Digit 6")
+   "7" (list #'meow-digit-argument :which-key "Meow Digit 7")
+   "8" (list #'meow-digit-argument :which-key "Meow Digit 8")
+   "9" (list #'meow-digit-argument :which-key "Meow Digit 9")
+   "0" (list #'meow-digit-argument :which-key "Meow Digit 0"))
 
   ;; NOTE: Bind meow help stuff into `help-map' on 'C-h'.
   ;; `help-for-help' has several binds in the `help-map', so just steal its 'C-h' bind.
@@ -382,6 +408,14 @@
              macro<imp>:path/file
            "`undo-fu' not yet supported as a Meow undo thing.")))
 
+
+  ;; ╔═════════════════════════════════════════════════════════════════════════╗
+  ;; ║ Leader Infixes                                                          ║
+  ;; ╚═════════════════════════════════════════════════════════════════════════╝
+
+  ;; Want these set up before _any_ config is done (so that they're definitely
+  ;; set up first and we don't have to worry about ordering), so see:
+  ;;   :/mantle/init/keybinds/general/+meow.el
 
   ;; ╔═════════════════════════════════════════════════════════════════════════╗
   ;; ║ Enable Meow!                                                            ║

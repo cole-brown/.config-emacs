@@ -291,6 +291,15 @@ Keywords are: `:no-commands', `:commands'")
 
 
   ;;------------------------------------------------------------------------------
+  ;; Leader Infixes
+  ;;------------------------------------------------------------------------------
+
+  (keybind:leader/global:def
+    :infix (keybind:infix "u")           ; No mnemonic for this one...
+    "" '(nil :which-key "Apps & Stuff")) ; Apps (e.g. Spotify), Stuff (e.g. ChatGPT?)
+
+
+  ;;------------------------------------------------------------------------------
   ;; Feature for Definers, Etc.
   ;;------------------------------------------------------------------------------
   ;; TODO: Have imp provide all of everything to Emacs?
