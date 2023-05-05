@@ -216,20 +216,24 @@
 
 (imp:use-package all-the-icons
   ;; Only use `all-the-icons' when we have a GUI.
-  :if (display-graphic-p)
+  ;;---
+  ;; NOTE [2023-05-04]:
+  ;; Just checking `display-graphic-p' is what `all-the-icons' says to do, and
+  ;; it is incorrect. It returns nil during startup. I assume because I'm
+  ;; starting Emacs as a server? It returns t properly once I'm in control
+  ;; enough to evaluate: (display-graphic-p)
+  ;;
+  ;; Can't check `server-running-p' for other reasons...
+  ;;   http://emacshorrors.com/posts/determining-if-the-server-is-started-or-the-wonders-of-server-running-p.html
+  ;; But `innit:emacs/server:running?' does implement a suggestion from long ago
+  ;; that never got added to Emacs:
+  ;;   https://lists.gnu.org/archive/html/bug-gnu-emacs/2018-06/msg00723.html
+  ;;---
+  :if (or (display-graphic-p)
+          (innit:emacs/server:running?))
 
   ;;------------------------------------------------------------------------------
-  :autoload
-  ;;------------------------------------------------------------------------------
-  (mantle:user:icon/font-awesome
-   mantle:user:icon/file-icon
-   mantle:user:icon/octicon
-   mantle:user:icon/material
-   mantle:user:icon:for-mode)
-
-
-  ;;------------------------------------------------------------------------------
-  :config
+  :init
   ;;------------------------------------------------------------------------------
 
   ;;------------------------------------------------------------------------------
@@ -482,6 +486,9 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
                 str))))
 
 
+  ;;------------------------------------------------------------------------------
+  :config
+  ;;------------------------------------------------------------------------------
   ;;------------------------------------------------------------------------------
   ;; Configuration
   ;;------------------------------------------------------------------------------
