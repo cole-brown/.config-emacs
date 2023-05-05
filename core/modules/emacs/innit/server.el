@@ -66,16 +66,47 @@
 ;;     -> http://lists.gnu.org/archive/html/bug-gnu-emacs/2018-06/msg00723.html
 ;; (unless (server-running-p) (server-start))
 (defun innit:emacs/server:process? ()
-  "Return non-nil if this Emacs has a server process."
+  "Return non-nil if this Emacs has a server process running."
   (bound-and-true-p server-process))
 ;; (innit:emacs/server:process?)
 
 
-(defun innit:emacs/server:running? ()
-  "Return non-nil if this Emacs has a server process and a server file/socket."
-  (and (innit:emacs/server:process?)
-       (innit:emacs/server:path)))
+(cl-defun innit:emacs/server:running? (&key (process t)
+                                            (file-or-socket nil))
+  "Return non-nil if this Emacs has a server running.
+
+Two keyword params:
+  - `:process'        - nil/non-nil (default t)
+  - `:file-or-socket' - nil/non-nil (default nil)
+
+If PROCESS is non-nil, this Emacs must have a `server-process'.
+If FILE-OR-SOCKET is non-nil, this Emacs must have an existing file/socket."
+  ;;------------------------------
+  ;; Sanity Check
+  ;;------------------------------
+  ;; Have to check for _something_...
+  (unless (or process file-or-socket)
+    (error "innit:emacs/server:running?: PROCESS or FILE-OR-SOCKET must be non-nil! Got: `:process' = %S, `:file-or-socket' = %S"
+           process
+           file-or-socket))
+
+  ;;------------------------------
+  ;; Is your server running?
+  ;;------------------------------
+  ;; ...well you better go catch it!
+  (and
+   ;; Check for process?
+   (or (not process)
+       (innit:emacs/server:process?))
+   ;; Check for file?
+   (or (not file-or-socket)
+       (innit:emacs/server:path))))
 ;; (innit:emacs/server:running?)
+;; (innit:emacs/server:running? :process t)
+;; (innit:emacs/server:running? :process nil)
+;; (innit:emacs/server:running? :file-or-socket t)
+;; (innit:emacs/server:running? :process nil :file-or-socket t)
+;; (innit:emacs/server:running? :process 'yep :file-or-socket 'yep)
 
 
 ;;------------------------------------------------------------------------------
