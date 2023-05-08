@@ -111,48 +111,131 @@
   :config
   ;;------------------------------
 
+  ;; HACK: Bug fix via advice. See for more info:
+  ;;   emacs-sn004:/docs/issues/2019-08-26_whitespace-mode-and-move-to-column.org
+  (define-advice move-to-column (:filter-args (args) ws-butler/whitespace-mode:fix/force-off-by-one)
+    "Un-lose the one single space that's being lost sometimes.
+
+Bug Conditions:
+  1. `whitespace-mode' is on
+  2. `move-to-column' is called with 'force' set true (`ws-butler' does this).
+  3. `ws-butler-keep-whitespace-before-point' is on
+Number 3 isn't actually necessary but it's the only time I've
+noticed this bug (aside from contriving it in bug hunts/repros).
+
+Repro:
+  1. Start emacs without user init: `emacs -q`
+  2. Paste the following code into the scratch buffer.
+  3. Run `M-x eval-buffer`
+  4. Run `M-x bug:whitespace:repro`
+
+(defun bug:whitespace:move-30-force ()
+  (interactive)
+  (move-to-column 30 t))
+
+(defun bug:whitespace:repro ()
+  (interactive)
+  ;; Set Up
+  (let ((buffer-name \"bug:whitespace:repro\"))
+    ;; Get a fresh buffer for each test.
+    (when-let ((buffer (get-buffer buffer-name)))
+      (kill-buffer buffer-name))
+    (pop-to-buffer (get-buffer-create buffer-name)))
+  ;; Make sure we don't have our bugfix advice running when we're trying to prove the bug.
+  (require 'nadvice)
+  (advice-mapc (lambda (advice _props) (advice-remove sym advice)) 'move-to-column)
+  ;; Don't want tabs when we're trying to count spaces.
+  (setq indent-tabs-mode nil)
+  ;; Not needed for bug; for seeing column/line on modeline.
+  (column-number-mode t)
+  (line-number-mode t)
+
   ;;------------------------------
-  ;; TODO: Does this bug still exist? This was from a few years ago in sn-002 config.
+  ;; Reproduce the bug!
   ;;------------------------------
-  ;;     ;; For a bug. See for more info:
-  ;;     ;;  sn-002 docs: "whitespace-and-butler/move-to-column.org"
-  ;;     (defun sn-002/advice/move-to-column/force-fix (args)
-  ;;       "Un-lose the one single space that's being lost sometimes."
-  ;;       (let ((column (nth 0 args))
-  ;;             (force (nth 1 args)))
+  ;; The bug: `whitespace-mode' and `move-to-column' (only when FORCE is non-nil
+  ;; (and it actually has to force)) interact with each other to produce an
+  ;; off-by-one error. For this example, we'll do \"Move 1\" without
+  ;; `whitespace-mode', to see what's expected of `(move-to-column 30 t)'.
   ;;
-  ;;         ;; bug conditions:
-  ;;         ;;   1. whitespace-mode is on
-  ;;         ;;   2. move-to-column is called with 'force' set true.
-  ;;         ;;   3. ws-butler-keep-whitespace-before-point is on
-  ;;         ;; Number 3 isn't actually necessary but it's the only time I've
-  ;;         ;; noticed this bug (aside from contriving it in bug hunts/repros).
-  ;;         (when (and (or global-whitespace-mode whitespace-mode)
-  ;;                    force
-  ;;                    ;; Not needed but ws-butler is what triggers this all the time
-  ;;                    ;; so I'll contain my brute force fix to only work if ws-butler
-  ;;                    ;; is setup to expect move-to-column to restore point.
-  ;;                    ws-butler-keep-whitespace-before-point)
-  ;;           ;; Possibly a bugged move-to-column... Let's figure out how far we
-  ;;           ;; have to go.
-  ;;           (save-excursion
-  ;;             (let ((at-last-line (> (forward-line 1) 0)))
-  ;;               (unless at-last-line (forward-line -1))
-  ;;               (move-end-of-line nil)
-  ;;               (when (and (> column (current-column))
-  ;;                          (not at-last-line))
-  ;;                 ;; We're in bug territory, and we want past current EOL, and this
-  ;;                 ;; line has a '\n' in it, so I think we have a bugged
-  ;;                 ;; move-to-column case. Up by one to offset for move-to-column's
-  ;;                 ;; off-by-one-in-this-instance bug.
-  ;;                 (setq column (1+ column))))))
-  ;;         ;; return list of (fixed or ignored) inputs
-  ;;         (list column force)))
-  ;;     ;; And now add our shenanigan to the function...
-  ;;     (advice-add 'move-to-column
-  ;;                 :filter-args #'sn-002/advice/move-to-column/force-fix)
-  ;;     ;;(advice-remove 'move-to-column #'sn-002/advice/move-to-column/force-fix)
-  ;;------------------------------
+  ;; Legend:
+  ;;   - '█' : our text cursor
+  ;;   - '-' : space
+  ;;     - '·' : space
+
+  ;;---
+  ;; [OK] Move 1: Unbugged Move:
+  ;;---
+  ;; Move 1: Expect:
+  ;; move-1:······················█
+  ;; Move 1: Get:
+  ;; move-1:······················█
+  (insert \"move-1:[OK]:\")
+  (move-to-column 30 t)
+  (insert (format \"column: %2d\" (current-column)))
+
+  ;;---
+  ;; Bug set up:
+  ;;---
+  ;; 1. Whitespace mode must be enabled!
+  (whitespace-mode 'enable)
+  ;; 2. We must not be on the final line of the buffer.
+  (insert \"\n\n\")
+  (forward-line -1)
+
+  ;;---
+  ;; [ERROR] Move 2: Bugged Move:
+  ;;---
+  ;; Move 2: Expect:
+  ;; move-2:······················█
+  ;; Move 2: Get:
+  ;; move-2:·····················█
+  (insert \"move-2:[ERROR]:\")
+  (move-to-column 30 t)
+  (insert (format \"column: %2d\" (current-column)))
+
+  ;;---
+  ;; [OK] Move 3: Final line of buffer is immune to bug:
+  ;;---
+  ;; Move 3: Expect:
+  ;; move-3:······················█
+  ;; Move 3: Get:
+  ;; move-3:······················█
+  (goto-char (point-max))
+  (insert \"move-3:[OK]:\")
+  (move-to-column 30 t)
+  (insert (format \"column: %2d\" (current-column))))"
+    (let ((column (nth 0 args))
+          (force (nth 1 args)))
+      ;; Bug Conditions:
+      ;;   1. `whitespace-mode' is on
+      ;;   2. `move-to-column' is called with 'force' set true.
+      ;;   3. `ws-butler-keep-whitespace-before-point' is on
+      ;; Number 3 isn't actually necessary but it's the only time I've
+      ;; noticed this bug (aside from contriving it in bug hunts/repros).
+      (when (and (or (bound-and-true-p global-whitespace-mode)
+                     (bound-and-true-p whitespace-mode))
+                 force
+                 ;; Not needed but ws-butler is what triggers this all the time
+                 ;; so I'll contain my brute force fix to only work if ws-butler
+                 ;; is setup to expect move-to-column to restore point.
+                 (bound-and-true-p ws-butler-keep-whitespace-before-point))
+        ;; Possibly a bugged move-to-column... Let's figure out how far we
+        ;; have to go.
+        (save-excursion
+          (let ((at-last-line (> (forward-line 1) 0)))
+            (unless at-last-line (forward-line -1))
+            (move-end-of-line nil)
+            (when (and (> column (current-column))
+                       (not at-last-line))
+              ;; We're in bug territory, and we want past current EOL, and this
+              ;; line has a '\n' in it, so I think we have a bugged
+              ;; move-to-column case. Up by one to offset for move-to-column's
+              ;; off-by-one-in-this-instance bug.
+              (setq column (1+ column))))))
+      ;; return list of (fixed or ignored) inputs
+      (list column force)))
+  ;; (advice-remove 'move-to-column #'move-to-column@ws-butler/whitespace-mode:fix/force-off-by-one)
 
   ;; Turn on ws-butler globally.
   (ws-butler-global-mode 1))
