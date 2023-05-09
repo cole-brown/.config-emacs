@@ -55,6 +55,19 @@
 
   (defun mantle:meow/keybind/general:text ()
     "Create the \"Text...\" keybinds in `general' for `meow'."
+    ;;------------------------------
+    ;; Insert Keybinds
+    ;;------------------------------
+
+    (keybind:leader/global:def
+      :infix (keybind:infix "i")
+      ;; ASCII/Unicode Lines Box Art Hydra
+      "b" '(art:cmd:box/draw :which-key "Unicode Box..."))
+
+
+    ;;------------------------------
+    ;; Text Keybinds
+    ;;------------------------------
 
     (keybind:leader/global:def
       :infix "t"                      ; text
@@ -67,7 +80,7 @@
       :infix (keybind:infix "t")
 
       ;; ASCII/Unicode Lines Box Art Hydra
-      "b" '(art:cmd:box/draw                                 :which-key "Unicode Box...")
+      "b" '(art:cmd:box/draw                                      :which-key "Unicode Box...")
 
       ;; Join Lines Hydra
       "j" (list (elisp:cmd (hydra:call 'buffer:hydra:join-lines)) :which-key "Join Lines...")
