@@ -40,8 +40,9 @@ Otherwise, raise an error signal with FORMAT and ARGS."
 (defvar int<template>:store nil
   "Storage hash table for templates.
 
-Keys should be keywords.
-Values should be templates.")
+Store is a hashtable of hashtables:
+  - mode symbol or nil -> templates hash table
+    - template keyword -> compiled template string")
 
 
 (defun int<template>:store/create ()
@@ -74,6 +75,34 @@ BODY should be TODO TODO TODO."
     (puthash mode templates-for-mode int<template>:store)))
 
 
+(defun int<template>:store/get/mode (mode &optional no-error?)
+  "Get the hashtable of templates for MODE.
+
+MODE should be one of:
+  - symbol  - template is for a single mode
+  - nil     - template is global (for any/all modes)
+  - `:auto' - Use current major mode or global to find the template.
+
+If no hash table for MODE exists (that is, if there are no templates for MODE),
+raise an error signal unless NO-ERROR? is non-nil, in which case just return
+nil."
+  (let ((func/name "int<template>:store/get/mode"))
+    ;; Don't bother if there's nothing to look in?
+    (if (not (hash-table-p int<template>:store))
+        (int<template>:error-or-nil no-error?
+          "%s: No templates exist at all"
+          func/name)
+      ;; Have hash table; try to find the template.
+      (if-let ((templates/mode (gethash mode int<template>:store)))
+          ;; Have something for the mode; keep going!
+          templates/mode
+        (int<template>:error-or-nil no-error?
+          "%s: No templates exist for mode `%S'"
+          func/name
+          mode)))))
+;; (int<template>:store/get/mode 'org-mode)
+
+
 (defun int<template>:store/get (mode template &optional no-error?)
   "Get the template for MODE and TEMPLATE.
 
@@ -85,26 +114,22 @@ MODE should be one of:
 If no template exists, raise an error signal unless NO-ERROR? is non-nil, in
 which case just return nil."
   (let ((func/name "int<template>:store/get"))
-    ;; Don't bother if there's nothing to look in?
-    (if (not (hash-table-p int<template>:store))
-        (int<template>:error-or-nil no-error?
-          "%s: No templates exist"
-          func/name)
-      ;; Have hash table; try to find the template.
-      (if-let ((templates/mode (gethash mode int<template>:store)))
+    (if-let ((templates/mode (int<template>:store/get/mode mode int<template>:store)))
           ;; Have something for the mode; keep going!
           (if-let ((value (gethash template templates/mode)))
               ;; Found it; return it!
               value
+            ;; Error / return nil
             (int<template>:error-or-nil no-error?
               "%s: Template `%S' does not exist for mode `%S'"
               func/name
               template
               mode))
+      ;; Error / return nil
         (int<template>:error-or-nil no-error?
           "%s: No templates exist for mode `%S'"
           func/name
-          mode)))))
+          mode))))
 ;; (int<template>:store/get 'org-mode :src)
 ;; (int<template>:store/get 'org-mode :src :no-error)
 
@@ -175,6 +200,85 @@ Return list of matching templates in best-match order."
 ;; (int<template>:store/get 'org-mode :src)
 ;; (int<template>:store/find nil 'org-mode :src)
 ;; (int<template>:store/find nil :auto :src)
+
+
+(defun int<template>:store/find/mode (buffer mode &optional no-error?)
+  "Get all templates for MODE.
+
+BUFFER should be a buffer name, buffer object, or nil (for `current-buffer').
+
+MODE should be one of:
+  - symbol  - template is for a single mode
+  - nil     - template is global (for any/all modes)
+  - `:auto' - Use current major mode or global to find the template.
+
+If no template exists, raise an error signal unless NO-ERROR? is non-nil, in
+which case just return nil.
+
+Return list of matching templates in best-match order."
+  (let ((func/name "int<template>:store/find/mode")
+        (buffer (if buffer
+                    (get-buffer buffer)
+                  (current-buffer)))
+        found)
+    (with-current-buffer buffer
+      ;; Keyword? Recurse to gather everything.
+      (cond ((keywordp mode)
+             (pcase mode
+               (:auto
+                ;; 3rd: Filter out any nils from our results.
+                (setq found
+                      (seq-filter (lambda (x) (not (null x)))
+                                  (append
+                                   ;; 1st: Look for a template for this buffer's current mode.
+                                   (int<template>:store/find/mode buffer
+                                                                  major-mode
+                                                                  :no-error)
+                                   ;; 2nd: Look for a global template.
+                                   (int<template>:store/find/mode buffer
+                                                                  nil
+                                                                  :no-error))))
+                ;; And now, if we still have nothing and should complain loudly,
+                ;; complain loudly:
+                (unless found
+                  (int<template>:error-or-nil no-error?
+                    "%s: `%S' mode: No templates found in global or `%S'!"
+                    func/name
+                    mode
+                    major-mode)))
+               (_
+                (int<template>:error-or-nil no-error?
+                  "%s: Unknown MODE keyword `%S'! Valid: %S"
+                  func/name
+                  mode
+                  '(:auto)))))
+
+            ;; Global template?
+            ;; Major mode template?
+            ;; Same code actually.
+            ((or (null mode)
+                 (symbolp mode))
+             ;; Skip checking if the mode supplied matches the current major mode.
+             ;; Could add it here if it seems useful.
+             (let ((templates/mode (int<template>:store/get/mode mode no-error?)))
+               (when (hash-table-p templates/mode)
+                 (maphash (lambda (keyword template)
+                            "Gather KEYWORD/TEMPLATE pairs for mode into results."
+                            (push (cons keyword template) found))
+                          templates/mode))))
+
+            ;; Fallthrough to a Nice Error:
+            (t
+             (int<template>:error-or-nil no-error?
+               "%s:  MODE must be a symbol, nil, or `:auto'. Got '%s': %S"
+               func/name
+               (type-of mode)
+               mode)))
+      found)))
+;; (int<template>:store/get 'org-mode :src)
+;; (int<template>:store/find/mode nil 'org-mode)
+;; (int<template>:store/find/mode nil :auto :no-error)
+;; (int<template>:store/find/mode nil :auto)
 
 
 ;;------------------------------------------------------------------------------
@@ -313,7 +417,7 @@ MODES should be one of:
 
 TEMPLATE should be a keyword.
 
-BODY should be TODO TODO TODO."
+BODY should be TODO:template: TODO TODO."
   (declare (indent 2))
   (let ((func/name "template:define")
         (modes/input modes))
@@ -335,14 +439,16 @@ BODY should be TODO TODO TODO."
     ;; Now MODES must be a list of symbols or nil/empty list.
     (dolist (mode modes)
       (unless (symbolp mode)
-        (error "%s: MODES must be a symbol, list of symbols, or nil. Found `%S': %S"
+        (error "%s: MODES must be a symbol, list of symbols, or nil. Found `%S' %S in %S (%S)"
                func/name
                (type-of mode)
-               mode)))
+               mode
+               modes
+               modes/input)))
 
     ;; Body has to be... something?
     (unless body
-      (error "%s: Template requires a BODY." func/name))
+      (error "%s: Template requires a BODY" func/name))
 
     ;;------------------------------
     ;; Create Template
@@ -390,6 +496,17 @@ ARGS should be the template's formatting arguments."
                            ,template
                            '(,@args))))
 ;; (funcall (template:cmd:insert :src 'elisp :yank))
+
+
+;; ;; TODO:template: is there even any way to build a list of templates defined for current mode?
+;; ;; Cuz currently the command to insert a template is where the template's args are defined.
+;; (defun template:cmd:choose ()
+;;   "Choose from global or the mode's templates."
+;;   ;; Let the error bubble up to user if nothing found for this mode.
+;;   (when-let ((templates (int<template>:store/find/mode nil      ; current buffer
+;;                                                        :auto))) ; current major mode or global
+;;     ;; TODO:template: provide a prompt w/ completion to select which one to use
+;;     (ignore templates)))
 
 
 ;;------------------------------------------------------------------------------
