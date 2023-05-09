@@ -35,45 +35,39 @@
 
   (defun mantle:meow/keybind/general:insert ()
     "Create the \"Insert...\" keybinds in `general' for `meow'."
-
-    ;; TODO-meow: Move the "Insert..." def to elsewhere in case something else needs it.
-    (keybind:leader/global:def
-      :infix "i"                        ; insert
-      "" '(nil :which-key "Insert...")) ; infix title
-
     ;;---
     ;; Signatures
     ;;---
 
     (keybind:leader/global:def
-      :infix (keybind:infix "i" "s")      ; insert -> signature
-      "" '(nil :which-key "Signature...") ; Infix Title
+      :infix (keybind:infix "i" "n")      ; insert -> name/note
+      "" '(nil :which-key "Name / Note / Signature...") ; Infix Title
+
+      ;; Sigil for Note Prefix.
+      ;; NOTE: Generally this is what I want when using these keybinds, so leave as the (new)
+      ;; 'primary' bind of "SPC i n n".
+      "n" (list (elisp:cmd (signature:insert 'sigil 'note))
+                :which-key (concat "Note: " (signature:string 'sigil 'note)))
 
       ;; "TODO" signature with timestamp; commented if needed:
       "t" (list (elisp:cmd (signature:insert 'sigil 'todo :timestamp t :comment t))
                 :which-key (concat "TODO: " (signature:string 'sigil 'todo)))
 
-      ;; Sigil for Note Prefix.
-      "n" (list (elisp:cmd (signature:insert 'sigil 'note))
-                :which-key (concat "Note: " (signature:string 'sigil 'note)))
-
       ;; Signature for the end of an email or something.
       "s" (list (elisp:cmd (signature:insert 'name 'sign))
                 :which-key (concat "Sign: " (signature:string 'name 'sign))))
 
-    ;; TODO-meow: Does this infix and two letter keybind make it so these are on
-    ;; the same level as the others with the same infix and a one letter
-    ;; keybind?
     (keybind:leader/global:def
-      :infix (keybind:infix "i" "s") ; insert -> signature
+      :infix (keybind:infix "i" "n" "i") ; insert -> name/note
+      "" '(nil :which-key "ID...")
 
       ;; Just the Sigil.
-      "is" (list (elisp:cmd (signature:insert 'id 'sigil))
-                 :which-key (concat "ID: Sigil: " (signature:string 'id 'sigil)))
+      "s" (list (elisp:cmd (signature:insert 'id 'sigil))
+                :which-key (concat "ID: Sigil: " (signature:string 'id 'sigil)))
 
       ;; Just the Name.
-      "in" (list (elisp:cmd (signature:insert 'id 'name))
-                 :which-key (concat "ID: Name: " (signature:string 'id 'name))))
+      "n" (list (elisp:cmd (signature:insert 'id 'name))
+                :which-key (concat "ID: Name: " (signature:string 'id 'name))))
 
     ;;---
     ;; Emails
@@ -83,25 +77,30 @@
               (signature:exists? 'id 'email :namespace :home)
               (signature:exists? 'id 'email :namespace :default))
 
+      ;; Someone has an email, so we can create the entry:
+      (keybind:leader/global:def
+        :infix (keybind:infix "i" "n" "e") ; insert -> name/note -> email
+        "" '(nil :which-key "Email..."))
+
       ;; work namespace.
       (when (signature:exists? 'id 'email :namespace :work)
         (keybind:leader/global:def
-          :infix (keybind:infix "i" "s") ; insert -> signature
-          "ew" (list (elisp:cmd (signature:insert 'id 'email :namespace :work))
+          :infix (keybind:infix "i" "n" "e") ; insert -> name/note
+          "w" (list (elisp:cmd (signature:insert 'id 'email :namespace :work))
                      :which-key (concat "Email (work): " (signature:string 'id 'email :namespace :work)))))
 
       ;; home namespace.
       (when (signature:exists? 'id 'email :namespace :home)
         (keybind:leader/global:def
-          :infix (keybind:infix "i" "s") ; insert -> signature
-          "eh" (list (elisp:cmd (signature:insert 'id 'email :namespace :home))
+          :infix (keybind:infix "i" "n" "e") ; insert -> name/note
+          "h" (list (elisp:cmd (signature:insert 'id 'email :namespace :home))
                      :which-key (concat "Email (home): " (signature:string 'id 'email :namespace :home)))))
 
       ;; default namespace.
       (when (signature:exists? 'id 'email :namespace :default)
         (keybind:leader/global:def
-          :infix (keybind:infix "i" "s") ; insert -> signature
-          "ec" (list (elisp:cmd (signature:insert 'id 'email :namespace :default))
+          :infix (keybind:infix "i" "n" "e") ; insert -> name/note
+          "c" (list (elisp:cmd (signature:insert 'id 'email :namespace :default))
                      :which-key (concat "Email (default): " (signature:string 'id 'email :namespace :default))))))
 
 
@@ -256,7 +255,7 @@
   ;;------------------------------
 
   (keybind:leader/global:def
-   :infix (keybind:infix "i" "s")      ;; insert -> signature
+   :infix (keybind:infix "i" "s")      ;; insert -> name/note
    "" '(nil :which-key "Signature...") ;; Infix Title
 
    ;; "TODO" signature with timestamp; commented if needed:
@@ -272,7 +271,7 @@
              :which-key (concat "Sign: " (signature:string 'name 'sign))))
 
   (keybind:leader/global:def
-   :infix (keybind:infix "i" "s" "i")      ;; insert -> signature -> ID
+   :infix (keybind:infix "i" "s" "i")      ;; insert -> name/note -> ID
    "" '(nil :which-key "ID...") ;; Infix Title
 
    ;; Just the Sigil.
@@ -291,7 +290,7 @@
   ;; work namespace.
   (when (signature:exists? 'id 'email :namespace :work)
     (keybind:leader/global:def
-     :infix (keybind:infix "i" "s" "e") ;; insert -> signature -> email
+     :infix (keybind:infix "i" "s" "e") ;; insert -> name/note -> email
      "" '(nil :which-key "Email...")    ;; Infix Title
 
      "w" (list (elisp:cmd (signature:insert 'id 'email :namespace :work))
@@ -300,7 +299,7 @@
   ;; home namespace.
   (when (signature:exists? 'id 'email :namespace :home)
     (keybind:leader/global:def
-     :infix (keybind:infix "i" "s" "e") ;; insert -> signature -> email
+     :infix (keybind:infix "i" "s" "e") ;; insert -> name/note -> email
 
      "h" (list (elisp:cmd (signature:insert 'id 'email :namespace :home))
                :which-key (concat "home: " (signature:string 'id 'email :namespace :home)))))
@@ -308,7 +307,7 @@
   ;; default namespace.
   (when (signature:exists? 'id 'email :namespace :default)
     (keybind:leader/global:def
-     :infix (keybind:infix "i" "s" "e") ;; insert -> signature -> email
+     :infix (keybind:infix "i" "s" "e") ;; insert -> name/note -> email
 
      "c" (list (elisp:cmd (signature:insert 'id 'email :namespace :default))
                :which-key (concat "default: " (signature:string 'id 'email :namespace :default)))))

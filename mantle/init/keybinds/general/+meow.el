@@ -298,6 +298,10 @@ Keywords are: `:no-commands', `:commands'")
     :infix (keybind:infix "u")           ; No mnemonic for this one...
     "" '(nil :which-key "Apps & Stuff")) ; Apps (e.g. Spotify), Stuff (e.g. ChatGPT?)
 
+    (keybind:leader/global:def
+      :infix "i"                        ; insert
+      "" '(nil :which-key "Insert..."))
+
 
   ;;------------------------------------------------------------------------------
   ;; Feature for Definers, Etc.

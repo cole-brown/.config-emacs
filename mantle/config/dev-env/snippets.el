@@ -380,11 +380,11 @@ NOTE: Text of options will be deduplicated before being used."
   (defun mantle:meow/keybind/general:snippets ()
     "Create the \"Snippets...\" keybinds in `general' for `meow'."
     (keybind:leader/global:def
-      :infix (keybind:infix "i" "s")     ; insert -> snippets
-      "" '(nil :which-key "Snippets...") ; infix title
+      :infix (keybind:infix "i" "t")     ; insert -> templates
+      "" '(nil :which-key "Templates & Snippets...") ; infix title
 
-      "n" '(yas-expand         :which-key "Expand Snippet")
-      "s" '(yas-insert-snippet :which-key "Insert Snippet...")))
+      "t" '(yas-insert-snippet :which-key "Insert Snippet...") ; generally we'll want to do this, so make it the 'primary' bind: "SPC i t t"
+      "e" '(yas-expand         :which-key "Expand Snippet")))
 
 
   ;;------------------------------
