@@ -151,8 +151,21 @@ Return count of leaf nodes."
 ;;------------------------------------------------------------------------------
 
 (defconst int<imp>:feature:replace:rx
-  '((":" "")
-    ("+" ""))
+  (list
+   ;;------------------------------
+   ;; Not allowed for specific reasons:
+   ;;------------------------------
+   '(":" "") ; Used by imp as separator between feature symbol list: '(:foo bar baz) -> ":foo:bar:baz"
+   '("+" "") ; Used occasionally to denote optional features; remove to be sane. '(:foo +optional) -> ":foo:optional"
+   ;;------------------------------
+   ;; Not allowed for no real reason, in Qwerty keyboard order:
+   ;;------------------------------
+   (list (rx-to-string '(or "`" "~" "!" "@" "#" "$" "%" "^" "&" "*" "(" ")"
+                            "[" "]" "{" "}" "\\" "|"
+                            ";" "'" "\""
+                            ",")
+                       :no-group)
+         ""))
   "Alist of regexs to replace and their replacement strings.
 
 Using lists instead of cons for alist entries because `cons' doesn't like
@@ -160,6 +173,7 @@ strings.
 
 Used symbol-by-symbol in `imp:feature:normalize:imp->emacs' when
 translating an imp symbol chain into one symbol for Emacs.")
+;; (imp:feature:normalize:imp->emacs :imp 'test?-xx:y::z '+!@$%^&*| 'symbols)
 
 
 (defconst int<imp>:feature:replace:separator
@@ -188,6 +202,8 @@ Returns a string."
                                       value)))))
 ;; (int<imp>:feature:name:normalize "foo")
 ;; (int<imp>:feature:name:normalize :foo)
+;; (int<imp>:feature:name:normalize 'test?-xx:y::z)
+;; (int<imp>:feature:name:normalize "+!@$%^&*|")
 
 
 (defun int<imp>:feature:normalize:string (&rest input)
@@ -204,8 +220,13 @@ Always returns a backwards list.
   (let ((func/name "int<imp>:feature:normalize:string")
         output)
     (dolist (item (int<imp>:list:flatten input))
-      (push (int<imp>:feature:name:normalize item)
-            output))
+      (let ((normalized (int<imp>:feature:name:normalize item)))
+        (if (str:empty? normalized)
+            (int<imp>:error func/name
+                            "Cannot use INPUT '%S'; it normalizes to nothing: %S"
+                            item
+                            normalized)
+          (push normalized output))))
 
     ;; Return the list or raise an error.
     (if (null output)
@@ -215,6 +236,9 @@ Always returns a backwards list.
     output))
 ;; (int<imp>:feature:normalize:string "+spydez" "foo" "bar")
 ;; (int<imp>:feature:normalize:string '((nil)))
+;; (int<imp>:feature:normalize:string 'test?-xx:y::z)
+;; (int<imp>:feature:normalize:string '+!@$%^&*|)
+;; (int<imp>:feature:normalize:string :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
 
 
 (defun int<imp>:feature:normalize (&rest input)
@@ -230,18 +254,18 @@ First symbol in output list will be a keyword; rest will be symbols.
     (int<imp>:feature:normalize '(foo :bar) 'baz)
       -> '(:foo bar baz)"
   (let ((func/name "int<imp>:feature:normalize")
-        (strings:reversed (int<imp>:feature:normalize:string input))
+        (strings/reversed (int<imp>:feature:normalize:string input))
         output)
-    (while strings:reversed
-      (let ((item (pop strings:reversed)))
+    (while strings/reversed
+      (let ((item (pop strings/reversed)))
         (push (intern
                ;; If this is the last item we're processing, it should be the
                ;; keyword as it'll be first in the output list.
-               (concat (if (null strings:reversed)
-                                ":"
-                              "")
-                            item))
-            output)))
+               (concat (if (null strings/reversed)
+                           ":"
+                         "")
+                       item))
+              output)))
 
     ;; Return the list or raise an error.
     (if (null output)
@@ -260,6 +284,8 @@ First symbol in output list will be a keyword; rest will be symbols.
 ;; (int<imp>:feature:normalize '(something-that-doesnt-exist-in-emacs))
 ;; (let ((feature 'something-that-doesnt-exist-in-emacs))
 ;;   (int<imp>:feature:normalize (list feature)))
+;; (int<imp>:feature:normalize :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
+
 
 
 (defun imp:feature:normalize:imp->emacs (&rest feature)
@@ -273,7 +299,8 @@ FEATURE will be normalized, then converted into a single symbol
 \(not a keyword)."
   (intern
    (mapconcat #'identity
-              (nreverse (int<imp>:feature:normalize:string feature))
+              (seq-filter (lambda (x) (not (str:empty? x)))
+                          (nreverse (int<imp>:feature:normalize:string feature)))
               int<imp>:feature:replace:separator)))
 ;; (imp:feature:normalize:imp->emacs :imp 'test 'symbols)
 ;; (imp:feature:normalize:imp->emacs '(:imp test symbols))
@@ -282,6 +309,7 @@ FEATURE will be normalized, then converted into a single symbol
 ;; (imp:feature:normalize:imp->emacs :imp 'provide)
 ;; (imp:feature:normalize:imp->emacs :imp)
 ;; (imp:feature:normalize:imp->emacs '(((:imp))) '((provide)))
+;; (imp:feature:normalize:imp->emacs :imp 'test?-xx:y::z '+!@$%^&*| 'symbols)
 
 
 (defun imp:feature:normalize (&rest input)
@@ -317,7 +345,7 @@ E.g.
 ;; (imp:feature:normalize "+spydez")
 ;; (imp:feature:normalize "+spydez" "foo" "bar")
 ;; (imp:feature:normalize '("+spydez" "foo" "bar"))
-
+;; (imp:feature:normalize :imp 'test?-xx:y::z "+!@$%^&*|" 'symbols)
 
 (defalias 'imp:feature 'imp:feature:normalize)
 
