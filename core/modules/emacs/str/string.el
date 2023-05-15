@@ -43,7 +43,15 @@ ARGS can contain:
          (setq trim/right t
                trim/left  t))))
 
-    (string-trim str trim/left trim/right)))
+    (cond ((and trim/left
+		(not trim/right))
+	   (string-trim-left str))
+	  ((and trim/right
+		(not trim/left))
+	   (string-trim-right str))
+	  (t ; Either `:full', `:both', `:left' & `:right', or 'the paragraph does not say'. 
+	   (string-trim str)))))
+;; (str:trim " foo ")
 ;; (str:trim " foo " :left)
 ;; (str:trim " foo " :left :right)
 ;; (str:trim " foo " :left :both)
