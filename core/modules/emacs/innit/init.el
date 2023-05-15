@@ -47,6 +47,8 @@
             :filename "time")
   (imp:load :feature  '(:innit optimize)
             :filename "optimize")
+  (imp:load :feature  '(:innit server)
+	    :filename "server")
   (imp:load :feature  '(:innit package)
             :filename "package")
   (imp:load :feature  '(:innit squelch)
