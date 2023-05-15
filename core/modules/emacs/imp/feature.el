@@ -184,6 +184,21 @@ String to use in between symbols when translating an imp symbol chain to
 an Emacs symbol.")
 
 
+(defun int<imp>:str:empty? (str &optional trim?)
+  "Return non-nil if STR is nil or empty.
+
+If TRIM? is non-nil, use `string-trim' before checking if string is empty."
+  (or (null str)
+      (string= ""
+               (if trim?
+                   (string-trim str)
+                 str))))
+;; (int<imp>:str:empty? nil)
+;; (int<imp>:str:empty? "")
+;; (int<imp>:str:empty? " ")
+;; (int<imp>:str:empty? " " :trim)
+
+
 (defun int<imp>:feature:name:normalize (input)
   "Normalize INPUT to a symbol.
 
@@ -221,7 +236,7 @@ Always returns a backwards list.
         output)
     (dolist (item (int<imp>:list:flatten input))
       (let ((normalized (int<imp>:feature:name:normalize item)))
-        (if (str:empty? normalized)
+        (if (int<imp>:str:empty? normalized)
             (int<imp>:error func/name
                             "Cannot use INPUT '%S'; it normalizes to nothing: %S"
                             item
@@ -299,7 +314,7 @@ FEATURE will be normalized, then converted into a single symbol
 \(not a keyword)."
   (intern
    (mapconcat #'identity
-              (seq-filter (lambda (x) (not (str:empty? x)))
+              (seq-filter (lambda (x) (not (int<imp>:str:empty? x)))
                           (nreverse (int<imp>:feature:normalize:string feature)))
               int<imp>:feature:replace:separator)))
 ;; (imp:feature:normalize:imp->emacs :imp 'test 'symbols)
