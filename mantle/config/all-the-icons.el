@@ -215,7 +215,8 @@
 ;; aka Rise of the Nerd Fonts
 
 (imp:use-package all-the-icons
-  ;; Only use `all-the-icons' when we have a GUI.
+  ;; TODO: Only use `all-the-icons' when we have a GUI?
+  ;;   - Turns out that's harder than it seems......
   ;;---
   ;; NOTE [2023-05-04]:
   ;; Just checking `display-graphic-p' is what `all-the-icons' says to do, and
@@ -229,8 +230,12 @@
   ;; that never got added to Emacs:
   ;;   https://lists.gnu.org/archive/html/bug-gnu-emacs/2018-06/msg00723.html
   ;;---
-  :if (or (display-graphic-p)
-          (innit:emacs/server:running?))
+  ;; NOTE [2023-05-15]:
+  ;; This, too, is useless?! :|
+  ;;   :if (or (display-graphic-p)
+  ;;           (innit:emacs/server:running?))
+  ;; So just... always load, then, I guess?
+  ;;---
 
   ;;------------------------------------------------------------------------------
   :init
