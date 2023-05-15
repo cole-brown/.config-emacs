@@ -400,8 +400,8 @@ Always returns nil."
 ;; Smudge (Spotify Controller)
 ;;------------------------------------------------------------------------------
 
-  (defvar innit:path:package:smudge (path:join innit:path:packages:user "smudge")
-    "`use-package' doesn't like having a function call for `:load-path', thus this.")
+(defvar innit:path:package:smudge (path:join innit:path:packages:user "smudge")
+  "`use-package' doesn't like having a function call for `:load-path', thus this.")
 
 
 ;; https://github.com/danielfm/smudge/
@@ -558,7 +558,7 @@ know if it still does, but this was the solution:
   ;; TODO:smudge: Is this hack still required?
   ;; HACK: This is a defconst so it doesn't update when you set a different port number.
   ;; So... Just force it to update.
-  (setq smudge-api-oauth2-callback (concat "http://localhost:" smudge-oauth2-callback-port smudge-oauth2-callback-endpoint))
+  (setq smudge-api-oauth2-callback (concat "http://localhost:" smudge-oauth2-callback-port "/" smudge-oauth2-callback-endpoint))
 
   ;;---
   ;; Keybinds
