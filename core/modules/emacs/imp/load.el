@@ -631,7 +631,7 @@ Return nil for failure, non-nil for success."
        (cond ((and macro:skip?
                    (imp:provided? macro:feature))
               ;; Skip w/ optional timing message.
-              (imp:timing:already-provided macro:feature
+              (imp:timing:skip/already-provided macro:feature
                                            macro:name:load
                                            macro:path:file)
               (setq macro:load-file? nil)
@@ -645,9 +645,9 @@ Return nil for failure, non-nil for success."
              ((and macro:optional?
                    (not (file-exists-p macro:path:file)))
               ;; Skip w/ optional timing message.
-              (imp:timing:optional-dne macro:feature
-                                       macro:name:load
-                                       macro:path:file)
+              (imp:timing:skip/optional-dne macro:feature
+                                            macro:name:load
+                                            macro:path:file)
               (setq macro:load-file? nil)
               ;; Return nil for 'did not load'.
               (setq load-result nil))

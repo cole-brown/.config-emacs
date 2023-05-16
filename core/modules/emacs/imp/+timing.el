@@ -9,6 +9,9 @@
 ;;                                 ──────────                                 ;;
 
 
+(require 'rx)
+
+
 ;;------------------------------
 ;; Future Features:
 ;;------------------------------
@@ -127,7 +130,7 @@ Args to this format string are:
   :risky t)
 
 
-(defcustom imp:timing:format:already-provided "skip %1$S; feature already provided"
+(defcustom imp:timing:format:skip "skip: %1$S"
   "Format string for skipping loading of a required file.
 
 Args to this format string are:
@@ -139,7 +142,33 @@ Args to this format string are:
   :risky t)
 
 
-(defcustom imp:timing:format:optional "skip %1$S; optional file does not exist: %3$s"
+(defcustom imp:timing:reason "reason: "
+  "String prefix for _why_ something was or wasn't.
+
+Example: When a file is skipped because it's already provided, the timing buffer
+will say (with default settings):
+  [...]
+  ├─skip: :feature:example
+  │ └─reason: already provided
+  [...]"
+  :group 'imp:group
+  :type '(string)
+  :risky t)
+
+
+(defcustom imp:timing:format:skip/already-provided "feature already provided"
+  "Format string for skipping loading of a required file.
+
+Args to this format string are:
+  1. Feature symbol: :imp/+timing
+  2. File name:      +timing.el
+  3. File path:      /path/to/imp/+timing.el"
+  :group 'imp:group
+  :type '(string)
+  :risky t)
+
+
+(defcustom imp:timing:format:skip/optional-dne "optional file does not exist: %3$s"
   "Format string for skipping loading of an optional file.
 
 Args to this format string are:
@@ -203,10 +232,19 @@ Args to this format string are:
   :risky t)
 
 
-(defcustom imp:timing:separator:launch
+(defcustom imp:timing:separator:restart
   (concat "\n\n"
-          (make-string 40 ?─ :multibyte))
+          (make-string 80 ?─ :multibyte))
   "String that can be inserted into the output buffer via `int<imp>:timing:launch'."
+  :group 'imp:group
+  :type '(string)
+  :risky t)
+
+
+(defcustom imp:timing:separator:final
+  (concat "\n\n"
+          (make-string 80 ?═ :multibyte))
+  "String that can be inserted into the output buffer via `imp:timing:final'."
   :group 'imp:group
   :type '(string)
   :risky t)
@@ -276,8 +314,7 @@ indention levels."
    ;; Join w/ no padding.
    ""))
 ;; (int<imp>:timing:tree:string :root)
-;; (let ((int<imp>:timing:indent 2))
-;;   (int<imp>:timing:tree:string :root))
+;; (let ((int<imp>:timing:indent 2)) (int<imp>:timing:tree:string :root))
 
 
 ;;------------------------------------------------------------------------------
@@ -380,11 +417,14 @@ does nothing instead."
       (with-current-buffer (get-buffer-create name)
         ;; We are now in BUFFER, so just insert the formatted string on a new line at the end.
         (goto-char (point-max))
-        ;; Prepend a newline, unless this is a new/empty buffer.
-        (insert (concat (if (= (buffer-size) 0)
-                            ""
-                          "\n")
-                        string))))
+        ;; If we're in `imp-timing-mode', we'll probably need to deal with the
+        ;; fact that the buffer is read-only...
+        (let ((inhibit-read-only t))
+          ;; Prepend a newline, unless this is a new/empty buffer.
+          (insert (concat (if (= (buffer-size) 0)
+                              ""
+                            "\n")
+                          string)))))
 
      ;;------------------------------
      ;; Errors
@@ -439,28 +479,48 @@ Message depends on `imp:timing:format:time'."
       (setq imp:timing:sum (+ imp:timing:sum elapsed)))))
 
 
-(defun imp:timing:already-provided (feature filename path)
+(defun imp:timing:skip/already-provided (feature filename path)
   "Print a message about skipping this FEATURE / FILENAME / PATH.
 
 Message depends on `imp:timing:format:skip'."
   (when (imp:timing:enabled?)
+    ;; Skip message.
     (int<imp>:timing:message :root
-                             imp:timing:format:already-provided
+                             imp:timing:format:skip
                              (int<imp>:feature:normalize:display feature)
                              filename
-                             path)))
+                             path)
+    ;; Increase indent level for reason.
+    (let ((int<imp>:timing:indent (1+ int<imp>:timing:indent)))
+      ;; Skip reason message.
+      (int<imp>:timing:message :leaf
+                               (concat imp:timing:reason
+                                       imp:timing:format:skip/already-provided)
+                               (int<imp>:feature:normalize:display feature)
+                               filename
+                               path))))
 
 
-(defun imp:timing:optional-dne (feature filename path)
+(defun imp:timing:skip/optional-dne (feature filename path)
   "Print a message about optional FEATURE / FILENAME / PATH that doesn't exist.
 
 Message depends on `imp:timing:format:optional'."
   (when (imp:timing:enabled?)
+    ;; Skip message.
     (int<imp>:timing:message :root
-                             imp:timing:format:optional
+                             imp:timing:format:skip
                              (int<imp>:feature:normalize:display feature)
                              filename
-                             path)))
+                             path)
+    ;; Increase indent level for reason.
+    (let ((int<imp>:timing:indent (1+ int<imp>:timing:indent)))
+      ;; Skip reason message.
+      (int<imp>:timing:message :leaf
+                               (concat imp:timing:reason
+                                       imp:timing:format:skip/optional-dne)
+                               (int<imp>:feature:normalize:display feature)
+                               filename
+                               path))))
 
 
 (defmacro imp:timing (feature filename path &rest body)
@@ -531,18 +591,360 @@ Return result of evaluating BODY."
     nil)
    ;; Not *Messages* and exists = output!
    ((get-buffer (imp:timing:buffer:name))
-    (int<imp>:timing:buffer:insert imp:timing:separator:launch))
+    ;; Mark where we restarted timing from
+    (int<imp>:timing:buffer:insert imp:timing:separator:restart))
    ;; Else, no output.
    (t
     nil)))
 
 
-(defun imp:timing:final ()
-  "Print out total timing summary."
+(defun imp:timing:final (&optional separator-line?)
+  "Print out total timing summary.
+
+If SEPARATOR-LINE? is non-nil, print out `imp:timing:separator:final' after
+final timing message."
   (when (imp:timing:enabled?)
     (int<imp>:timing:buffer:insert
      (format imp:timing:format:time:total
-             imp:timing:sum))))
+             imp:timing:sum))
+    (when separator-line?
+      (int<imp>:timing:buffer:insert imp:timing:separator:final))))
+;; (imp:timing:final)
+
+
+;;--------------------------------------------------------------------------------
+;; Major Mode
+;;--------------------------------------------------------------------------------
+
+(defun int<imp>:timing/mode:font-lock-keywords:element/create (matcher subexp facename &optional override laxmatch)
+  "Create an entry for the `font-lock-keywords' list.
+
+See `font-lock-keywords' for full details.
+
+This creates only the (MATCHER . HIGHLIGHT) form where HIGHLIGHT is
+MATCH-HIGHLIGHT.
+  - MATCH-HIGHLIGHT is of the form: (SUBEXP FACENAME [OVERRIDE [LAXMATCH]])
+
+MATCHER should be a regex string.
+
+SUBEXP should be a natnum.
+
+FACENAME should be a font face symbol (e.g. from `defface' or
+`list-faces-display'.
+
+\(Optional) OVERRIDE should be:
+  - nil       : Do not override existing fontifications.
+  - t         : Existing fontifications can be overwritten.
+  - `keep'    : Only parts not already fontified are highlighted.
+  - `prepend' : Merge existing and new fontification; new takes precedence.
+  - `append'  : Merge existing and new fontification; existing takes precedence.
+
+\(Optional) LAXMATCH should be nil/non-nil. If LAXMATCH is non-nil, that means
+don't signal an error if there is no match for SUBEXP in MATCHER."
+  (cons
+   ;; MATCHER: Regex to match.
+   matcher
+
+   ;; HIGHLIGHT: MATCH-HIGHLIGHT: (SUBEXP FACENAME [OVERRIDE [LAXMATCH]])
+   (cons
+    ;; SUBEXP: Desired match's group number from MATCHER regex
+    subexp
+
+    ;; Build this list so optional OVERRIDE & LAXMATCH don't appear when nil.
+    (cons
+     ;; FACENAME: Font Face to Use
+     facename
+
+     (when (or override laxmatch)
+       (cons
+        ;; (Optional) OVERRIDE Flag:
+        override
+
+        (when laxmatch
+          ;; (Optional) LAXMATCH Flag:
+          ;; If LAXMATCH is non-nil, that means don't signal an error if there is no match for SUBEXP in MATCHER.
+          (list laxmatch))))))))
+;; (int<imp>:timing/mode:font-lock-keywords:element/create "foo" 0 'font-lock-comment-face nil t)
+
+
+(defconst int<imp>:timing/mode:font-lock-keywords
+  (let (flk ; The font lock keywords list that will become this const.
+
+        ;;------------------------------
+        ;; Timing Tree (Unicode Box Drawing Characters)
+        ;;------------------------------
+        ;; (tree '(;; Currently only using these to build the timing tree:
+        ;;         ;;   "└" "├" "│" "─"
+        ;;         ;; But why not add "everything" for completeness:
+        ;;         "┌" "┬" "┐" "─" "├" "┼" "┤" "│" "└" "┴" "┘"
+        ;;         "╔" "╦" "╗" "═" "╠" "╬" "╣" "║" "╚" "╩" "╝"))
+        ;; Or should we use the whole range?
+        ;;   - https://www.w3.org/TR/xml-entity-names/025.html
+        ;;   - U+02500 - U+025FF
+        ;;     - Includes:
+        ;;       - Box Drawing
+        ;;       - Block Elements
+        ;;       - Geometric Shapes
+        ;;   - U+02500-U+0257F
+        ;;     - Just Box Drawing
+        ;;       - Single line, heavy line, double line, dashed, etc. All there.
+        (rx/unicode-box (rx-to-string `(one-or-more (any (#x2500 . #x0257F)))))
+
+        ;;------------------------------
+        ;; Punctuation and Suchlike
+        ;;------------------------------
+        ;; (comment '(";")) ; NOTE: Try fontifying this as comments using syntax table first too.
+        (throbber '(;; Doesn't actually throb; does indicate something could be in progress.
+                    "..."
+                    "…"))
+
+        ;;------------------------------
+        ;; Words and Things
+        ;;------------------------------
+        ;; Currently have "loading" and "skip", but use more versions of both in
+        ;; case we normalize/change the tenses...
+        (rx/status/info    (rx-to-string `(or "load" "loading"  "loaded")  :no-group))
+        (rx/status/warning (rx-to-string `(or "skip" "skipping" "skipped") :no-group))
+        (rx/reason/warning (rx-to-string `(and ,imp:timing:reason
+                                               (one-or-more any)
+                                               line-end)
+                                         :no-group))
+
+        ;; (amounts '("second" "seconds"
+        ;;            "minute" "minutes"
+        ;;            "hour"   "hours"))
+        (rx/duration (rx-to-string `(and (group
+                                          (one-or-more digit)
+                                          "."
+                                          (one-or-more digit))
+                                         " "
+                                         (group
+                                          (or "second" "seconds"
+                                              "minute" "minutes"
+                                              "hour"   "hours")))
+                                   :no-group))
+
+        ;;------------------------------
+        ;; Feature Names
+        ;;------------------------------
+        (rx/feature (rx-to-string `(and ":"
+                                        (one-or-more
+                                         ;; Emacs Lisp is super permissive about what a symbol name can be...
+                                         ;; How permissive should we be about what an Imp Feature Name should be?
+                                         ;; NOTE: Similar but different from `int<imp>:feature:replace:rx'.
+                                         ;; Careful how this goes or you lose the question mark...
+                                         (any "?" ":" "-" "_" "/" "."
+                                              alphanumeric)))
+                                  :no-group))
+
+        ;;------------------------------
+        ;; Final Status
+        ;;------------------------------
+        ;; Not currently printed to 'imp:timing' buffer?
+        )
+
+    ;;------------------------------
+    ;; Timing Tree
+    ;;------------------------------
+    (push (int<imp>:timing/mode:font-lock-keywords:element/create
+           rx/unicode-box ; Match Regex
+           0 ; Match's Group Number from Match Regex
+           'font-lock-comment-delimiter-face ; Font Face to Use
+           ;; TODO: Lighten up on these guys? I shouldn't need them except for other things (e.g.
+           ;; `whitespace-mode') want to layer on top of my mode?
+           t
+           t)
+          flk)
+
+    ;;------------------------------
+    ;; Punctuation and Suchlike
+    ;;------------------------------
+    ;; NOTE: `M-x list-faces-display' and go to 'font-lock-' to see all the pre-defined font-lock faces.
+    (push (int<imp>:timing/mode:font-lock-keywords:element/create
+           (rx-to-string `(or ,@throbber) :no-group) ; Match Regex
+           0 ; Match's Group Number from Match Regex
+           'font-lock-comment-face ; Font Face to Use
+           ;; TODO: Lighten up on these guys? I shouldn't need them except for other things (e.g.
+           ;; `whitespace-mode') want to layer on top of my mode?
+           t
+           t)
+          flk)
+
+    ;;------------------------------
+    ;; Words and Things
+    ;;------------------------------
+    (push (int<imp>:timing/mode:font-lock-keywords:element/create
+           rx/status/info
+           0 ; Match's Group Number from Match Regex
+           'font-lock-comment-face ; Font Face to Use
+           ;; TODO: Lighten up on these guys? I shouldn't need them except for other things (e.g.
+           ;; `whitespace-mode') want to layer on top of my mode?
+           t
+           t)
+          flk)
+    (push (int<imp>:timing/mode:font-lock-keywords:element/create
+           rx/status/warning
+           0 ; Match's Group Number from Match Regex
+           'font-lock-warning-face ; Font Face to Use
+           ;; TODO: Lighten up on these guys? I shouldn't need them except for other things (e.g.
+           ;; `whitespace-mode') want to layer on top of my mode?
+           t
+           t)
+          flk)
+    (push (int<imp>:timing/mode:font-lock-keywords:element/create
+           rx/reason/warning
+           0 ; Match's Group Number from Match Regex
+           'font-lock-warning-face ; Font Face to Use
+           ;; TODO: Lighten up on these guys? I shouldn't need them except for other things (e.g.
+           ;; `whitespace-mode') want to layer on top of my mode?
+           t
+           t)
+          flk)
+
+    ;; NOTE: Try leaving `status' and `amounts' as just... unlocked text? (e.g. white in my theme's case)
+    ;; (push (int<imp>:timing/mode:font-lock-keywords:element/create
+    ;;        (rx-to-string `(or ,@status) :no-group) ; Match Regex
+    ;;        0 ; Match's Group Number from Match Regex
+    ;;        'font-lock-comment-face ; Font Face to Use
+    ;;        ;; TODO: Lighten up on these guys? I shouldn't need them except for other things (e.g.
+    ;;        ;; `whitespace-mode') want to layer on top of my mode?
+    ;;        t
+    ;;        t)
+    ;;       flk)
+
+    ;; Duration: "01.234 seconds"
+    ;; Groupings:
+    ;;   - #0: "01.234"
+    ;;   - #1: "seconds"
+    (push (int<imp>:timing/mode:font-lock-keywords:element/create
+           rx/duration ; Match Regex
+           1 ; Match's Group Number from Match Regex
+           'font-lock-function-name-face ; Font Face to Use
+           ;; TODO: Lighten up on these guys? I shouldn't need them except for other things (e.g.
+           ;; `whitespace-mode') want to layer on top of my mode?
+           t
+           t)
+          flk)
+
+    ;;------------------------------
+    ;; Feature Names
+    ;;------------------------------
+    (push (int<imp>:timing/mode:font-lock-keywords:element/create
+           rx/feature ; Match Regex
+           0 ; Match's Group Number from Match Regex
+           'font-lock-variable-name-face ; Font Face to Use
+           ;; 'font-lock-string-face ; Font Face to Use
+           ;; TODO: Lighten up on these guys? I shouldn't need them except for other things (e.g.
+           ;; `whitespace-mode') want to layer on top of my mode?
+           t
+           t)
+          flk)
+
+    ;;------------------------------
+    ;; Final Status
+    ;;------------------------------
+    ;; Not currently printed to 'imp:timing' buffer?
+
+    ;;------------------------------
+    ;; Done; Return Font Lock Keywords
+    ;;------------------------------
+    flk)
+  "Syntax keywords for `imp-timing-mode' buffer.
+
+See `font-lock-keywords' for various formatting options of these entries.
+Each element in a user-level keywords list should have one of these forms:
+  - MATCHER
+  - (MATCHER . SUBEXP)
+  - (MATCHER . FACENAME)
+  - (MATCHER . HIGHLIGHT)
+  - (MATCHER HIGHLIGHT ...)
+  - (eval . FORM)")
+;; (pp int<imp>:timing/mode:font-lock-keywords)
+
+
+(defconst int<imp>:timing/mode:font-lock-defaults
+  ;; Format for list:
+  ;;  (KEYWORDS [KEYWORDS-ONLY [CASE-FOLD [SYNTAX-ALIST ...]]])
+  ;; See for more info:
+  ;;   - `font-lock-defaults'
+  ;;   - http://xahlee.info/emacs/emacs/elisp_font_lock_mode.html
+  (list
+   ;;------------------------------
+   ;; KEYWORDS
+   ;;------------------------------
+   ;; See `font-lock-keywords' for various formatting options of these entries.
+   int<imp>:timing/mode:font-lock-keywords
+
+   ;;------------------------------
+   ;; KEYWORDS-ONLY?
+   ;;------------------------------
+   ;; NOTE: "If KEYWORDS-ONLY is non-nil, syntactic fontification (strings and comments) is not performed."
+   nil
+   ;; (list
+   ;;  ;; See `font-lock-keywords-only' for various formatting options of these entries.
+   ;;  )
+
+   ;;------------------------------
+   ;; CASE-FOLD?
+   ;;------------------------------
+   ;; See also `font-lock-keywords-case-fold-search'.
+   nil
+
+   ;;------------------------------
+   ;; SYNTAX-ALIST
+   ;;------------------------------
+   ;; See also `font-lock-syntax-table'.
+   ;; Why use this when you have `:syntax-table' in `define-derived-mode'?
+   nil
+
+   ;;------------------------------
+   ;; The Rest: (VARIABLE . VALUE)
+   ;;------------------------------
+   ;; None.
+   )
+  "Used by `imp-timing-mode' to set the buffer local `font-lock-defaults'.
+
+See help for `font-lock-defaults' for what all this does/can do.")
+
+
+;;;###autoload
+(define-derived-mode imp-timing-mode special-mode "imp:timing"
+  "Major mode for the `imp:timing:buffer:name' timing information buffer.
+
+Derive from `special-mode' as a start:
+https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Major-Modes.html"
+  ;;------------------------------
+  ;; KEYWORD ARGS:
+  ;;------------------------------
+  ;; Non-Standard Variable Names?
+  ;;---
+  ;; If we had a syntax table, and if it's not named `<mode>-syntax-table'
+  ;; (`imp-timing-mode-syntax-table'), say so:
+  ;; :syntax-table int<imp>:timing/mode:syntax-table
+  ;; Don't want an `abbrev-table' as we're a read-only mode so it's a bit
+  ;; pointless, but same thing as the `:syntax-table' arg.
+  ;; :abbrev-table int<imp>:timing/mode:abbrev-table
+
+  ;;------------------------------
+  ;; BODY
+  ;;------------------------------
+
+  ;;---
+  ;; Fontification / Colorization / Syntax Hilighting
+  ;;---
+  (setq font-lock-defaults int<imp>:timing/mode:font-lock-defaults)
+
+  ;;---
+  ;; Other Things
+  ;;---
+  ;; Force the buffer to be tailed; users can hook into this mode and disable if desired.
+  (require 'autorevert)
+  (auto-revert-tail-mode +1))
+
+
+;; NOTE: We aren't a file-based mode, so we don't register ourselves for anything in `auto-mode-alist'.
+;; ;;;###autoload
+;; (add-to-list 'auto-mode-alist '("\\.fileextension" . imp-timing-mode))
 
 
 ;;------------------------------------------------------------------------------

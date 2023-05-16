@@ -18,6 +18,11 @@
 ;; Finalize.
 ;;------------------------------------------------------------------------------
 
+;; Output final time for imp loads.
+(when (functionp #'imp:timing:final)
+  (imp:timing:final :separator))
+
+
 ;; TODO: A random koan output by `mis' instead of `nub'.
 (nub:debug
     :innit
