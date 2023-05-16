@@ -346,6 +346,36 @@ NOTE: This converts a value `:messages' to \"*Messages*\"."
     imp:timing:buffer:name))
 
 
+(defun int<imp>:timing:buffer:get (&optional buffer-or-name &rest args)
+  "Get the imp timing buffer.
+
+BUFFER-OR-NAME should be a string or a buffer object.
+If it is nil, return value of function `imp:timing:buffer:name' will be used.
+
+ARGS can be:
+  - `:create', `create' - Create the buffer if it doesn't exist.
+
+NOTE: If created, the buffer will be put into `imp-timing-mode'."
+  (let ((buffer-or-name (or buffer-or-name
+                            (imp:timing:buffer:name))))
+    ;; If it already exists, we're done; just return it.
+    (cond ((get-buffer buffer-or-name))
+
+          ;; Doesn't exist! Create only if requested.
+          ((seq-some (lambda (arg) (memq arg '(:create create))) args)
+           (with-current-buffer (get-buffer-create buffer-or-name)
+             (imp-timing-mode)
+             (current-buffer)))
+
+          ;; Fallthrough: Doesn't exist and don't want to create?
+          ;; Return nil I guess? That's what `get-buffer' does for buffers that don't exist...
+          (t
+           nil))))
+;; (int<imp>:timing:buffer:get)
+;; (int<imp>:timing:buffer:get nil :create)
+
+
+
 (defun int<imp>:timing:buffer:show (force-show?)
   "Show timing buffer or not, depending on settings.
 
@@ -386,7 +416,7 @@ does nothing instead."
     ;; Bury only when we find the window currently displaying it.
     (when-let* ((name (imp:timing:buffer:name))
                 ;; Get the buffer in order to prevent "No buffer named <...>" messages.
-                (buffer (get-buffer name)))
+                (buffer (int<imp>:timing:buffer:get name)))
       (kill-buffer buffer)
       (message "imp:timing: Killed timing buffer: %s"
                name))))
@@ -414,7 +444,7 @@ does nothing instead."
      ((stringp name)
       ;; Should we force tailing of the buffer or leave that up to user and `auto-revert-tail-mode'?
       ;; I think start off with `auto-revert-tail-mode'.
-      (with-current-buffer (get-buffer-create name)
+      (with-current-buffer (int<imp>:timing:buffer:get name :create)
         ;; We are now in BUFFER, so just insert the formatted string on a new line at the end.
         (goto-char (point-max))
         ;; If we're in `imp-timing-mode', we'll probably need to deal with the
@@ -590,7 +620,7 @@ Return result of evaluating BODY."
    ((int<imp>:timing:buffer:messages?)
     nil)
    ;; Not *Messages* and exists = output!
-   ((get-buffer (imp:timing:buffer:name))
+   ((int<imp>:timing:buffer:get (imp:timing:buffer:name))
     ;; Mark where we restarted timing from
     (int<imp>:timing:buffer:insert imp:timing:separator:restart))
    ;; Else, no output.
