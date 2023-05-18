@@ -31,8 +31,13 @@
 (defcustom imp:timing:enabled? nil
   "Should loading & timing messages be printed?"
   :group 'imp:group
-  :type '(boolean)
-  :risky t)
+  :type '(boolean))
+
+
+(defcustom imp:timing:buffer:tail? t
+  "Should the timing buffer be tailed?"
+  :group 'imp:group
+  :type '(boolean))
 
 
 ;; NOTE: Doom Emacs can add the feature flag `+timing' to "doom/init.el".
@@ -375,6 +380,30 @@ NOTE: If created, the buffer will be put into `imp-timing-mode'."
 ;; (int<imp>:timing:buffer:get nil :create)
 
 
+;; https://stackoverflow.com/a/4685005/425816
+(defun int<imp>:timing:buffer:tail ()
+  "Tail the timing buffer.
+
+NOTE: Does nothing if `imp:timing:buffer:tail?' is nil, or '*Messages*' buffer
+is used for timing.
+
+NOTE: Cannot use `auto-revert-tail-mode' as it only works on file-based buffers.
+So, this just throws an error:
+  (require 'autorevert)
+  (auto-revert-tail-mode +1)"
+  (when (and imp:timing:buffer:tail?
+             (not (int<imp>:timing:buffer:messages?)))
+    (with-current-buffer (int<imp>:timing:buffer:get)
+      ;; Set point to max for the buffer in general.
+      (goto-char (point-max))
+
+      ;; Set point to max in any windows displaying the buffer. Otherwise those windows just let the
+      ;; displayed lines just wander down past the displayed section of the buffer (that is, windows
+      ;; don't care about the above point - they have their own).
+      (let ((windows (get-buffer-window-list (current-buffer) nil t)))
+        (dolist (window windows)
+          (set-window-point window (point-max)))))))
+
 
 (defun int<imp>:timing:buffer:show (force-show?)
   "Show timing buffer or not, depending on settings.
@@ -465,6 +494,9 @@ does nothing instead."
                  "(*Messages*)"
                "(non-*Messages*)")
              name)))
+
+    ;; Tail buffer if desired.
+    (int<imp>:timing:buffer:tail)
 
     ;; Show buffer if desired.
     (when imp:timing:buffer:show
@@ -967,9 +999,13 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Major-Modes.html
   ;;---
   ;; Other Things
   ;;---
+  ;; Might be nice to tail the buffer?
   ;; Force the buffer to be tailed; users can hook into this mode and disable if desired.
-  (require 'autorevert)
-  (auto-revert-tail-mode +1))
+  ;(require 'autorevert)
+  ;(auto-revert-tail-mode +1)
+  ; Only works for file buffers...
+  )
+
 
 
 ;; NOTE: We aren't a file-based mode, so we don't register ourselves for anything in `auto-mode-alist'.
