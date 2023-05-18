@@ -82,11 +82,6 @@
 
   (defun mantle:meow/keybind/general:magit ()
     "Create the \"Version Control...\" keybinds in `general' for `meow'."
-    ;; TODO-meow: Create this in dev-env/init.el or something so other dev-env guys can use?
-    (keybind:leader/global:def
-      :infix (keybind:infix "d")                                   ; "dev-env"? "devops"?
-      "" '(nil :which-key "Dev-Env, DevOps & Version Control...")) ; infix title
-
     ;; And put magit commands straight into the Dev-Env/DevOps/VC keybind leader menu:
     (keybind:leader/global:def
       :infix (keybind:infix "d") ; "dev-env"

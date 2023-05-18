@@ -293,14 +293,43 @@ Keywords are: `:no-commands', `:commands'")
   ;;------------------------------------------------------------------------------
   ;; Leader Infixes
   ;;------------------------------------------------------------------------------
+  ;; Leader Keybinds used in multiple files in config should be created here so
+  ;; that they are ready and existing for whoever happens to go in whatever
+  ;; order.
+  ;;------------------------------
+  ;; NOTE: Defining the infix's title clears that key of any pre-existing binds,
+  ;; which is the important reason for doing it this way. So... Do not include
+  ;; that line elsewhere!
+  ;; E.g.:
+  ;; - Here:
+  ;;     (keybind:leader/global:def
+  ;;       :infix (keybind:infix "d")
+  ;;       "" '(nil :which-key "Dev-Env, DevOps & Version Control...")) ; Infix's Title
+  ;; - Elsewhere:
+  ;;     (keybind:leader/global:def
+  ;;       :infix (keybind:infix "d")
+  ;;       ;; No Infix Title!
+  ;;       ;; Now do keybinds:
+  ;;       "a" (list #'command-goes-here :which-key "Command Title")
+  ;;       "b" #'command-func-name-is-its-title
+  ;;       "c" '(command-also-here :which-key "Also Title"))
+  ;;------------------------------
+  ;; NOTE: Keep in alphanumeric order, please!
 
+  ;; Dev-Env / Devops
   (keybind:leader/global:def
-    :infix (keybind:infix "u")           ; No mnemonic for this one...
-    "" '(nil :which-key "Apps & Stuff")) ; Apps (e.g. Spotify), Stuff (e.g. ChatGPT?)
+    :infix (keybind:infix "d")
+    "" '(nil :which-key "Dev-Env, DevOps & Version Control...")) ; Infix's Title
 
-    (keybind:leader/global:def
-      :infix "i"                        ; insert
-      "" '(nil :which-key "Insert..."))
+  ;; Insert
+  (keybind:leader/global:def
+    :infix "i"
+    "" '(nil :which-key "Insert..."))
+
+  ;; Apps & Stuff
+  (keybind:leader/global:def
+    :infix (keybind:infix "u")
+    "" '(nil :which-key "Apps & Stuff"))
 
 
   ;;------------------------------------------------------------------------------
