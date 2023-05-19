@@ -660,8 +660,8 @@ Return result of evaluating BODY."
     nil)))
 
 
-(defun imp:timing:final (&optional separator-line?)
-  "Print out total timing summary.
+(defun int<imp>:timing:final (&optional separator-line?)
+  "Actually output the total timing summary.
 
 If SEPARATOR-LINE? is non-nil, print out `imp:timing:separator:final' after
 final timing message."
@@ -671,7 +671,43 @@ final timing message."
              imp:timing:sum))
     (when separator-line?
       (int<imp>:timing:buffer:insert imp:timing:separator:final))))
-;; (imp:timing:final)
+;; (int<imp>:timing:final)
+;; (int<imp>:timing:final t)
+
+
+(defun int<imp>:timing:final/timer (&optional separator-line?)
+  "Run timer for final message (total timing summary).
+
+If not ready to output at end of timer, re-run timer.
+
+If SEPARATOR-LINE? is non-nil, print out `imp:timing:separator:final' after
+final timing message."
+  (run-with-timer 1 ; seconds
+                  nil ; do not repeat
+                  (lambda (separator?)
+                    "Check if ready to output final message, then output or rerun timer."
+                    (if (or (> int<imp>:timing:indent 0)
+                            int<imp>:timing:feature:current)
+                        ;; Still timing something, so wait again.
+                        (int<imp>:timing:final/timer separator?)
+                      ;; Done I think? Output.
+                      (int<imp>:timing:final separator?)))
+                  separator-line?))
+
+
+(defun imp:timing:final (&optional separator-line?)
+  "Set up a total timing summary to print out once everything's done loading.
+
+If SEPARATOR-LINE? is non-nil, print out `imp:timing:separator:final' after
+final timing message."
+  ;; Don't bother trying until start-up is (mostly) over.
+  ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Startup-Summary.html#Startup-Summary
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              "Print final timing info to imp timing buffer once done timing."
+              (int<imp>:timing:final/timer separator-line?))))
+;; (imp:timing:final t)
+;; (run-hooks 'emacs-startup-hook)
 
 
 ;;--------------------------------------------------------------------------------
