@@ -969,6 +969,29 @@ Each element in a user-level keywords list should have one of these forms:
 See help for `font-lock-defaults' for what all this does/can do.")
 
 
+;; Just use expected name instead of my... unique naming conventions.
+(defvar imp-timing-mode-map
+  (let ((map (make-sparse-keymap)))
+    ;; This will be set implictly by `define-derived-mode' if not set explictly.
+    (set-keymap-parent map special-mode-map)
+
+    ;;------------------------------
+    ;; Unbind
+    ;;------------------------------
+    ;; "g" is `revert-buffer' by default (inherited from `special-mode-map')
+    ;; but is often used as "refresh buffer" (e.g. `deadgrep-mode' binds it to `deadgrep-restart').
+    ;; `imp-timing-mode' doesn't really have a "refresh", since it's just historical.
+    (define-key map (kbd "g") nil) ; unbind `revert-buffer'
+
+    ;;------------------------------
+    ;; Bind
+    ;;------------------------------
+    ;; (define-key map (kbd "n") #'next-line)
+
+    map)
+  "Foo map derived from parent explicitly.")
+
+
 ;;;###autoload
 (define-derived-mode imp-timing-mode special-mode "imp:timing"
   "Major mode for the `imp:timing:buffer:name' timing information buffer.
