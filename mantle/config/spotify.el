@@ -25,7 +25,7 @@
 ;; NOTE: They're not a width that plays nice with monospaced fonts...
 ;; Hence the tabs for alignment...
 ;;
-;;   U+23F5  ⏵ 	 U+25B6 ▶/▶ 		 Play
+;;   U+23F5  ▶️/⏵ 	 U+25B6 ▶/▶ 		 Play
 ;;   U+23F8  ⏸/⏸ 	        		 Pause
 ;;   U+23EF  ⏯/⏯ 	        		 Play/Pause toggle
 ;;   U+23F4  ⏴ 	 U+25C0 ◀/◀ 		 Reverse
@@ -558,14 +558,7 @@ know if it still does, but this was the solution:
   ;; TODO:smudge: Is this hack still required?
   ;; HACK: This is a defconst so it doesn't update when you set a different port number.
   ;; So... Just force it to update.
-  (setq smudge-api-oauth2-callback (concat "http://localhost:" smudge-oauth2-callback-port "/" smudge-oauth2-callback-endpoint))
-
-  ;;---
-  ;; Keybinds
-  ;;---
-  ;; Keybind: See config/keybinds/spotify.el
-  ;; (define-key smudge-mode-map (kbd "C-c .") 'smudge-command-map)
-  )
+  (setq smudge-api-oauth2-callback (concat "http://localhost:" smudge-oauth2-callback-port "/" smudge-oauth2-callback-endpoint)))
 
 
 ;;--------------------------------------------------------------------------------
@@ -608,14 +601,207 @@ know if it still does, but this was the solution:
   ;; (insert int<smudge>:hydra/title)
 
 
+  (defvar int<smudge>:hydra/title:status/style 'detailed
+    "Style of Smudge status in the hydra title.
+
+ Options:
+  - `status'   - Use the short `smudge-controller-player-status' string.
+  - `detailed' - Detailed table of status.
+  - nil        - No status in the title.")
+
+
+  (defun int<smudge>:title:volume/meter (percentage)
+    "Return volume PERCENTAGE [0,100] integer as a unicode meter.
+
+Examples:
+  - percentage -> returned string
+  -   0 -> \"⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀\"
+  -   4 -> \"⣆⣀⣀⣀⣀⣀⣀⣀⣀⣀\"
+  -  42 -> \"⣿⣿⣿⣿⣄⣀⣀⣀⣀⣀\"
+  - 100 -> \"⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\""
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (unless (and (integerp percentage)
+                 (< -1 percentage 101))
+      (error "int<smudge>:title:volume/meter: PERCENTAGE must be integer in range [0,100]; got %s: %S"
+             (type-of percentage)
+             percentage))
+
+    ;;------------------------------
+    ;; +Progress+ Volume Meter
+    ;;------------------------------
+    (let* ((meter/length 10)
+           (meter/char/full ?⣿)
+           (meter/char/empty ?⣀)
+           ;; NOTE: The bottom 2 dots/pips don't "count" - they're `meter/char/empty', after all.
+           (meter/char/partials '(?⣄ ?⣆ ?⣇ ?⣧ ?⣷ ?⣿))
+           ;; Percentage value of one of the 6 dots/pips used in `meter/char/partials'.
+           (meter/char/partials/value (/ (float meter/length)
+                                         (length meter/char/partials)))
+           output)
+      ;;---
+      ;; "Full Volume" characters
+      ;;---
+      (while (>= percentage 10)
+        (push meter/char/full output)
+        (setq percentage (- percentage 10)))
+
+      ;;---
+      ;; "Partial Volume" character
+      ;;---
+      (when (> percentage 0)
+        (push (nth (floor (/ meter/char/partials/value 2)) meter/char/partials)
+              output))
+
+      ;;---
+      ;; "No Volume" characters
+      ;;---
+      ;; Pad end of full/partial volume str with empties.
+      (string-pad (if output
+                      (apply #'string (nreverse output))
+                    "")
+                  meter/length
+                  meter/char/empty)))
+  ;; (length (int<smudge>:title:volume/meter 0))
+  ;; (int<smudge>:title:volume/meter 1)
+  ;; (int<smudge>:title:volume/meter 10)
+  ;; (int<smudge>:title:volume/meter 11)
+  ;; (int<smudge>:title:volume/meter 44)
+
+
+  (defun int<smudge>:title:detailed ()
+    "Output detailed (multi-line) player status string"
+    ;; TODO: Make a helper in `smudge' for getting things from inside of this status.
+    ;; https://developer.spotify.com/documentation/web-api/reference/get-the-users-currently-playing-track
+    (if-let ((json/status (smudge-cache-api-get-status :name (system-name))))
+        (let* (;;---
+               ;; JSON Fields & Player State
+               ;;---
+               (state/playing (gethash 'is_playing json/status)) ; :json-false... t?
+               (state/repeat (gethash 'repeat_state json/status)) ; "off", "track", "context"
+               (state/shuffle (gethash 'shuffle_state json/status)) ; :json-false... t?
+               (state/progress/ms (gethash 'progress_ms json/status))
+               (json/item (gethash 'item json/status))
+               (state/duration/ms (gethash 'duration_ms json/item))
+               (state/name/track (gethash 'name json/item))
+               ;; `item' is a 'TrackObject' _or_ an 'EpisodeObject'.
+               ;; Assume 'TrackObject'.
+               ;; TODO: Be smarter; figure it out/error.
+               (json/album (gethash 'album json/item))
+               (state/name/album (gethash 'name json/album))
+               (list/artists (gethash 'artists json/item)) ; list of 'ArtistObject'
+               (state/name/artist/count (length list/artists))
+               (state/name/artist/primary (gethash 'name (nth 0 list/artists)))
+               (state/name/artist/all (string-join (mapcar (lambda (artist-json)
+                                                             (gethash 'name artist-json))
+                                                           list/artists)
+                                                   ", "))
+               (state/name/artist (if (> state/name/artist/count 1)
+                                      state/name/artist/all
+                                    state/name/artist/primary))
+               (json/device (gethash 'device json/status))
+               (state/name/device (gethash 'name json/device))
+               ;; TODO: Name the device if not this device...
+               ;; But before that we'd need to be able to get status without a device name/id.
+               ;; See `smudge-cache-api-get-status' at top of this `let*'.
+               (state/device/this? (and (stringp state/name/device)
+                                        (string= state/name/device (system-name))))
+               (state/volume/percent (gethash 'volume_percent json/device))
+               (state/volume/meter (if (integerp state/volume/percent)
+                                       (int<smudge>:title:volume/meter state/volume/percent)
+                                     ""))
+
+               ;;---
+               ;; Row Titles
+               ;;---
+               (row/artist (concat "Artist"
+                                   (when (> 1 state/name/artist/count)
+                                     "s")))
+               (row/album "Album")
+               (row/track "Track")
+               (row/status "Status")
+               (row/volume "Volume")
+               (row/width/title (max (length row/artist)
+                                     (length row/album)
+                                     (length row/track)
+                                     (length row/status)
+                                     (length row/volume)))
+               ;;---
+               ;; Formatting
+               ;;---
+               (row/indent/standard "  ├─")
+               (row/indent/final    "  └─")
+               (row/indent/fill     "─")
+
+               (format/row/title (concat "%"
+                                         (number-to-string row/width/title)
+                                         "s"))
+
+               (row/artist (string-replace " " "─" (format format/row/title row/artist)))
+               (row/album  (string-replace " " "─" (format format/row/title row/album)))
+               (row/track  (string-replace " " "─" (format format/row/title row/track)))
+               (row/status (string-replace " " "─" (format format/row/title row/status)))
+               (row/volume (string-replace " " "─" (format format/row/title row/volume)))
+
+               (format/row "%s%s: %s"))
+          ;;------------------------------
+          ;; Put it all together prettily.
+          ;;------------------------------
+          (concat "──┬─────────────────────────────────────\n"
+                  (mapconcat (lambda (entry)
+                               ;; Format the status lines:
+                               (apply #'format format/row entry))
+                             (list (list row/indent/standard row/artist state/name/artist)
+                                   (list row/indent/standard row/album  state/name/album)
+                                   (list row/indent/standard row/track  state/name/track)
+                                   (list row/indent/standard
+                                         row/status
+                                         (concat
+                                          (if (eq state/playing :json-false) "⏸" "▶️")
+                                          (cond ((string= "track" state/repeat)
+                                                 "🔂")
+                                                ((string= "context" state/repeat)
+                                                 "🔁")
+                                                (t ;; Should just be "off" but catch other unexpected values.
+                                                 nil))
+                                          (unless (eq state/shuffle :json-false) "🔀")))
+                                   (list row/indent/final
+                                         row/volume
+                                         (format "%s %d%%"
+                                                 state/volume/meter
+                                                 state/volume/percent)))
+                             "\n")))
+      ;; Else there is no status currently...
+      nil))
+  ;; (int<smudge>:title:detailed)
+
+
   ;; Could have plist args if I need to customize?
   (defun int<smudge>:title ()
     "Get title string for `pretty-hydra'."
-    ;; Icon & "Spotify"
-    (concat int<smudge>:hydra/title
-            "\n"
-            ;; Player Status formatted string.
-            smudge-controller-player-status))
+    ;; This is used in `pretty-hydra-define', so we have to escape any
+    ;; percentages in order to make it through `pretty-hydra's string
+    ;; formatting.
+    (string-replace "%" "%%"
+                    (mapconcat #'identity
+                               (list
+                                ;; Icon & "Spotify"
+                                int<smudge>:hydra/title
+
+                                ;; Status?
+                                (pcase int<smudge>:hydra/title:status/style
+                                  ;; Short Status: Player Status formatted string.
+                                  ('status
+                                   smudge-controller-player-status)
+                                  ;; Long Status: Table of status details.
+                                  ('detailed
+                                   (int<smudge>:title:detailed))
+                                  ;; Shortest Status: No status.
+                                  (_
+                                   nil)))
+                               "\n")))
+  ;; (int<smudge>:title)
 
 
   ;; TODO: pretty-hydra needs to know about unicode character widths in order to make nice tables? :sad:
@@ -708,20 +894,28 @@ know if it still does, but this was the solution:
        ;; TODO: :toggle #'func-that-gets-current-state
        ))
 
+     ;; NOTE: Wanted "Volume (42%)", but can't do a dynamic label here? :(
      "Volume"
      (("." ;; line previous
        smudge-controller-volume-up
        "🔊"
+       ;; (format "🔊 (%d%%)" (smudge-connect-volume-get-next (smudge-cache-get-volume :name (system-name)) +1)))
+       ;; (concat "🔊 ("
+       ;;         (number-to-string (smudge-connect-volume-get-next (smudge-cache-get-volume :name (system-name)) +1))
+       ;;         "%)" )
        :exit nil)
 
       ("e" ;; line next
        smudge-controller-volume-down
        "🔉"
+       ;;(format "🔉 (%d%%)" (smudge-connect-volume-get-next (smudge-cache-get-volume :name (system-name)) -1))
        :exit nil)
 
       ;; TODO: choose from mute or unmute: "🔇" "🔈"
       ("x"
        smudge-controller-volume-mute-unmute
+       ;; NOTE: This doesn't work!!! It evaluates once and then fuck you?!
+       ;; TODO: fix?
        (if (smudge-cache-api-is-muted :name (system-name))
            "🔈 Unmute"
          "🔇 Mute")
