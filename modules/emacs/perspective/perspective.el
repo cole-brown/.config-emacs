@@ -244,8 +244,9 @@ From Doom's `+workspace-new' in
             )
         (persp-delete-other-windows))
       (switch-to-buffer "*scratch*")
-      (setf (persp-window-conf persp)
-            (funcall persp-window-state-get-function (selected-frame))))
+      (let ((config (persp-window-conf persp)))
+        (setf config
+              (funcall persp-window-state-get-function (selected-frame)))))
     persp))
 
 
