@@ -218,7 +218,33 @@ Example:
                                            :jeff :zort :vogon)))
     ...
 
-Return a cons of lists: '(args-list . kwargs-plist)"
+Return a cons of lists: '(args-list . kwargs-plist)
+
+NOTE: Not compatible with `dash' let functions like `-let', `-let*' when using
+keywords that can have keyword values.
+For example:
+  1. This is  fine:
+     (let* ((args '(id email :namespace :work :default failed-to-find-thing))
+            (parsed (elisp:parse:args+kwargs args
+                                             :namespace
+                                             :timestamp
+                                             :comment
+                                             :default))
+            (type (car parsed))
+            (keys (cdr parsed)))
+       (list (cons \"type:\" type)
+             (cons \"keys:\" keys)))
+
+  2. This loses the keyword `:namespace' value of `:work':
+     (-let* ((args '(id email :namespace :work :default failed-to-find-thing))
+             ((type keys) (elisp:parse:args+kwargs args
+                                                   :namespace
+                                                   :timestamp
+                                                   :comment
+                                                   :default)))
+
+       (list (cons \"type:\" type)
+             (cons \"keys:\" keys)))"
   (let ((leading-args nil)
         (rest-as-keywords nil)
         (keywords nil)
@@ -241,6 +267,33 @@ Return a cons of lists: '(args-list . kwargs-plist)"
 ;; (elisp:parse:args+kwargs '(jeff jefferson :namespace :work) :namespace)
 ;; (elisp:parse:args+kwargs '(jeff jefferson :namespace nil :value 42) :namespace :value)
 ;; (elisp:parse:args+kwargs '((jeff (jefferson)) :namespace nil :value 42) :namespace :value)
+;;
+;; `dash.el' ain't happy with values that are keywords:
+;; (-let* ((args '(id email :namespace :work :default failed-to-find-thing))
+;;         ((type keys) (elisp:parse:args+kwargs args :namespace :timestamp :comment :default)))
+;;   (list (cons "type:" type)
+;;         (cons "keys:" keys)))
+;; (-let* ((args '(id email :namespace :work :default failed-to-find-thing))
+;;         ((type keys) (elisp:parse:args+kwargs args :namespace :timestamp :comment :default))
+;;         ((&plist :namespace :timestamp :comment :default) keys))
+;;   (pp (list (cons "type:" type)
+;;             (cons "keys:" keys)
+;;             (cons :namespace namespace)
+;;             (cons :timestamp timestamp)
+;;             (cons :comment comment)
+;;             (cons :default default))))
+;; This does work, but... meh?
+;; (-let* ((args '(id email :namespace :work :default failed-to-find-thing))
+;;         (parsed (elisp:parse:args+kwargs args :namespace :timestamp :comment :default))
+;;         (type (car parsed))
+;;         (keys (cdr parsed))
+;;         ((&plist :namespace :timestamp :comment :default) keys))
+;;   (pp (list (cons "type:" type)
+;;             (cons "keys:" keys)
+;;             (cons :namespace namespace)
+;;             (cons :timestamp timestamp)
+;;             (cons :comment comment)
+;;             (cons :default default))))
 
 
 (defun elisp/cl:parse:filter-kwargs (args &rest claims)
