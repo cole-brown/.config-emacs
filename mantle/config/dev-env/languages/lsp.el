@@ -122,7 +122,6 @@ Borrowed from Doom."
 
   (innit:hook:defun
       (:name    'lsp:modeline/update
-       :file    macro<imp>:path/file
        :docstr  "Update modeline with LSP state."
        :squelch t)
     (let* ((workspaces (lsp-workspaces))
@@ -132,10 +131,10 @@ Borrowed from Doom."
                                " "
                                (propertize
                                 ;; Just use an icon if possible, else
-                                (let ((icon (mantle:user:icon/octicon "rocket"
-                                                                       ""
-                                                                       :face     face
-                                                                       :v-adjust -0.0575)))
+                                (let ((icon (mantle:user:icon/font-awesome "rocket"
+                                                                           ""
+                                                                           :face     face
+                                                                           :v-adjust -0.0575)))
                                   (if (str:empty? icon :full)
                                       ;; TODO: Get icon working?
                                       (propertize "LSP-TODO-THIS" 'face face)
@@ -149,7 +148,6 @@ Borrowed from Doom."
 
   (innit:hook:defun
      (:name   'lsp:header/breadcrumb
-      :file   macro<imp>:path/file
       :docstr "Set up `lsp-mode' to show some information in the header line.")
     (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
     (lsp-headerline-breadcrumb-mode))
@@ -157,7 +155,6 @@ Borrowed from Doom."
 
   (innit:hook:defun
       (:name   'lsp:enable
-       :file   macro<imp>:path/file
        :docstr (mapconcat #'identity
                           '("Basic hook to enable `lsp-mode' for a buffer."
                             ""
@@ -420,7 +417,6 @@ From Doom's `+lsp-defer-server-shutdown-a' in \"modules/tools/lsp/lsp.el\"."
   ;; This should be hooked into `meow-normal-mode-hook' or its `evil' equivalent.
   (innit:hook:defun
       (:name    'lsp/flycheck:syntax/trigger
-       :file    "hi";macro<imp>:path/file
        :docstr  "Trigger a syntax check on switch to normal mode."
        :squelch nil)
     (when (and flycheck-mode
