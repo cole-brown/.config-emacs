@@ -136,6 +136,8 @@ OPTIONS is a plist of optional vars:
 
   :file      - File path string for where your macro is called from... in case
                you happen to lose your hook and need to find it.
+             - If not provided or nil, use `macro<imp>:path/file' if it
+               exists, else use `(imp:path:abbreviate (imp:path:current:file))'
 
   :docstr    - A string to use as the defined function's docstring.
 
@@ -146,7 +148,13 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
   (let* ((macro<innit>:announce  (int<innit>:hook:option :announce options))
          (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
          (macro<innit>:transient (int<innit>:hook:option :transient options))
-         (macro<innit>:arg/file  (int<innit>:hook:option :file options)) ;; Not complete yet...
+         (macro<innit>:arg/file  (or
+                                  ;; Explicit arg in OPTIONS provided?
+                                  (int<innit>:hook:option :file options)
+                                  ;; In an `imp:use-package' with that macro's lexical variable present?
+                                  (elisp:symbol/lexical:bound-and-true? macro<imp>:path/file)
+                                  ;; Figure out something automatically?
+                                  (imp:path:abbreviate (imp:path:current:file)))) ; Still need to convert to relative path...
          (macro<innit>:docstr    (int<innit>:hook:option :docstr options))
          ;; Do not eval:
          ;;   - input
@@ -218,6 +226,13 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
 ;;        :announce t)
 ;;     (message "hi: %S" macro<imp>:path/file)
 ;;     ))
+;;
+;; Implicit `:file':
+;; (innit:hook:defun
+;;     (:name    'test:file
+;;      :docstr  "Update modeline with LSP state."
+;;      :squelch t)
+;;   (message "hi: %S" macro<imp>:path/file))
 
 
 (defmacro innit:hook:defun-and-add (hook-vars options &rest body)
@@ -252,6 +267,8 @@ OPTIONS is a plist of optional vars:
 
   :file      - Filename where your macro is called from... in case you happen
                to lose your hook and need to find it.
+             - If not provided or nil, use `macro<imp>:path/file' if it
+               exists, else use `(imp:path:abbreviate (imp:path:current:file))'
 
   :docstr    - A string to use as the defined function's docstring."
   (declare (indent 2))
