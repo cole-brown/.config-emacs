@@ -12,6 +12,33 @@
 ;; This should be low-level stuff for use by other code.
 
 
+(defmacro elisp:symbol/lexical:bound-and-true? (symbol)
+  "Return SYMBOL's value if it exists, else nil.
+
+NOTE: SYMBOL's value can be nil; will return nil in that case.
+See also `elisp:symbol/lexical:bound?'."
+  ;; If it has a value, return it.
+  ;; If not, who cares and we get to return `nil' for free.
+  `(ignore-error void-variable ,symbol))
+;; (let ((testing 42)) (elisp:symbol/lexical:bound-and-true? testing))
+;; (elisp:symbol/lexical:bound-and-true? testing)
+
+
+(defmacro elisp:symbol/lexical:bound? (symbol)
+  "Return t if SYMBOL exists as a variable, else nil.
+
+NOTE: If SYMBOL exists and is nil, return t.
+See also `elisp:symbol/lexical:bound-and-true?'."
+  ;; Don't care about `debug-on-error'; that would ruin this function's reason
+  ;; for existance.
+  `(condition-case nil
+       ;; Return true if it exist...
+       (when ,symbol t)
+     ;; Return nil if it caused the "does not exist" error.
+     (void-variable nil)))
+;; (let ((testing 42)) (elisp:symbol/lexical:bound? testing))
+;; (elisp:symbol/lexical:bound? testing)
+
 ;;------------------------------------------------------------------------------
 ;; Delete Functions
 ;;------------------------------------------------------------------------------
