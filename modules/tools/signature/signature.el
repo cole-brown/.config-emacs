@@ -160,14 +160,18 @@ Signature Types:
     - 'sigil 'todo
   - Or whatever was created via `signature:set'.
 
-(Optional) Keywords are:
+\(Optional) Keywords are:
   - :namespace <keyword> - Namespace signature is stored under.
-  - :timestamp <non-nil> - Append \" [YYYY-MM-DD]\" (org inactive) timestamp.
+  - :timestamp <non-nil> - Append RFC-3339 datetime.
   - :comment   <non-nil> - Wrap signature in comment characters if appropriate.
   - :default   <string>  - Fallback string if signature doesn't exist."
   ;; Break `args' up into type list and keyword args, then check for any of the
   ;; optional keywords.
-  (-let* (((type keys) (elisp:parse:args+kwargs args :namespace :timestamp :comment :default))
+  ;; NOTE: This fucks up any values that are keywords, which we have lots, so do not do:
+  ;;   (-let* (((type keys) (elisp:parse:args+kwargs args :namespace :timestamp :comment :default))
+  (-let* ((parsed (elisp:parse:args+kwargs args :namespace :timestamp :comment :default))
+          (type (car parsed))
+          (keys (cdr parsed))
           ((&plist :namespace :timestamp :comment :default) keys))
 
     ;; First, do we even have this signature?
@@ -178,11 +182,19 @@ Signature Types:
           (when timestamp
             (setq sig (concat sig
                               " "
-                              (spy:datetime/string.get 'org-inactive))))
+                              ;; Alternative datetimes:
+                              ;;   - 'org 'inactive 'date
+                              ;;   - 'org 'inactive 'rfc-3339
+                              ;;   - 'org 'inactive 'full
+                              ;;   - etc.
+                              ;;     - See `datetime:init' in ":/core/modules/elisp/datetime/format.el"
+                              (datetime:string/get 'rfc-3339 'datetime))))
 
           (when comment
             ;; Append ':' and wrap sig with comment characters if necessary.
-            (setq sig (mis0/comment/wrap (concat sig ":"))))
+            (mis :buffer 'current
+                 :output 'string
+                 (mis:comment "%s%s" sig ":")))
 
           ;; Return it.
           sig)
@@ -192,6 +204,7 @@ Signature Types:
 ;; (signature:string 'id 'sigil)
 ;; (signature:string 'sigil 'todo :namespace :work)
 ;; (signature:string 'sigil 'todo :timestamp t :comment t)
+;; (signature:string 'id 'email :namespace :work)
 
 
 (defun signature:insert (&rest args)
