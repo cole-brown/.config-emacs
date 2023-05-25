@@ -352,7 +352,7 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
                                :v-adjust (or (plist-get plist :v-adjust) 0)
                                :height (or (plist-get plist :height) 1))
        " "
-       (if face
+       (if face/text
            (propertize str 'face face/text)
          str))))
 
@@ -386,7 +386,7 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
                               :v-adjust (or (plist-get plist :v-adjust) 0)
                               :height (or (plist-get plist :height) 1))
        " "
-       (if face
+       (if face/text
            (propertize str 'face face/text)
          str))))
 
@@ -420,7 +420,7 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
                                :v-adjust (or (plist-get plist :v-adjust) 0)
                                :height (or (plist-get plist :height) 1))
        " "
-       (if face
+       (if face/text
            (propertize str 'face face/text)
          str))))
 
