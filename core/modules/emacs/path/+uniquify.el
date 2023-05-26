@@ -1,11 +1,9 @@
-;;; uniquify.el --- Unique Buffer Names -*- lexical-binding: t; -*-
-;;
-;; Copyright (C) 2022 Cole Brown
+;;; core/modules/emacs/path/+uniquify.el --- Unique Buffer Names -*- lexical-binding: t; -*-
 ;;
 ;; Author: Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:  2022-10-20
-;; Modified: 2022-10-20
+;; Modified: 2023-05-26
 ;;
 ;;; Commentary:
 ;;
@@ -279,10 +277,41 @@ Will check settings:
 BUFFER should be a buffer object.
 `path:uniquify:settings/local' should be up-to-date."
   (with-current-buffer buffer
-    (let ((name (path:uniquify:settings/get :name buffer)))
-      (unless (equal name (buffer-name buffer))
-        ;; Use non-nil `unique' arg in order to avoid infinite loop recursion.
-        (rename-buffer name :unique)))))
+    (let ((func/name "path:uniquify:buffer:name/set")
+          (name (path:uniquify:settings/get :name buffer)))
+      ;;------------------------------
+      ;; Error Checks
+      ;;------------------------------
+      (cond ((null name)
+             ;; Error for now so we can work on hunting this down.
+             ;; Ideally no erroring? Maybe?
+             (nub:error
+                 :innit
+                 func/name
+               '(:line:each
+                 "Cannot name this buffer; no name in settings?!"
+                 "`%s': %S")
+               (symbol-name 'path:uniquify:settings/local)
+               path:uniquify:settings/local))
+            ((not (stringp name))
+             (nub:error
+                 :innit
+                 func/name
+               '(:line:each
+                 "Cannot name this buffer; no name in settings?!"
+                 "`%s': %S")
+               (symbol-name 'path:uniquify:settings/local)
+               path:uniquify:settings/local))
+            ;;------------------------------
+            ;; Buffer Naming (Or Not)
+            ;;------------------------------
+            ((string= name (buffer-name buffer))
+             ;; Nothing to do; name already set?
+             nil)
+            (t
+             ;; Use non-nil UNIQUE arg in order to avoid infinite loop recursion
+             ;; due to our advising of `rename-buffer'.
+             (rename-buffer name :unique))))))
 
 
 (defun path:uniquify:buffer:path/absolute/directory (buffer)
