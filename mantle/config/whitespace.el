@@ -265,7 +265,6 @@ Add to `whitespace-enable-predicate' via `add-function'."
 
   (innit:hook:defun
       (:name    "org/whitespace:mode/enter"
-       :file    macro<imp>:path/file
        :docstr  "I like some whitespace-mode stuff in org-mode, but want less than other modes."
        :squelch t)
     ;; Make a local copy of `whitespace-style' we can modify and...
@@ -275,7 +274,6 @@ Add to `whitespace-enable-predicate' via `add-function'."
 
   (innit:hook:defun
       (:name    "org/whitespace:save/pre"
-       :file    macro<imp>:path/file
        :docstr  "Invoke `whitespace-cleanup' if the `ws-butler' feature is not present."
        :squelch t)
    (unless (featurep 'ws-butler)

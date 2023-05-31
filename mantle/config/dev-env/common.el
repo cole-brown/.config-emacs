@@ -84,7 +84,6 @@
   ;;   (innit:hook:func/name:symbol "rainbow-mode/enable" nil)
   (innit:hook:defun
       (:name "rainbow-mode/enable"
-       :file macro<imp>:path/file
        :docstr "Enable `rainbow-mode' (colorize color codes) for this buffer.")
     (rainbow-mode +1))
 
@@ -118,13 +117,11 @@
 
   (innit:hook:defun
       (:name   "ediff:window/save"
-       :file   macro<imp>:path/file
        :docstr "Save window config so it can be restored after quitting `ediff'.")
     (setq mantle:user:ediff:window/cache (current-window-configuration)))
 
   (innit:hook:defun
       (:name   "ediff:window/restore"
-       :file   macro<imp>:path/file
        :docstr "Restore a saved window config after quitting `ediff'."
        ;; NOTE: The `ediff:window/restore' hook needs the `:depth' argument!
        :depth  'append)

@@ -109,7 +109,6 @@ MODULE should be a string of the module name."
 
   (innit:hook:defun
       (:name   'python:settings
-       :file   macro<imp>:path/file
        :docstr "Settings for Python mode. Non-LSP stuff.")
 
     ;; Python (`pycodestyle', technically) defaults to wanting 79, not 80, width code.
@@ -126,7 +125,6 @@ MODULE should be a string of the module name."
 
   (innit:hook:defun
       (:name   'python:flycheck
-       :file   macro<imp>:path/file
        :docstr (mapconcat #'identity
                           '("Use the correct Python executables for Flycheck."
                             ""
@@ -534,7 +532,6 @@ MODULE should be a string of the module name."
 
     (innit:hook:defun
         (:name   'python:pyenv:version
-         :file   macro<imp>:path/file
          :docstr "Set `pyenv-mode' version from buffer-local variable.")
       (when (eq major-mode 'python-mode)
         (when (not (local-variable-p 'mantle:user:python:pyenv/version)) ;; Not set in this buffer yet?
@@ -638,7 +635,6 @@ MODULE should be a string of the module name."
 
       (innit:hook:defun
           (:name   'python:anaconda:enable/maybe
-           :file   macro<imp>:path/file
            :docstr "Enable `anaconda-mode' if `lsp-mode' is absent and `python-shell-interpreter' is present.")
         (unless (or (bound-and-true-p lsp-mode)
                     (bound-and-true-p eglot--managed-mode)
@@ -650,7 +646,6 @@ MODULE should be a string of the module name."
 
       (innit:hook:defun
           (:name   'python:anaconda:processes:auto-kill
-           :file   macro<imp>:path/file
            :docstr "Kill anaconda processes if this buffer is the last python buffer.")
         (when (and (eq major-mode 'python-mode)
                    (not (delq (current-buffer)
@@ -659,7 +654,6 @@ MODULE should be a string of the module name."
 
       (innit:hook:defun
           (:name   'python:anaconda:processes:auto-kill/local
-           :file   macro<imp>:path/file
            :docstr (mapconcat #'identity
                               '("Add a local hook to auto-kill the buffer's anaconda processes."
                                 ""

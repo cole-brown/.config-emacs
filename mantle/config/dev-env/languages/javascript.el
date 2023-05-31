@@ -91,7 +91,6 @@
 
   (innit:hook:defun
      (:name   'javascript:settings
-      :file   macro<imp>:path/file
       :docstr "Settings for Javascript mode. Non-LSP stuff.")
 
    ;; Nothing currently, I guess?
@@ -238,7 +237,6 @@
 
   (innit:hook:defun
       (:name   'typescript:settings
-       :file   macro<imp>:path/file
        :docstr "Settings for Typescript mode. Non-LSP stuff.")
 
      ;; 'wide' is a decent default, probably?

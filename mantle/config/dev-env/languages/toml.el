@@ -33,7 +33,6 @@
 
   (innit:hook:defun
       (:name   'toml:settings
-       :file   macro<imp>:path/file
        :docstr "Settings for TOML mode. Non-LSP stuff.")
 
     (setq fill-column (jerky:get 'fill-column 'wide))

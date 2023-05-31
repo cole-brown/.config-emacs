@@ -105,7 +105,6 @@ From Doom's `+css-adaptive-fill-fn' in \"modules/lang/web/autoload/css.el\"."
 
   (innit:hook:defun
      (:name   'css:settings
-      :file   macro<imp>:path/file
       :docstr "Settings for CSS mode. Non-LSP stuff.")
    ;; Correctly continue /* and // comments on newline-and-indent
    (setq comment-line-break-function #'mantle:css:comment-indent-new-line)

@@ -59,7 +59,6 @@
 ;; ;; Nice lil search for symbols: http://www.unicode.org/charts/
 ;; (innit:hook:defun
 ;;     (:name   "org/pretty-checkboxes"
-;;      :file   macro<imp>:path/file
 ;;      :docstr "Beautify Org's Checkbox Symbols")
 ;;   (setq prettify-symbols-alist
 ;;         '(("[ ]" . "☐")
@@ -92,7 +91,6 @@
 ;;     org-mode-hook
 ;;     (:name   'org:pretty-checkboxes
 ;;      :file   (imp:path:current:file)
-;;      ;; :file   macro<imp>:path/file
 ;;      :docstr "Beautify Org's Checkbox Symbols")
 ;;   (font-lock-add-keywords
 ;;    nil ;; 'org-mode - some org-mode stuff (e.g. org-journal) is a derived

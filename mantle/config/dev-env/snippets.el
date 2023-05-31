@@ -276,7 +276,6 @@ NOTE: Text of options will be deduplicated before being used."
 
   (innit:hook:defun
       (:name    "yasnippet"
-       :file    macro<imp>:path/file
        :docstr  "Hook for yasnippet editting."
        :squelch t)
     ;; Normally we want a final newline in all files, so `require-final-newline'

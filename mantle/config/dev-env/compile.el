@@ -37,7 +37,6 @@
   ;;   (innit:hook:func/name:symbol "rainbow-mode/enable" nil)
   (innit:hook:defun
       (:name "compile:ansi-color:enable"
-       :file macro<imp>:path/file
        :docstr (mapconcat #'identity
                           '("Apply ANSI codes (color) in compilation buffers."
                             ""

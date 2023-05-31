@@ -75,7 +75,6 @@
   ;;---
   (innit:hook:defun
       (:name    "org/jump-to-now-target"
-       :file    macro<imp>:path/file
        :docstr  "Jump point to \"now\" link, if it's in the first part of the file."
        :squelch t)
     (when-let ((location (buffer:search:header "[[--now")))
@@ -83,7 +82,6 @@
 
   (innit:hook:defun
       (:name    "org/local-settings"
-       :file    macro<imp>:path/file
        :docstr  "Set up buffer local vars."
        :squelch t)
     (setq-local yas-indent-line 'auto)

@@ -33,7 +33,6 @@
 
   (innit:hook:defun
       (:name    "gptel:org:settings"
-       :file    macro<imp>:path/file
        :docstr  "Settings for ChatGPT buffers.")
     (visual-line-mode +1))
 

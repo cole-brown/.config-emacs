@@ -47,7 +47,6 @@
   ;;
   ;; (innit:hook:defun
   ;;     (:name    "recentf:touch/buffer"
-  ;;      :file    macro<imp>:path/file
   ;;      :docstr  "Bump file in recent file list when it is switched or written to."
   ;;      :squelch t)
   ;;   (when buffer-file-name
@@ -57,7 +56,6 @@
   ;;
   ;; (innit:hook:defun
   ;;     (:name    "recentf:touch/dired"
-  ;;      :file    macro<imp>:path/file
   ;;      :docstr  "Add dired directories to recentf file list."
   ;;      :squelch t)
   ;;   (recentf-add-file default-directory))

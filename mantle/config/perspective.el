@@ -57,7 +57,6 @@
   ;; quirks, so... replace it with a "main" perspective.
   (innit:hook:defun
       (:name    "persp:perspective:replace-nil"
-       :file    macro<imp>:path/file
        :docstr  (concat "The default perspective that 'persp-mode' creates is special and doesn't "
                         "represent a real persp object, so buffers can't really be assigned to "
                         "it, among other quirks, so... replace it with a \"main\" perspective.")
@@ -73,7 +72,6 @@
 
   (innit:hook:defun
       (:name    "persp:perspective:init-first"
-       :file    macro<imp>:path/file
        :docstr  (concat "Ensure a main perspective exists.")
        ;; :squelch t ;; TODO: Do I need to squelch?
        )
@@ -96,7 +94,6 @@
 
   (innit:hook:defun
       (:name    "persp:uniquify:init-hack"
-       :file    macro<imp>:path/file
        :docstr "Hack around `uniquify' buffer renaming to keep `persp-mode' working."
        ;; :squelch t ;; TODO: Do I need to squelch?
        )
@@ -121,7 +118,6 @@
 
   (innit:hook:defun
       (:name    "persp:winner:data/save"
-       :file    macro<imp>:path/file
        :docstr "Save `winner' perspective data?"
        ;; :squelch t ;; TODO: Do I need to squelch?
        )
@@ -133,7 +129,6 @@
 
   (innit:hook:defun
       (:name    "persp:winner:data/load"
-       :file    macro<imp>:path/file
        :docstr "Load `winner' perspective data?"
        ;; :squelch t ;; TODO: Do I need to squelch?
        )
@@ -148,7 +143,6 @@
 
   (innit:hook:defun
       (:name    "persp:buffer:add-current"
-       :file    macro<imp>:path/file
        :docstr "Add current buffer to focused perspective."
        ;; :squelch t ;; TODO: Do I need to squelch?
        )
@@ -163,7 +157,6 @@
   (innit:hook:defun
       (:name     "persp:buffer:ignore/dead"
        :argslist (buffer)
-       :file     macro<imp>:path/file
        :docstr   "Don't try to persist dead buffers. They cause errors."
        ;; :squelch  t ;; TODO: Do I need to squelch?
        )
@@ -174,7 +167,6 @@
   (innit:hook:defun
       (:name     "persp:buffer:ignore/remote"
        :argslist (buffer)
-       :file     macro<imp>:path/file
        :docstr   "Don't try to persist remote buffers. They are super slow."
        ;; :squelch  t ;; TODO: Do I need to squelch?
        )
@@ -290,7 +282,6 @@ or on some buffer listing ops."
     (innit:hook:defun-and-add
         persp-after-load-state-functions
         (:name    "persp:state/load"
-         :file    macro<imp>:path/file
          :docstr "Fix bug: Stop session persistence from restoring a broken posframe."
          ;; :squelch t ;; TODO: Do I need to squelch?
          )

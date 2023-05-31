@@ -67,7 +67,6 @@
 
   (innit:hook:defun
       (:name   'cc:settings
-       :file   macro<imp>:path/file
        :docstr "Settings for C/C++ mode. Non-LSP stuff.")
 
     ;; Use BSD style in C, C++.

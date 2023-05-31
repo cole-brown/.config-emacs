@@ -31,7 +31,6 @@
 
   (innit:hook:defun
       (:name   'json:settings
-       :file   macro<imp>:path/file
        :docstr "Settings for JSON mode. Non-LSP stuff.")
 
     (setq fill-column (jerky:get 'fill-column 'wide))

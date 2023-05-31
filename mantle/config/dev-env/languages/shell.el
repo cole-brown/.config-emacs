@@ -75,7 +75,6 @@ in \"modules/lang/sh/autoload.el\"."
 
   (innit:hook:defun
      (:name   'shell:keywords/add
-      :file   macro<imp>:path/file
       :docstr (mapconcat #'identity
                          '("Add the extra syntax hilighting to the mode."
                           ""
@@ -95,7 +94,6 @@ in \"modules/lang/sh/autoload.el\"."
 
   (innit:hook:defun
      (:name   'shell:settings
-      :file   macro<imp>:path/file
       :docstr "Settings for SHELL mode. Non-LSP stuff.")
 
    (setq fill-column (jerky:get 'fill-column 'wide)
@@ -154,7 +152,6 @@ in \"modules/lang/sh/autoload.el\"."
 
   (innit:hook:defun
       (:name   'powershell:settings
-       :file   macro<imp>:path/file
        :docstr "Settings for PowerShell mode. Non-LSP stuff.")
 
     (setq fill-column (jerky:get 'fill-column 'wide))
@@ -192,7 +189,6 @@ in \"modules/lang/sh/autoload.el\"."
 ;;   ;;------------------------------
 ;;   (innit:hook:defun
 ;;      (:name   'fish:settings
-;;       :file   macro<imp>:path/file
 ;;       :docstr "Settings for Fish Shell mode. Non-LSP stuff.")
 ;;
 ;;    ;; 'wide' is a decent default, probably?

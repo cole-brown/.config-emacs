@@ -105,7 +105,6 @@
   (innit:hook:defun-and-add
       projectile-relevant-known-projects
       (:name    "projectile:known-projects"
-       :file    macro<imp>:path/file
        :docstr  (concat "Auto-discovery on `projectile-mode' is slow and premature. "
                         "Let's defer it until it's actually needed. "
                         "Also clean up non-existing projects too!")

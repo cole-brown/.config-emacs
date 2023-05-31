@@ -56,7 +56,6 @@
 
   (innit:hook:defun
      (:name   'csharp:settings
-      :file   macro<imp>:path/file
       :docstr (concat "Settings for C# mode. Non-LSP stuff."
                       "\n"
                       "Note that `csharp-mode' is not derived from `cc-mode' (though it does "

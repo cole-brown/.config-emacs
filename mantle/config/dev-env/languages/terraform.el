@@ -126,7 +126,6 @@ Return a string:
 
   (innit:hook:defun
       (:name   'terraform:settings
-       :file   macro<imp>:path/file
        :docstr "Settings for Terraform mode. Non-LSP stuff.")
     (setq compile-command (mantle:terraform:runner)))
 

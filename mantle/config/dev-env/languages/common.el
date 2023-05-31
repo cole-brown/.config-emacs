@@ -242,7 +242,6 @@ Originally from Doom's `+format-on-save-enabled-modes' in \"modules/editor/forma
 
   (innit:hook:defun
       (:name   'format-all:enable?
-       :file   macro<imp>:path/file
        :docstr "Decide whether or not to enable auto-formatting on save.")
 
     (let ((language (format-all--language-id-buffer))) ; string, likely from `language-id-buffer'.

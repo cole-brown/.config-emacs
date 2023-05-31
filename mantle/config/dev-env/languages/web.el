@@ -86,7 +86,6 @@
 
   (innit:hook:defun
      (:name   'web:settings
-      :file   macro<imp>:path/file
       :docstr "Settings for Web mode. Non-LSP stuff.")
 
    ;; Nothing currently, I guess?
@@ -98,7 +97,6 @@
 
   (innit:hook:defun
      (:name   'web:fix-js-comments
-      :file   macro<imp>:path/file
       :docstr "Fix comment handling in `web-mode' for JavaScript.")
    (when (member web-mode-content-type '("javascript" "jsx"))
      ;; For some reason the default is to insert HTML comments even

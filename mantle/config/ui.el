@@ -269,7 +269,6 @@ original function if not custom."
   ;;------------------------------
   (innit:hook:defun
       (:name    'highlight-indent-guides:faces/init
-       :file    macro<imp>:path/file
        :docstr  (mapconcat #'identity
                            '("Set indent faces if possible."
                              ""
@@ -284,7 +283,6 @@ original function if not custom."
 
   (innit:hook:defun
       (:name    'highlight-indent-guides:disable-maybe
-       :file    macro<imp>:path/file
        :docstr  (mapconcat #'identity
                            '("Disable `highlight-indent-guides' if `org-indent-mode'."
                              ""
@@ -349,7 +347,6 @@ original function if not custom."
   ;; See Doom's "core/core-ui.el".
   ;; (innit:hook:defun
   ;;     (:name    'hl-line:disable/local
-  ;;      :file    macro<imp>:path/file
   ;;      :docstr  "Disable `hl-line' by setting our local var."
   ;;      :squelch t)
   ;;  (unless hl-line-mode
@@ -357,13 +354,11 @@ original function if not custom."
 
   (innit:hook:defun
       (:name    'hl-line:enable/global
-       :file    macro<imp>:path/file
        :docstr  "Disable `hl-line' when starting to select text.")
   (global-hl-line-mode +1))
 
   (innit:hook:defun
       (:name    'hl-line:select-text/enter
-       :file    macro<imp>:path/file
        :docstr  "Disable `hl-line' when starting to select text."
        :squelch t)
     (when (bound-and-true-p hl-line-mode)
@@ -372,7 +367,6 @@ original function if not custom."
 
   (innit:hook:defun
       (:name    'hl-line:select-text/exit
-       :file    macro<imp>:path/file
        :docstr  "Enable `hl-line' when done selecting text."
        :squelch t)
    (when mantle:user:ui:hl-line:enabled?/local-cache

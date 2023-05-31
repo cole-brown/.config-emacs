@@ -66,7 +66,6 @@
 
  (innit:hook:defun
       (:name   'markdown:settings
-       :file   macro<imp>:path/file
        :docstr "Settings for Markdown mode.")
 
    ;; Don't trigger autofill in code blocks (see `auto-fill-mode')

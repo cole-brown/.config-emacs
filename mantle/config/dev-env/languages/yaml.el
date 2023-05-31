@@ -28,7 +28,6 @@
 
   (innit:hook:defun
       (:name   'yaml:settings
-       :file   macro<imp>:path/file
        :docstr "Settings for YAML mode. Non-LSP stuff.")
 
     (setq fill-column (jerky:get 'fill-column 'wide))

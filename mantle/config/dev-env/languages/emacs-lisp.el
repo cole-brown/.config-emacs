@@ -131,7 +131,6 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
 
   (innit:hook:defun
       (:name   'emacs-lisp:settings
-       :file   macro<imp>:path/file
        :docstr "Settings for Emacs Lisp mode. Non-LSP stuff.")
     ;; Emacs' built-in elisp files use a hybrid tab->space indentation scheme
     ;; with a tab width of 8. Any smaller and the indentation will be
@@ -606,7 +605,6 @@ Originally from Doom's `+emacs-lisp/buttercup-run-project' in
 ;;
 ;;   (innit:hook:defun
 ;;       (:name   'emacs-lisp:flycheck-cask:setup
-;;        :file   macro<imp>:path/file
 ;;        :docstr (mapconcat #'identity
 ;;                           '("Hook `flycheck-cask-setup' into `flycheck-mode-hook'."
 ;;                             ""
