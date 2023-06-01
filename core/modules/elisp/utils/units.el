@@ -114,6 +114,10 @@
 (defun unit:byte (value unit)
   "Return integer of bytes for VALUE of UNITS bytes.
 
+VALUE should be a float or int number.
+
+UNIT should be a symbol (and a key from alist `int<units>:bytes').
+
 Example:
   (unit:byte 2 'kb)
     -> 2000
@@ -131,19 +135,22 @@ Example:
           func/name
         "Unknown unit name '%S'! See `int<units>:bytes' for allowed units."
         unit))
-    (unless (integerp value)
+    ;; Allow floats as well as ints for e.g.: (unit:byte 0.5 'gb)
+    (unless (numberp value)
       (nub:error
           :innit
           func/name
-        "VALUE should be an integer. Got %S: %S"
+        "VALUE should be a number (int or float). Got %S: %S"
         (type-of value)
         value))
 
     ;;------------------------------
     ;; Unit Conversion
     ;;------------------------------
-    (* value unit/multiplier)))
+    ;; Allowing floats, so we need to convert to int for actual bytes.
+    (floor (* value unit/multiplier))))
 ;; (unit:byte 100 'kb)
+;; (unit:byte 0.5 'kb)
 
 
 ;; TODO:units: Convert unit to human-readable value:
