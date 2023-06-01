@@ -89,35 +89,68 @@ Borrowed from Doom."
     "Have the LSP/Emacs IPC optimizations been applied?")
 
 
-  (defvar-local lsp-modeline-icon nil
-    "LSP enabled/disabled icon for modeline.")
-
-
   (define-minor-mode mantle:lsp/ipc:optimization-mode
-    "Deploys universal GC and IPC optimizations for `lsp-mode' and `eglot'."
+    "Deploys _universal_ GC and IPC optimizations for `lsp-mode' and `eglot'.
+
+Borrowed from Doom's `+lsp-optimization-mode' in \"modules/tools/lsp/config.el\"."
     :global t
     :init-value nil
+    ;; TODO: Why are these all `setq-default'?
+    ;;   Not Buffer-Local:
+    ;;     - `read-process-output-max'
+    ;;     - `gcmh-high-cons-threshold'
+    ;;     - `mantle:lsp/ipc:initialized?'
+    ;;   Buffer-Local:
+    ;;     - `mantle:lsp/ipc:optimization-mode'
+    ;;
+    ;; Not that it matters, since for non-buffer-local variables `setq-default'
+    ;; is just `setq' and just sets the current value, but that's also very
+    ;; different from its intended purpose for buffer-local vars, where it
+    ;; _doesn't_ set the current value, just the value that _new_ buffers will
+    ;; use.
+    ;;
+    ;; TODO: change to just using `setq'?
     (if (not mantle:lsp/ipc:optimization-mode)
-        ;; Revert.
-        (setq-default read-process-output-max mantle:lsp/ipc:cache/read-process-output-max
-                      gcmh-high-cons-threshold mantle:lsp/ipc:cache/gcmh-high-cons-threshold
-                      mantle:lsp/ipc:initialized? nil)
+        (progn
+          ;;------------------------------
+          ;; Disable: Revert Settings
+          ;;------------------------------
+          (setq-default read-process-output-max     mantle:lsp/ipc:cache/read-process-output-max)
+          (setq-default gcmh-high-cons-threshold    mantle:lsp/ipc:cache/gcmh-high-cons-threshold)
+          (setq-default mantle:lsp/ipc:initialized? nil))
+
+      ;;------------------------------
+      ;; Enable
+      ;;------------------------------
       ;; Only apply these settings once!
       (unless mantle:lsp/ipc:initialized?
-        ;; Save the existing default...
-        (setq mantle:lsp/ipc:cache/read-process-output-max  (default-value 'read-process-output-max)
-              mantle:lsp/ipc:cache/gcmh-high-cons-threshold (default-value 'gcmh-high-cons-threshold))
+        ;;---
+        ;; Save the existing defaults...
+        ;;---
+        (setq mantle:lsp/ipc:cache/read-process-output-max  (default-value 'read-process-output-max))
+        (setq mantle:lsp/ipc:cache/gcmh-high-cons-threshold (default-value 'gcmh-high-cons-threshold))
+
+        ;;---
         ;; ...and give more wiggle room.
+        ;;---
         (setq-default read-process-output-max (max read-process-output-max
-                                                   (unit:byte 2 'mb))
-        ;; REVIEW LSP causes a lot of allocations, with or without the native JSON
-        ;;        library, so we up the GC threshold to stave off GC-induced
-        ;;        slowdowns/freezes. Doom uses `gcmh' to enforce its GC strategy,
-        ;;        so we modify its variables rather than `gc-cons-threshold'
-        ;;        directly.
-        (setq-default gcmh-high-cons-threshold (* 2 mantle:lsp/ipc:cache/gcmh-high-cons-threshold))
+                                                   (unit:byte 2 'mb)))
+        ;; NOTE: LSP causes a lot of allocations, with or without the native
+        ;; JSON library, so we up the GC threshold to stave off GC-induced
+        ;; slowdowns/freezes. We use `gcmh' to enforce our GC strategy, so we
+        ;; modify its variables rather than `gc-cons-threshold' directly.
+        (setq-default gcmh-high-cons-threshold (max (default-value 'gcmh-high-cons-threshold)
+                                                    (* 2 mantle:lsp/ipc:cache/gcmh-high-cons-threshold)))
         (gcmh-set-high-threshold)
-        (setq mantle:lsp/ipc:optimized? t)))))
+        (setq mantle:lsp/ipc:initialized? t))))
+
+
+  ;;---
+  ;; Modeline
+  ;;---
+
+  (defvar-local lsp-modeline-icon nil
+    "LSP enabled/disabled icon for modeline.")
 
 
   (innit:hook:defun
@@ -146,12 +179,20 @@ Borrowed from Doom."
                    'append)))
 
 
+  ;;---
+  ;; Headerline
+  ;;---
+
   (innit:hook:defun
      (:name   'lsp:header/breadcrumb
       :docstr "Set up `lsp-mode' to show some information in the header line.")
     (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
     (lsp-headerline-breadcrumb-mode))
 
+
+  ;;---
+  ;; Hook for Enabling LSP in other `use-package' `:hook' sections.
+  ;;---
 
   (innit:hook:defun
       (:name   'lsp:enable
