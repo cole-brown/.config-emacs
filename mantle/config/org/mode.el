@@ -272,6 +272,9 @@
   ;;------------------------------
   :bind ; meow
   ;;------------------------------
+  ;; NOTE: `org-mode-map' already has some stuff bound, and they use `<return>'
+  ;; (apparently) instead of `RET'? So use both just to make sure these actually
+  ;; take hold as the binds.
   (:map org-mode-map
    ;;---
    ;; Return of the +Jedi+ Enter Key:
@@ -279,15 +282,21 @@
    ;;---
    ;; 1. "RET" should be a boring, plain, and unsurprising "\n".
    ("RET" . newline)
-   ;; 2. Move "newline and maybe indent for me?".
+   ("<return>" . newline)
+
+   ;; 2. Move "newline and maybe indent for me?" to shift.
    ("S-RET" . org-newline-and-indent)
+   ("S-<return>" . org-newline-and-indent)
+
    ;; 3. These are useful in lists to make more list items.
    ;; TODO:keybind:org: make/find a smarter function for:
    ;;   - "create first list item" or
    ;;   - "toggle an empty list item between checkbox or no"
    ;;   - "create another list item, with or without checkbox depending on current list item"
-   ("C-RET" . org-insert-todo-heading) ; TODO heading or a checkbox list item
-   ("M-RET" . org-meta-return)) ; Normal heading, normal list item, or various other things
+   ("C-RET" . org-insert-todo-heading)      ; TODO heading or a checkbox list item
+   ("C-<return>" . org-insert-todo-heading) ; TODO heading or a checkbox list item
+   ("M-RET" . org-meta-return)              ; Normal heading, normal list item, or various other things
+   ("M-<return>" . org-meta-return))        ; Normal heading, normal list item, or various other things
 
 
   ;;------------------------------
