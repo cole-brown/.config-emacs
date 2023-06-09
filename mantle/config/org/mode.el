@@ -296,7 +296,14 @@
    ("C-RET" . org-insert-todo-heading)      ; TODO heading or a checkbox list item
    ("C-<return>" . org-insert-todo-heading) ; TODO heading or a checkbox list item
    ("M-RET" . org-meta-return)              ; Normal heading, normal list item, or various other things
-   ("M-<return>" . org-meta-return))        ; Normal heading, normal list item, or various other things
+   ("M-<return>" . org-meta-return)         ; Normal heading, normal list item, or various other things
+
+   ;;---
+   ;; Movement
+   ;;---
+   ;; TODO:meow: Why the fuck can't I do "hey `meow', this is a bind for `meow-normal-mode' in `org-mode-map'?!
+   ("M-." . org-previous-visible-heading)
+   ("M-e" . org-next-visible-heading))
 
 
   ;;------------------------------
