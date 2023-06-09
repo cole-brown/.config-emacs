@@ -46,10 +46,7 @@ List of strings of directories to automatically add/commit/push in their
 respective git repos. Can be sub-directories of a repository (TODO: add
 allowance for single files?)."
   :group 'autogit:group
-  :type  '(restricted-sexp :tag "String List"
-                           :match-alternatives
-                           (lambda (x) (and (listp x)
-                                            (seq-every-p #'stringp x)))))
+  :type  '(repeat string))
 
 
 (defcustom autogit:repos:path/watch
@@ -59,10 +56,7 @@ allowance for single files?)."
 List of strings of directories to watch for (not necessarily auto-commit)
 changes. Can be sub-directories of a repository."
   :group 'autogit:group
-  :type  '(restricted-sexp :tag "String List"
-                           :match-alternatives
-                           (lambda (x) (and (listp x)
-                                            (seq-every-p #'stringp x)))))
+  :type  '(repeat string))
 
 
 ;;------------------------------
