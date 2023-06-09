@@ -317,14 +317,6 @@ Will convert the paths to absolute/canonical values before comparing."
   ;;     -> nil
   (let ((child/abs (path:canonicalize:file child))
         (parent/abs (path:canonicalize:file parent)))
-    (message (mapconcat #'identity
-                        '("child:          %s"
-                          "parent:         %s"
-                          "child's parent: %s")
-                        "\n")
-             child/abs
-             parent/abs
-             (path:parent child/abs))
     (unless (string= child/abs parent/abs)
       (string= (path:parent child/abs)
                parent/abs))))
