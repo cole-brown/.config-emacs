@@ -58,6 +58,28 @@
   :after (:and org magit))
 
 
+;;--------------------------------------------------------------------------------
+;; Groot: Link to files as git repo name & relative path
+;;--------------------------------------------------------------------------------
+
+(defvar innit:path:package:groot (path:join innit:path:packages:user "groot")
+  "`use-package' doesn't like having a function call for `:load-path', thus this.")
+
+(imp:use-package groot
+  ;; This is my own package, so...
+  ;;   1) Don't try to install.
+  :ensure nil
+  ;;   2) Here's where it is; add this dir to the `load-path'.
+  :load-path innit:path:package:groot
+  ;;   ...?
+  ;;   3) I guess I need to make requirements explicit since we aren't trying to
+  ;;      install anything?
+  :after org
+
+  ;; NOTE: `groot-repositories' set in secrets.
+  )
+
+
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
