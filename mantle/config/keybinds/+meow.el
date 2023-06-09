@@ -278,15 +278,18 @@
   ;; ──┬───────────────────────────────
   ;;   │ Movement in Insert State
   ;; ──┴───────────────────────────────
-  (meow-define-keys
-      'insert
-    ;; ──┬────────────────
-    ;;   │ ↑ ↓ ← →
-    ;; ──┴────────────────
-    '("M-." . meow-prev)
-    '("M-e" . meow-next)
-    '("M-o" . meow-left)
-    '("M-u" . meow-right))
+  ;; (meow-define-keys
+  ;;     'insert
+  ;;   ;; ──┬────────────────
+  ;;   ;;   │ ↑ ↓ ← →
+  ;;   ;; ──┴────────────────
+  ;; Do we want non-selecting movement keys?
+  ;;   - To make `M-x meow-tutor` easier to start, yes.
+  ;;   - No. I want somewhere to put `org-next-visible-heading' and `org-previous-visible-heading', and these are in the way.
+  ;;   '("M-." . meow-prev)
+  ;;   '("M-e" . meow-next)
+  ;;   '("M-o" . meow-left)
+  ;;   '("M-u" . meow-right))
 
 
   ;; ──┬───────────────────────────────
@@ -298,10 +301,11 @@
    ;; ──┴────────────────
    ;; Do we want non-selecting movement keys?
    ;;   - To make `M-x meow-tutor` easier to start, yes.
-   '("M-." . meow-prev)
-   '("M-e" . meow-next)
-   '("M-o" . meow-left)
-   '("M-u" . meow-right)
+   ;;   - No. I want somewhere to put `org-next-visible-heading' and `org-previous-visible-heading', and these are in the way.
+   ;; '("M-." . meow-prev)
+   ;; '("M-e" . meow-next)
+   ;; '("M-o" . meow-left)
+   ;; '("M-u" . meow-right)
 
    ;; ↑ / prev / up / ...expand?
    '("." . meow-prev-expand)
