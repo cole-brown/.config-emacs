@@ -76,8 +76,15 @@
   ;;      install anything?
   :after org
 
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
   ;; NOTE: `groot-repositories' set in secrets.
-  )
+
+  ;; This is a defvar, not a defcustom, as it's only intended for the dev (me).
+  (setq groot--org-api-warn-on-error t))
 
 
 ;;------------------------------------------------------------------------------
