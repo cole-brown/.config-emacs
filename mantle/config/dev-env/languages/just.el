@@ -1,0 +1,87 @@
+;;; mantle/config/dev-env/just.el --- Project-Specific Command Runner -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <http://github/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; Created:    2023-01-03
+;; Modified:   2023-01-03
+;; URL:        https://github.com/cole-brown/.config-emacs
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Project-Specific Command Runner
+;;
+;; `just' like `make' except for commands in general, and also a heapful of
+;; lessons learned, hopefully.
+;;
+;;; Code:
+
+
+;;------------------------------------------------------------------------------
+;; Just Some Syntax Highlighting
+;;------------------------------------------------------------------------------
+
+(imp:use-package just-mode
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (innit:hook:defun
+      (:name   'just:settings
+       :docstr "Settings for `just-mode'. Non-LSP stuff.")
+
+    (setq fill-column (jerky:get 'fill-column 'wide))
+
+    ;; TODO: Disable highlighting of long lines in whitespace-mode?
+    )
+
+
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+  (just-mode-hook . mantle:hook:just:settings))
+
+
+;;--------------------------------------------------------------------------------
+;; Just Some Recipe Runner
+;;--------------------------------------------------------------------------------
+
+(use-package justl
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+
+  ;; Recipe Name Field (default: 20)
+  (justl-recipe-width 30))
+
+
+;; TODO: Keybinds?
+;;   - `justl'
+;;   - `justl-exec-recipe-in-dir'
+;;   - `justl-exec-recipe'
+;;   - Possibly more; docs aren't great...
+;;
+;; ;;------------------------------
+;; ;; Keybinds : Meow
+;; ;;------------------------------
+;;
+;; (use-package justl
+;;   :when  (imp:flag? :keybinds +meow)
+;;   :after meow
+;;
+;;   ;;------------------------------
+;;   :config
+;;   ;;------------------------------
+;;
+;;   (map! :n "e" 'justl-exec-recipe)
+;;   )
+
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
+(imp:provide :mantle 'config 'user 'dev-env 'languages 'yaml)
