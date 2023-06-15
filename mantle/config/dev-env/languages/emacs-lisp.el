@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-07-28
-;; Modified:   2022-12-22
+;; Timestamp:  2023-06-15
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -158,7 +158,9 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
    ;; ;; emacs configs, so we disable `emacs-lisp-checkdoc' and reduce the
    ;; ;; `emacs-lisp' checker's verbosity.
    ;; (flycheck-mode-hook #'+emacs-lisp-reduce-flycheck-errors-in-emacs-config-h)
-   (emacs-lisp-mode-hook . rainbow-delimiters-mode))
+   (emacs-lisp-mode-hook . rainbow-delimiters-mode)
+   (emacs-lisp-mode-hook . mantle:hook:time-stamp:settings)
+   (before-save-hook     . mantle:hook:time-stamp:save))
 
 
   ;;------------------------------

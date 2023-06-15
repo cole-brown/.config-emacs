@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-06-02
-;; Modified:   2023-03-16
+;; Timestamp:  2023-06-15
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -97,8 +97,11 @@
   :hook
   ;;------------------------------
 
-  ((org-mode-hook . mantle:hook:org/jump-to-now-target) ;; (innit:hook:func/name:symbol "org/jump-to-now-target" nil)
-   (org-mode-hook . mantle:hook:org/local-settings))    ;; (innit:hook:func/name:symbol "org/local-settings"     nil)
+  ((org-mode-hook    . mantle:hook:org/jump-to-now-target) ;; (innit:hook:func/name:symbol "org/jump-to-now-target" nil)
+   (org-mode-hook    . mantle:hook:org/local-settings)
+   (org-mode-hook    . mantle:hook:time-stamp:settings)
+   (before-save-hook . mantle:hook:time-stamp:save))
+
 
   ;;------------------------------
   :custom
