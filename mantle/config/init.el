@@ -32,12 +32,16 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Emacs, Files, Etc
+;; Operating System Things? Emacs Itself, Files, Etc
 ;;------------------------------------------------------------------------------
 
 (imp:load :feature  '(:mantle config user emacs)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "emacs")
+
+(imp:load :feature  '(:mantle config user resource-monitor)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "resource-monitor")
 
 (imp:load :feature  '(:mantle config user files)
           :path     (imp:path:current:dir/relative :mantle)
