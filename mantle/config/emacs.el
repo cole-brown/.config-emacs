@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2023-01-24
-;; Modified:   2023-01-24
+;; Timestamp:  2023-06-15
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -420,6 +420,126 @@ Example:
 
   ;; Double the default max buffer size.
   (comint-buffer-maximum-size 2048))
+
+
+;;--------------------------------------------------------------------------------
+;; (Automatic) Time Stamps
+;;--------------------------------------------------------------------------------
+
+(imp:use-package time-stamp
+  :ensure nil ; This is an Emacs built-in feature.
+
+
+  ;; WARNING: The docstrings for the \\[time-stamp] custom vars says that you
+  ;; should not change them globally:
+  ;;   > These variables are best changed with file-local variables.
+  ;;   > If you were to change `time-stamp-pattern', `time-stamp-line-limit',
+  ;;   > `time-stamp-start', or `time-stamp-end' in your init file, you
+  ;;   > would be incompatible with other people's files.
+  ;;
+  ;; The file comments also warn:
+  ;;   > ;;; Do not change time-stamp-line-limit, time-stamp-start,
+  ;;   > ;;; time-stamp-end, time-stamp-pattern, time-stamp-inserts-lines,
+  ;;   > ;;; or time-stamp-count in your .emacs or you will be incompatible
+  ;;   > ;;; with other people's files!  If you must change them, do so only
+  ;;   > ;;; in the local variables section of the file itself.
+  ;;
+  ;; See: /usr/share/emacs/28.1/lisp/time-stamp.el.gz
+  ;;
+  ;; So... Make hooks for them maybe?
+  ;;
+  ;; ;;------------------------------
+  ;; :custom
+  ;; ;;------------------------------
+  ;;
+  ;; ;;------------------------------
+  ;; :hook
+  ;; ;;------------------------------
+  ;; (before-save-hook . time-stamp)
+
+
+  ;;------------------------------
+  ;; NOTE: Modes that want timestamps, do something like this:
+  ;;------------------------------
+  ;; Example: `org-mode':
+  ;; ;;------------------------------
+  ;; :hook
+  ;; ;;------------------------------
+  ;; ((org-mode-hook    . mantle:hook:time-stamp:settings
+  ;;  (before-save-hook . mantle:hook:time-stamp:save))
+
+
+  ;;------------------------------
+  :init
+  ;;------------------------------
+
+  (innit:hook:defun
+      (:name   "time-stamp:settings"
+       :docstr "Set time-stamp pattern local vars.")
+    ;; `time-stamp-pattern' (effective) default:
+    ;;    "8/Time-stamp:[ \t]+\\\\?[\"<]+%:y-%02m-%02d %02H:%02M:%02S %u\\\\?[\">]"
+    ;;  Example:
+    ;;    "Time-stamp: <2987-06-05 10:11:12 username>"
+    ;;
+    ;; ...but `time-stamp-pattern' is confusing... Set the separate variables?
+
+    ;;---
+    ;; Search Limits
+    ;;---
+    ;; How far to search a file for the time-stamp?
+    ;;   - Positive: from start of file
+    ;;   - Negative: from end of file
+    ;; default: 8
+    (setq-local time-stamp-line-limit 20)
+
+    ;;---
+    ;; Search Regexes
+    ;;---
+    ;; Start!
+    ;;   default: "Time-stamp:[ \t]+\\\\?[\"<]+"
+    ;;   aka:     (rx "Time-stamp:"
+    ;;                (one-or-more (any " " "\t"))
+    ;;                (optional "\\")
+    ;;                (one-or-more (any ?\" "<")))
+    ;; Should we try to be compatible while also letting ourself do timestamps like?:
+    ;;   "Timestamp: 2310-03-04" (most files?)
+    ;;   "TIMESTAMP: 2310-03-04" (org-mode file property)
+    (setq-local time-stamp-start
+                (rx (or "Timestamp" "Time-stamp" "Time-Stamp" "TIMESTAMP")
+                    ":"
+                    (one-or-more (any " " "\t"))
+                    (optional "\\") ; ...wut? Escape char in some file types for "<" maybe?
+                    (optional (any ?\" "<"))))
+
+    ;; End!
+    ;;   default: "\\\\?[\">]"
+    ;;   aka:     (rx (optional "\\") (any ?\" ">"))
+    ;;
+    ;; Should we try to be compatible while also letting ourself do timestamps like?:
+    ;;   "Timestamp: 2310-03-04"
+    (setq-local time-stamp-end
+                (rx (or (and (optional "\\")
+                             (any ?\" ">"))
+                        "\n")))
+
+    ;;---
+    ;; Time Format
+    ;;---
+    ;; default: "%Y-%02m-%02d %02H:%02M:%02S %l"
+    (setq-local time-stamp-format "%Y-%02m-%02d"))
+
+
+  (innit:hook:defun
+      (:name   "time-stamp:save"
+       :docstr (mapconcat #'identity
+                          '("Auto-timestamp files before save."
+                            ""
+                            "Add to hook variable `before-save-hook'.")
+                          "\n"))
+    ;; This hook is merely a namespacing so that it's easier for me to remember.
+    ;; Could just as easily do:
+    ;;   (add-hook 'before-save-hook 'time-stamp)
+    (time-stamp)))
 
 
 ;;------------------------------------------------------------------------------
