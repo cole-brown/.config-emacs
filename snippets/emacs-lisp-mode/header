@@ -5,20 +5,26 @@
 # --
 ;;; `(path:vc/git:relative (path:current:file))` --- ${1:description} -*- lexical-binding: t; -*-
 ;;
-;; Author:     `(signature:string 'id 'name :default (user-full-name))` <`(signature:string 'id 'email :default (message-user-mail-address)`>
-;; Maintainer: `(signature:string 'id 'name :default (user-full-name))` <`(signature:string 'id 'email :default (message-user-mail-address)`>
+;; Author:     `(signature:string 'id 'name :default (user-full-name))` <`(or (signature:string 'id 'url) (signature:string 'id 'email :default (message-user-mail-address)))`>
+;; Maintainer: `(signature:string 'id 'name :default (user-full-name))` <`(signature:string 'id 'email :default (message-user-mail-address))`>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    `(datetime:string/get 'rfc-3339 'date)`
-;; Modified:   `(datetime:string/get 'rfc-3339 'date)`
+;; Timestamp:  `(datetime:string/get 'rfc-3339 'date)`
+;;
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;; ${1}
+;; $1
 ;;
 ;;; Code:
 
 
 ;;------------------------------------------------------------------------------
-;; ${2}
+;; ${2:Section Title}
 ;;------------------------------------------------------------------------------
 
 ;; TODO: stuff here
