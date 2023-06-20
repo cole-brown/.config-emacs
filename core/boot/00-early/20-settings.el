@@ -1,13 +1,24 @@
-;;; 20-init.el --- Early Init -*- lexical-binding: t; -*-
+;;; core/boot/00-early/20-settings.el --- Early Init: Settings for (Faster) Init -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-03-25
+;; Timestamp:  2023-06-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
 ;; Move along.
 ;;
 ;;; Commentary:
+;;
+;; NOTE: This is during 'early-init.el'!
+;;
+;; Setting for (Faster) Init
+;;   1. Startup timing
+;;   2. Settings to speed up init
+;;   3. Settings shamelessly borrowed from Doom's early-on-in-init stuff.
+;;
 ;;; Code:
 
 

@@ -1,7 +1,10 @@
-;;; 50-mantle.el --- Hand init over to user. -*- lexical-binding: t; -*-
+;;; core/boot/20-config/50-mantle.el --- Hand init over to user. -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-03-25
+;; Timestamp:  2023-06-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -9,7 +12,11 @@
 ;;
 ;;; Commentary:
 ;;
-;; Hand init over to user.
+;; Hand init over to user for the bulk of their Emacs set-up.
+;;
+;; More precisely, hand the 'config' stage over to 'mantle/config'.
+;;
+;; We get back init briefly for the 'finalize' stage.
 ;;
 ;;; Code:
 

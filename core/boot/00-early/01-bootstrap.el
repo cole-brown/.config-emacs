@@ -1,4 +1,23 @@
-;;; core/boot/00-early/00-bootstrap.el -*- lexical-binding: t; -*-
+;;; core/boot/00-early/01-bootstrap.el --- Early Init: Bootstrap -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-03-23
+;; Timestamp:  2023-06-20
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; NOTE: This is during 'early-init.el'!
+;;
+;; Bootstrapping for 'early-init.el', which is bootstrapping for 'init.el'...
+;; Sorta... bootstraps all the way down.
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

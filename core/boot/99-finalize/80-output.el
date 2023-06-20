@@ -1,7 +1,10 @@
-;;; 80-output.el --- Output some things. -*- lexical-binding: t; -*-
+;;; core/boot/99-finalize/80-output.el --- Finally: Say Something. -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-11-16
+;; Timestamp:  2023-06-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -9,7 +12,9 @@
 ;;
 ;;; Commentary:
 ;;
-;; Output some things.
+;; Output something to say we're done, maybe?
+;;
+;; Also, goodbye; you've been a lovely person.
 ;;
 ;;; Code:
 
@@ -18,7 +23,7 @@
 ;; Finalize.
 ;;------------------------------------------------------------------------------
 
-;; Output final time for imp loads.
+;; Tell `imp:timing' that everything's done.
 (when (functionp #'imp:timing:final)
   (imp:timing:final :separator))
 
@@ -39,6 +44,7 @@
     (imp:file:current)
     '(:innit :finalize)
   "Boot Loader: 99 Finalize :: Everything Has Been Done.")
+
 
 ;;------------------------------------------------------------------------------
 ;; The End.

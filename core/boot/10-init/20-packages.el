@@ -1,9 +1,10 @@
-;;; 20-packages.el --- Core Packages -*- lexical-binding: t; -*-
+;;; core/boot/10-init/20-packages.el --- Core Packages -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <code@brown.dev>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-17
-;; Modified:   2022-11-17
+;; Timestamp:  2023-06-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -11,7 +12,11 @@
 ;;
 ;;; Commentary:
 ;;
-;; Core Packages
+;; Core Packages except:
+;;   - '01-bootstrap.el':
+;;     - `no-littering'
+;;     - `gcmh'
+;;     - `mis'
 ;;
 ;;; Code:
 

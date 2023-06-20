@@ -1,14 +1,25 @@
-;;; 00-init.el --- Initialize Emacs -*- lexical-binding: t; -*-
+;;; core/boot/10-init/10-settings.el --- Normal Init: Settings -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-03-25
+;; Timestamp:  2023-06-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
 ;; Move along.
 ;;
 ;;; Commentary:
+;;
+;; Settings for Init
+;;   - Directory Local Vars helpers.
+;;   - ...
+;;   - etc.
+;;
+;;
 ;;; Code:
+
 
 
 ;;------------------------------------------------------------------------------

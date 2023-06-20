@@ -1,9 +1,9 @@
-;;; 00-init.el --- normal init stuff -*- lexical-binding: t; -*-
+;;; core/boot/10-init/00-init.el --- Normal Init: Load Stuff -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-10-24
-;; Modified:   2022-10-24
+;; Timestamp:  2023-06-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -11,7 +11,20 @@
 ;;
 ;;; Commentary:
 ;;
-;; normal init settings
+;; NOTE: This is during 'init.el'!
+;;
+;; 'init.el' setup happens in two distinct stages:
+;;   1. 'init'
+;;   2. 'config'
+;;   3. 'finalize'
+;;
+;; All of the 'init' runs stage happens before any 'config' runs, in order to
+;; give ourselves and the user a way to orginize any rough dependencies.
+;;
+;; Basically, initialize some things so everyone's all agreed that we're
+;; definitely ready to configure all the things with `use-package' and such.
+;;
+;; Importantly, this is where user's init (aka 'mantle/init') is called.
 ;;
 ;;; Code:
 

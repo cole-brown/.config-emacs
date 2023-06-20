@@ -1,4 +1,22 @@
-;;; core/boot/00-early/80-package.el -*- lexical-binding: t; -*-
+;;; core/boot/00-early/80-package.el --- Early Init: Packages -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-20
+;; Timestamp:  2023-06-20
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; NOTE: This is during 'early-init.el'!
+;;
+;; Any 'early-init.el' parts of initializing Emacs package system(s).
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

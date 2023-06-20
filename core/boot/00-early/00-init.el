@@ -1,9 +1,9 @@
-;;; 00-init.el --- early-init stuff -*- lexical-binding: t; -*-
+;;; core/boot/00-early/00-init.el --- Early Init: Load Stuff -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2022-10-24
-;; Modified:   2022-10-24
+;; Timestamp:  2023-06-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -11,7 +11,9 @@
 ;;
 ;;; Commentary:
 ;;
-;;  early-init settings and set-up and stuff
+;; NOTE: This is during 'early-init.el'!
+;;
+;; Load all our 'early-init.el' settings and set-up and stuff
 ;;
 ;;; Code:
 

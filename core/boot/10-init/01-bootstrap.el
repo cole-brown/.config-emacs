@@ -1,13 +1,24 @@
-;;; 00-bootstrap.el --- Super early stuff requried for "all" of init. -*- lexical-binding: t; -*-
+;;; core/boot/10-init/01-bootstrap.el --- Normal Init: Bootstrap -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-03-25
+;; Timestamp:  2023-06-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
 ;; Move along.
 ;;
 ;;; Commentary:
+;;
+;; Bootstrapping for 'init.el'.
+;;   - Finish initializing Emacs package system(s).
+;;   - Set up `no-littering' package so all other packages know where to put
+;;     their shit.
+;;   - Set up `gcmh' for improved garbage collection during init.
+;;   - etc.
+;;
 ;;; Code:
 
 

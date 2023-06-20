@@ -1,12 +1,19 @@
 ;;; core/boot/10-init/80-mantle.el --- Load the mantle (user init) entry file. -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-03-28
+;; Timestamp:  2023-06-20
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
-;;;
-;;; Load the mantle (user init) entry file.
-;;;
+;;
+;; Load the mantle (user init) entry file.
+;;
 ;;; Code:
 
 
