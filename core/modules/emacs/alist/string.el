@@ -1,4 +1,24 @@
-;;; alist/string.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/alist/string.el --- String-Keyed Alists -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-12-16
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; String-Keyed Alists
+;;
+;; NOTE: Currently all unused and untested!
+;; NOTE: Maybe... I dunno... fix that at some point.
+;;
+;;; Code:
+
 
 ;;------------------------------------------------------------------------------
 ;; String Alists
@@ -92,3 +112,9 @@
 ;; ;; (let ((alist '(("foo" . bar))))
 ;; ;;   (int<keyboard>:alist/string:delete "foo" alist)
 ;; ;;   alist)
+
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
+(imp:provide :alist 'string)

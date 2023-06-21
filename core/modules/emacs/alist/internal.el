@@ -1,15 +1,30 @@
-;;; alist/internal.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/alist/internal.el --- Erroring and Private Stuff; Go Away -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-12-07
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                          Simple-ish Erroring                           ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                 ──────────
+;;
+;; Bit of Formatting
+;;   - `dd` never hurt anyone...
+;; Simple-ish Erroring
+;;   - I want better errors than "something went wrong"...
+;;
+;;; Code:
 
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                          Simple-ish Erroring                           ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;         Bit of Formatting                                                  ;;
-;;           - `dd` never hurt anyone...                                      ;;
-;;         Simple-ish Erroring                                                ;;
-;;           - I want better errors than "something went wrong"...            ;;
-;;                                 ──────────                                 ;;
 
 
 ;;------------------------------------------------------------------------------

@@ -1,4 +1,30 @@
-;;; emacs/alist/types/types.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/alist/type/types.el --- Alist Type: Generic Types? -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-12-17
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                         Better Alist Functions                         ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;               At least these all have 'alist' in the name...
+;;                                 ──────────
+;;
+;; Helper functions for alists that follow a convention for naming and stuff.
+;; And will assist you in keeping you alist up-to-date, like it's a variable
+;; or something.
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

@@ -1,24 +1,33 @@
-;;; init.el --- Alist Helpers -*- lexical-binding: t; -*-
+;;; core/modules/emacs/alist/init.el --- Better Alist Functions -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-12-15
-;; Modified:   2022-04-13
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;; Helpful alist functions.
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                           Association Lists                            ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                 ──────────
+;;
+;; - Better alist functions.
+;; - Helpful alist functions.
+;; - Alist functions that are all namespaced so you can find related functions.
+;;   - Y'know, like `assoc' and `alist-get' both start with "alist"- oh.
+;; - Other useful things probably.
+;;   - Oh, like how to make string alists work.
+;;     - Didja know that took special effort? I've forgotten that factoid so
+;;       many times I made this...
 ;;
 ;;; Code:
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                           Association Lists                            ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;   - Namespaced so you can find related functions.                          ;;
-;;   - Other useful things, probably.                                         ;;
-;;                                 ──────────                                 ;;
 
 
 ;;------------------------------------------------------------------------------
