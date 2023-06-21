@@ -2,8 +2,9 @@
 ;;
 ;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-12-04
-;; Modified:   2022-11-22
+;; Timestamp:  2023-06-21
 ;;
 ;; This file is not part of GNU Emacs.
 ;;

@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2021-09-22
-;; Modified:   2021-09-22
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-09-22
+;; Timestamp:  2023-06-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Interactive Buffer Functions
+;; Interactive Buffer Functions
 ;;
 ;;; Code:
 

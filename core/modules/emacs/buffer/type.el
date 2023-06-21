@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-12-01
-;; Modified:   2022-12-01
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-12-01
+;; Timestamp:  2023-06-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;; Buffer Types
+;; Buffer Types:
 ;;
 ;; Special       - Buffer name starts with "*".
 ;; Dired         - Buffer mode is Dired.
@@ -21,10 +21,14 @@
 ;; Buried        - Not visible.
 ;; File-Visiting - Buffer has a backing file.
 ;; "Real"        - One of:
-;;    1. A non-nil value for the buffer-local variable `buffer:type:real?' variable.
+;;    1. A non-nil value for the buffer-local variable `buffer:type:real?'
+;;       variable.
 ;;    2. Any function in `buffer:type:functions/real' returns non-nil
 ;;    3. Any function in `buffer:type:functions/unreal' returns nil.
 ;; "Unreal"      - Not "real".
+;;
+;; Derived from Doom's buffer type stuff, like `doom-real-buffer-p' in
+;; \"core/autoload/buffers.el\".
 ;;
 ;;; Code:
 

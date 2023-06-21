@@ -1,4 +1,22 @@
-;;; emacs/buffer/init.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/buffer/init.el --- Buffer Functions -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-11-16
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Buffer Functions
+;;
+;; Namespaced for my convenience.
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

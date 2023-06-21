@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-12-20
-;; Modified:   2022-12-20
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-12-20
+;; Timestamp:  2023-06-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Narrow/Widen Buffer
+;; Helpers for dealing with narrowing & widening buffers.
 ;;
 ;;; Code:
 

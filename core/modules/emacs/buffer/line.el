@@ -1,12 +1,28 @@
-;;; emacs/buffer/line.el -*- lexical-binding: t; -*-
-
-;;------------------------------------------------------------------------------
+;;; core/modules/emacs/buffer/line.el --- Welcome to... (line?) -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-11-16
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Welcome to... (line?)
+;; ...Smarter Line Functions dot Com!
+;;
+;; ------------------------------------------------------------------------------
 ;; Rebind to Smarter Functions:
-;;------------------------------------------------------------------------------
-
-;;------------------------------
+;; ------------------------------------------------------------------------------
+;;
+;; ------------------------------
 ;; Emacs
-;;------------------------------
+;; ------------------------------
+;;
 ;; (imp:use-package emacs
 ;;   :unless (or (imp:flag? :keybinds +meow)
 ;;               (imp:flag? :keybinds +evil))
@@ -24,11 +40,12 @@
 ;;    ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning:visual)
 ;;    ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end:visual)
 ;;    ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end:visual)))
-
-
-;;------------------------------
+;;
+;;
+;; ------------------------------
 ;; Meow
-;;------------------------------
+;; ------------------------------
+;;
 ;; (imp:use-package package-name
 ;;   :when  (imp:flag? :keybinds +meow)
 ;;   :after meow
@@ -49,12 +66,12 @@
 ;;    ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning:visual)
 ;;    ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end:visual)
 ;;    ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end:visual)))
-
-
-;;------------------------------
+;;
+;;
+;; ------------------------------
 ;; Evil
-;;------------------------------
-
+;; ------------------------------
+;;
 ;; (imp:use-package package-name
 ;;   :when  (imp:flag? :keybinds +evil)
 ;;   :after (:and evil evil-collection)
@@ -87,6 +104,8 @@
 ;;   ;;  [remap evil-end-of-visual-line]       #'buffer:cmd:line/smart:move-end:visual
 ;;   ;;  [remap evil-end-of-line]              #'buffer:cmd:line/smart:move-end:visual)
 ;;   )
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------
