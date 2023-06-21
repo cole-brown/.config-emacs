@@ -1,4 +1,14 @@
-;;; dlv/dlv.el --- Directory Local Variables -*- lexical-binding: t; -*-
+;;; core/modules/emacs/dlv/dlv.el --- Directory Local Variables -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-09-10
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;

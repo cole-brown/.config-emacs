@@ -1,8 +1,10 @@
-;;; dlv/init.el --- Directory Local Variables -*- lexical-binding: t; -*-
+;;; core/modules/emacs/dlv/init.el --- Directory Local Variables -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Homepage:   https://github.com/cole-brown/.config-doom
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-09-10
+;; Timestamp:  2023-06-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -22,19 +24,15 @@
 ;;   `test<dlv>:' - Emacs ERT functions, variables, etc
 ;; ------------------------------
 ;;
-;; TODO: describe `imp' flags
-;; Flags:
-;;   - +debug
-;;   - NOTE: Currently considering these mutually exclusive
-;;     - -enabled
-;;     - +enabled/safe
-;;     - +enabled/all
-;;     - +enabled/flag
-;;   - -display
-;;
-;; These are not the GNU Emacs droids you're looking for.
-;; We can go about our business.
-;; Move along.
+;; `dlv' looks for these `imp:flag' flags:
+;;   - `:dlv +debug' : Default to enabling `:info' and `:debug' log statements.
+;;   - Enable/Disable Settings (mutually exclusive; pick one):
+;;     - `:dlv -enabled'      : Not enabled == disabled.
+;;     - `:dlv +enabled/safe' : Only safe DLVs allowed!
+;;     - `:dlv +enabled/all'  : Always allow anything - potentially dangerous!
+;;     - `:dlv +enabled/flag' : Always ask the user - potentially annoying!
+;;   - `:dlv -display'
+;;     - Don't load the commands for displaying DLVs & related info.
 ;;
 ;;; Code:
 

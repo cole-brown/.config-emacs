@@ -1,11 +1,24 @@
-;;; dlv/class.el --- DLV class funcs -*- lexical-binding: t; -*-
+;;; core/modules/emacs/dlv/class.el --- DLV Helpers for DLV "Classes" -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-10-05
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;; DLVs are categorized into 'classes'. These are functions for managing those
+;; DLV Helpers for DLV "Classes"
+;;
+;; DLVs are categorized into "classes". These are functions for managing those
 ;; classes.
 ;;
 ;;; Code:
+
 
 (imp:require :nub)
 (imp:require :dlv 'debug)
