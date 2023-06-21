@@ -111,12 +111,34 @@
   :ensure nil ; This is an Emacs built-in feature.
   :after  pretty-hydra
 
+  ;; ;;------------------------------
+  ;; :pretty-hydra
+  ;; ;;------------------------------
+  ;;
+  ;; ;; (pretty-hydra-define int<profiler>:hydra ; for debugging
+  ;; (int<profiler>:hydra
+  ;;  (:quit-key "g"
+  ;;   :color blue ;; Default to `:exit t' for all heads.
+  ;;   :title "Profiler")
+  ;;
+  ;;  ("Toggle"
+  ;;   (("c" (profiler-start 'cpu)     "Start: CPU"     :toggle (profiler-cpu-running-p))
+  ;;    ("m" (profiler-start 'mem)     "Start: MEM"     :toggle (profiler-mem-running-p))
+  ;;    ("s" (profiler-start 'cpu+mem) "Start: CPU+MEM" :toggle (profiler-running-p))
+  ;;    ("t" profiler-stop "Stop")
+  ;;    ("x" profiler-reset "Reset"))
+  ;;
+  ;;   "Report"
+  ;;   (("r" profiler-report "Report"))))
+  ;; ;; (int<profiler>:hydra/body)
+  ;; ;; (profiler-running-p)
+
+
   ;;------------------------------
-  :pretty-hydra
+  :config
   ;;------------------------------
 
-  ;; (pretty-hydra-define int<profiler>:hydra ; for debugging
-  (int<profiler>:hydra
+  (pretty-hydra-define int<profiler>:hydra ; for debugging
    (:quit-key "g"
     :color blue ;; Default to `:exit t' for all heads.
     :title "Profiler")
@@ -133,12 +155,7 @@
   ;; (int<profiler>:hydra/body)
   ;; (profiler-running-p)
 
-
-  ;;------------------------------
-  :config
-  ;;------------------------------
-
-  (keybind:leader/global:def
+(keybind:leader/global:def
     :infix (keybind:infix "<f1>")
     "p" (list #'int<profiler>:hydra/body :which-key "Profiler...")))
 
@@ -146,4 +163,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'resource-monitor)
+(imp:provide :mantle 'config 'user 'resource-monitor)
