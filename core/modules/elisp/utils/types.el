@@ -1,4 +1,26 @@
-;;; elisp/utils/types.el -*- lexical-binding: t; -*-
+;;; core/modules/elisp/utils/types.el --- Functions for Types -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-02-16
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Functions for Types
+;;
+;; Functions like:
+;;   - cons but not list?
+;;     - `consp' is _NOT_ what you want in that case!
+;;   - proper list not improper list?
+;;   - list, any list, even improper list?
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

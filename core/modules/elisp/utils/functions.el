@@ -1,4 +1,22 @@
-;;; elisp/utils/functions.el -*- lexical-binding: t; -*-
+;;; core/modules/elisp/utils/functions.el --- Functions for Functions -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-12-17
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Functions for functions.
+;; Functions for function args.
+;; Functions that create functions.
+;;
+;;; Code:
 
 
 (imp:require :elisp 'utils 'types)

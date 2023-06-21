@@ -1,10 +1,11 @@
-;;; jerky/init.el --- tree/value store -*- lexical-binding: t; -*-
+;;; core/modules/elisp/jerky/init.el --- Tree/Value Store -*- lexical-binding: t; -*-
 ;;
-;; Author:   Cole Brown <code@brown.dev>
-;; URL:      https://github.com/cole-brown/.config-emacs
-;; Created:  2020-07-14
-;; Modified: 2021-05-19
-;; Version:  3.2
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-07-14
+;; Timestamp:  2023-06-21
+;; Version:    3.2
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,12 +13,21 @@
 ;;
 ;;; Commentary:
 ;;
-;; Tree/value store, sort of.
+;; You've heard of "Key/Value Store", well Jerky is a Tree/Value Store, sort of.
 ;; Fancy hash table, technically.
 ;;
 ;; Store values at the leaf nodes of a tree.
 ;;
 ;;; Code:
+
+
+;; ┌───────────────────────────────┬───────┬───────────────────────────────────┐
+;; ├───────────────────────────────┼ jerky ┼───────────────────────────────────┤
+;; │ Named after ~dirky~, as in "dir key", which needed to be more general...  │
+;; │ So... Generlky? Genky?... Jenky?                                          │
+;; │ Jerky?                                                                    │
+;; │                                 Jerky.                                    │
+;; └───────────────────────────────────────────────────────────────────────────┘
 
 
 ;;------------------------------------------------------------------------------

@@ -1,9 +1,9 @@
-;;; elisp/utils/units.el --- Nicer units? -*- lexical-binding: t; -*-
+;;; core/modules/elisp/utils/units.el --- Nicer units? -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2023-02-24
-;; Modified:   2023-02-24
+;; Timestamp:  2023-06-21
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -15,7 +15,6 @@
 ;; Kilobytes, hogsheads, nautical miles...
 ;;
 ;;; Code:
-;;; elisp/utils/types.el -*- lexical-binding: t; -*-
 
 
 ;;------------------------------------------------------------------------------

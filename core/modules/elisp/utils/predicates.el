@@ -1,9 +1,10 @@
-;;; predicates.el --- Predicate Functions -*- lexical-binding: t; -*-
+;;; core/modules/elisp/utils/predicates.el --- Predicate Functions -*- lexical-binding: t; -*-
 ;;
-;; Author:   Cole Brown <code@brown.dev>
-;; URL:      https://github.com/cole-brown/.config-emacs
-;; Created:  2022-11-14
-;; Modified: 2022-11-14
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-11-14
+;; Timestamp:  2023-06-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -11,7 +12,10 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Predicate Functions
+;; Predicate Functions
+;;   - Yes Functions
+;;   - No Functions
+;;   - Yes/No Functions
 ;;
 ;;; Code:
 

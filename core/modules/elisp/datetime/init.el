@@ -1,4 +1,22 @@
-;;; elisp/datetime/init.el -*- lexical-binding: t; -*-
+;;; core/modules/elisp/datetime/init.el --- Dates and Times and Datetimes -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-11-16
+;; Timestamp:  2023-06-20
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Dates and Times and Datetimes
+;;
+;; Named datetime formatting.
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

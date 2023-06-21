@@ -1,13 +1,23 @@
-;;; jerky/jerky.el -*- mode: emacs-lisp; lexical-binding: t -*-
+;;; core/modules/elisp/jerky/jerky.el --- Jerky's Repo, Getters, Setters, etc. -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-07-14
+;; Timestamp:  2023-06-21
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; The important bits of 'jerky'.
+;;   - The hash-table "repository".
+;;   - Your various getters and setters.
+;;
+;;; Code:
 
-
-;; ┌───────────────────────────────┬───────┬───────────────────────────────────┐
-;; ├───────────────────────────────┼ jerky ┼───────────────────────────────────┤
-;; │ Named after ~dirky~, as in "dir key", which needed to be more general...  │
-;; │ So... Generlky? Genky?... Jenky?                                          │
-;; │ Jerky?                                                                    │
-;; │                                 Jerky.                                    │
-;; └───────────────────────────────────────────────────────────────────────────┘
 
 (require 'seq)
 
