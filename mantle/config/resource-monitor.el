@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2023-06-15
-;; Timestamp:  2023-06-16
+;; Timestamp:  2023-06-21
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -111,6 +111,8 @@
   :ensure nil ; This is an Emacs built-in feature.
   :after  pretty-hydra
 
+  ;; TODO:hydra: `:pretty-hydra' didn't get recognized, but 'pretty-hydra' says
+  ;; it's a 'use-package' keyword?
   ;; ;;------------------------------
   ;; :pretty-hydra
   ;; ;;------------------------------
@@ -155,7 +157,7 @@
   ;; (int<profiler>:hydra/body)
   ;; (profiler-running-p)
 
-(keybind:leader/global:def
+  (keybind:leader/global:def
     :infix (keybind:infix "<f1>")
     "p" (list #'int<profiler>:hydra/body :which-key "Profiler...")))
 
