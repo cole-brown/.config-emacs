@@ -183,13 +183,22 @@
 ;; On Windows, it's asking me to install the `sqlite3' package in Emacs, and
 ;; install the SQLite shared library using my distro's package manager. Which
 ;; is... fun?
-;; https://github.com/pekingduck/emacs-sqlite3-api
-(imp:use-package sqlite3)
+;;
+;; And this requires `make' and friends in order to actually compile
+;; `sqlite3`...
+;;
+;; TODO:magit:windows: Try this?
+;; https://github.com/org-roam/org-roam/blob/e1873a6a1660b5c4f850df2da578d1a1b851f8ac/doc/installation.md#windows
+;; Meanwhile, maybe just skip Forge on Windows?
+(unless innit:os:windows?
 
-;; https://github.com/magit/forge
-;; https://magit.vc/manual/forge/Loading-Forge.html#Loading-Forge
-(imp:use-package forge
-  :after magit)
+  ;; https://github.com/pekingduck/emacs-sqlite3-api
+  (imp:use-package sqlite3)
+
+  ;; https://github.com/magit/forge
+  ;; https://magit.vc/manual/forge/Loading-Forge.html#Loading-Forge
+  (imp:use-package forge
+    :after magit))
 
 
 ;;------------------------------------------------------------------------------
