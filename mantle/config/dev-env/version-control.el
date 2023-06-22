@@ -179,9 +179,15 @@
 ;;------------------------------------------------------------------------------
 ;; "Work with Git forges, such as Github and Gitlab, from the comfort of Magit
 ;; and the rest of Emacs."
+
+;; On Windows, it's asking me to install the `sqlite3' package in Emacs, and
+;; install the SQLite shared library using my distro's package manager. Which
+;; is... fun?
+;; https://github.com/pekingduck/emacs-sqlite3-api
+(imp:use-package sqlite3)
+
 ;; https://github.com/magit/forge
 ;; https://magit.vc/manual/forge/Loading-Forge.html#Loading-Forge
-
 (imp:use-package forge
   :after magit)
 

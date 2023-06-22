@@ -404,11 +404,12 @@ Always returns nil."
   "`use-package' doesn't like having a function call for `:load-path', thus this.")
 
 
-;; TODO: Why isn't Smudge installing/loading its requirements? Because it's a local repo???
+;; TODO:smudge: Why isn't Smudge installing/loading its requirements? Because it's a local repo???
 ;;   > Package-Requires: ((emacs "27.1") (simple-httpd "1.5") (request "0.3") (oauth2 "0.16"))
 (imp:use-package simple-httpd)
 (imp:use-package request)
 (imp:use-package oauth2)
+
 
 ;; https://github.com/danielfm/smudge/
 (imp:use-package smudge
