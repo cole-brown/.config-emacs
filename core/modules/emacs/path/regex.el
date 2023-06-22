@@ -1,8 +1,22 @@
-;;; emacs/path/regex.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/path/regex.el --- Regexes & Globs -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-22
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Regexes: Now you have 2 problems.
+;; Globs:   Globs and regexes are the same thing, right?
+;;
+;;; Code:
 
-;;-------------------------------------spy--------------------------------------
-;;--                         Glob & Regex Functions                           --
-;;----------------Globs and regexes are the same thing, right?------------------
 
 (imp:require :alist 'type 'string)
 

@@ -1,15 +1,18 @@
-;;; git.el --- Version Control & Paths -*- lexical-binding: t; -*-
+;;; core/modules/emacs/path/git.el --- Version Control & Paths -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2022 Cole Brown
-;;
-;; Author: Cole Brown <code@brown.dev>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:  2022-10-20
-;; Modified: 2022-10-20
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-10-20
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;;  Version Control & Paths
+;; Version Control & Paths
 ;;
 ;;; Code:
 
@@ -17,7 +20,7 @@
 (imp:require :path 'path)
 
 
-;; TODO: how to autoload / lazy require magit for these functions?
+;; TODO:path: how to autoload / lazy require magit for these functions?
 
 
 ;;--------------------------------------------------------------------------------

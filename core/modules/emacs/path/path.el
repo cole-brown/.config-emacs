@@ -1,19 +1,21 @@
-;;; core/modules/emacs/path/path.el --- Path Function -*- mode: emacs-lisp; lexical-binding: t -*-
+;;; core/modules/emacs/path/path.el --- Path Functions -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <code@brown.dev>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Modified:   2022-11-22
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;;  Path Functions
+;; Path Functions
 ;;
 ;;; Code:
 
-;;------------------------------------path--------------------------------------
-;;--                             Path Functions                               --
-;;---------------------------------/mnt/hello-----------------------------------
 
 (imp:require :str)
 (imp:require :elisp 'utils 'functions)

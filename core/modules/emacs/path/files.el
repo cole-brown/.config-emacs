@@ -1,8 +1,21 @@
-;;; -*- lexical-binding: t; -*-
+;;; core/modules/emacs/path/files.el --- Filename & files functions. -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-07-29
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Filename & files functions.
+;;
+;;; Code:
 
-;;------------------------------------file--------------------------------------
-;;--                             File Functions                               --
-;;----------------------------/mnt/hello/there.txt------------------------------
 
 (require 'cl-lib)
 

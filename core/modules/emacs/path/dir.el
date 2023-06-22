@@ -1,8 +1,21 @@
-;;; -*- lexical-binding: t; -*-
+;;; core/modules/emacs/path/dir.el --- Directory Functions -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-04-07
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Directory Functions
+;;
+;;; Code:
 
-;;-------------------------------------dir--------------------------------------
-;;--                          Directory Functions                             --
-;;----------------------------/mnt/hello/there.txt------------------------------
 
 (require 'cl-lib)
 

@@ -1,13 +1,26 @@
-;;; core/modules/emacs/path/+uniquify.el --- Unique Buffer Names -*- lexical-binding: t; -*-
+;;; core/modules/emacs/path/+uniquify.el --- Project-Based Unique Buffer Names -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:  2022-10-20
-;; Modified: 2023-05-26
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-10-20
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;; Nice, unique buffer names base off projects.
+;; Unique Buffer Names
+;;
+;; `uniquify' only gives you a very little bit of context to use if you want to
+;; try to create your own buffer uniquifying function. It does this because it
+;; expects to be in control of what is unique about the buffer's name.
+;;
+;; `path:uniquify' uniquify off of a project / version control root directory
+;; and relative path, so we have to just ignore `uniquify' and wander out on our
+;; own.
 ;;
 ;;; Code:
 
