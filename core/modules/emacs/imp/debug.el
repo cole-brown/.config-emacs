@@ -1,13 +1,36 @@
-;;; emacs/imp/debug.el -*- lexical-binding: t; -*-
-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║              Debugging for Imps & Other Mischievous Sprites            ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                        Insert all Heisenbugs here.                         ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/emacs/imp/debug.el --- Delouse the Imps. -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-03-09
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║              Debugging for Imps & Other Mischievous Sprites            ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                        Insert all Heisenbugs here.
+;;                                 ──────────
+;; Please be sure to:
+;;   - Delouse the imps.
+;;   - Wash the imps with flea and tick shampoo.
+;;   - Do not feed the imps crabs or shrimps.
+;;   - Promptly squash all bugs on the imps.
+;;
+;; Please be sure not to:
+;;   - Louse the imps.
+;;   - Wash the imps with fleas and ticks.
+;;   - Squash the imps.
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

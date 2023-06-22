@@ -1,19 +1,34 @@
-;;; emacs/imp/require.el -*- lexical-binding: t; -*-
-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                            Require Features                            ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                     Require Imp feature symbol paths.                      ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/emacs/imp/provide.el --- Require a feature from imp. -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-05-07
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                            Require Features                            ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                     Require Imp feature symbol paths.
+;;                                 ──────────
+;;
+;; Require from just Emacs: `require'
+;; Require from just imp:   `imp:require'
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------
 ;; Public API: Require
 ;;------------------------------------------------------------------------------
-
 
 (defun imp:require (&rest feature)
   "Ensures file(s) for FEATURE:BASE keyword & FEATURE symbols are provided.

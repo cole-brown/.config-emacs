@@ -1,13 +1,31 @@
-;;; emacs/imp/feature.el -*- lexical-binding: t; -*-
-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                              Imp Features                              ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;           I imagine some horns, a tail... maybe an evil cackle?            ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/emacs/imp/feature.el --- imp feature tree, name normalization, etc -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-10-28
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                              Imp Features                              ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;           I imagine some horns, a tail... maybe an evil cackle?
+;;                                 ──────────
+;;
+;; - feature tree
+;; - name normalization
+;; - feature predicates
+;; - feature at path
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

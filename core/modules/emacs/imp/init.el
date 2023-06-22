@@ -1,34 +1,33 @@
-;;; imp/init.el --- Structured IMPort/export of elisp features  -*- lexical-binding: t; -*-
+;;; core/modules/emacs/imp/init.el --- Structured IMPort/export of elisp features  -*- lexical-binding: t; -*-
 ;;
-;; Author:           Cole Brown <http://github/cole-brown>
-;; Maintainer:       Cole Brown <code@brown.dev>
-;; Created:          2021-05-07
-;; Modified:         2022-04-13
-;; Version:          1.1.20220413
-;; URL:              https://github.com/cole-brown/.config-emacs
-;; Package-Requires: ((emacs "27.1"))
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-05-07
+;; Timestamp:  2023-06-22
+;; Version:    1.1.20220413
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
-;;------------------------------------------------------------------------------
-;; Usage
-;;------------------------------------------------------------------------------
 ;;
-;;------------------------------
+;; ------------------------------------------------------------------------------
+;; Usage
+;; ------------------------------------------------------------------------------
+;;
 ;; Require
 ;; ------
 ;; (imp:require <symbol/keyword0> ...)
 ;;   - If a root is set for <symbol/keyword0>, this can (try to) find the file
 ;;     required.
-;;------------------------------
 ;;
-;;------------------------------
 ;; Provide
 ;; -------
 ;; (imp:provide <symbol/keyword0> ...)            ; Provide via imp only.
 ;; (imp:provide:with-emacs <symbol/keyword0> ...) ; Provide via imp and Emacs.
-;;------------------------------
 ;;
-;;------------------------------
 ;; (Optional) Set-Up:
 ;; ------
 ;; (imp:path:root/set <symbol/keyword0>
@@ -36,8 +35,6 @@
 ;;                    &optional <path-to-root-file-relative-or-absolute>)
 ;;   - Setting a root for <symbol/keyword0> allows later `imp:require' calls to
 ;;     try to find the file if not already provided.
-;;------------------------------
-;;
 ;;
 ;;; Code:
 

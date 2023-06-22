@@ -1,15 +1,29 @@
-;;; emacs/imp/load.el -*- lexical-binding: t; -*-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                               Load Files                               ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
+;;; core/modules/emacs/imp/load.el --- Load Files -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-05-07
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                               Load Files                               ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
 ;;                    Load with, or without, timing info.
-;;                                 ──────────                                 ;;
-
-
-;; Special thanks to Doom's `load!' macro, which this was originally based off of.
+;;                                 ──────────
+;;
+;; Special thanks    to Doom's `load!' macro, which this was originally based off of.
+;; Special apologies to Doom's `load!' macro, which this was originally based off of.
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

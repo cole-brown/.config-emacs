@@ -1,12 +1,26 @@
-;;; emacs/imp/flag.el --- Imp Feature Flags -*- lexical-binding: t; -*-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                               Imp Flags                                ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                           Daemonic Vexillology?                            ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/emacs/imp/+flag.el --- Imp Feature Flags -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-04-14
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                               Imp Flags                                ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                           Daemonic Vexillology?
+;;                                 ──────────
+;;
+;;; Code:
 
 
 ;; TODO: Unit tests for this file's functions!

@@ -1,19 +1,33 @@
-;;; emacs/imp/+timing.el -*- lexical-binding: t; -*-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                              Load Timing                               ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                  Be done is as little as 98.765 seconds.                   ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/emacs/imp/+timing.el --- Imps with Timecards -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-01-07
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                              Load Timing                               ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                  Be done is as little as 98.765 seconds.
+;;                                 ──────────
+;;
+;;; Code:
 
 
 (require 'rx)
 
 
 ;;------------------------------
-;; Future Features:
+;; TODO:imp: Future Features:
 ;;------------------------------
 ;;   - Delayed output mode:
 ;;     - If enabled, just save info about load ordering to a tree list.

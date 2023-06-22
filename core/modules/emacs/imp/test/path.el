@@ -1,5 +1,20 @@
-;; -*- no-byte-compile: t; lexical-binding: t; -*-
-;;; emacs/imp/test/path.el
+;;; core/modules/emacs/imp/test/path.el --- Tests for "path.el" -*- no-byte-compile: t; lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-01-03
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Tests for "path.el"
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

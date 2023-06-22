@@ -1,12 +1,28 @@
-;;; core/modules/emacs/imp/package.el -*- lexical-binding: t; -*-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║               Use a Package, Evaluate After a Package...               ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                            Free(ish) Shipping!                             ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/emacs/imp/package.el --- `imp' + `use-package' = `imp:use-package' -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-04-20
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║               Use a Package, Evaluate After a Package...               ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                            Free(ish) Shipping!
+;;                                 ──────────
+;;
+;; `imp' + `use-package' = `imp:use-package'
+;;
+;;; Code:
 
 
 (require 'cl-lib)

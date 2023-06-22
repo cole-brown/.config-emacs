@@ -1,13 +1,30 @@
-;;; emacs/imp/provide.el -*- lexical-binding: t; -*-
-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                            Provide Features                            ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;       Provide Imp feature symbol paths & also Emacs feature symbols.       ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/emacs/imp/provide.el --- Provide a feature to imp, maybe Emacs. -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-05-07
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                            Provide Features                            ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;       Provide Imp feature symbol paths & also Emacs feature symbols.
+;;                                 ──────────
+;;
+;; Provide to just Emacs:  `provide'
+;; Provide to just imp:    `imp:provide'
+;; Provide to imp & Emacs: `imp:provide:with-emacs'
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

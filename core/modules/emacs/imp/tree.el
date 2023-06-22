@@ -1,13 +1,26 @@
-;;; emacs/imp/tree.el -*- lexical-binding: t; -*-
-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                                  Tree                                  ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                       noun: A woody perennial plant.                       ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/emacs/imp/tree.el --- imp feature tree helpers -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-22
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                                  Tree                                  ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                       noun: A woody perennial plant.
+;;                                 ──────────
+;;
+;;; Code:
 
 
 (require 'seq)
@@ -193,7 +206,6 @@ BRANCH."
 ;;------------------------------------------------------------------------------
 ;; API for imp:
 ;;------------------------------------------------------------------------------
-
 
 (defun int<imp>:tree:update/helper (chain value tree)
   "Adds CHAIN with final VALUE to TREE.

@@ -1,13 +1,26 @@
-;;; emacs/imp/error.el -*- lexical-binding: t; -*-
-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                            Errors & Output                             ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                           404 - Error Not Found                            ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/emacs/imp/error.el --- imp error helpers -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-22
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                            Errors & Output                             ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                           404 - Error Not Found
+;;                                 ──────────
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------
@@ -20,7 +33,7 @@
 (defvar int<imp>:error:sink:hack/debug #'message
   "Also send error messages to this function?
 
-Value should be `nil' or a function with a signature like `message'.
+Value should be nil or a function with a signature like `message'.
 
 Error messages get truncated and I haven't figured out how not to truncate:
   Lisp error: (error \"[ERROR   ]: imp:require: Failed to find/load requi...\")

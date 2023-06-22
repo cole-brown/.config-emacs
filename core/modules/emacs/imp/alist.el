@@ -1,13 +1,22 @@
-;;; emacs/imp/alist.el -*- lexical-binding: t; -*-
-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                         Better Alist Functions                         ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;               At least these all have 'alist' in the name...               ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/emacs/imp/alist.el --- imp alist helpers -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-05-16
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; imp alist helpers
+;;
+;; NOTE: 'imp' only! Everyone else go to: 'core/modules/emacs/alist'
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

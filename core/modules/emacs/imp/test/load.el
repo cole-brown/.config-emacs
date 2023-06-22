@@ -1,5 +1,20 @@
-;; -*- no-byte-compile: t; lexical-binding: t; -*-
-;;; emacs/imp/test/load.el
+;;; core/modules/emacs/imp/test/load.el --- Tests for "load.el" -*- no-byte-compile: t; lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-01-05
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Tests for "load.el"
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

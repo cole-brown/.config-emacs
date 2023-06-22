@@ -1,5 +1,20 @@
-;; -*- no-byte-compile: t; lexical-binding: t; -*-
-;;; emacs/imp/test/tree.el
+;;; core/modules/emacs/imp/test/tree.el --- Tests for "tree.el" -*- no-byte-compile: t; lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-05-07
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Tests for "tree.el"
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

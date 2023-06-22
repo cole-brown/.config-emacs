@@ -1,12 +1,29 @@
-;;; emacs/imp/test.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/imp/test.el --- Load Files for Unit Tests -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-01-31
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                       Load Files for Unit Tests                        ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                       Tests can have imps too, yes?
+;;                                 ──────────
+;;
+;; `imp:test:load': Similar to `imp:load', but with some kwargs for testing.
+;;
+;;; Code:
 
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                       Load Files for Unit Tests                        ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                           Similar to `imp:load'.                           ;;
-;;                                 ──────────                                 ;;
 
 
 ;;------------------------------------------------------------------------------
