@@ -1,10 +1,10 @@
-;;; vars.el --- It's full of variables, innit? -*- lexical-binding: t; -*-
+;;; core/modules/emacs/innit/vars.el --- It's full of variables, innit? -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-04-13
-;; Modified:   2022-04-25
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-04-13
+;; Timestamp:  2023-06-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  It's full of variables, innit?
+;; It's full of variables, innit?
 ;;
 ;;; Code:
 

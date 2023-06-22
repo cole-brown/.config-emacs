@@ -1,11 +1,14 @@
-;;; advice.el --- Advice Helper Functions -*- lexical-binding: t; -*-
-;;; Commentary:
+;;; core/modules/emacs/innit/advice.el --- Advice Helper Functions -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-12-01
-;; Modified:   2022-12-01
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-12-01
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;

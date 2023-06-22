@@ -1,11 +1,14 @@
-;;; core/modules/emacs/innit/server.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/innit/server.el --- Daemons, Servers, and Demonic Waitresses -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-03-22
-;; Modified:   2023-05-04
 ;; URL:        https://github.com/cole-brown/.config-emacs
-;; Copyright (C) 2022 Cole Brown
+;; Created:    2022-03-22
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
@@ -15,10 +18,10 @@
 ;; So this is actually not useful:
 ;;   (unless (server-running-p) (server-start))
 ;;
-;; So these are some functions for figuring out if Emacs Server is running, so
-;; you can actually do things like that. Then maybe Emacs will collect itself
-;; into one instance, and then maybe drag-drop, send from Visual Studio, etc
-;; will work as expected.
+;; These are some functions for figuring out if Emacs Server is running, so you
+;; can actually do things like that smells like it should be doing. Then maybe
+;; Emacs will collect itself into one instance, and then maybe drag-drop, send
+;; from Visual Studio, etc will work as expected.
 ;;
 ;; For daemony things, see:
 ;;   https://www.emacswiki.org/emacs/EmacsAsDaemon

@@ -1,10 +1,10 @@
-;;; init.el --- Complicating, innit? -*- lexical-binding: t; -*-
+;;; core/modules/emacs/innit/init.el --- Emacs init "help", innit? -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-04-13
-;; Modified:   2022-04-25
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-04-13
+;; Timestamp:  2023-06-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,11 +12,11 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Adding structure to the uncomplicated, innit?
+;; Emacs init "help", innit?
+;; Complicating, innit?
+;; Adding structure to the uncomplicated, innit?
 ;;
 ;;; Code:
-
-
 ;;------------------------------------------------------------------------------
 ;; Set up imp.
 ;;------------------------------------------------------------------------------

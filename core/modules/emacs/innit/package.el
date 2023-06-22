@@ -1,10 +1,10 @@
-;;; package.el --- Now we're the Postal Service -*- lexical-binding: t; -*-
+;;; core/modules/emacs/innit/package.el --- Init package systems. -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-04-26
-;; Modified:   2022-04-26
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-04-26
+;; Timestamp:  2023-06-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,13 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Now we're the Postal Service
+;; Init package systems:
+;;   - Emacs package stuff (e.g. `package.el').
+;;   - `use-package'
+;;   - `straight'
+;;
+;; Oh, and `innit:package:upgrade'.
+;; Now we're the Postal Upgrade Service.
 ;;
 ;;; Code:
 

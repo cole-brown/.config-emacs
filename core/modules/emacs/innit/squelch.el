@@ -1,10 +1,10 @@
-;;; squelch.el --- Squelch Output -*- lexical-binding: t; -*-
+;;; core/modules/emacs/innit/squelch.el --- Squelch Output -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-08-01
-;; Modified:   2022-08-01
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-08-01
+;; Timestamp:  2023-06-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

@@ -1,10 +1,10 @@
-;;; error.el --- Errors during init. -*- lexical-binding: t; -*-
+;;; core/modules/emacs/innit/error.el --- Errors during init -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-04-26
-;; Modified:   2022-10-25
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-04-26
+;; Timestamp:  2023-06-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,12 +12,12 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Errors during init.
+;; Errors during init
 ;;
 ;;; Code:
 
 
-;; TODO: Actually use these errors during start-up.
+;; TODO:innit: Actually use these errors during start-up.
 
 ;;------------------------------------------------------------------------------
 ;; Custom Error Types

@@ -1,15 +1,18 @@
-;;; hook.el --- With Blackjack! -*- lexical-binding: t; -*-
+;;; core/modules/emacs/innit/hook.el --- With Blackjack! -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-05-09
-;; Modified:   2022-06-01
 ;; URL:        https://github.com/cole-brown/.config-emacs
-;; Copyright (C) 2022 Cole Brown
+;; Created:    2022-05-09
+;; Timestamp:  2023-06-22
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;;  With Blackjack!
+;; With Blackjack!
 ;;
 ;; Originally from here:
 ;;   https://www.reddit.com/r/emacs/comments/1m7fqv/avoid_lambda_in_hooks_use_defun_instead/cc83axz/

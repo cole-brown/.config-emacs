@@ -1,10 +1,10 @@
-;;; debug.el --- Better with less bugs, innit? -*- lexical-binding: t; -*-
+;;; core/modules/emacs/innit/debug.el --- Better with less bugs, innit? -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-04-26
-;; Modified:   2022-04-26
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-04-26
+;; Timestamp:  2023-06-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Better with less bugs, innit?
+;; Better with less bugs, innit?
 ;;
 ;;; Code:
 

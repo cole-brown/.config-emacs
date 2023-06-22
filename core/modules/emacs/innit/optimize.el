@@ -1,10 +1,10 @@
-;;; optimize.el --- But is it speed? -*- lexical-binding: t; -*-
+;;; core/modules/emacs/innit/optimize.el --- But is it speed? -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-04-27
-;; Modified:   2022-04-27
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-04-27
+;; Timestamp:  2023-06-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,15 +12,16 @@
 ;;
 ;;; Commentary:
 ;;
-;;  But is it speed?
+;; Optimize for... What?
+;; Is it speed?
 ;;
 ;;; Code:
 
 
-;; TODO: move out of `innit' and into... idk...
+;; TODO:innit: move out of `innit' and into... idk...
 ;;   - `dotemacs'?
 ;;   - innit sub-modules?
-;; TODO: Maybe better: TODO: Want all this both optional and obvious in the start-up code, so... how to do that?
+;; TODO:innit: Maybe better: TODO:innit: Want all this both optional and obvious in the start-up code, so... how to do that?
 ;;  - Put it back in the start-up code?
 
 
