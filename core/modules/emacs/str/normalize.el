@@ -2,185 +2,157 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Normalize something else into a string  strings.
+;; Convert to a String
 ;;------------------------------------------------------------------------------
 
-(defun str:normalize:symbol->string (symbol)
-  "Converts a symbol/keyword name to a string. Removes \":\" from keyword symbols."
+(defun str:normalize:symbol (symbol)
+  "Convert a SYMBOL/keyword name to a string.
+Remove \":\" from keyword symbols."
   (replace-regexp-in-string ":" ""
                             (symbol-name symbol)))
-;; (str:normalize.symbol 'jeff)
-;; (str:normalize.symbol :jeff)
-;; (let ((x 'jeff)) (str:normalize.symbol x))
-;; (let* ((jeff "geoff") (x 'jeff)) (str:normalize.symbol x))
+;; (str:normalize:symbol 'jeff)
+;; (str:normalize:symbol :jeff)
+;; (str:normalize:symbol 'str:normalize:symbol)
+;; (let ((x 'jeff)) (str:normalize:symbol x))
+;; (let* ((jeff "geoff") (x 'jeff)) (str:normalize:symbol x))
 
 
-(defun str:normalize:name->list (&rest inputs)
-  "For each item in INPUTS:
-  - If it's a string, use as-is.
-  - If it's a symbol (or function), use the symbol's name via
-    `str:normalize:symbol->string'.
+;;--------------------------------------------------------------------------------
+;; Normalize to String(s)
+;;--------------------------------------------------------------------------------
 
-Returns a list of strings."
-  (let ((output nil))
-    (dolist (item inputs output)
-      ;; Filter out (ignore) nils and empty strings.
-      (cond ((or (null item)
-                 (and (stringp item)
-                      (string= "" item)))
-             nil)
-
-            ;; String? Direct to output.
-            ((stringp item)
-             (push item output))
-
-            ;; Symbol (or function)? Use its name.
-            ((symbolp item)
-             (push (str:normalize:symbol->string item) output))))
-    ;; `push' pushes to the front of the list, so reverse it for result.
-    (nreverse output)))
-;; (str:normalize:name->list "Test/ing" 'jeff :jeff)
-;; (str:normalize:name->list nil "Test/ing" 'jeff "" :jeff)
-
-
-(defun str:normalize:name (input)
+(defun str:normalize:any (input)
   "Normalize INPUT to a string.
-  - If it's a string, use as-is.
-  - If it's a symbol (or function), use its name via
-    `str:normalize:symbol->string'.
 
-Returns a string."
-  ;; Just reuse `str:normalize:name->list'.
-  (nth 0 (str:normalize:name->list input)))
+INPUT should be a string, symbol (or keyword), function, or nil.
+  - nil:      nil
+  - \"\":     nil
+  - string:   Use as-is.
+  - symbol:   Convert to string with `str:normalize:symbol'.
+  - function: Call it with no parameters and use the output string.
+    - If output is not a string, return nil.
 
+Return a string or nil."
+  ;; nil and empty string -> nil
+  (cond ((or (null input)
+             (and (stringp input)
+                  (string= "" input)))
+         nil)
 
-(defun str:normalize:value->list (&rest inputs)
-  "For each item in INPUTS:
-  - If it's a string, use the string.
-  - If it's a symbol, use the symbol's value.
-  - If it's a function, call it with no parameters and use the output string.
+        ;; String? Direct to output.
+        ((stringp input)
+         input)
 
-Returns a list of strings."
-  (let ((func/name "str:normalize:value->list")
-        (output nil))
-    (dolist (item inputs output)
-      ;; String? Direct to output.
-      (cond ((stringp item)
-             (push item output))
+        ;; List? Normalize each and combine.
+        ((listp input)
+         (mapconcat #'str:normalize:any
+                    input
+                    " "))
 
-            ;; Function? Assume it will give us our string.
-            ((or (fboundp item)
-                 (functionp item))
-             (condition-case-unless-debug err
-                 (let ((result (funcall item)))
-                   (if (stringp result)
-                       (push result output)
-                     (error "%s: Function did not return a string: %S -> %S"
-                            func/name
-                            item
-                            result)))
-               (error (error "%s: Failed calling %S: %S"
-                             func/name
-                             item
-                             err))))
+        ;; Function? Call function, return string or nil.
+        ((or (functionp input)
+             (fboundp input))
+         (let ((value (funcall input)))
+           (if (stringp value)
+               value
+             ;; Do not allow non-strings to escape a string normalization function.
+             nil)))
 
-            ;; Symbol? Use its value.
-            ((symbolp item)
-             (condition-case-unless-debug err
-                 (let ((result (symbol-value item)))
-                   (if (stringp result)
-                       (push result output)
-                     (error "%s: Symbol '%S' does not contain a string value: %S"
-                            func/name
-                            item
-                            result)))
-               (error (error "%s: Failed while trying to get symbol value of %S: %S"
-                             func/name
-                             item
-                             err))))
-
-            (t
-             (error "%s: Don't know what to do with INPUT. Reason: '%s' Input: '%s'"
-                    func/name
-                    "Not a string, function, or symbol?"
-                    input))))
-    ;; `push' pushes to the front of the list, so reverse it for result.
-    (nreverse output)))
-;; bad: func doesn't return str
-;;   (str:normalize:value->list "Test/ing" 'ignore :jeff)
-;; bad: keywords can't have string values
-;;   (str:normalize:value->list "Test/ing" 'test:test :jeff)
-;; good:
-;;   (let* ((name "jeff") (name-symbol 'name)) (str:normalize:value->list "Test/ing" 'test:test name-symbol))
-;;   (let* ((name "jeff")) (str:normalize:value->list "Test/ing" 'test:test 'name))
+        ;; Symbol (or keyword)? Use its name.
+        ((symbolp input)
+         (str:normalize:symbol input))))
+;; (str:normalize:any nil)
+;; (str:normalize:any "")
+;; (str:normalize:any "jeff")
+;; (str:normalize:any (lambda () "geoff"))
+;; (str:normalize:any 'jeff)
+;; (let ((jeff "jill actually")) (str:normalize:any jeff))
+;; (let ((jeff "jeff quoted so still jeff")) (str:normalize:any 'jeff))
 
 
-(defun str:normalize:value (input)
-  "Normalize INPUT to a string.
-  - If it's a string, use as-is.
-  - If it's a symbol, use the symbol's value.
-  - If it's a function, call it with no parameters and use the output string.
+(defun str:normalize:each (&rest inputs)
+  "Normalize a list of INPUTS to a list of strings.
 
-Returns a list of strings."
-  ;; Just reuse `str:normalize:value->list'.
-  (nth 0 (str:normalize:value->list input)))
+Normalize each item in INPUTS using `str:normalize:any', which see.
+
+Filter out nils and return the list of strings."
+  (seq-remove #'null
+              (seq-map #'str:normalize:any inputs)))
+;; (str:normalize:each "Test/ing" 'test:test :jeff)
+;; (let* ((name "jeff") (name-symbol 'name)) (str:normalize:each "Test/ing" 'name 'name-symbol))
+;; (let* ((name "jeff")) (str:normalize:each "Test/ing" 'test:test 'name))
+;; #'ignore returns nil, filtered out.
+;;   (str:normalize:each "Test/ing" 'ignore :jeff)
+
+
+(defun str:normalize:join (input &optional separator)
+  "Normalize a list of INPUTS to strings, and join strings with SEPARATOR.
+
+Normalize INPUTS via `str:normalize:any'.
+
+If SEPARATOR is a string, use it to join strings. Else join with a space."
+  (if (listp input)
+      (mapconcat #'str:normalize:any
+                 input
+                 (if (stringp separator) separator " "))
+    (str:normalize:any input)))
+;; (str:normalize:join '(jeff jeff))
+;; (str:normalize:join '(jeff jeff) "/")
+;; (str:normalize:join 'jeff)
 
 
 ;;------------------------------------------------------------------------------
-;; Normalize something into a keyword.
+;; Normalize/convert to... Not a string?!
 ;;------------------------------------------------------------------------------
+;; confused-travolta.jpg
 
-(defun str:normalize:name->keyword (input)
-  "Convert INPUT to a keyword.
+(defun keyword:normalize:any (input)
+  "Normalize INPUT to a keyword.
 
-If INPUT is nil, return nil.
-If INPUT is already a keyword, return as-is.
-If INPUT is a function, call it with no args and convert its string output
-to a keyword.
-If INPUT is a symbol, get its `symbol-name', and convert to a keyword.
-If INPUT is a string (leading ':' is optional), convert to a keyword."
-  (let ((func/name "str:normalize:name->keyword"))
-    (cond ((null input)
-           nil)
+INPUT should be a keyword, symbol, string, function, or nil.
+  - nil:      nil
+  - \"\":     nil (i.e. empty string is not allowed)
+  - `:':      nil (i.e. keyword that is only the colon is not allowed)
+  - keyword:  Use as-is.
+  - string:   Convert to a keyword.
+  - symbol:   Convert to a keyword.
+  - function: Call it with no parameters, return keyword or recurse.
 
-          ((keywordp input)
-           input)
+Return a keyword or nil."
+  ;; Return nil?
+  (cond ((or (null input)
+             (and (stringp input)
+                  (string= "" input))
+             (and (keywordp input)
+                  (eq : input)))
+         nil)
 
-          ;; Function? Assume it will give us our string.
-          ((or (fboundp item)
-               (functionp item))
-           (condition-case-unless-debug err
-               (let ((result (funcall item)))
-                 (if (stringp result)
-                     result
-                   (error "%s: Function did not return a string: %S -> %S"
-                          func/name
-                          item
-                          result)))
-             (error (error "%s: Failed calling %S: %S"
-                           func/name
-                           item
-                           err))))
+        ;; Keyword? Use as-is.
+        ((keywordp input)
+         input)
 
-          ((or (stringp input)
-               (symbolp input))
-           (intern
-            ;; INPUT only optionally has a ":", so ensure a ":" by:
-            ;;   1) Removing the leading ":" if it exists.
-            ;;   2) Always prefixing a new ":".
-            (concat ":"
-                    ;; Remove keyword's leading ":"?
-                    (string-remove-prefix
-                     ":"
-                     ;; Make sure we have a string.
-                     (if (stringp input)
-                         input
-                       (symbol-name input))))))
-          (t
-           (error "%s: Unsupported INPUT type of '%S': %S"
-                  func/name
-                  (type-of input)
-                  input)))))
+        ;; String? Ensure leading ":" and intern to get a keyword.
+        ((stringp input)
+         (intern
+          ;; INPUT is allowed to optionally have a ":", so ensure a ":" by:
+          ;;   1) Removing the leading ":" if it exists.
+          ;;   2) Always prefixing a new ":".
+          (concat ":"
+                  (string-remove-prefix ":" input))))
+
+        ;; Function? Call it for them and ask ourself to figure out what the
+        ;; hell happened. Need this separate from the fallback case in case
+        ;; the function returns a keyword - don't want `str:normalize:any' to
+        ;; nil that out.
+        ((or (functionp input)
+             (fboundp input))
+         (keyword:normalize:any (funcall input)))
+
+        ;; Something else? Normalize to a string and ask ourself to do the thing.
+        (t
+         ;; `str' already does a lot of work normalizing stuff.
+         ;; So use it.
+         (keyword:normalize:any (str:normalize:any input)))))
 
 
 ;;------------------------------------------------------------------------------
