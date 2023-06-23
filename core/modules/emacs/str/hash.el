@@ -28,71 +28,42 @@
 ;; Hashes
 ;;------------------------------------------------------------------------------
 
-(defun int<str>:hash:input->str (input)
-  "Converts a single INPUT (string or symbol) into a string."
-  (cond ((null input)
-         (error "%s: Cannot hash 'nil' INPUT. %s Input: %s"
-                "int<str>:hash:input->str"
-                "Not a string, symbol, or list of strings/symbols."
-                input))
-
-        ;; String? Well ok then.
-        ((stringp input)
-         input)
-
-        ;; A single symbol? Turn it into a string.
-        ((symbolp input)
-         (symbol-name input))
-
-         ;; Fallthrough: Bad Input.
-         (t
-          (error "%s: Don't know what to do with INPUT. %s Input: %s"
-                 "int<str>:hash:input->str"
-                 "Not a string, symbol, or list of strings/symbols?"
-                 input))))
-;; (int<str>:hash:input->str "jeff")
-;; (int<str>:hash:input->str 'jeff)
-
-
 (defun str:hash:full (input &optional hash)
-  "Returns the full hash string of INPUT (can be string, symbol or list of
-strings/symbols). Uses HASH algorithm (see `(secure-hash-algorithms)' for
-available algorithms.
+  "Return the full hash string of INPUT.
 
-If HASH is nil, this will use the default defined in `str:hash:default'."
+INPUT can be string, symbol or list of strings/symbols.
+
+HASH algorithm should be one of the symbols returned from
+`secure-hash-algorithms', which, see for available algorithms.
+
+If HASH is nil, default to `str:hash:default'."
   ;; Set hash to default if unspecified.
   (let ((hash (or hash str:hash:default))
-        (input-string nil))
+        ;; Normalize INPUT before error checking.
+        (input-string (str:normalize:any input)))
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
     ;; Make sure hash exists as a supported algorithm.
     (unless (member hash (secure-hash-algorithms))
       (error "Unknown hash: %s" hash))
 
-    ;; See if we need to turn our input into a string.
-    (cond ((null input)
-           (error "Cannot hash 'nil' INPUT. %s Input: %s"
-                  "Not a string, symbol, or list of strings/symbols."
-                  input))
+    (unless (stringp input-string)
+      (error "Cannot hash INPUT. Normalization did not produce a string. Input: %s '%s' -> %s '%s'"
+             (type-of input)
+             input
+             (type-of input-string)
+             input-string))
 
-          ;; String or symbol? Turn it into a string.
-          ((or (stringp input)
-               (symbolp input))
-           (setq input-string (str:normalize:any input)))
-
-          ;; A list? Stringify and concat together.
-          ((listp input)
-           (setq input-string (mapconcat #'int<str>:hash:input->str input " ")))
-
-          ;; Fallthrough: Bad Input.
-          (t
-           (error "Don't know what to do with INPUT. %s Input: %s"
-                  "Not a string, symbol, or list of strings/symbols?"
-                  input)))
-
+    ;;------------------------------
+    ;; Hash!
+    ;;------------------------------
     (secure-hash hash input-string)))
 ;; (str:hash:full "jeff")
 ;; (str:hash:full 'jeff)
 ;; (str:hash:full '(jeff jeff))
 ;; (str:hash:full nil)
+;; (str:hash:full (list (system-name) system-type))
 
 
 (defun str:hash:pretty (input &optional hash slice join)
@@ -115,6 +86,7 @@ slices. Otherwise uses `str:hash:join/slices'."
             join
             (substring hash-full (- slice) nil))))
 ;; (str:hash:pretty "jeff")
+;; (str:hash:pretty (list (system-name) system-type))
 
 
 (defun str:hash:recreate (prefixes pretty-hash)
