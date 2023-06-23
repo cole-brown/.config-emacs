@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-06-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -157,8 +157,8 @@ Value should be an alist of keys:
              (file-directory-p path))
         (path:directory path)
       path)))
-;; (path:uniquify:path/normalize (path:current:file))
-;; (path:uniquify:path/normalize (path:current:dir))
+;; (path:uniquify:settings/path/normalize (path:current:file))
+;; (path:uniquify:settings/path/normalize (path:current:dir))
 ;; (setq path:uniquify:directory/end-in-slash? nil)
 ;; (setq path:uniquify:directory/end-in-slash? t)
 
@@ -177,8 +177,7 @@ parent directory."
   (with-current-buffer buffer
     ;; Figure out new buffer name.
     (if-let* ((path/absolute/file (path:uniquify:settings/path/normalize path/absolute/directory
-                                                                         name/requested
-                                                                         buffer))
+                                                                         name/requested))
               (project            (path:project:current/alist path/absolute/file)))
         ;; We have a project, so we can figure out a name.
         (list (cons :path/parent      path/absolute/directory)
@@ -221,9 +220,9 @@ PATH/ABSOLUTE/DIRECTORY should be a string of the absolute path to the file's
 parent directory."
   (with-current-buffer buffer
     (setq path:uniquify:settings/local
-          (int<path>:uniquify:settings/create buffer
-                                              path/absolute/directory
-                                              name/requested))))
+          (int<path>:uniquify:settings/create path/absolute/directory
+                                              name/requested
+                                              buffer))))
 
 
 (defun path:uniquify:settings/clear (buffer)
