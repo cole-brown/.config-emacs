@@ -76,7 +76,7 @@ If HASH is nil, this will use the default defined in `str:hash:default'."
           ;; String or symbol? Turn it into a string.
           ((or (stringp input)
                (symbolp input))
-           (setq input-string (str:normalize:value->list input)))
+           (setq input-string (str:normalize:any input)))
 
           ;; A list? Stringify and concat together.
           ((listp input)
@@ -131,7 +131,7 @@ Then it joins the prefix string to the PRETTY-HASH string with
 `str:hash:join/prepend'."
   ;; Create prepend string from prefixes...
   (concat (apply #'str:join str:hash:join/prefixes
-                 (apply #'str:normalize:value->list prefixes))
+                 (apply #'str:normalize:each prefixes))
           ;; ...add prepend separator...
           str:hash:join/prepend
           ;; ...and finish with the pretty hash.
@@ -151,7 +151,7 @@ Finally, it join prefixes string and inputs hash string with
 `str:hash:join/prepend'."
   ;; Create prepend string from prefixes...
   (concat (apply #'str:join str:hash:join/prefixes
-                 (apply #'str:normalize:value->list prefixes))
+                 (apply #'str:normalize:each prefixes))
           ;; ...add prepend separator...
           str:hash:join/prepend
           ;; ...and finish with the pretty hash.

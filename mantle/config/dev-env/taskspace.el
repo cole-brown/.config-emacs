@@ -80,7 +80,7 @@ and see what file it's defined in."
   ;;---
 
   (let* ((group     :home) ; taskspace "group" == jerky "namespace"
-         (group-str (str:normalize:symbol->string group))
+         (group-str (str:normalize:symbol group))
          (group-fn  (intern (concat "mantle:user:taskspace:generate/" group-str))))
     (when (and (system:secret:has)
                ;; Jerky should have had the paths set during secrets init.
@@ -112,7 +112,7 @@ and see what file it's defined in."
   ;; "Work" Domain
   ;;---
   (let* ((group     :work) ; taskspace "group" == jerky "namespace"
-         (group-str (str:normalize:symbol->string group))
+         (group-str (str:normalize:symbol group))
          (group-fn  (intern (concat "mantle:user:taskspace:generate/" group-str))))
     (when (and (system:secret:has)
                ;; Jerky should have had the paths set during secrets init.

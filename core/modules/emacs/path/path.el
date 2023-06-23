@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-06-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -661,7 +661,7 @@ non-nil to continue and nil to halt the walk."
 (defun int<path>:append (parent next)
   "Append NEXT element to PARENT, adding dir separator between them.
 
-PARENT & NEXT are normalized via `str:normalize:name', so keywords or symbol
+PARENT & NEXT are normalized via `str:normalize:any', so keywords or symbol
 names can be used as well as strings."
   (cond ((and (null parent)
               (null next))
@@ -672,14 +672,13 @@ names can be used as well as strings."
          ;;        next)
          )
         ((null next)
-         (str:normalize:name parent))
+         (str:normalize:any parent))
         ((null parent)
-         (str:normalize:name next))
+         (str:normalize:any next))
         (t
-         (concat (file-name-as-directory (str:normalize:name parent))
-                 (str:normalize:name next)))))
+         (concat (file-name-as-directory (str:normalize:any parent))
+                 (str:normalize:any next)))))
 ;; (int<path>:append nil "jeff")
-;; (str:normalize:name->list "jill")
 ;; (int<path>:append "jeff" "jill")
 ;; (int<path>:append "jeff/" "jill")
 ;; (int<path>:append 'jeff :jill)
@@ -705,7 +704,7 @@ Filter out nil."
 (path:join \"jeff\" \"jill.el\")
   ->\"jeff/jill.el\""
   (seq-reduce #'int<path>:append
-              (apply #'str:normalize:name->list (int<path>:flatten path))
+              (apply #'str:normalize:each (int<path>:flatten path))
               nil))
 ;; (path:join "jeff" "jill")
 ;; (path:join "jeff" "jill/")

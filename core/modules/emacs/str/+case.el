@@ -1328,7 +1328,7 @@ integers/marker according to CASES keywords."
   (when (and (= (length cases) 1)
              (stringp (car cases)))
     ;; Split and convert each into a keyword.
-    (setq cases (mapcar #'str:normalize:name->keyword
+    (setq cases (mapcar #'keyword:normalize:any
                         (str:split " " cases)))
     ;; Check that they're all valid.
     (unless (seq-every-p #'int<str>:case:validate/case cases)

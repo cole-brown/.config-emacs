@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-07-14
-;; Timestamp:  2023-06-21
+;; Timestamp:  2023-06-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -580,7 +580,7 @@ Check/return first to be non-nil of:
 ;; Key Functions
 ;;------------------------------------------------------------------------------
 
-(defalias 'int<jerky>:key:symbol->str 'str:normalize:symbol->string
+(defalias 'int<jerky>:key:symbol->str 'str:normalize:symbol
   "Convert a symbol to a string. Removes ':' from keywords.")
 
 

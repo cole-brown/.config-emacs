@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-06
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-06-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -190,16 +190,11 @@ THEME can be a single symbol or list thereof. If nil, apply these settings to
 Initially from Doom's `custom-theme-set-faces!'."
   (declare (indent 1))
   ;; Make a function name for the hook based on THEME.
-  (let* ((theme/unquote (elisp:unquote theme))
-         (macro<innit/theme>:func (gensym (concat "innit:theme:face:hook:"
-                                                 (if (listp theme/unquote)
-                                                     (mapconcat #'str:normalize:name
-                                                                theme/unquote
-                                                                "/")
-                                                   (str:normalize:name theme/unquote))
-                                                 ":"
-                                                 ;; `gensym' will suffix the name with `gensym-counter' for a unique name.
-                                                 ))))
+  (let* ((macro<innit/theme>:func (gensym (concat "innit:theme:face:hook:"
+                                                  (str:normalize:join theme "/")
+                                                  ":"
+                                                  ;; `gensym' will suffix the name with `gensym-counter' for a unique name.
+                                                  ))))
     ;; Only eval inputs once.
     `(let ((macro<innit/theme>:themes (elisp:list:listify (or ,theme 'user)))
            (macro<innit/theme>:specs  (list ,@specs)))
