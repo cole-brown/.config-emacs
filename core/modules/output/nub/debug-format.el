@@ -1,19 +1,30 @@
-;;; output/nub/debug-format.el -*- lexical-binding: t; -*-
-
+;;; core/modules/output/nub/debug-format.el --- Debug Formatting -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-26
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
 ;;; Commentary:
-
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║              Oh, you /don't/ want any bugs. Right; ok...               ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                    How to Hide Bugs 101: Look for them.
+;;                                 ──────────
+;;
+;; Debug Formatting
+;;
 ;; Some fancier debugging message helpers.
 ;;
-;;
-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║              Oh, you /don't/ want any bugs. Right; ok...               ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                    How to Hide Bugs 101: Look for them.                    ;;
-;;                                 ──────────                                 ;;
+;;; Code:
 
 
 (imp:require :nub 'internal)
@@ -73,14 +84,16 @@ will share the default fill-strings _and_ the cycle index with other users."
 ;;------------------------------------------------------------------------------
 
 (defun nub:debug:string:fill (user length &optional reversed? restart?)
-  "CREATE a string of length LENGTH using next fill string as determined by
-USER, RESTART?, `int<nub>:debug:fills' and `int<nub>:debug:fills/index'.
+  "Create a fill string of LENGTH.
 
-Increments indexes and such so that repeatedly calling will cycle the fill
+Using next fill string as determined by USER, RESTART?, `int<nub>:debug:fills'
+and `int<nub>:debug:fills/index'.
+
+Increment indexes and such so that repeatedly calling will cycle the fill
 strings properly.
 
 If RESTART? is non-nil, resets to the start of fill string sequence first before
-finding/returning a fill string.
+creating the fill string.
 
 If REVERSED? is non-nil, reverses the string returned so that lists like this
 will always align the fill strings at the end.

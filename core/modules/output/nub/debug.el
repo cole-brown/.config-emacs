@@ -1,19 +1,30 @@
-;;; output/nub/debug.el -*- lexical-binding: t; -*-
-
+;;; core/modules/output/nub/debug.el --- Debug-Level Commands & Output -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-06-24
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
 ;;; Commentary:
-
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║              Oh, you /don't/ want any bugs. Right; ok...               ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                    How to Hide Bugs 101: Look for them.
+;;                                 ──────────
+;;
 ;; "Simple" debugging functionality for layout.
 ;;
 ;; ...it was simple enough at one point. Probably before all the tagging stuff.
-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║              Oh, you /don't/ want any bugs. Right; ok...               ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                    How to Hide Bugs 101: Look for them.                    ;;
-;;                                 ──────────                                 ;;
+;;
+;;; Code:
 
 
 (imp:require :nub 'internal)

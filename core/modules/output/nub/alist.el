@@ -1,17 +1,29 @@
-;;; output/nub/alist.el -*- lexical-binding: t; -*-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                         Better Alist Functions                         ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;               At least these all have 'alist' in the name...               ;;
-;;                                 ──────────                                 ;;
-
-
+;;; core/modules/output/nub/alist.el --- Internal Alist Helpers -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-11-30
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Internal Alist Helpers
+;;
 ;; Helper functions for alists that follow a convention for naming and stuff.
 ;; And will assist you in keeping you alist up-to-date, like it's a variable
 ;; or something.
+;;
+;; Can't use our `elisp/alist' module; `nub' needs to be- oh... this uses
+;; `elisp/utils/types'. And it does load after `elisp/alist'... Was I trying to
+;; avoid dependencies so `nub' could be a standalone package that is loaded
+;; super early (a la `gcmh', `no-littering')? Probably.
+;;
+;;; Code:
 
 (require 'seq)
 (imp:require :nub 'internal)
@@ -50,7 +62,7 @@ If ITEM is nil, return t, because:
 
 
 (defun int<nub>:alist:copy/shallow (alist)
-  "Returns a shallow copy of ALIST.
+  "Return a shallow copy of ALIST.
 
 Copies the ALIST so that the returned alist does not share structure with
 the input. Does not copy the keys/values (not a deep copy)."
@@ -58,7 +70,9 @@ the input. Does not copy the keys/values (not a deep copy)."
 
 
 (defun int<nub>:alist:get/value (key alist &optional default)
-  "Get cdr of KEY's entry in ALIST."
+  "Get cdr of KEY's entry in ALIST.
+
+Return DEFAULT if not found (default: nil)."
   (alist-get key alist default))
 
 
@@ -144,9 +158,9 @@ Returns ALIST."
 
 
 (defun int<nub>:alist:delete/helper (key alist)
-  "Removes KEY from ALIST.
+  "Remove KEY from ALIST.
 
-Returns alist without the key."
+Return a copy of ALIST without the KEY."
   ;;---
   ;; Error Checking
   ;;---
@@ -162,12 +176,19 @@ Returns alist without the key."
 
   ;; Return the alist.
   alist)
+;; (setq test-alist nil)
+;; (int<nub>:alist:delete/helper :k test-alist)
+;; (int<nub>:alist:update :k :v test-alist)
+;; test-alist
+;; (int<nub>:alist:delete/helper :k2 test-alist)
+;; (int<nub>:alist:delete/helper :k test-alist)
+;; test-alist
 
 
 (defmacro int<nub>:alist:delete (key alist)
-  "Removes KEY from ALIST.
+  "Remove KEY from ALIST.
 
-Returns ALIST."
+Return ALIST without the KEY."
   `(let ((mmm:alist ,alist))
      (cond
       ((listp mmm:alist)

@@ -1,12 +1,51 @@
+;;; core/modules/output/nub/variables.el --- Variables, Setters, Init -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-12-01
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                               Variables                                ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                 Things change; variables stay the same...
+;;                                 ──────────
+;;
+;; Internal: variables, getters, setters, etc.
+;;
+;; API: Variable Init & Friends!
+;;   - `nub:vars:init'
+;;   - `nub:vars:reset'
+;;   - `nub:vars:terminate'
+;;
+;;; Code:
+
+
+;;------------------------------------------------------------------------------
+;; Section Title
+;;------------------------------------------------------------------------------
+
+;; TODO: stuff here
+
+
+;;------------------------------------------------------------------------------
+;; The End.
+;;------------------------------------------------------------------------------
+;; TODO: Choose one!
+(imp:provide :nub 'variables.el)
+(imp:provide:with-emacs :nub 'variables.el)
+(provide 'variables.el)
 ;;; output/nub/variables.el -*- lexical-binding: t; -*-
 
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                               Variables                                ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                 Things change; variables stay the same...                  ;;
-;;                                 ──────────                                 ;;
 
 
 (imp:require :nub 'internal)

@@ -1,13 +1,20 @@
-;;; output/nub/utils.el -*- lexical-binding: t; -*-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║               Nub: /noun/ A small lump or protuberance.                ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                Well... At least I didn't name it 'jeff.el'.                ;;
-;;                                 ──────────                                 ;;
-
+;;; core/modules/output/nub/utils.el --- Utility Nubs -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-10-22
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Utility Functions for Nub
+;;
+;;; Code:
 
 (imp:require :nub 'internal)
 (imp:require :nub 'alist)

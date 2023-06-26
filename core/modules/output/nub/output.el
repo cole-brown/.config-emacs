@@ -1,12 +1,27 @@
-;;; output/nub/base.el -*- lexical-binding: t; -*-
+;;; core/modules/output/nub/output.el --- Output Sinks -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-06-03
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                           Sinks for Sources                            ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                      Do _not_ use as a kitchen sink!
+;;                                 ──────────
+;;
+;;; Code:
 
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                            Error/Warn/Etc.                             ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                  Delete if you can make error-proof code.                  ;;
-;;                                 ──────────                                 ;;
 
 (require 'seq)
 (imp:require :nub 'internal)

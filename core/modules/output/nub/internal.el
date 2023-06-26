@@ -1,12 +1,28 @@
-;;; output/nub/internal.el -*- lexical-binding: t; -*-
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║               What does the error lib use for erroring?                ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;            At least it's only turtles a bit of the way down...             ;;
-;;                                 ──────────                                 ;;
+;;; core/modules/output/nub/internal.el --- Internal Functions -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-12-07
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║               What does the error lib use for erroring?                ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;            At least it's only turtles a bit of the way down...
+;;                                 ──────────
+;;
+;; Internal Functions
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------

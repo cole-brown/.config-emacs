@@ -1,25 +1,26 @@
-;;; warning.el --- Nub Warning Level Output -*- lexical-binding: t; -*-
+;;; core/modules/output/nub/warning.el --- Warning-Level Output -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-06-07
-;; Modified:   2022-06-07
+;; Timestamp:  2023-06-26
 ;;
-;; This file is not part of GNU Emacs.
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;;  Nub Warning Level Output
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                            Warning Messages                            ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                          CAUTION: Warnings ahead!
+;;                                 ──────────
 ;;
 ;;; Code:
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                            Warning Messages                            ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                          CAUTION: Warnings ahead!                          ;;
-;;                                 ──────────                                 ;;
 
 
 (imp:require :path)

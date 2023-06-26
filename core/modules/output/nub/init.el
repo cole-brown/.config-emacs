@@ -1,25 +1,28 @@
-;;; init.el --- Multi-'user' output message helper. -*- lexical-binding: t; -*-
+;;; core/modules/output/nub/init.el --- Multi-"user" output message helper. -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2021-11-30
-;; Modified:   2022-04-21
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-10-28
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║               Nub: /noun/ A small lump or protuberance.                ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                       Hey... Naming things is hard.
+;;                                 ──────────
+;;
 ;; Output messages with output levels and output sinks settings per user.
 ;;
-;;
-;;
 ;;; Code:
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║               Nub: /noun/ A small lump or protuberance.                ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                       Hey... Naming things is hard.                        ;;
-;;                                 ──────────                                 ;;
 
 
 ;;------------------------------------------------------------------------------

@@ -1,25 +1,28 @@
-;;; error.el --- Nub Error Level Output -*- lexical-binding: t; -*-
+;;; core/modules/output/nub/error.el --- Error-Level Output -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-25
-;; Modified:   2022-05-25
+;; Timestamp:  2023-06-26
 ;;
-;; This file is not part of GNU Emacs.
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;;  Nub Error Level Output
+;;                                 ──────────
+;; ╔════════════════════════════════════════════════════════════════════════╗
+;; ║                             Error Messages                             ║
+;; ╚════════════════════════════════════════════════════════════════════════╝
+;;                                   ──────
+;;                  Delete if you can make error-proof code.
+;;                                 ──────────
+;;
+;; Error-Level Output
 ;;
 ;;; Code:
-
-;;                                 ──────────                                 ;;
-;; ╔════════════════════════════════════════════════════════════════════════╗ ;;
-;; ║                             Error Messages                             ║ ;;
-;; ╚════════════════════════════════════════════════════════════════════════╝ ;;
-;;                                   ──────                                   ;;
-;;                  Delete if you can make error-proof code.                  ;;
-;;                                 ──────────                                 ;;
 
 
 (imp:require :path)

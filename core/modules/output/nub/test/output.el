@@ -1,5 +1,20 @@
-;; -*- no-byte-compile: t; lexical-binding: t; -*-
-;;; output/nub/test/output.el
+;;; core/modules/output/nub/test/output.el --- Tests for "output.el" -*- no-byte-compile: t; lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-12-07
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Tests for "output.el"
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------
