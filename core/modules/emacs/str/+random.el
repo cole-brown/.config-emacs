@@ -1,14 +1,34 @@
-;;; emacs/str/+random.el -*- lexical-binding: t; -*-
-
+;;; core/modules/emacs/str/+random.el --- Random Strings -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-09-17
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Random Strings
+;;
 ;; Some of this is derived from:
 ;;   - http://ergoemacs.org/emacs/elisp_insert_random_number_string.html
 ;;   - http://ergoemacs.org/emacs/elisp_generate_uuid.html
+;;
+;;; Code:
 
 
 (imp:require :str 'string)
 
 
-;; TODO: Move out of "str/+random.el".
+;;--------------------------------------------------------------------------------
+;; Random: ...Numbers?!?
+;;--------------------------------------------------------------------------------
+;; TODO:str: Move out of "str/+random.el".
+
 (defun num:random:big (limit)
   "Returns a random integer between 0 and LIMIT.
 
@@ -104,8 +124,8 @@ Version 2017-08-03"
 ;; (str:random:hex/insert 40)
 
 
-(defun str:random:string/insert (length)
-  "Insert a random alphanumerics string of length 5.
+(defun str:random:string/insert (&optional length)
+  "Insert a random alphanumerics string of LENGTH (default: 5).
 The possible chars are: A to Z, a to z, 0 to 9.
 
 Call `universal-argument' before for different count.
@@ -122,7 +142,13 @@ Version 2018-08-03"
 
 (defun str:random:uuid/insert ()
   "Insert a UUID.
-This commands calls “uuidgen” on MacOS, Linux, and calls PowelShell on Microsoft Windows.
+
+This calls out to:
+  - MacOS:   'uuidgen'
+  - Linux:   'uuidgen'
+  - Windows: 'PowerShell'
+Otherwise falls back to Emacs' `md5' hash of a bunch of random(ish) values from
+Emacs.
 
 URL `http://ergoemacs.org/emacs/elisp_generate_uuid.html'
 Version 2020-06-04"
@@ -135,8 +161,9 @@ Version 2020-06-04"
    ((string-equal system-type "gnu/linux")
     (shell-command "uuidgen" t))
    (t
-    ;; Code here by Christopher Wellons, 2011-11-18.
-    ;; and editted Hideki Saito further to generate all valid variants for "N" in xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx format.
+    ;; Code here by Christopher Wellons, 2011-11-18. Editted by Hideki Saito
+    ;; further to generate all valid variants for "N" in
+    ;; xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx format.
     (let ((myStr (md5 (format "%s%s%s%s%s%s%s%s%s%s"
                               (user-uid)
                               (emacs-pid)
@@ -162,10 +189,10 @@ Version 2020-06-04"
 ;; Random: String
 ;;------------------------------------------------------------------------------
 
-(defun str:random:number/string (length)
-  "Returns a string of LENGTH random digits. LENGTH default to 5.
+(defun str:random:number/string (&optional length)
+  "Return a string of random digits.
 
-Call `universal-argument' before for different count.
+LENGTH should be an integer (default: 5).
 
 URL `http://ergoemacs.org/emacs/elisp_insert_random_number_string.html'
 Version 2017-05-24"
@@ -174,10 +201,10 @@ Version 2017-05-24"
 ;; (str:random:number/string 10)
 
 
-(defun str:random:hex/string (length)
-  "Returns a string of LENGTH random hexadecimal digits. LENGTH default to 5.
+(defun str:random:hex/string (&optional length)
+  "Return a string of random hexadecimal digits.
 
-Call `universal-argument' before for different count.
+LENGTH should be an integer (default: 5).
 
 URL `http://ergoemacs.org/emacs/elisp_insert_random_number_string.html'
 Version 2017-08-03"
@@ -186,11 +213,12 @@ Version 2017-08-03"
 ;; (str:random:hex/string 10)
 
 
-(defun str:random:string/string (length)
-  "Returns a string of a random alphanumerics string of length 5.
+(defun str:random:string/string (&optional length)
+  "Return a string random alphanumerics.
+
 The possible chars are: A to Z, a to z, 0 to 9.
 
-Call `universal-argument' before for different count.
+LENGTH should be an integer (default: 5).
 
 URL `http://ergoemacs.org/emacs/elisp_insert_random_number_string.html'
 Version 2018-08-03"
@@ -199,9 +227,15 @@ Version 2018-08-03"
 ;; (str:random:string/string 10)
 
 
-(defun str:random:uuid/string ()
-  "Returns a string of a UUID.
-This commands calls “uuidgen” on MacOS, Linux, and calls PowelShell on Microsoft Windows.
+(defun str:random:uuid/string (&optional length)
+  "Return a string of a UUID.
+
+This calls out to:
+  - MacOS:   'uuidgen'
+  - Linux:   'uuidgen'
+  - Windows: 'PowerShell'
+Otherwise falls back to Emacs' `md5' hash of a bunch of random(ish) values from
+Emacs.
 
 URL `http://ergoemacs.org/emacs/elisp_generate_uuid.html'
 Version 2020-06-04"

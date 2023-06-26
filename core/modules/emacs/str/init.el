@@ -1,13 +1,24 @@
-;;; emacs/str/init.el --- String Helpers -*- lexical-binding: t; -*-
+;;; core/modules/emacs/path/init.el --- String Functions -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2021-09-10
-;; Modified:   2022-04-13
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-02-16
+;; Timestamp:  2023-06-23
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;; Helpful string functions.
+;; String Functions
+;;
+;; Why?
+;;   - These are namespaced, which makes searching/finding/browsing them in
+;;     Emacs help much nicer.
+;;   - Many more string case types.
+;;   - Other reasons at the time that weren't written down.
 ;;
 ;;; Code:
 

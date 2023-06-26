@@ -1,17 +1,20 @@
-;;; core/modules/emacs/str/+case-hydra.el --- Hydra for String Case Functions -*- lexical-binding: t; -*-
+;;; core/modules/emacs/str/+case-hydra.el --- Hydra for String Cases -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2021-09-22
-;; Modified:   2021-09-22
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-09-22
+;; Timestamp:  2023-06-23
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;;  Hydra for String Case Functions
+;; Hydra for String Cases
 ;;
 ;;; Code:
-
 
 
 (imp:require :str 'case)

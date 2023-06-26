@@ -1,4 +1,45 @@
-;;; emacs/str/case.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/str/+case.el --- StRiNg CaSe CoNvErSiOn -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-23
+;; Timestamp:  2023-06-23
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; String Case Conversions
+;;
+;; Emacs has:
+;;   1. `upcase'
+;;   2. `downcase'
+;;   3. `capitalize'
+;;
+;; This has:
+;;   1. Simple Types
+;;      1. `:lower'
+;;      2. `:upper'
+;;      3. `:title'
+;;   2. snake_case_types
+;;      1. `:snake'
+;;      2. `:snake.lower'
+;;      3. `:snake.upper'
+;;      4. `:snake.title'
+;;   3. CamelCaseTypes
+;;      1. `:camel'
+;;      2. `:camel.lower'
+;;      3. `:camel.upper'
+;;   4. AlTeRnAtInG cAsE tYpEs
+;;      1. `:alternating'
+;;      2. `:alternating.lower'
+;;      3. `:alternating.upper'
+;;      4. `:alternating.random'
+;;
+;;; Code:
 
 
 (require 'rx)
@@ -1319,6 +1360,7 @@ integers/markers from \"alternating case\" to either
 ;; General Conversion
 ;;------------------------------
 
+;; TODO:str: better interactivity - help with completion of CASES
 (defun str:case/region:to (start end &rest cases)
   "Convert region in current buffer described by START and END
 integers/marker according to CASES keywords."

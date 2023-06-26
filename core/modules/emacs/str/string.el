@@ -1,13 +1,18 @@
-;;; emacs/str/string.el --- Useful String Functions -*- lexical-binding: t; -*-
+;;; core/modules/emacs/str/string.el --- String Functions -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <code@brown.dev>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-04-17
-;; Modified:   2023-04-17
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
-;; String Functions for Strings
+;; String Functions that don't go in any of the other string function files.
 ;;
 ;;; Code:
 
@@ -17,7 +22,7 @@
 ;;------------------------------------------------------------------------------
 
 (defun str:contains? (needle haystack)
-  "Return t/nil for whether HAYSTACK string contains NEEDLE string."
+  "Predicate for for whether HAYSTACK string contains NEEDLE string."
   (not (null (string-match-p (regexp-quote needle) haystack))))
 
 
@@ -33,6 +38,7 @@ ARGS can contain:
   (let (trim/left
         trim/right)
 
+    ;; Parse args to figure out which side(s) to trim.
     (dolist (arg args)
       (pcase arg
         ((or :left 'left)
@@ -43,14 +49,15 @@ ARGS can contain:
          (setq trim/right t
                trim/left  t))))
 
+    ;; Trim desired side(s) of STR.
     (cond ((and trim/left
-		(not trim/right))
-	   (string-trim-left str))
-	  ((and trim/right
-		(not trim/left))
-	   (string-trim-right str))
-	  (t ; Either `:full', `:both', `:left' & `:right', or 'the paragraph does not say'. 
-	   (string-trim str)))))
+                (not trim/right))
+           (string-trim-left str))
+          ((and trim/right
+                (not trim/left))
+           (string-trim-right str))
+          (t
+           (string-trim str)))))
 ;; (str:trim " foo ")
 ;; (str:trim " foo " :left)
 ;; (str:trim " foo " :left :right)
@@ -58,14 +65,9 @@ ARGS can contain:
 
 
 (defun str:empty? (str &optional trim-args)
-  "Return non-nil if STR is nil or empty.
+  "Predicate for if STR is nil or empty.
 
-See `str:trim' for TRIM-ARGS. TL;DR:
-  - `:left', 'left'
-  - `:right', `right'
-  - `:full', `full', `:both', `both'
-  - nil (no trimming)
-    - default"
+If TRIM-ARGS is non-nil, trim with `str:trim' before checking for empty string."
   (or (null str)
       (string= ""
                (if trim-args
@@ -82,8 +84,9 @@ See `str:trim' for TRIM-ARGS. TL;DR:
 ;;------------------------------------------------------------------------------
 
 (defun str:split (regex string)
-  "Split STRING based on REGEX separators; returns a list of strings
-with nils filtered out.
+  "Split STRING based on REGEX separators.
+
+Return a list of strings with nils filtered out.
 
 NOTE: Obeys `case-fold-search'! Set `case-fold-search' appropriately for your
 needs, or use `str:rx:with/case.sensitive' macro if you want to have
@@ -111,14 +114,13 @@ case sensitivity!"
 ;;------------------------------------------------------------------------------
 
 (defun int<str>:str:print->str (func &rest args)
-  "Calls FUNC with ARGS, returns `standard-output' as a string."
+  "Call FUNC with ARGS; return `standard-output' as a string."
   (with-output-to-string
     (apply func args)))
 
 
 (defun int<str>:str:insert->str (func &rest args)
-  "Calls FUNC with ARGS in a temp buffer, then returns the temp buffer's
-contents as a string."
+  "Call FUNC with ARGS in a temp buffer; return the temp buffer as a string."
   (with-temp-buffer
     (apply func args)
     (buffer-string)))

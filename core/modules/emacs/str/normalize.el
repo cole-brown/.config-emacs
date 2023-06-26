@@ -1,4 +1,21 @@
-;;; emacs/str/string.el -*- lexical-binding: t; -*-
+;;; core/modules/emacs/str/normalize.el --- String Normalization -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-09-27
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Normalize to Strings
+;; Normalize Strings?
+;;
+;;; Code:
 
 
 ;;------------------------------------------------------------------------------
@@ -31,6 +48,7 @@ INPUT should be a string, symbol (or keyword), function, or nil.
   - symbol:   Convert to string with `str:normalize:symbol'.
   - function: Call it with no parameters and use the output string.
     - If output is not a string, return nil.
+  - list:     Normalize each item in list and join with spaces.
 
 Return a string or nil."
   ;; nil and empty string -> nil
