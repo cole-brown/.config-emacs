@@ -1,10 +1,10 @@
-;;; init.el --- Emacs Windows -*- lexical-binding: t; -*-
+;;; core/modules/emacs/window/init.el --- Emacs Windows -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-07-15
-;; Modified:   2022-07-15
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-07-15
+;; Timestamp:  2023-06-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,11 @@
 ;;
 ;;; Commentary:
 ;;
-;; Functions for Emacs Windows
+;; Emacs Windows
+;; Not:
+;;   - Windows the operating system
+;;   - The operating system's windows
+;;   - Emacs frames, which are basically the operating system's windows
 ;;
 ;;; Code:
 
