@@ -1,4 +1,20 @@
-;;; system/multiplexer/dlv.el -*- lexical-binding: t; -*-
+;;; core/modules/system/multiplexer/dlv.el --- Dir-Local Variables -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-10-05
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Per-System Dir-Local Variables
+;;
+;;; Code:
 
 
 (imp:require :dlv)

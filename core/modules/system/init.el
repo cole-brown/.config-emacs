@@ -1,9 +1,10 @@
-;;; init.el --- `:system' namespace -*- lexical-binding: t; -*-
+;;; core/modules/system/init.el --- System of a Host -*- lexical-binding: t; -*-
 ;;
-;; Author:   Cole Brown <code@brown.dev>
-;; URL:      https://github.com/cole-brown/.config-emacs
-;; Created:  2022-06-07
-;; Modified: 2022-06-07
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-06-07
+;; Timestamp:  2023-06-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -11,7 +12,13 @@
 ;;
 ;;; Commentary:
 ;;
-;;  `:system' namespace initialization
+;; System of a Host
+;;
+;; Emacs uses "system" to refer to the host, so we do too.
+;; See `system-name', which is your computer name aka machine name aka hostname.
+;;   (system-name)
+;;
+;; TODO:system: Change to use `host' namespace instead?
 ;;
 ;;; Code:
 

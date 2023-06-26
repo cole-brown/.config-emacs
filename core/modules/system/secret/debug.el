@@ -1,4 +1,20 @@
-;;; system/secret/debug.el --- Debugging/error help. -*- lexical-binding: t; -*-
+;;; core/modules/system/secret/debug.el --- Debugging -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-26
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Debugging
+;;
+;;; Code:
 
 
 (imp:require :nub)

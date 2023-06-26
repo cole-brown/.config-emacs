@@ -1,11 +1,20 @@
-;;; system/secret/load.el -*- lexical-binding: t; -*-
+;;; core/modules/system/secret/load.el --- Load Secrets -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-26
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Load the Secret
 ;;
 ;;; Code:
-
-
-;; ┌───────────────────────────────────────────────────────────────────────────┐
-;; │                            Load the Secret.                               │
-;; └───────────────────────────────────────────────────────────────────────────┘
 
 
 (imp:require :nub)

@@ -1,8 +1,22 @@
-;;; system/multiplexer/namespaces.el -*- lexical-binding: t; -*-
-
-;;---------------------Jerky Namespaces for the System(s)-----------------------
-;;--                           Default Namespaces                             --
-;;------------------------------------------------------------------------------
+;;; core/modules/system/multiplexer/namespaces.el --- 'jerky' Namespaces for Systems -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-07-10
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; 'jerky' Namespaces for Systems
+;;
+;; Default namespaces, that is.
+;;
+;;; Code:
 
 
 (imp:require :jerky)

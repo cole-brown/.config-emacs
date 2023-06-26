@@ -1,15 +1,20 @@
-;;; system/secret/init.el --- Emacs secret init -*- lexical-binding: t; -*-
+;;; core/modules/system/secret/init.el --- Set-Up Secrets Separately -*- lexical-binding: t; -*-
 ;;
-;; Author:   Cole Brown <code@brown.dev>
-;; URL:      https://github.com/cole-brown/.config-emacs
-;; Created:  2020-08-28
-;; Modified: 2022-06-05
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-08-28
+;; Timestamp:  2023-06-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
 ;; Move along.
 ;;
 ;;; Commentary:
+;;
+;; ┌───────────────────────────────────────────────────────────────────────────┐
+;; │                      What's the Secret Password?                          │
+;; └───────────────────────────────────────────────────────────────────────────┘
 ;;
 ;; Separate secrets from the standard Emacs initialization.
 ;;
@@ -34,9 +39,6 @@
 ;;; Code:
 
 
-;; ┌───────────────────────────────────────────────────────────────────────────┐
-;; │                        What's the Secret Word?                            │
-;; └───────────────────────────────────────────────────────────────────────────┘
 
 
 ;;------------------------------------------------------------------------------

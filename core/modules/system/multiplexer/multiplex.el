@@ -1,11 +1,28 @@
-;;; system/multiplexer/multiplex.el -*- lexical-binding: t; -*-
+;;; core/modules/system/multiplexer/multiplex.el --- Knowledge About All Systems -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-10-28
+;; Timestamp:  2023-06-26
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Define all systems so that we can then know which system this system is.
+;;
+;; Use `system:multiplexer:define' to define your systems.
+;;
+;; Then you can use `system:multiplexer:set' and `system:multiplexer:get' to set
+;; up in a system-agnostic(ish) manner.
+;;
+;;; Code:
 
 
-;;------------------Init & Config Help for Multiple Systems.--------------------
-;;--                     What computer is this anyways?                       --
-;;--------------------------(probably the wrong one)----------------------------
-
-(require 'cl-lib) ;; cl-defun for '&key'
+(require 'cl-lib)
 
 (imp:require :nub)
 (imp:require :jerky)
