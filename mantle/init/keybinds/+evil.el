@@ -1,10 +1,10 @@
-;;; mantle/config/evil.el --- Emacs Vim Input Layer -*- lexical-binding: t; -*-
+;;; mantle/init/keybinds/+evil.el --- Emacs Vim Input Layer -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-07-12
-;; Modified:   2023-02-09
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-07-12
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,12 @@
 ;;
 ;;; Commentary:
 ;;
-;; Configure Evil and Friends.
+;; ┌───────────────────────┤ Emacs Vim Input Layer ├───────────────────────┐
+;; │                +1.5 Evilness and +7.0 Keybind Confusion               │
+;; └───────────────────────┤ (I'm still learning.) ├───────────────────────┘
+;;
+;; "Emacs Vim Input Layer" doesn't sound all that `evil' at all once you spell
+;; it out...
 ;;
 ;; This should be entirely optional, since we're swapping over to `meow' to try
 ;; that modal input package out.
@@ -22,9 +27,6 @@
 ;;; Code:
 
 
-;;---------------------------Emacs Vim Input Layer -----------------------------
-;;--                +1.5 Evilness and +7.0 Keybind Confusion                  --
-;;---------------------------(I'm still learning.)------------------------------
 
 
 ;;------------------------------------------------------------------------------

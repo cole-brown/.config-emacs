@@ -1,10 +1,10 @@
-;;; mantle/init/keybinds/+general-meow.el --- The General in Your Keybind Army -*- lexical-binding: t; -*-
+;;; mantle/init/keybinds/general/+meow.el --- General Meow, Keybind Army Cat Division -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-03-24
-;; Modified:   2023-03-24
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-03-24
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,12 @@
 ;;
 ;;; Commentary:
 ;;
-;; The General in Your Keybind Army
+;; General Meow, Keybind Army Cat Division
+;;
+;; Init the `meow' stuff in `general'.
+;;   - Not much compared to `evil' since there's no built-in support for `meow'.
+;;
+;; Create some definers to use in `use-package' during config.
 ;;
 ;;; Code:
 

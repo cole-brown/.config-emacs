@@ -1,7 +1,10 @@
-;;; config.el --- User-Level Emacs Configuration -*- lexical-binding: t; -*-
+;;; mantle/init.el --- User-Level Emacs Initialization -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-03-25
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -10,6 +13,10 @@
 ;;; Commentary:
 ;;
 ;; User-Level Emacs Configuration
+;;
+;; The user's `use-package', settings, etc. should happen in this part of
+;; start-up.
+;;
 ;;
 ;;; Code:
 

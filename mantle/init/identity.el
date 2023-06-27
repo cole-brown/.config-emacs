@@ -1,4 +1,22 @@
-;;; config/identity.el -*- lexical-binding: t; -*-
+;;; mantle/init/identity.el --- Leeloo Dallas, Multi-Pass -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2020-11-10
+;; Timestamp:  2023-06-27
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Leelo Dallas, Multi-Pass
+;;
+;; My Identity stuff. Mostly done in secret repo, actually.
+;;
+;;; Code:
 
 
 (imp:require :tools 'signature)

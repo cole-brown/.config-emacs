@@ -1,7 +1,10 @@
-;;; mantle/init/keybinds/emacs.el --- Keybinds for Emacs in General -*- lexical-binding: t; -*-
+;;; mantle/init/keybinds/emacs.el --- Vanilla Emacs Input Layer -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-27
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -9,10 +12,12 @@
 ;;
 ;;; Commentary:
 ;;
+;; Vanilla Emacs Input Layer
+;;
 ;;  Keybinds for Emacs in General
 ;;
-;;  ...Not like... `general' the keybinds package.
-;;  Just in general. Like for not any particular thing better covered elsewhere.
+;; ...Not like... `general' the keybinds package.
+;; Just in general. Like for not any particular thing better covered elsewhere.
 ;;
 ;;; Code:
 

@@ -1,8 +1,24 @@
-;;; init/systems.el -*- lexical-binding: t; -*-
+;;; mantle/init/system.el --- System Initialization -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-06-09
+;; Timestamp:  2023-06-27
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; System Initialization
+;; ┌──────────────┐ Init & Config Help for Multiple Systems ┌──────────────┐
+;; │                     What computer is this anyways?                    │
+;; └──────────────────────┘ (probably the wrong one) └─────────────────────┘
+;;
+;;; Code:
 
-;;------------------Init & Config Help for Multiple Systems.--------------------
-;;--                     What computer is this anyways?                       --
-;;--------------------------(probably the wrong one)----------------------------
 
 (imp:require :system 'multiplexer)
 

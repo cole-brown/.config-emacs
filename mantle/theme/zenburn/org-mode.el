@@ -1,7 +1,10 @@
-;;; org-mode.el --- Zenburn & Org-Mode Customizations -*- lexical-binding: t; -*-
+;;; mantle/theme/zenburn/org-mode.el --- Zenburn Tweaks for Org Mode -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-05-12
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -9,7 +12,19 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Zenburn & Org-Mode Customizations
+;; Fix some things that annoy me about Zenburn's `org-mode' faces.
+;; Things like:
+;;   - Make TODO keywords less bright (I think? I forget...).
+;;   - Give TODO keywords a background.
+;;     - For easier scanning for a headline.
+;;   - Reduce number of headline colors used.
+;;
+;; Also while were at it, fix some things that are technically not related to
+;; `zenburn':
+;;   - Give all `org-mode' TODO keywords visual separation from the headline.
+;;     - For easier scanning for a headline.
+;;   - Make all `org-mode' TODO keywords the same width.
+;;     - For much nicer headline structure when headlines are collapsed.
 ;;
 ;;; Code:
 

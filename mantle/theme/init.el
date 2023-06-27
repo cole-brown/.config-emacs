@@ -1,13 +1,19 @@
-;;; init.el --- Init User's Theme -*- lexical-binding: t; -*-
+;;; mantle/theme/init.el --- Set Up User's Theme -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-05-06
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
 ;; Move along.
 ;;
 ;;; Commentary:
+;;
+;; Initialize and/or Configure User's Theme
+;;
 ;;; Code:
 
 

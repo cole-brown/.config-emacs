@@ -1,7 +1,10 @@
-;;; zenburn.el --- Low-Contrast Theme -*- lexical-binding: t; -*-
+;;; mantle/theme/zenburn/init.el --- Low-Contrast Dark Theme -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-05-12
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -9,7 +12,8 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Low-Contrast Theme
+;; Low-Contrast Dark Theme
+;; Best Theme Since Sliced Bread
 ;;
 ;;; Code:
 

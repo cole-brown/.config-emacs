@@ -1,7 +1,10 @@
-;;; whitespace.el --- Zenburn tweaks for Whitespace Mode -*- lexical-binding: t; -*-
+;;; mantle/theme/zenburn/whitespace.el --- Zenburn Tweaks for Whitespace Mode -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-05-16
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -9,7 +12,12 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Zenburn & Whitespace-Mode customizations
+;; Zenburn doesn't (didn't? I haven't checked in years...) have any predefined
+;; faces for `whitespace-mode', and `whitespace-mode' has some eye-bleedingly
+;; visceral colors.
+;;
+;; Here we tell `whitespace-mode' to chill the fuck down and use these Zenburn
+;; faces.
 ;;
 ;;; Code:
 

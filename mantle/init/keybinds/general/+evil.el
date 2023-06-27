@@ -1,10 +1,10 @@
-;;; mantle/init/keybinds/+general-evil.el --- The General in Your Keybind Army -*- lexical-binding: t; -*-
+;;; mantle/init/keybinds/general/+evil.el --- The `evil' General in My Keybind Army -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-07-21
-;; Modified:   2023-03-24
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-07-21
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,11 @@
 ;;
 ;;; Commentary:
 ;;
-;; The (Evil) General in Your Keybind Army
+;; The `evil' General in My Keybind Army
+;;
+;; Init the `evil' stuff in `general'.
+;;
+;; Create some definers to use in `use-package' during config.
 ;;
 ;;; Code:
 

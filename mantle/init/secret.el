@@ -1,13 +1,30 @@
-;;; init/secret.el -*- lexical-binding: t; -*-
+;;; mantle/init/secret.el --- What secrets? -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-07-11
+;; Timestamp:  2023-06-27
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; ┌────────────────────────┐ Initialize My Secrets ┌────────────────────────┐
+;; │               You're not allowed to know what they are.                 │
+;; └─────────────────────────────┘ (shhh...) └───────────────────────────────┘
+;;
+;;; Code:
 
 
 (imp:require :system 'secret)
 
 
-;;--------------------------Initialize Our Secrets.-----------------------------
-;;--               You're not allowed to know what they are.                  --
-;;---------------------------------(shhh...)------------------------------------
-
+;;--------------------------------------------------------------------------------
+;; Secret Init
+;;--------------------------------------------------------------------------------
 
 (nub:debug
  :innit

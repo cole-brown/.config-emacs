@@ -1,10 +1,10 @@
 ;;; mantle/init/keybinds/general/init.el --- General of the Keybind Army? -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-07-21
-;; Modified:   2022-07-21
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-07-21
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

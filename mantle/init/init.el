@@ -1,7 +1,10 @@
-;;; init/init.el --- Initialize User Stuff -*- lexical-binding: t; -*-
+;;; mantle/init/init.el --- User's Emacs Initialization -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
-;; URL:    https://github.com/cole-brown/.config-emacs
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-03-25
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -9,7 +12,19 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Initialize User Stuff in This Order
+;; Hello <insert_username_here>!
+;;
+;; This is for any early initialization that you want to happen before the bulk
+;; of your set-up, which should happen in & under 'mantle/init/config.el'.
+;; Examples:
+;;   - Load any of your lisp code (helpers, etc) you want available for all of
+;;     package config.
+;;   - Load some secrets maybe so they're available when you need them?
+;;     - e.g. API keys
+;;   - `use-package' (or other package setup) for "must exist for everyone else"
+;;     packages.
+;;     - e.g. keybind packages like `evil', `meow', etc.
+;;   - Any debugging you want maybe?
 ;;
 ;;; Code:
 
