@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-11-29
-;; Modified:   2022-11-29
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-11-29
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -15,6 +15,7 @@
 ;; Perspectives, Workspaces... Whatever.
 ;;
 ;; https://github.com/Bad-ptr/persp-mode.el
+;;
 ;; `persp-mode' gives "perspectives", a perspective-restricted `buffer-list', and
 ;; file-based session persistence.
 ;;

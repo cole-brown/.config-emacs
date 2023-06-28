@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-01-24
-;; Timestamp:  2023-06-15
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-01-24
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -15,7 +15,7 @@
 ;; Emacs Settings and Configuration
 ;;
 ;; For Emacs settings that have to be in place super early, see:
-;;   $(git rev-parse --show-toplevel)/settings.el
+;; 'settings.el'
 ;;
 ;;; Code:
 

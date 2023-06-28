@@ -1,10 +1,10 @@
-;;; help.el --- Which Key & other Helpful things -*- lexical-binding: t; -*-
+;;; mantle/config/help.el --- Which Key & other Helpful things -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-07-15
-;; Modified:   2022-07-15
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-07-15
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

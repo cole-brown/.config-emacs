@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-04-28
-;; Modified:   2023-04-28
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-04-28
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

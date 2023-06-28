@@ -1,10 +1,10 @@
 ;;; mantle/config/init.el --- Configure User Stuff -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-04-26
-;; Modified:   2022-08-05
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-04-26
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,12 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Configure User Stuff in This Order
+;; Hello again, <insert_username_here>!
+;;
+;; This is where we configure all your stuff.
+;;
+;; The bulk of your settings/setup/config should be loaded from this file.
+;; `use-package' or other package loading/config should be like 90% here.
 ;;
 ;;; Code:
 

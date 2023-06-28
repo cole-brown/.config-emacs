@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-07-13
-;; Modified:   2022-07-13
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-07-13
+;; Timestamp:  2023-06-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,17 +12,14 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Icon Fonts
+;; ┌──────────────────────────────────═══───────────────────────────────────┐
+;; │                                 ═════                                  │
+;; │                             All The Icons                              │
+;; │                            (Wingdings 3.0)                             │
+;; │                                 ═════                                  │
+;; └──────────────────────────────────═══───────────────────────────────────┘
 ;;
 ;;; Code:
-
-
-;; ┌──────────────────────────────────═══───────────────────────────────────┐ ;;
-;; │                                 ═════                                  │ ;;
-;; │                             All The Icons                              │ ;;
-;; │                            (Wingdings 3.0)                             │ ;;
-;; │                                 ═════                                  │ ;;
-;; └──────────────────────────────────═══───────────────────────────────────┘ ;;
 
 
 ;; TODO:all-the-icons: [2023-05-02]: Can't figure out how to say, like, "I'd
