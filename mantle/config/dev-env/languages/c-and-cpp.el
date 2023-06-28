@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2021-09-27
-;; Modified:   2022-12-12
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2021-09-27
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,8 +12,8 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Config the C.
-;;  And the C++.
+;; Config the C.
+;; And the C++.
 ;;
 ;;; Code:
 

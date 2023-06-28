@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-01-03
-;; Modified:   2023-01-04
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-01-03
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -442,7 +442,7 @@
 ;; but `impatient-mode' has the distinction of only relying on Emacs packages.
 ;; See: https://wikemacs.org/wiki/Markdown#Live_preview_as_you_type
 
-;; TODO: `impatient-mode' is mainly for HTML... move to HTML (or web or
+;; TODO:html: `impatient-mode' is mainly for HTML... move to HTML (or web or
 ;; whatever) file when/if it gets one? Or... Keep this one for markdown and make
 ;; another for HTML if needed?
 
@@ -556,8 +556,8 @@ You can then:
   :config
   ;;------------------------------
 
-  ;; Redefine entire transient since it only has one keybind and now we're
-  ;; replacing that one and adding more?
+  ;; NOTE: Redefine entire transient since it only has one keybind and now we're
+  ;; replacing that one and adding more.
   (transient-define-prefix mantle:meow/transient:markdown/preview ()
     "Markdown preview keybinds."
     ["Preview..."

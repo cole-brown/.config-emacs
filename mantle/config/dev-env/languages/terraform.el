@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-01-03
-;; Modified:   2023-01-03
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-01-03
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,6 +17,11 @@
 ;; ...Except the code can't do a whole lot of code things.
 ;; Hardware as a markup language? Not really?..
 ;;
+;; No, no. Not Verilog or VHDL...
+;;
+;; Hardware like entire computers and switches and stuff.
+;; Like... The Cloud.
+;;
 ;;; Code:
 
 
@@ -27,8 +32,9 @@
 ;; Sanity Check
 ;;------------------------------------------------------------------------------
 
-;; Lodge a complaint if 'terraform' isn't installed on the system. But don't skip
-;; the `use-package', since it only needs the exe for the compile stuff.
+;; Lodge a complaint if 'terraform' isn't installed on the system. But don't
+;; skip the `terraform-mode' `use-package', since it only needs the exe for the
+;; compile stuff.
 (unless (executable-find "terraform")
   (nub:warning
       :innit
@@ -246,12 +252,31 @@ Return a string:
     "p" (list (elisp:cmd (mantle:terraform:run "plan"))  :which-key "terraform plan"))) ; (mantle:terraform:command "plan"))))
 
 
-;; ;;------------------------------------------------------------------------------
-;; ;; TODO: Documentation?
-;; ;;------------------------------------------------------------------------------
-;;
-;; TODO: This package for docs? Or just LSP? Or what does this vs that do?
-;; https://github.com/TxGVNN/terraform-doc
+;;------------------------------------------------------------------------------
+;; Documentation
+;;------------------------------------------------------------------------------
+
+;; Don't bother unless `terraform` is actually installed?
+(when (executable-find "terraform")
+
+  ;; https://github.com/TxGVNN/terraform-doc
+  (imp:use-package terraform-doc)
+
+  ;;------------------------------
+  ;; Keybinds : Meow
+  ;;------------------------------
+
+  (imp:use-package terraform-mode
+    :when  (imp:flag? :keybinds +meow)
+    :after meow
+
+    ;;------------------------------
+    :general
+    ;;------------------------------
+
+    (keybind:meow:leader/local:bind-keys
+        'terraform-mode-map
+      "d" (list #'terraform-doc :which-key "Docs..."))))
 
 
 ;; ;;------------------------------------------------------------------------------
@@ -277,6 +302,12 @@ Return a string:
 ;; Doom does this, but just use what the 'emacs.md' doc says instead?
 ;; (when (modulep! +lsp)
 ;;   (add-hook 'terraform-mode-local-vars-hook #'lsp! 'append))
+;;
+;; ;; Don't bother unless `terraform` is actually installed?
+;; (when (executable-find "terraform")
+
+;;   ;; https://github.com/TxGVNN/terraform-doc
+;;   (imp:use-package terraform-doc)
 
 
 ;;------------------------------------------------------------------------------

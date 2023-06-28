@@ -1,10 +1,10 @@
-;;; mantle/config/dev-env/http.el --- Hyper Text Markup Language -*- lexical-binding: t; -*-
+;;; mantle/config/dev-env/http.el --- Hyper Text Transfer Protocol -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-01-04
-;; Modified:   2023-01-04
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-01-04
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,9 +12,12 @@
 ;;
 ;;; Commentary:
 ;;
-;; Hyper Text Markup Language!
-;; Its... not really about text or markup anymore; it's a whole 'nuther OS.
+;; Hyper Text Transfer Protocol
 ;;
+;; HTTP Error Codes...
+;; REST Clients...
+;;
+;; For HTML, see 'mantle/config/dev-env/web.el'.
 ;;; Code:
 
 
@@ -26,7 +29,7 @@
 (imp:use-package know-your-http-well
   :commands (http-header http-method http-relation http-status-code)
 
-  ;; TODO-keybinds: Put these keybinds under the leader somewhere?
+  ;; TODO:keybinds: Put these keybinds under the leader somewhere?
   ;; M-x http-header ;; content-type
   ;; M-x http-method ;; post | POST
   ;; M-x http-relation ;; describedby

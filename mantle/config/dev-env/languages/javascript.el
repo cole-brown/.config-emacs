@@ -1,10 +1,10 @@
-;;; mantle/config/dev-env/javascript.el --- Development Environment -*- lexical-binding: t; -*-
+;;; mantle/config/dev-env/javascript.el --- Javascript: Where 1 + 1 can equal 11. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-01-05
-;; Modified:   2023-01-05
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-01-05
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Development Environment
+;; Javascript: Where 1 + 1 can equal 11.
 ;;
 ;;; Code:
 

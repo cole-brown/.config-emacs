@@ -1,10 +1,10 @@
-;;; mantle/config/common.el --- General Development Environment Stuff -*- lexical-binding: t; -*-
+;;; mantle/config/dev-env/common.el --- General Development Environment Stuff -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-08-05
-;; Timestamp:  2023-06-15
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-08-05
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

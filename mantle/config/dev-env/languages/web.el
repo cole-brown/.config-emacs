@@ -1,10 +1,10 @@
-;;; mantle/config/dev-env/web.el --- Spider Web Development? -*- lexical-binding: t; -*-
+;;; mantle/config/dev-env/web.el --- `web-mode' and friends (HTML stuff) -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-01-05
-;; Modified:   2023-01-05
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-01-05
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Spider Web Development?
+;; `web-mode' and friends. HTML stuff.
 ;;
 ;;; Code:
 

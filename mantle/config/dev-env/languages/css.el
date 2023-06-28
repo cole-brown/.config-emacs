@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-01-05
-;; Modified:   2023-01-05
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-01-05
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,9 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Cascading Style Sheets
+;; Cascading Style Sheets
+;;
+;; Normal style isn't stylish enough? Need a whole damn cascade of it.
 ;;
 ;;; Code:
 
