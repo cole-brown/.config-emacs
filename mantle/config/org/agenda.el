@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-03-16
-;; Modified:   2023-03-16
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-03-16
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Configure Org-Mode's Agenda.
+;;  Configure `org-mode' Agenda
 ;;
 ;;; Code:
 

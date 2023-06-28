@@ -1,10 +1,10 @@
-;;; mantle/config/hydra/init.el - hydras, pretty and otherwise -*- lexical-binding: t; -*-
+;;; mantle/config/hydra/init.el --- hydras, pretty and otherwise -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-07-13
-;; Modified:   2022-07-13
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-07-13
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
