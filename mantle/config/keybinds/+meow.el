@@ -1,10 +1,10 @@
-;;; mantle/config/meow.el --- 'Less is More' Modal Editing -*- lexical-binding: t; -*-
+;;; mantle/config/keybinds/+meow.el --- 'Less is More' Modal Editing -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-07-12
-;; Modified:   2023-02-09
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-07-12
+;; Timestamp:  2023-06-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

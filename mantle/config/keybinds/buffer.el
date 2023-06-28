@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2022-11-14
-;; Modified:   2022-11-14
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-11-14
+;; Timestamp:  2023-06-28
 ;;
 ;;; Commentary:
 ;;
