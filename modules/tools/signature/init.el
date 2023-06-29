@@ -1,9 +1,10 @@
-;;; tools/signature/init.el --- Signatures, Emails, and Such -*- lexical-binding: t; -*-
+;;; modules/tools/signature/init.el --- Signatures, Emails, and Such -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2020-11-16
-;; Modified:   2022-10-18
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2022-10-18
+;; Timestamp:  2023-06-29
 ;;
 ;;; Commentary:
 ;;

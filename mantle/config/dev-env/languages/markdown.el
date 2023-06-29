@@ -518,7 +518,7 @@ You can then:
   1. Select the buffer in the browser.
   2. Watch your changes appear as you type!"
     (interactive)
-    (if (not markdown-mode)
+    (if (not (derived-mode-p 'markdown-mode))
         (message "%s is not a `markdown-mode' buffer!"
                  (buffer-name))
 
@@ -532,10 +532,10 @@ You can then:
   (defun mantle:cmd:markdown:preview-live/stop ()
       "Stop/kill/whatever the live markdown preview of the current buffer."
       (interactive)
-      (cond ((not markdown-mode)
+      (cond ((not (derived-mode-p 'markdown-mode))
              (message "%s is not a `markdown-mode' buffer!"
                       (buffer-name)))
-            ((not impatient-mode)
+            ((not (derived-mode-p 'impatient-mode))
              (message "%s is not an `impatient-mode' (live preview) buffer!"
                       (buffer-name)))
             (t

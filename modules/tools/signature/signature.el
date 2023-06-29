@@ -1,9 +1,14 @@
-;;; tools/signature.el --- Signatures, Emails, and Such -*- lexical-binding: t; -*-
+;;; modules/tools/signature/signature.el --- Signatures, Emails, and Such -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <code@brown.dev>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Modified:   2022-10-18
+;; Timestamp:  2023-06-29
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
@@ -16,7 +21,8 @@
 ;;--                          (Illegible Squiggle)                            --
 ;;------------------------------------------------------------------------------
 
-;; TODO: Should this be its own thing like jerky?
+;; TODO: Should this be its own package like jerky?
+;; TODO: ...is jerky it's own package yet?
 
 
 (require 'subr-x)

@@ -1,4 +1,22 @@
-;;; mode/org/link.el -*- lexical-binding: t; -*-
+;;; modules/mode/org/link.el --- Org-Mode Link Stuff -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-29
+;; Timestamp:  2023-06-29
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Org-Mode Link Stuff
+;;   - Create a link named "here" from the org-mode links.
+;;   - Create a link named "here" form the kill ring.
+;;
+;;; Code:
 
 
 (imp:require :buffer 'region)

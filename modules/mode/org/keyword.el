@@ -1,4 +1,23 @@
-;;; mode/org/keyword.el -*- lexical-binding: t; -*-
+;;; modules/mode/org/keyword.el --- Org-Mode Keyword Stuff -*- lexical-binding: t; -*-
+;;
+;; Author:     Cole Brown <https://github.com/cole-brown>
+;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-06-29
+;; Timestamp:  2023-06-29
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
+;;
+;;; Commentary:
+;;
+;; Org-Mode Keyword Stuff
+;;   - Keyword getter & setter functions.
+;;   - TODO keyword creator & converter functions.
+;;
+;;; Code:
+
 
 (imp:require :buffer 'delete)
 

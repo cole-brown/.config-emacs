@@ -1,9 +1,10 @@
 ;;; modules/emacs/perspective/init.el --- `persp-mode' improvements -*- lexical-binding: t; -*-
 ;;
 ;; Author:   Cole Brown <code@brown.dev>
+;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:      https://github.com/cole-brown/.config-emacs
 ;; Created:  2023-01-20
-;; Modified: 2023-01-20
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -11,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  `persp-mode' improvements
+;; `persp-mode' improvements
 ;;
 ;;; Code:
 

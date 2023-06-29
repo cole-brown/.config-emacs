@@ -2,9 +2,9 @@
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:    2023-01-19
-;; Modified:   2023-01-20
 ;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2023-01-19
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  `persp-mode' commands & helpers
+;; `persp-mode' commands & helpers
 ;;
 ;; Originally from Doom's "modules/ui/workspaces/autoload/workspaces.el".
 ;;

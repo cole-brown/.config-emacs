@@ -1,9 +1,10 @@
-;;; naming.el --- Naming Helpers -*- lexical-binding: t; -*-
+;;; modules/dev-env/taskspace/naming.el --- Naming Helpers -*- lexical-binding: t; -*-
 ;;
-;; Author:     Cole Brown <http://github/cole-brown>
+;; Author:     Cole Brown <https://github.com/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Modified:   2022-07-06
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -11,7 +12,7 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Naming Helpers
+;; Naming Helpers
 ;;
 ;;; Code:
 

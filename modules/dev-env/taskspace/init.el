@@ -1,9 +1,10 @@
-;;; taskspace/init.el --- Per-task notes & files. -*- lexical-binding: t; -*-
+;;; modules/dev-env/taskspace/init.el --- Per-task notes & files. -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Modified:   2022-07-06
+;; Timestamp:  2023-06-29
 ;; Version:    2.3
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
