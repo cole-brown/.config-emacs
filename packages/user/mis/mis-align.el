@@ -1,9 +1,14 @@
 ;;; mis-align.el --- String Alignment for Mis -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
+;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:  2019-10-23
-;; Modified: 2022-08-08
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2019-10-23
+;; Timestamp:  2023-06-29
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;

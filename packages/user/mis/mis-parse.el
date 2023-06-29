@@ -2,8 +2,13 @@
 ;;
 ;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
+;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-10-23
 ;; Modified:   2022-08-18
+;;
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
@@ -34,7 +39,6 @@
 ;;
 ;; This file is dedicated to the common functionality related to parsing user
 ;; inputs and building Mis Syntax Trees.
-;;
 ;;
 ;;; Code:
 

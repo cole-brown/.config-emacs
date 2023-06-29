@@ -1,11 +1,14 @@
 ;;; mis-comment.el --- Mis API for Code Buffers/Files -*- lexical-binding: t; -*-
 ;;
-;; Author: Cole Brown <code@brown.dev>
+;; Author:     Cole Brown <code@brown.dev>
 ;; Maintainer: Cole Brown <code@brown.dev>
-;; Created:  2019-10-23
-;; Modified: 2022-08-11
+;; URL:        https://github.com/cole-brown/.config-emacs
+;; Created:    2019-10-23
+;; Timestamp:  2023-06-29
 ;;
-;; This file is not part of GNU Emacs.
+;; These are not the GNU Emacs droids you're looking for.
+;; We can go about our business.
+;; Move along.
 ;;
 ;;; Commentary:
 ;;
