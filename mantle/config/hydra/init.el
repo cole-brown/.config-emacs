@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-13
-;; Timestamp:  2023-06-28
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -138,7 +138,7 @@
 ;; Other Hydra Things
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user hydra nesting)
+(imp:load :feature  '(:mantle config hydra nesting)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "nesting")
 
@@ -146,4 +146,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'hydra)
+(imp:provide :mantle 'config 'hydra)

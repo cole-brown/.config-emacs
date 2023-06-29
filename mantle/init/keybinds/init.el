@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-21
-;; Timestamp:  2023-06-27
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -47,7 +47,7 @@
 ;;------------------------------------------------------------------------------
 
 (imp:timing
-    '(:mantle user init keybinds)
+    '(:mantle init keybinds)
     (imp:file:current)
     (imp:path:current:dir)
 

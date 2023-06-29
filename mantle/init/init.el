@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-03-25
-;; Timestamp:  2023-06-27
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -80,7 +80,7 @@
 ;;---
 ;; User Init
 ;;---
-(imp:load :feature  '(:mantle init user identity)
+(imp:load :feature  '(:mantle init identity)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "identity")
 
@@ -89,7 +89,7 @@
 ;; Systems
 ;;------------------------------
 
-(imp:load :feature  '(:mantle init user system)
+(imp:load :feature  '(:mantle init system)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "system")
 
@@ -98,7 +98,7 @@
 ;; Secrets
 ;;------------------------------
 
-(imp:load :feature  '(:mantle init user secret)
+(imp:load :feature  '(:mantle init secret)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "secret")
 
@@ -124,4 +124,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'init 'user)
+(imp:provide :mantle 'init)

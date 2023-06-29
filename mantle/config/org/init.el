@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-03-16
-;; Timestamp:  2023-06-28
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -21,11 +21,11 @@
 ;; Org-Mode Itself
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user org mode)
+(imp:load :feature  '(:mantle config org mode)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "mode")
 
-(imp:load :feature  '(:mantle config user org agenda)
+(imp:load :feature  '(:mantle config org agenda)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "agenda")
 
@@ -34,7 +34,7 @@
 ;; Org-Journal
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user org journal)
+(imp:load :feature  '(:mantle config org journal)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "journal")
 
@@ -43,11 +43,11 @@
 ;; Etc.
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user org contacts)
+(imp:load :feature  '(:mantle config org contacts)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "contacts")
 
-(imp:load :feature  '(:mantle config user org pretty)
+(imp:load :feature  '(:mantle config org pretty)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "pretty")
 
@@ -56,7 +56,7 @@
 ;; Integration with Other Parts of Emacs
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user org version-control)
+(imp:load :feature  '(:mantle config org version-control)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "version-control")
 
@@ -64,4 +64,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'org)
+(imp:provide :mantle 'config 'org)

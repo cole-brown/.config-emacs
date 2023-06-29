@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-05
-;; Timestamp:  2023-06-28
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -212,4 +212,4 @@ in \"modules/lang/sh/autoload.el\"."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'languages 'shell)
+(imp:provide :mantle 'config 'dev-env 'languages 'shell)

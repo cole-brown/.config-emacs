@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-14
-;; Timestamp:  2023-06-28
+;; Timestamp:  2023-06-29
 ;;
 ;;; Commentary:
 ;;
@@ -243,4 +243,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'keybinds 'buffer)
+(imp:provide :mantle 'config 'keybinds 'buffer)

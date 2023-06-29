@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-04
-;; Timestamp:  2023-06-27
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -68,7 +68,7 @@
 ;; User Init: Utils, etc for use in rest of `mantle'.
 ;;------------------------------
 ;; Give user a folder & files to do with whatever they want.
-(imp:load :feature  '(:mantle init user)
+(imp:load :feature  '(:mantle init)
           :path     (imp:path:join innit:path:mantle "init")
           :filename "init")
 
@@ -76,4 +76,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'init 'base)
+(imp:provide :mantle 'lower 'init)

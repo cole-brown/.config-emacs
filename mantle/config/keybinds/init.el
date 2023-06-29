@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-21
-;; Timestamp:  2023-06-28
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -51,19 +51,19 @@
 ;;------------------------------------------------------------------------------
 ;; Keybinds that don't care about Emacs/Evil, or can figure out which kind to create.
 
-(imp:load :feature  '(:mantle config user keybinds signature)
+(imp:load :feature  '(:mantle config keybinds signature)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "signature")
 
-(imp:load :feature  '(:mantle config user keybinds text)
+(imp:load :feature  '(:mantle config keybinds text)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "text")
 
-(imp:load :feature  '(:mantle config user keybinds file)
+(imp:load :feature  '(:mantle config keybinds file)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "file")
 
-(imp:load :feature  '(:mantle config user keybinds buffer)
+(imp:load :feature  '(:mantle config keybinds buffer)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "buffer")
 
@@ -76,7 +76,7 @@
 ;; TODO:   - `general' is already loaded...
 ;; (imp:eval:after TODO-something-or-other-maybe?
 ;;
-;;  (imp:load :feature  '(:mantle config user keybinds emacs)
+;;  (imp:load :feature  '(:mantle config keybinds emacs)
 ;;            :path     (imp:path:join (imp:path:current:dir/relative :mantle) "emacs")
 ;;            :filename "init"))
 
@@ -84,4 +84,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'keybinds)
+(imp:provide :mantle 'config 'keybinds)

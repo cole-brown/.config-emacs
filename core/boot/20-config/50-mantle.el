@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-03-25
-;; Timestamp:  2023-06-20
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -25,7 +25,7 @@
 ;; Configure: 'mantle/' (User's Config)
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config)
+(imp:load :feature  '(:mantle lower config)
           :filename "config")
 
 

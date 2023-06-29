@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-26
-;; Timestamp:  2023-06-27
+;; Timestamp:  2023-06-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -27,11 +27,11 @@
 ;;------------------------------------------------------------------------------
 
 ;; Which-Key & Helpful
-(imp:load :feature  '(:mantle config user help)
+(imp:load :feature  '(:mantle config help)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "help")
 
-(imp:load :feature  '(:mantle config user all-the-icons)
+(imp:load :feature  '(:mantle config all-the-icons)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "all-the-icons")
 
@@ -40,23 +40,23 @@
 ;; Operating System Things? Emacs Itself, Files, Etc
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user emacs)
+(imp:load :feature  '(:mantle config emacs)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "emacs")
 
-(imp:load :feature  '(:mantle config user resource-monitor)
+(imp:load :feature  '(:mantle config resource-monitor)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "resource-monitor")
 
-(imp:load :feature  '(:mantle config user files)
+(imp:load :feature  '(:mantle config files)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "files")
 
-(imp:load :feature  '(:mantle config user project)
+(imp:load :feature  '(:mantle config project)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "project")
 
-(imp:load :feature  '(:mantle config user ui)
+(imp:load :feature  '(:mantle config ui)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "ui")
 
@@ -65,18 +65,18 @@
 ;; Input
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user hydra)
+(imp:load :feature  '(:mantle config hydra)
           :path     (imp:path:join (imp:path:current:dir/relative :mantle)
                                    "hydra")
           :filename "init")
 
 ;; Sets an `imp:flag', which is used by `evil' config to figure out which optional
 ;; undo system to use.
-(imp:load :feature  '(:mantle config user undo-tree)
+(imp:load :feature  '(:mantle config undo-tree)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "undo-tree")
 
-(imp:load :feature  '(:mantle config user keybinds)
+(imp:load :feature  '(:mantle config keybinds)
           :path     (imp:path:join (imp:path:current:dir/relative :mantle)
                                    "keybinds")
           :filename "init")
@@ -86,11 +86,11 @@
 ;; Emacs
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user whitespace)
+(imp:load :feature  '(:mantle config whitespace)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "whitespace")
 
-(imp:load :feature  '(:mantle config user perspective)
+(imp:load :feature  '(:mantle config perspective)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "perspective")
 
@@ -102,7 +102,7 @@
 ;;
 ;; Or there's the new kids like the "SMOCE stack".
 
-(imp:load :feature  '(:mantle config user completion)
+(imp:load :feature  '(:mantle config completion)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "completion")
 
@@ -111,7 +111,7 @@
 ;; Secrets (Consts, Vars, Etc.)
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user secret)
+(imp:load :feature  '(:mantle config secret)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "secret")
 
@@ -120,7 +120,7 @@
 ;; Modes
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user org)
+(imp:load :feature  '(:mantle config org)
           :path     (imp:path:join (imp:path:current:dir/relative :mantle)
                                    "org")
           :filename "init")
@@ -130,7 +130,7 @@
 ;; Development Environment
 ;;------------------------------------------------------------------------------
 
-(imp:load :feature  '(:mantle config user dev-env)
+(imp:load :feature  '(:mantle config dev-env)
           :path     (imp:path:join (imp:path:current:dir/relative :mantle)
                                    "dev-env")
           :filename "init")
@@ -148,4 +148,4 @@
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user)
+(imp:provide :mantle 'config)
