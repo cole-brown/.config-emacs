@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-08
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-07-11
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -45,36 +45,80 @@
     "NOTE: Could be redefined later for more work-specific details, so check
 e.g. 'finalize-domain-secret.el' for a redef. Or 'C-h f my/taskspace/generate'
 and see what file it's defined in."
-    ;; Format:
-    ;; header snippet key
-    ;;
-    ;; taskname
-    ;; taskpath
-    ;;
-    ;; 'mkdir cmd'
-    ;;
-    ;; fancy box to separate this stuff from start of normal notes
-    (format (concat "%s\n" ;; header
-                    "\n"
-                    "#+TASKSPACE: %s\n" ;; taskpath
-                    "#+TASKSPACE: %s\n" ;; translated taskpath
-                    "%s\n" ;; taskname
-                    "\n"
-                    "%s\n" ;; mkdir cmd for remote servers
-                    "\n"
-                    "%s\n" ;; fancy box top
-                    "%s\n" ;; fancy box middle
-                    "%s\n" ;; fancy box bottom
-                    "\n\n")
-            "/header" ;; yasnippet
-            taskpath
-            (path:translate :auto :auto taskpath)
-            taskname
-            (format "mkdir %s" taskname)
-            "     ┌┬┬┬──────────────────────────────────────────────────────────────┬┬┬┐"
-            "     ├┼┼┤                             ...                              ├┼┼┤"
-            "     └┴┴┴──────────────────────────────────────────────────────────────┴┴┴┘"))
+    ;; Break these formats up a bit for easier maintenance?
+    (mapconcat
+     #'identity
+     (list
+      ;;---
+      ;; Header (as of [2023-07-11], just a copy of `yasnippet' "/header")
+      ;;---
+      (format (mapconcat #'identity
+                         '("#+TITLE:     %s"
+                           "#+AUTHOR:    %s"
+                           "#+EMAIL:     %s"
+                           "#+DATE:      %s"
+                           "#+TIMESTAMP: 0000-00-00") ; Auto-filled by Emacs' `time-stamp' feature.
+                         "\n")
+              ;; TITLE:
+              (let ((file-name (file-name-nondirectory (file-name-sans-extension (buffer-file-name)))))
+                (if (string= (file-name-extension file-name) "notes")
+                    (concat
+                     (capitalize (file-name-extension file-name))
+                     "."
+                     (mapconcat #'capitalize
+                                (split-string (file-name-sans-extension file-name) "_")
+                                "_"))
+                  (capitalize file-name)))
+              ;; AUTHOR:
+              (signature:string 'id 'name :default (user-full-name))
+              ;; EMAIL:
+              (signature:get 'id 'email :namespace (jerky:namespace:get) :default (message-user-mail-address))
+              ;; DATE:
+              (datetime:string/get 'rfc-3339 'date))
 
+      ;;---
+      ;; Blank
+      ;;---
+      ""
+
+      ;;---
+      ;; Task Name & Path
+      ;;---
+      (format (mapconcat #'identity
+                         '("#+TASKSPACE: %s" ; taskpath
+                           "#+TASKSPACE: %s" ; translated taskpath
+                           "%s"              ; taskname
+                           ""
+                           "%s")             ; mkdir cmd for remote servers
+                         "\n")
+              taskpath
+              (path:translate :auto :auto taskpath)
+              taskname
+              (format "mkdir %s" taskname))
+
+      ;;---
+      ;; Blank
+      ;;---
+      ""
+
+      ;;---
+      ;; Fancy Header / Notes Separator
+      ;;---
+      "     ┌┬┬┬──────────────────────────────────────────────────────────────┬┬┬┐"
+      "     ├┼┼┤                             ...                              ├┼┼┤"
+      "     └┴┴┴──────────────────────────────────────────────────────────────┴┴┴┘"
+
+      ;;---
+      ;; Blank
+      ;;---
+      ""
+      ""
+      "* Description"
+      ""
+      ""
+      )
+     "\n"))
+  ;; (mantle:user:taskspace:generate :test "test_task" "~/path/to/taskspace/test_task")
 
   ;;---
   ;; "Home" Domain
@@ -180,7 +224,7 @@ and see what file it's defined in."
   ;;------------------------------
   ;; Actually Create Keybinds:
   ;;------------------------------
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       ;;---
       ;; Use `general':
       ;;---
