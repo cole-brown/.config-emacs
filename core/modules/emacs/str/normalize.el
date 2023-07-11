@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-27
-;; Timestamp:  2023-06-26
+;; Timestamp:  2023-07-11
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -44,42 +44,40 @@ Remove \":\" from keyword symbols."
 INPUT should be a string, symbol (or keyword), function, or nil.
   - nil:      nil
   - \"\":     nil
+  - list:     nil; use `str:normalize:each' or `str:normalize:join' instead.
   - string:   Use as-is.
   - symbol:   Convert to string with `str:normalize:symbol'.
   - function: Call it with no parameters and use the output string.
     - If output is not a string, return nil.
-  - list:     Normalize each item in list and join with spaces.
 
 Return a string or nil."
-  ;; nil and empty string -> nil
-  (cond ((or (null input)
-             (and (stringp input)
-                  (string= "" input)))
-         nil)
+  (let ((input (elisp:unquote input)))
+    ;; nil and empty string -> nil
+    (cond ((or (null input)
+               (and (stringp input)
+                    (string= "" input))
+               ;; List? You should use `str:normalize:each' or `str:normalize:join' instead.
+               (listp input))
+           nil)
 
-        ;; String? Direct to output.
-        ((stringp input)
-         input)
+          ;; String? Direct to output.
+          ((stringp input)
+           input)
 
-        ;; List? Normalize each and combine.
-        ((listp input)
-         (mapconcat #'str:normalize:any
-                    input
-                    " "))
+          ;; Function? Call function, return string or nil.
+          ((or (functionp input)
+               (fboundp input))
+           (let ((value (funcall input)))
+             (if (stringp value)
+                 value
+               ;; Do not allow non-strings to escape a string normalization function.
+               nil)))
 
-        ;; Function? Call function, return string or nil.
-        ((or (functionp input)
-             (fboundp input))
-         (let ((value (funcall input)))
-           (if (stringp value)
-               value
-             ;; Do not allow non-strings to escape a string normalization function.
-             nil)))
-
-        ;; Symbol (or keyword)? Use its name.
-        ((symbolp input)
-         (str:normalize:symbol input))))
+          ;; Symbol (or keyword)? Use its name.
+          ((symbolp input)
+           (str:normalize:symbol input)))))
 ;; (str:normalize:any nil)
+;; (str:normalize:any '(quote foo))
 ;; (str:normalize:any "")
 ;; (str:normalize:any "jeff")
 ;; (str:normalize:any (lambda () "geoff"))
@@ -95,7 +93,7 @@ Normalize each item in INPUTS using `str:normalize:any', which see.
 
 Filter out nils and return the list of strings."
   (seq-remove #'null
-              (seq-map #'str:normalize:any inputs)))
+              (seq-map #'str:normalize:any (elisp:unquote inputs))))
 ;; (str:normalize:each "Test/ing" 'test:test :jeff)
 ;; (let* ((name "jeff") (name-symbol 'name)) (str:normalize:each "Test/ing" 'name 'name-symbol))
 ;; (let* ((name "jeff")) (str:normalize:each "Test/ing" 'test:test 'name))
@@ -109,14 +107,16 @@ Filter out nils and return the list of strings."
 Normalize INPUTS via `str:normalize:any'.
 
 If SEPARATOR is a string, use it to join strings. Else join with a space."
-  (if (listp input)
-      (mapconcat #'str:normalize:any
-                 input
-                 (if (stringp separator) separator " "))
-    (str:normalize:any input)))
+  (let ((input (elisp:unquote input)))
+    (if (listp input)
+        (mapconcat #'str:normalize:any
+                   input
+                   (if (stringp separator) separator " "))
+      (str:normalize:any input))))
 ;; (str:normalize:join '(jeff jeff))
 ;; (str:normalize:join '(jeff jeff) "/")
 ;; (str:normalize:join 'jeff)
+;; (str:normalize:join '(quote zenburn) "/")
 
 
 ;;------------------------------------------------------------------------------
