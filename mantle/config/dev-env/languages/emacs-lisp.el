@@ -305,7 +305,7 @@ https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned"
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:elisp-mode)
     (mantle:meow/keybind/transient:elisp-mode)))
 

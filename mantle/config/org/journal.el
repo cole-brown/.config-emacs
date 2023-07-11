@@ -374,7 +374,7 @@ LETTER must be a 1-character string."
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:journal)
     (mantle:meow/keybind/transient:journal)))
 

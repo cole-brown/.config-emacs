@@ -102,7 +102,7 @@ other things and refuses to refer to it by name? *shrug*")
 
   ;; Don't define these functions at all when not using Meow's leader so that
   ;; errors are even more noticable.
-  (unless (imp:provided? :keybinds 'user 'general 'meow)
+  (unless (imp:provided? :keybinds 'general 'meow)
     (defun mantle:meow:leader/local:key (map key func)
       "Bind prefix + KEY to FUNC for Meow \"local \" leader.
 
@@ -383,7 +383,7 @@ From: \"add mode and meow state specific keymaps\"
   ;; Meow "Local" Leader Entries
   ;;---
   ;; TODO:meow: anything else in this meow init that needs iffing?
-  (unless (imp:provided? :keybinds 'user 'general 'meow)
+  (unless (imp:provided? :keybinds 'general 'meow)
     (mantle:meow:leader/local:init))
 
   ;;---

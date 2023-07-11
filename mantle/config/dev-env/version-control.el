@@ -113,7 +113,7 @@
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:magit)
     (mantle:meow/keybind/transient:magit)))
 
@@ -299,7 +299,7 @@
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:magit-todo)
     (mantle:meow/keybind/transient:magit-todo)))
 
@@ -383,7 +383,7 @@
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:git-gutter-fringe)
     (mantle:meow/keybind/transient:git-gutter-fringe)))
 

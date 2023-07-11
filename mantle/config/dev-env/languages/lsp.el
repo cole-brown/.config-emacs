@@ -592,4 +592,4 @@ So treat the same in meow insert mode."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'user 'dev-env 'languages 'lsp)
+(imp:provide :mantle 'config 'dev-env 'languages 'lsp)

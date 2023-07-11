@@ -342,7 +342,7 @@ Keywords are: `:no-commands', `:commands'")
   ;;------------------------------------------------------------------------------
   ;; TODO: Have imp provide all of everything to Emacs?
   ;;       - That is, replace `imp:provide' with `imp:provide:with-emacs' in imp.
-  (imp:provide:with-emacs :keybinds 'user 'general 'meow))
+  (imp:provide:with-emacs :keybinds 'general 'meow))
 
 
 ;;------------------------------------------------------------------------------

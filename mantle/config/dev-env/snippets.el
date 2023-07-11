@@ -407,7 +407,7 @@ NOTE: Text of options will be deduplicated before being used."
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:snippets)
     (mantle:meow/keybind/transient:snippets)))
 

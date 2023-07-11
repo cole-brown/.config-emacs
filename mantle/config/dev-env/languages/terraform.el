@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-03
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-07-10
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -228,7 +228,7 @@ Return a string:
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:terraform)
     (mantle:meow/keybind/transient:terraform)))
 
@@ -266,12 +266,12 @@ Return a string:
   ;; Keybinds : Meow
   ;;------------------------------
 
-  (imp:use-package terraform-mode
+  (imp:use-package terraform-doc
     :when  (imp:flag? :keybinds +meow)
-    :after meow
+    :after (:and terraform-mode meow)
 
     ;;------------------------------
-    :general
+    :config
     ;;------------------------------
 
     (keybind:meow:leader/local:bind-keys

@@ -159,7 +159,7 @@ Add keybinds to the leader using function `keybind:leader/local'.")
   ;;------------------------------------------------------------------------------
   ;; TODO: Have imp provide all of everything to Emacs?
   ;;       - That is, replace `imp:provide' with `imp:provide:with-emacs' in imp.
-  (imp:provide:with-emacs :keybinds 'user 'general 'evil))
+  (imp:provide:with-emacs :keybinds 'general 'evil))
 
 
 ;;------------------------------------------------------------------------------

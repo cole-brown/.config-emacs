@@ -274,7 +274,7 @@ MODULE should be a string of the module name."
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:python/pyimport)
     (mantle:meow/keybind/transient:python/pyimport)))
 
@@ -319,7 +319,7 @@ MODULE should be a string of the module name."
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:python/py-isort)
     (mantle:meow/keybind/transient:python/py-isort)))
 
@@ -442,7 +442,7 @@ MODULE should be a string of the module name."
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:python/pipenv)
     (mantle:meow/keybind/transient:python/pipenv)))
 
@@ -741,7 +741,7 @@ MODULE should be a string of the module name."
       ;; Actually Create Keybinds:
       ;;------------------------------
 
-      (if (imp:provided? :keybinds 'user 'general 'meow)
+      (if (imp:provided? :keybinds 'general 'meow)
           (mantle:meow/keybind/general:python/anaconda)
         (mantle:meow/keybind/transient:python/anaconda)))
 
@@ -860,7 +860,7 @@ MODULE should be a string of the module name."
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:python/pytest)
     (mantle:meow/keybind/transient:python/pytest)))
 

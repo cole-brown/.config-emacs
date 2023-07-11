@@ -415,7 +415,7 @@ or on some buffer listing ops."
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:perspective)
     (mantle:meow/keybind/transient:perspective)))
 

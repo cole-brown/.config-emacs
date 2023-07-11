@@ -60,7 +60,7 @@
   ;;   2. (imp:eval:after (:keybinds user general meow) ...)
   ;;   3. (imp:eval:after (:keybinds user general evil) ...)
   ;; Or if you don't use `imp' for loading, the Emacs feature symbol is:
-  ;;  (imp:feature:normalize:imp->emacs :keybinds 'user 'general)
+  ;;  (imp:feature:normalize:imp->emacs :keybinds 'general)
   ;;    -> `keybinds:user:general'
   (imp:load :feature  '(:mantle init keybinds general)
             :path     (imp:path:join (imp:path:current:dir/relative :mantle)

@@ -21,7 +21,7 @@
 
 
 (imp:require :buffer 'manage)
-(imp:require :mantle 'config 'user 'hydra)
+(imp:require :mantle 'config 'hydra)
 
 
 ;;------------------------------------------------------------------------------

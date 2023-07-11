@@ -1085,7 +1085,7 @@ targets."
   ;; Actually Create Keybinds:
   ;;------------------------------
 
-  (if (imp:provided? :keybinds 'user 'general 'meow)
+  (if (imp:provided? :keybinds 'general 'meow)
       (mantle:meow/keybind/general:completion)
     (mantle:meow/keybind/transient:completion)))
 
