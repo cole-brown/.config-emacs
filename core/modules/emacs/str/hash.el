@@ -57,7 +57,7 @@ If HASH is nil, default to `str:hash:default'."
   ;; Set hash to default if unspecified.
   (let ((hash (or hash str:hash:default))
         ;; Normalize INPUT before error checking.
-        (input-string (str:normalize:any input)))
+        (input-string (str:normalize:join input)))
     ;;------------------------------
     ;; Error Checks
     ;;------------------------------
