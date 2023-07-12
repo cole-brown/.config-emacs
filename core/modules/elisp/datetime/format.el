@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-06-20
+;; Timestamp:  2023-07-12
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,14 +24,42 @@
 (imp:require :elisp 'utils)
 (imp:require :jerky)
 
+(imp:require :datetime 'datetime)
+
 
 ;;------------------------------------------------------------------------------
 ;; Getters, Setters.
 ;;------------------------------------------------------------------------------
 
-;;--------------------
-;; General
-;;--------------------
+;; TODO:datetime: Make other funcs use this func?
+(defun datetime:format (time &rest name)
+  "Format TIME using stored NAME format string.
+
+NAME can be strings, symbols, or list(s) of such. See `datetime:format/get'.
+
+TIME should be one of:
+  - nil, `:now', `now'
+    - Use current time.
+  - a \"Lisp Timestamp\" list
+    - See `current-time' for details on return value.
+  - a \"Lisp calendrical information\" list
+    - See `decode-time' for details on return value."
+  (let* ((time (if (memq time '(nil :now now))
+                   (current-time)
+                 (datetime:convert time :lisp:time)))
+         (time/len (length time)))
+    ;; Should have a "Lisp Timestamp" now.
+    (if (or (= time/len 2)
+            (= time/len 4))
+        (format-time-string (apply #'datetime:format/get name) time)
+      (error "datetime:format: Unknown TIME type/form: (type-of %s) %S"
+             (type-of time)
+             time))))
+;; (datetime:format nil 'rfc-3339 'datetime)
+;; (datetime:format (current-time) 'rfc-3339 'datetime)
+;; (datetime:format (decode-time (current-time)) 'rfc-3339 'datetime)
+;; (datetime:format (datetime:replace (current-time) :day 1 :hour 0 :minute 0 :second 0) 'rfc-3339 'date)
+
 
 (defun datetime:string/get (&rest args)
   "Return a formatted datetime string based on ARGS.
@@ -56,6 +84,7 @@ Return string from `format-time-string'."
 ;; (datetime:string/get 'iso-8601 'long)
 
 
+;; TODO:datetime: move `format' funcs above `string' func.
 (defun datetime:format/get (&rest name)
   "Return a datetime format string by NAME.
 

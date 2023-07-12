@@ -24,13 +24,67 @@
 ;; Dates, Times, and Manipulations
 ;;------------------------------------------------------------------------------
 
+;; TODO:datetime: a `datetime:type' for getting what type an input is?
+;;    - e.g. `:unix', `:lisp:time', etc. See `datetime:convert'.
+
+(defun datetime:convert (time type)
+  "Convert TIME to a different TYPE of time.
+
+TYPE should be:
+  - `:unix', `:seconds' - integer of number of seconds since Unix epoch
+  - `:lisp:time' - a \"Lisp Timestamp\" list
+                 - list of 2 or 4 integers:
+                   - (HIGH LOW)
+                   - (HIGH LOW USEC PSEC)
+                 - See `current-time'.
+  - `:lisp:cal'  - a \"Lisp Calendrical Information\" list
+                 - list of 9 integers:
+                   - (SECOND MINUTE HOUR DAY MONTH YEAR DOW DST UTCOFF)
+                 - See `decode-time' for details on return value.
+  - `:ticks'     - Return a cons: (TICKS . FREQ)
+                 - See `time-convert' (FORM == t) for details on return value.
+TODO: a plist return type or something more user friendly?"
+  (let* ((time/converted
+          (time-convert
+           ;; `time-convert' doesn't deal with the "Lisp Calendrical Information" lists correctly.
+           (if (and (listp time)
+                    (= (length time) 9))
+               (encode-time time)
+             time)
+           ;; Translate TYPE into the `form' param that `time-convert' expects.
+           (pcase type
+             ((or :unix :seconds)
+              'integer)
+             ((or :lisp:time
+                  :lisp:cal)
+              'list)
+             (:ticks
+              t)
+             (_
+              (error "datetime:convert: Unknown TYPE: (type-of %s) %S"
+                     (type-of type)
+                     type))))))
+
+    ;; Even more converting?
+    (if (eq type :lisp:cal)
+        ;; Yeah, decode into list of calendar bits.
+        (decode-time time/converted)
+      ;; Nope; conversion is done already.
+      time/converted)))
+;; (datetime:convert (decode-time) :unix)
+;; (datetime:convert (current-time) :unix)
+;; (datetime:convert (current-time) :lisp:time)
+;; (datetime:convert (current-time) :lisp:cal)
+;; (datetime:convert (current-time) :ticks)
+
+
 (defun datetime:now (&optional type)
   "Get a Lisp timestamp of current system time.
 
 Return value depends on TYPE:
   - nil, `:lisp:time' - a \"Lisp Timestamp\" list
                       - See `current-time' for details on return value.
-  - `:lisp:cal'       - a \"Lisp calendrical information\" list
+  - `:lisp:cal'       - a \"Lisp Calendrical Information\" list
                       - See `decode-time' for details on return value.
 TODO: a plist return type or something more user friendly?"
   (pcase type
@@ -71,11 +125,12 @@ TIME should be:
   - Lisp timestamp: `(datetime:now :lisp:time)', `current-time'
   - Lisp calendrical information: `(datetime:now :lisp:cal)'"
   (pcase time
+    ;; Must check for nil before `listp'.
+    ((or 'nil :now 'now)
+     (setq time (current-time)))
     ((pred listp)
      ;; ok; no-op; assume the list is a correct time.
      )
-    ((or 'nil :now 'now)
-     (setq time (current-time)))
     (_
      (error "datetime:now: Unknown TIME: (type-of %s) %S"
            (type-of time)
