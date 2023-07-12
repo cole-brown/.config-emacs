@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-03-16
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-07-12
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -80,8 +80,70 @@ Then runs COMMAND interactively with ARGS."
 
 
   ;;------------------------------
+  ;; New File Header
+  ;;------------------------------
+
+  (defun mode:org/journal:file-header (time)
+    "Custom function to create a new journal file's header.
+
+TIME is current time suitable for `format-time-string'."
+    (let* ((date/month/1st
+            ;; Note: Not sure what TIME is passed in... I assume "now"? So backdate to start of the month?
+            (datetime:replace time
+                              :day    1
+                              :hour   0
+                              :minute 0
+                              :second 0))
+            (timestamp/month/1st
+             (datetime:format
+              (datetime:convert date/month/1st :lisp:time)
+              'rfc-3339 'date)))
+      (str:format/newline
+       '("#+TITLE:       %s"
+         "#+DESCRIPTION: TODO: A quip for today."
+         "#+AUTHOR:      %s"
+         "#+EMAIL:       %s"
+         "#+DATE:        %s"
+         "#+TIMESTAMP:   0000-00-00" ; Auto-filled by Emacs' `time-stamp' feature.
+         ""
+         "- TODOs are here:"
+         "  - file:%s"
+         ""
+         "- ‽☢‽☢ <urgentest of titles> ☢‽☢‽"
+         "  - oh no...")
+       ;; TITLE:
+       (let ((file-name (file-name-nondirectory (file-name-sans-extension (buffer-file-name)))))
+         (if (string= (file-name-extension file-name) "notes")
+             (concat
+              (capitalize (file-name-extension file-name))
+              "."
+              (mapconcat #'capitalize
+                         (split-string (file-name-sans-extension file-name) "_")
+                         "_"))
+           (capitalize file-name)))
+       ;; DESCRIPTION:
+       ;;   - No format arg, currently.
+       ;; AUTHOR:
+       (signature:string 'id 'name :default (user-full-name))
+       ;; EMAIL:
+       (signature:get 'id 'email :namespace (jerky:namespace:get) :default (message-user-mail-address))
+       ;; DATE:
+       timestamp/month/1st
+       ;; "TODOs are here:"
+       (path:abbreviate
+        (path:join (jerky:get 'path 'lily)
+                   "todos"
+                   (str:normalize:any (jerky:namespace:get))
+                   (format "%s.todos.org"
+                           timestamp/month/1st))))))
+  ;; (mode:org/journal:file-header (datetime:now))
+
+
+  ;;------------------------------
   :custom
   ;;------------------------------
+
+  (org-journal-file-header #'mode:org/journal:file-header)
 
   (org-journal-dir (jerky:get 'path 'org 'journal
                               :namespace (jerky:get 'namespace 'system)))
