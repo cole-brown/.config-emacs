@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-04-17
-;; Timestamp:  2023-06-26
+;; Timestamp:  2023-07-11
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -109,6 +109,12 @@ case sensitivity!"
   (string-join strings separator))
 
 
+(defun str:join/newline (&rest strings)
+  "Join STRINGS with \"\\n\" between them."
+  (declare (pure t) (side-effect-free t))
+  (string-join strings "\n"))
+
+
 ;;------------------------------------------------------------------------------
 ;; To String
 ;;------------------------------------------------------------------------------
@@ -124,6 +130,38 @@ case sensitivity!"
   (with-temp-buffer
     (apply func args)
     (buffer-string)))
+
+
+;;--------------------------------------------------------------------------------
+;; Formatting
+;;--------------------------------------------------------------------------------
+
+(defun str:format (format-string &rest objects)
+  "Format a string out of a FORMAT-STRING and OBJECTS.
+
+FORMAT-STRING should be a string, with optional format control characters.
+OBJECTS can be anything, and are substituted into it to make the result string.
+
+See `format' for details."
+  (declare (pure t) (side-effect-free t))
+  (apply #'format format-string objects))
+
+
+(defun str:format/newline (format-string-list &rest objects)
+  "Format a string out of a list of formatting strings and OBJECTS.
+
+FORMAT-STRING-LIST should be a list of formatting strings, with optional format
+control characters. The list will first be joined together into one string using
+newline characters.
+
+OBJECTS can be anything, and are substituted into the formatting string to make
+the result string.
+
+See `format' for details."
+  (declare (pure t) (side-effect-free t))
+  (apply #'str:format
+         (apply #'str:join/newline format-string-list)
+         objects))
 
 
 ;;------------------------------------------------------------------------------
