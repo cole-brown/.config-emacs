@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-14
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -60,7 +60,9 @@
     (keybind:leader/global:def
       :infix (keybind:infix "i")
       ;; ASCII/Unicode Lines Box Art Hydra
-      "b" '(art:cmd:box/draw :which-key "Unicode Box..."))
+      "b" '(art:cmd:box/draw :which-key "Unicode Box...")
+      ;; Datetimes / Timestamps
+      "d" (list #'datetime:cmd:timestamp:insert/prompt :which-key "Datetime..."))
 
 
     ;;------------------------------
