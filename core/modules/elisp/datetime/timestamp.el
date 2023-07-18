@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-06-20
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -30,18 +30,55 @@
 ;; Timestamp Functions (Also Datestamp)
 ;;------------------------------------------------------------------------------
 
-;;--------------------
-;; Interactive: Insert Timestamp
-;;--------------------
-
-
 (defun datetime:timestamp:insert (&rest name)
   "Insert a timestamp NAME into current buffer at point.
 
 Timestamp is of current time and is inserted into current buffer at point."
-  (interactive)
   (insert (apply #'datetime:string/get name)))
 
+
+;;--------------------------------------------------------------------------------
+;; Interactive: Prompt for Timestamp
+;;--------------------------------------------------------------------------------
+
+(defvar int<datetime>:timestamp:insert/prompt:history nil
+  "History variable for `datetime:cmd:timestamp:insert/prompt'.
+
+Just a bucket to hold history for datetime commands to keep segregated from general
+history.")
+
+
+(defun datetime:cmd:timestamp:insert/prompt ()
+  "Insert a timestamp into current buffer at point.
+
+Timestamp format will be prompted with auto-complete based on stored `datetime'
+formats."
+  (interactive)
+  ;; And insert whatever the user chose.
+  (datetime:timestamp:insert
+   ;; Prompt user for what format to use.
+   (completing-read "Datetime Format: "
+                    ;; List of Format Names
+                    (seq-map
+                     ;; Trim the prefix string off for display purposes.
+                     (lambda (format)
+                       (let ((name (car format)))
+                         (string-trim-left name
+                                           (string-trim-right (jerky:key:string 'datetime 'format 'xTRIMx)
+                                                              "xTRIMx"))))
+                     ;; Get all datetime formats.
+                     (jerky:has (jerky:key:string 'datetime 'format)))
+                    nil
+                    t ; Must get a match.
+                    nil
+                    int<datetime>:timestamp:insert/prompt:history
+                    nil) ; No default value?
+   ))
+
+
+;;------------------------------------------------------------------------------
+;; Interactive: Insert Specific Timestamp
+;;------------------------------------------------------------------------------
 
 (defun datetime:cmd:timestamp:insert/rfc-3339 ()
   "Insert a full (date & time) rfc-3339 formatted timestamp.
@@ -67,10 +104,9 @@ Timestamp is of current time and is inserted into current buffer at point."
   (datetime:timestamp:insert 'org 'inactive 'date))
 
 
-
-;;--------------------
+;;------------------------------------------------------------------------------
 ;; Misc
-;;--------------------
+;;------------------------------------------------------------------------------
 
 ;; Was used in an old weekly-status template; may be useful again some day?
 (defun datetime:timestamp:next-friday (format)
