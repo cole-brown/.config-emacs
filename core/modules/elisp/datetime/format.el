@@ -60,36 +60,7 @@ stored under that \"namespace\" or tree branch.
 ;; Formatters
 ;;--------------------------------------------------------------------------------
 
-(defun datetime:format (time &rest name)
-  "Format TIME using stored NAME format string.
-
-NAME can be strings, symbols, or list(s) of such. See `datetime:format/get'.
-
-TIME should be one of:
-  - nil, `:now', `now'
-    - Use current time.
-  - a \"Lisp Timestamp\" list
-    - See `current-time' for details on return value.
-  - a \"Lisp calendrical information\" list
-    - See `decode-time' for details on return value."
-  (let* ((time (if (memq time '(nil :now now))
-                   (current-time)
-                 (datetime:convert time :lisp:time)))
-         (time/len (length time)))
-    ;; Should have a "Lisp Timestamp" now.
-    (if (or (= time/len 2)
-            (= time/len 4))
-        (format-time-string (apply #'datetime:format/get name) time)
-      (error "datetime:format: Unknown TIME type/form: (type-of %s) %S"
-             (type-of time)
-             time))))
-;; (datetime:format nil 'rfc-3339 'datetime)
-;; (datetime:format (current-time) 'rfc-3339 'datetime)
-;; (datetime:format (decode-time (current-time)) 'rfc-3339 'datetime)
-;; (datetime:format (datetime:replace (current-time) :day 1 :hour 0 :minute 0 :second 0) 'rfc-3339 'date)
-
-
-(defun datetime:string/get (&rest args)
+(defun datetime:format (&rest args)
   "Return a formatted datetime string based on ARGS.
 
 Use `datetime:format/get' to get a datetime format and then calls
@@ -98,18 +69,70 @@ Use `datetime:format/get' to get a datetime format and then calls
 Splits ARGS out into a 'name' and a 'keyword-args' plist.
 The 'name' is everything that comes before any of our keywords.
 
-_Optional_ keywords are:
-  :time - A time (compatible with `format-time-string') to use instead of now.
-  :zone - A timezone to use instead of the local one.
+Optional Keywords:
+  `:time' - A time to use instead of now.
+  `:zone' - A timezone to use instead of the local one.
+
+TIME and ZONE should both be compatible with `format-time-string', with a few
+additions:
+  TIME should be one of:
+    - nil, `:now', `now'
+      - Use current time.
+    - a \"Lisp Timestamp\" list
+      - See `current-time' for details on return value.
+    - a \"Lisp calendrical information\" list
+      - See `decode-time' for details on return value.
+
+  ZONE should be one of:
+    - nil, `local' - Local Time
+    - `wall'       - Wall Time
+    - `utc'        - Universal Time
+    - string       - a string as in the `TZ' environment variable
+    - list         - as from `current-time-zone'
+    - integer      - as from `decode-time'
 
 Return string from `format-time-string'."
   (let* ((name-and-kwargs (elisp:parse:args+kwargs args :time :zone))
          (name   (car name-and-kwargs))
          (kwargs (cdr name-and-kwargs))
          (time   (plist-get kwargs :time))
-         (zone   (plist-get kwargs :zone)))
-    (format-time-string (apply #'datetime:format/get name) time zone)))
-;; (datetime:string/get 'iso-8601 'long)
+         (zone   (plist-get kwargs :zone))
+         ;; Translate TIME to something `format-time-string' understands.
+         (time (if (memq time '(nil :now now))
+                   (current-time)
+                 (datetime:convert time :lisp:time)))
+         (time/len (length time))
+         ;; Translate ZONE to something `format-time-string' understands.
+         (zone (pcase zone
+                 ((or 'nil :local 'local)
+                  nil)
+                 ((or :wall 'wall)
+                  ;; Seems to be the same as `local' time, but the docstr describes it
+                  ;; different so... maybe it's different for some people. Keep
+                  ;; separated from `local' time.
+                  'wall)
+                 ('utc
+                  t)
+                 (_
+                  ;; Use ZONE as-is; no error checking. Cuz how the heck would I
+                  ;; error check all of the timezone string possibilities, and
+                  ;; there's not exactly functions for asserting validity of
+                  ;; lists/integers from `current-time-zone'/`decode-time'.
+                  zone))))
+
+    ;; Should have a "Lisp Timestamp" now.
+    (if (or (= time/len 2)
+            (= time/len 4))
+        (format-time-string (apply #'datetime:format/get name) time)
+      (error "datetime:format: Unknown TIME type/form: (type-of %s) %S"
+             (type-of time)
+             time))))
+;; (datetime:format 'rfc-3339 'datetime)
+;; (datetime:format 'rfc-3339 'datetime :zone 'wall)
+;; (datetime:format 'rfc-3339 'datetime :zone 'utc)
+;; (datetime:format 'rfc-3339 'datetime :time (current-time))
+;; (datetime:format 'rfc-3339 'datetime :time (decode-time (current-time)))
+;; (datetime:format 'rfc-3339 'datetime :time (datetime:replace (current-time) :day 1 :hour 0 :minute 0 :second 0))
 
 
 ;;------------------------------------------------------------------------------
