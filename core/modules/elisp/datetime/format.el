@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-07-12
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -28,10 +28,38 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Getters, Setters.
+;; Format: Getters, Setters.
 ;;------------------------------------------------------------------------------
 
-;; TODO:datetime: Make other funcs use this func?
+(defun datetime:format/get (&rest name)
+  "Return a datetime format string by NAME.
+
+NAME can be strings, symbols, or list(s) of such.
+
+Prepends '(datetime format) to the NAME before asking `jerky' so that all values
+are stored under that \"namespace\" or tree branch."
+  (apply #'jerky:get 'datetime 'format name))
+
+
+(defun datetime:format/set (&rest args)
+  "Set a datetime format string.
+
+Splits ARGS out into a 'name' and 'keyword-args'.
+
+The 'name' is everything that comes before any of our keywords. Prepends
+'(datetime format) to the 'name' before asking `jerky' so that all values are
+stored under that \"namespace\" or tree branch.
+
+'keywords-args' are:
+  `:value'  - datetime format string
+  `:docstr' - documentation string"
+  (apply #'jerky:set 'datetime 'format args))
+
+
+;;--------------------------------------------------------------------------------
+;; Formatters
+;;--------------------------------------------------------------------------------
+
 (defun datetime:format (time &rest name)
   "Format TIME using stored NAME format string.
 
@@ -82,32 +110,6 @@ Return string from `format-time-string'."
          (zone   (plist-get kwargs :zone)))
     (format-time-string (apply #'datetime:format/get name) time zone)))
 ;; (datetime:string/get 'iso-8601 'long)
-
-
-;; TODO:datetime: move `format' funcs above `string' func.
-(defun datetime:format/get (&rest name)
-  "Return a datetime format string by NAME.
-
-NAME can be strings, symbols, or list(s) of such.
-
-Prepends '(datetime format) to the NAME before asking `jerky' so that all values
-are stored under that \"namespace\" or tree branch."
-  (apply #'jerky:get 'datetime 'format name))
-
-
-(defun datetime:format/set (&rest args)
-  "Set a datetime format string.
-
-Splits ARGS out into a 'name' and 'keyword-args'.
-
-The 'name' is everything that comes before any of our keywords. Prepends
-'(datetime format) to the 'name' before asking `jerky' so that all values are
-stored under that \"namespace\" or tree branch.
-
-'keywords-args' are:
-  `:value'  - datetime format string
-  `:docstr' - documentation string"
-  (apply #'jerky:set 'datetime 'format args))
 
 
 ;;------------------------------------------------------------------------------
