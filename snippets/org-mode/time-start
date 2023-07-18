@@ -3,5 +3,5 @@
 # name: /time/start: org start/finish list timestamps
 # key: /time/start
 # --
-- started:  `(datetime:string/get 'rfc-3339 'datetime)`
+- started:  `(datetime:format 'rfc-3339 'datetime)`
 - finished: $0

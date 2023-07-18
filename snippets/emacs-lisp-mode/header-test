@@ -8,8 +8,8 @@
 ;; Author:     `(signature:string 'id 'name :default (user-full-name))` <`(or (signature:string 'id 'url) (signature:string 'id 'email :default (message-user-mail-address)))`>
 ;; Maintainer: `(signature:string 'id 'name :default (user-full-name))` <`(signature:string 'id 'email :default (message-user-mail-address))`>
 ;; URL:        https://github.com/cole-brown/.config-emacs
-;; Created:    `(datetime:string/get 'rfc-3339 'date)`
-;; Timestamp:  `(datetime:string/get 'rfc-3339 'date)`
+;; Created:    `(datetime:format 'rfc-3339 'date)`
+;; Timestamp:  `(datetime:format 'rfc-3339 'date)`
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

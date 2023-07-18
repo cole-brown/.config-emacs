@@ -34,7 +34,7 @@
   "Insert a timestamp NAME into current buffer at point.
 
 Timestamp is of current time and is inserted into current buffer at point."
-  (insert (apply #'datetime:string/get name)))
+  (insert (apply #'datetime:format name)))
 
 
 ;;--------------------------------------------------------------------------------

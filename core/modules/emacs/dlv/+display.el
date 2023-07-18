@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-21
-;; Timestamp:  2023-06-21
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -93,7 +93,7 @@ Output to '*Messages*' buffer."
              (get symbol 'safe-local-variable)
              (assoc symbol safe-local-variable-values))))
 ;; (let* ((dir "~/dlv-test/")
-;;        (filename (format "locals-%S.txt" (datetime:string/get 'iso-8601 'file)))
+;;        (filename (format "locals-%S.txt" (datetime:format 'iso-8601 'file)))
 ;;        (filepath (concat dir filename))
 ;;        (class 'int<dlv>:test:class)
 ;;        (mode nil)

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-13
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -72,9 +72,9 @@
     :minor 2
     ;; Can be ISO-8601 or RFC-3339 date or datetime.
     ;; Will get smashed down to just digits.
-    :revision "2022-10-25"
-    ;; (datetime:string/get 'iso-8601 'short)
-    ;; (datetime:string/get 'yyyymmdd)
+    :revision "2023-07-18"
+    ;; (datetime:format 'iso-8601 'short)
+    ;; (datetime:format 'yyyymmdd)
     )
   "Plist version data for this Emacs config.")
 

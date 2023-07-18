@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-03-16
-;; Timestamp:  2023-07-12
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -96,8 +96,8 @@ TIME is current time suitable for `format-time-string'."
                               :second 0))
             (timestamp/month/1st
              (datetime:format
-              (datetime:convert date/month/1st :lisp:time)
-              'rfc-3339 'date)))
+              'rfc-3339 'date
+              :time (datetime:convert date/month/1st :lisp:time))))
       (str:format/newline
        '("#+TITLE:       %s"
          "#+DESCRIPTION: TODO: A quip for today."

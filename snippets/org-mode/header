@@ -22,6 +22,6 @@
                         (capitalize file-name)))`}
 #+AUTHOR:      ${2:`(signature:string 'id 'name :default (user-full-name))`}
 #+EMAIL:       ${3:`(signature:get 'id 'email :namespace (jerky:namespace:get) :default (message-user-mail-address))`}
-#+DATE:        ${4:`(datetime:string/get 'rfc-3339 'date)`}
+#+DATE:        ${4:`(datetime:format 'rfc-3339 'date)`}
 #+TIMESTAMP:   0000-00-00
 $0

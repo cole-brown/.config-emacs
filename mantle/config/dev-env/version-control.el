@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-21
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -53,7 +53,7 @@
     "Kill all magit buffers."
     (interactive)
     (message "[%s] Kill all 'magit' buffers..."
-             (datetime:string/get 'rfc-3339 'datetime))
+             (datetime:format 'rfc-3339 'datetime))
     (buffer:kill:matching ".*magit.*"
                           :internal
                           :modified

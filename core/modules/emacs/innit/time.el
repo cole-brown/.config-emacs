@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-26
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -92,7 +92,7 @@ If STRING? is non-nil, return the message as a string instead of displaying it."
                                          ;; "├──────────┴─────┴──────────┤"
                                          ;; Yes Timestamp:
                                          "│  ┌───────┴─────┴───────┐  │"
-                                         (format "├──┤ %19s ├──┤" (datetime:string/get 'rfc-3339 'datetime))
+                                         (format "├──┤ %19s ├──┤" (datetime:format 'rfc-3339 'datetime))
                                          "│  └─────────────────────┘  │"
                                          ;; Stats:
                                          (format "│      init time: %8.03fs │" time)

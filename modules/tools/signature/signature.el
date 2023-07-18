@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -194,7 +194,7 @@ Signature Types:
                               ;;   - 'org 'inactive 'full
                               ;;   - etc.
                               ;;     - See `datetime:init' in ":/core/modules/elisp/datetime/format.el"
-                              (datetime:string/get 'rfc-3339 'datetime))))
+                              (datetime:format 'rfc-3339 'datetime))))
 
           (when comment
             ;; Append ':' and wrap sig with comment characters if necessary.

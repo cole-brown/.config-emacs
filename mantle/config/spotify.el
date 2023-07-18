@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-04-28
-;; Timestamp:  2023-06-28
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -522,7 +522,7 @@ know if it still does, but this was the solution:
     (interactive)
 
     (let ((progress-reporter (make-progress-reporter (format "[%s] Spotify clean-up..."
-                                                             (datetime:string/get 'rfc-3339 'datetime))
+                                                             (datetime:format 'rfc-3339 'datetime))
                                                      0
                                                      100)))
 

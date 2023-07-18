@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-08
-;; Timestamp:  2023-07-11
+;; Timestamp:  2023-07-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -74,7 +74,7 @@ and see what file it's defined in."
               ;; EMAIL:
               (signature:get 'id 'email :namespace (jerky:namespace:get) :default (message-user-mail-address))
               ;; DATE:
-              (datetime:string/get 'rfc-3339 'date))
+              (datetime:format 'rfc-3339 'date))
 
       ;;---
       ;; Blank
