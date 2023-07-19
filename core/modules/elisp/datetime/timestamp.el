@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-07-18
+;; Timestamp:  2023-07-19
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -94,6 +94,7 @@ Timestamp is of current time and is inserted into current buffer at point."
 Timestamp is of current time and is inserted into current buffer at point."
   (interactive)
   (datetime:timestamp:insert 'iso-8601 'datetime))
+;; (datetime:cmd:timestamp:insert/iso-8601)
 
 
 (defun datetime:cmd:timestamp:insert/org ()

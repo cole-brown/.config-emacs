@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-14
-;; Timestamp:  2023-07-18
+;; Timestamp:  2023-07-19
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -57,13 +57,34 @@
     ;; Insert Keybinds
     ;;------------------------------
 
+    ;; Insert...
     (keybind:leader/global:def
-      :infix (keybind:infix "i")
+      :infix (keybind:infix "i") ; insert
       ;; ASCII/Unicode Lines Box Art Hydra
-      "b" '(art:cmd:box/draw :which-key "Unicode Box...")
-      ;; Datetimes / Timestamps
-      "d" (list #'datetime:cmd:timestamp:insert/prompt :which-key "Datetime..."))
+      "b" '(art:cmd:box/draw :which-key "Unicode Box..."))
 
+    ;; Datetimes / Timestamps
+    (keybind:leader/global:def
+      :infix (keybind:infix "id")        ; insert -> datetime
+      "" '(nil :which-key "Datetime...") ; infix title
+      ;;---
+      ;; Favorite Datetime Formats
+      ;;---
+      "d" (list #'datetime:cmd:timestamp:insert/rfc-3339 :which-key "RFC-3339 Datetime")
+      "D" (list (elisp:cmd (datetime:timestamp:insert 'rfc-3339 'date)) :which-key "RFC-3339 Date")
+
+      "i" (list #'datetime:cmd:timestamp:insert/iso-8601 :which-key "ISO-8601 Datetime")
+      "I" (list (elisp:cmd (datetime:timestamp:insert 'iso-8601 'date)) :which-key "ISO-8601 Date")
+
+      "o" (list #'datetime:cmd:timestamp:insert/org :which-key "Org Inactive Date")
+      "O" (list (elisp:cmd (datetime:timestamp:insert 'org 'inactive 'rfc-3339)) :which-key "Org Inactive RFC-3339")
+      ;; "a" (list (elisp:cmd (datetime:timestamp:insert 'org 'inactive 'date-day)) :which-key "Org Inactive Date & Day")
+      ;; "A" (list (elisp:cmd (datetime:timestamp:insert 'org 'inactive 'full)) :which-key "Org Inactive Date, Day, Time")
+
+      ;;---
+      ;; Prompt for a Datetime Format
+      ;;---
+      "p" (list #'datetime:cmd:timestamp:insert/prompt :which-key "Datetime..."))
 
     ;;------------------------------
     ;; Text Keybinds
