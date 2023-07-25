@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-06
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-07-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -171,7 +171,7 @@ Errors alist is all files not generated, where each assoc in errors alist is:
                 (insert str-or-func)
               ;; Call with group so users can have a function for multiple
               ;; groups if applicable...
-              (insert (funcall str-or-func group taskname taskpath))))))
+              (insert (funcall str-or-func group taskname taskpath filepath))))))
 
         ;; ;; If made a remote notes file, make a .taskspace config now.
         ;; (when (and (string= file (int<taskspace>:config group :file/notes))
@@ -271,10 +271,6 @@ increasing) serial number."
         (cons '--dir-name      dir-name)
         (cons '--dir-full-path dir-full-path))
 
-      (nub:debug:func/return
-          :taskspace
-          func/name
-          func/tags
 
         ;; Only create if:
         ;;   - valid description input and
@@ -298,12 +294,36 @@ increasing) serial number."
               ;; How about we report something actually useful maybe?
               ;; Full path of created dir on... success?
               ;; Nil on folder non-existance.
-              (if (path:exists? dir-full-path)
-                  dir-full-path
-                nil))
+              (nub:debug:func/return
+                  :taskspace
+                  func/name
+                  func/tags
+                (if (path:exists? dir-full-path)
+                    dir-full-path
+                  nil)))
 
-          ;; Failed check; return nil.
-          nil)))))
+          ;; Failed check; complain and return nil.
+          (nub:debug
+              :taskspace
+              func/name
+              func/tags
+            '(:line:each
+              "Failed checks:"
+              "  naming:verify:    %S"
+              "  not dupes?:       %S"
+              "  not pre-existing: %S")
+            (int<taskspace>:naming:verify group description)
+            (not (cl-some (lambda (x) (int<taskspace>:dir= group
+                                                           description
+                                                           x
+                                                           'description))
+                          date-dirs))
+            (not (path:exists? dir-full-path)))
+          (nub:debug:func/return
+              :taskspace
+              func/name
+              func/tags
+            nil)))))
 ;; (int<taskspace>:dir:create :work "testcreate" nil)
 
 

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-06
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-07-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -112,10 +112,19 @@ Each entry in the alist is a list of: (keyword string settings-variable)
       "Files to generate for new taskspaces. Expects an alist like:\n"
       "(('file1.name' 'contents') ('file2.name' #'your-gen-function))\n"
       "\n"
-      "Note: `group', `taskname' and `taskpath' are supplied as the args to \n"
-      "the generator functions. Taskpath is the fully expanded file path.\n"
+      "Note: `group', `taskname', `taskpath', and `notepath' are supplied as the args\n"
+      "to the generator functions.\n"
+      "\n"
+      "`taskname' is the full taskname.\n"
+      "  example: \"2023-07-21_0_lunch-n-learn-all-about-3d\"\n"
+      "\n"
+      "`taskpath' is the full path to the task folder.\n"
+      "  example: \"/home/user/taskspace/work/2023-07-21_0_lunch-n-learn-all-about-3d/\"\n"
+      "`notepath' is the full path to the notes file, which can be in a separate directory.\n"
+      "  example: \"/home/user/org/taskspace/work/2023-07-21_0_lunch-n-learn-all-about-3d.notes.org\"\n"
+      "\n"
       "Should return a string of the file's contents.\n"
-      "e.g.: (defun my/taskspace/gen-org-notes (group taskname taskpath)\n"
+      "e.g.: (defun my/taskspace/gen-org-notes (group taskname taskpath filename)\n"
       "        (format ...))\n"))
 
     (:file/notes "_notes.org" "File for storing/recording notes about a task.")

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-08
-;; Timestamp:  2023-07-18
+;; Timestamp:  2023-07-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -41,7 +41,7 @@
   ;;---
   ;; General (Non-Per-Domain) Init...
   ;;---
-  (defun mantle:user:taskspace:generate (group taskname taskpath)
+  (defun mantle:user:taskspace:generate (group taskname taskpath filepath)
     "NOTE: Could be redefined later for more work-specific details, so check
 e.g. 'finalize-domain-secret.el' for a redef. Or 'C-h f my/taskspace/generate'
 and see what file it's defined in."
@@ -60,15 +60,18 @@ and see what file it's defined in."
                            "#+TIMESTAMP: 0000-00-00") ; Auto-filled by Emacs' `time-stamp' feature.
                          "\n")
               ;; TITLE:
-              (let ((file-name (file-name-nondirectory (file-name-sans-extension (buffer-file-name)))))
-                (if (string= (file-name-extension file-name) "notes")
+              (let ((filename/no-ext (file-name-nondirectory (file-name-sans-extension filepath))))
+                ;; Is filename "<something>.notes.*"? We already stripped the (actual file
+                ;; extension) ".*" so now we can check if the "extension" is ".notes".
+                (if (string= (file-name-extension filename/no-ext) "notes")
+                    ;; Reverse "something.notes" into "Notes.Something".
                     (concat
-                     (capitalize (file-name-extension file-name))
+                     (capitalize (file-name-extension filename/no-ext))
                      "."
                      (mapconcat #'capitalize
-                                (split-string (file-name-sans-extension file-name) "_")
+                                (split-string (file-name-sans-extension filename/no-ext) "_")
                                 "_"))
-                  (capitalize file-name)))
+                  (capitalize filename/no-ext)))
               ;; AUTHOR:
               (signature:string 'id 'name :default (user-full-name))
               ;; EMAIL:
@@ -118,7 +121,7 @@ and see what file it's defined in."
       ""
       )
      "\n"))
-  ;; (mantle:user:taskspace:generate :test "test_task" "~/path/to/taskspace/test_task")
+  ;; (mantle:user:taskspace:generate :test "test_task" "~/path/to/taskspace/test_task.notes.ext" "~/notes/test_task.notes.ext")
 
   ;;---
   ;; "Home" Domain
