@@ -175,6 +175,7 @@ From Doom's `+workspace-buffer-list' in
 From Doom's `+workspace-orphaned-buffer-list' in
 \"modules/ui/workspaces/autoload/workspaces.el\"."
   (cl-remove-if #'persp--buffer-in-persps (buffer-list)))
+;; (perspective:buffer:list/orphaned)
 
 
 ;;------------------------------------------------------------------------------

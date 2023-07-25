@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-07-18
+;; Timestamp:  2023-07-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -39,6 +39,8 @@ NAME can be strings, symbols, or list(s) of such.
 Prepends '(datetime format) to the NAME before asking `jerky' so that all values
 are stored under that \"namespace\" or tree branch."
   (apply #'jerky:get 'datetime 'format name))
+;; (datetime:format/get 'rfc-3339 'datetime)
+;; (datetime:format 'iso-8601 'datetime)
 
 
 (defun datetime:format/set (&rest args)

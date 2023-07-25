@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-01-07
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-07-19
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -125,7 +125,7 @@ Example: '(:imp example feature)")
 
 If you want it to go to *Messages* with the usual minibuffer interaction, set
 to: `:messages'."
-  :group 'autogit:group
+  :group 'imp:group
   :type '(choice (string :tag "Name of Buffer")
                  (const :tag "Use `message' to send to *Messages* buffer with the usual minibuffer interactions."
                         :messages)))
@@ -133,7 +133,7 @@ to: `:messages'."
 
 (defcustom imp:timing:buffer:show t
   "If non-nil, show `imp:timing:buffer:name' every time it gets a new message."
-  :group 'autogit:group
+  :group 'imp:group
   :type  '(boolean))
 
 
