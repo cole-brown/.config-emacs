@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-05
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-07-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -207,6 +207,23 @@ in \"modules/lang/sh/autoload.el\"."
 ;;   :custom
 ;;   ;;------------------------------
 ;;   (fish-indent-offset (jerky:get 'code 'tab 'standard)))
+
+
+;;------------------------------------------------------------------------------
+;; With Editor (Magit dependency)
+;;------------------------------------------------------------------------------
+;; Already have this because Magit uses it, but it seems useful to have around
+;; for hooking into the various shell modes.
+
+;; https://github.com/magit/with-editor/
+(imp:use-package with-editor
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+  ((shell-mode-hook  . with-editor-export-editor)
+   (eshell-mode-hook . with-editor-export-editor)
+   (term-exec-hook   . with-editor-export-editor)
+   (vterm-mode-hook  . with-editor-export-editor)))
 
 
 ;;------------------------------------------------------------------------------
