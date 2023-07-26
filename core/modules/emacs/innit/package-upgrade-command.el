@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-07-19
-;; Timestamp:  2023-07-25
+;; Timestamp:  2023-07-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -781,7 +781,10 @@ packages."
                     length/subset
                     length/all)
           (format "%d" length/subset))
-        (if (= length/subset 1) "" "s"))))))
+        (if (= length/subset 1) "" "s"))
+       (unless dry-run
+           (int<innit>:package/upgrade:message/newline)
+           (int<innit>:package/upgrade:message "Restart Emacs to start using new packages."))))))
 ;; (innit:package:upgrade :dry-run t)
 
 
@@ -802,8 +805,7 @@ Will only upgrade the first MAX if MAX is numberp or can be converted by
   (when (listp max)
     (setq max (nth 0 max)))
 
-  (innit:package:upgrade :dry-run 'forced-for-testing ;; TODO: Remove dry-run param.
-                         :max max))
+  (innit:package:upgrade :max max))
 
 ;; http://nhoffman.github.io/.emacs.d/#orgf46780c
 ;; Some useful ELPA variables and functions:
