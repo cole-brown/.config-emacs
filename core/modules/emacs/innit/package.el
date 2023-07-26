@@ -39,8 +39,6 @@
 (defvar innit:package:archives:common
   '(;; Milkypostman's Emacs Lisp Package Archive
     (:melpa . ("melpa" . "https://melpa.org/packages/"))
-    ;; For more & newer Org-Mode packages.
-    (:org . ("org"   . "https://orgmode.org/elpa/"))
 
     ;;---
     ;; The Default
@@ -51,7 +49,7 @@
 
 
 (defcustom innit:package:archives:enabled
-  '(:melpa :org :default)
+  '(:melpa :default)
   "Ordered list of package archives to enable in `innit:package:init'."
   :group 'innit:group
   :type  '(restricted-sexp :match-alternatives (keywordp)))
