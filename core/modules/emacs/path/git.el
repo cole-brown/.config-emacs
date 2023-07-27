@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-07-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -190,19 +190,19 @@ If PATH is not in a Git repository, return nil."
 ;; Project
 ;;--------------------------------------------------------------------------------
 
-(defun path:project:current/alist (path)
-  "Get an alist about PATH's filepath relative to the current project root.
+(defun path:project:current/alist (filepath)
+  "Get an alist about FILEPATH path relative to the current project root.
 
-PATH should be an absolute path string.
+FILEPATH should be an absolute path string.
 
 If in a project, return an alist:
   '((:project/type . symbol)                 ; e.g. `projectile'
     (:project/name . \"root-dir-name\")      ; e.g. \".emacs.d\"
     (:path         . \"path/to/buffer.el\")) ; relative to `:project/name' root
 
-If PATH is not in the `current-project' path, return nil."
-  (when-let* ((path/project (cdr-safe (project-current)))
-              (path/relative (path:canonicalize:relative path path/project))
+If FILEPATH is not in the `current-project' path, return nil."
+  (when-let* ((path/project (cdr-safe (project-current nil (path:parent filepath))))
+              (path/relative (path:canonicalize:relative filepath path/project))
               ;; If we don't end up with a relative path, we're not in the
               ;; current project and we have no idea what's going on, so...
               ;; return nil.

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-06-23
+;; Timestamp:  2023-07-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -524,6 +524,7 @@ Return the buffer created by `create-file-buffer'."
     ;; ...but only advise if we're enabled (still) by then...
     (when (advice-member-p #'path:advice:uniquify:rename-buffer #'rename-buffer)
       (advice-add 'uniquify-buffer-base-name :around #'path:advice:uniquify:uniquify-buffer-base-name))))
+;; (path:uniquify:set-up)
 
 
 ;; TODO:emacs-29: Delete when upgraded to Emacs 29!
