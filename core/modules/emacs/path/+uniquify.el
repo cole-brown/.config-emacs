@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-07-27
+;; Timestamp:  2023-07-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -176,35 +176,54 @@ PATH/ABSOLUTE/DIRECTORY should be a string of the absolute path to the file's
 parent directory."
   (with-current-buffer buffer
     ;; Figure out new buffer name.
-    (if-let* ((path/absolute/file (path:uniquify:settings/path/normalize path/absolute/directory
-                                                                         name/requested))
-              (project            (path:project:current/alist path/absolute/file)))
-        ;; We have a project, so we can figure out a name.
-        (list (cons :path/parent      path/absolute/directory)
-              (cons :path             path/absolute/file)
-              (cons :project          project)
-              (cons :name/requested   name/requested)
-              ;; And the actual name:
-              (cons :name             (path:project:buffer/name:propertize
-                                       :buffer       buffer
-                                       ;; Do not provide any text properteries in these!
-                                       :project/name (list (alist-get :project/name project))
-                                       :project/path (list (alist-get :path project))))
-              (cons :name/propertized (path:project:buffer/name:propertize
-                                       :buffer       buffer
-                                       ;; Do propertize these as desired.
-                                       :project/name (list (alist-get :project/name project)
-                                                           'face 'underline)
-                                       :project/path (list (alist-get :path project)))))
+    (let* ((path/absolute/file (path:uniquify:settings/path/normalize path/absolute/directory
+                                                                      name/requested))
+           (project            (path:project:current/alist path/absolute/file))
+           ;; Assuming we don't have enough info, the name will just be the path.
+           (name/buffer/naked       path/absolute/file)
+           (name/buffer/propertized path/absolute/file))
 
-      ;; No project... Fallback to full path?
-      (list (cons :path/parent      path/absolute/directory)
-            (cons :path             path/absolute/file)
-            (cons :project          project)
-            (cons :name/requested   name/requested)
-            ;; And the actual name:
-            (cons :name             path/absolute/file)
-            (cons :name/propertized path/absolute/file)))))
+      ;;------------------------------
+      ;; Name the buffer.
+      ;;------------------------------
+      ;; If we have a `project', we can figure out our name for the buffer.
+      (when project
+        (setq name/buffer/naked
+              ;; Create the buffer name from the project settings.
+              (path:project:buffer/name:propertize
+               :buffer       buffer
+               ;; Do not provide any text properteries in these!
+               :project/name (list (alist-get :project/name project))
+               :project/path (list (alist-get :path project))))
+
+        (setq name/buffer/propertized
+              ;; Create the buffer name from the project settings.
+              (path:project:buffer/name:propertize
+               :buffer       buffer
+               ;; Do propertize these as desired.
+               :project/name (list (alist-get :project/name project)
+                                   'face 'underline)
+               :project/path (list (alist-get :path project)))))
+
+      ;;------------------------------
+      ;; Create our settings (alist tree structure).
+      ;;------------------------------
+      (list (list :path
+                  (cons :parent    path/absolute/directory)
+                  (cons :filepath  path/absolute/file)
+                  (cons :filename  (file:name path/absolute/file)))
+            (cons :project         project)
+            (list :name
+                  ;; Name Emacs asked for.
+                  (cons :requested name/requested)
+                  ;; And the actual `buffer-name'.
+                  (cons :buffer             name/buffer/naked)
+                  (cons :buffer/propertized name/buffer/propertized)
+                  ;; TODO: these?
+                  ;; ;; And stuff for the modeline:
+                  ;; (cons :modeline                "TODO: foo")
+                  ;; (cons :modeline/propertized    "TODO: foo")
+                  )))))
 ;; (int<path>:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
 
 
@@ -223,6 +242,8 @@ parent directory."
           (int<path>:uniquify:settings/create path/absolute/directory
                                               name/requested
                                               buffer))))
+;; (path:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
+;; path:uniquify:settings/local
 
 
 (defun path:uniquify:settings/clear (buffer)
@@ -233,21 +254,145 @@ BUFFER should be a buffer object."
     (setq path:uniquify:settings/local nil)))
 
 
-(defun path:uniquify:settings/get (keyword buffer)
-  "Get KEYWORD's value from the local variable `path:uniquify:settings/local'.
+(defun int<path>:uniquify:settings/get (keywords settings)
+  "Get KEYWORDS value from the SETTINGS alist tree.
 
-BUFFER should be a buffer object."
+KEYWORDS should be:
+  - a keyword: `:project'
+  - a list of keywords: `(:path :filepath)'
+
+SETTINGS should be `path:uniquify:settings/local' or a sub-alist thereof."
+  (let ((func/name "int<path>:uniquify:settings/get"))
+    (message "keywords: %S" keywords)
+    (message "settings: %S" settings)
+
+    (cond ((null keywords)
+           (nub:error
+               :innit
+               func/name
+             '("Cannot get value in settings; no keyword? "
+               "keywords: %S, buffer: %S, settings: %S")
+             keywords
+             buffer
+             settings))
+
+          ;; Actually get the value.
+          ((keywordp keywords)
+           (message "keywordp")
+           (message "value: %S" (alist-get keywords settings))
+           (alist-get keywords settings))
+
+          ((and (listp keywords)
+                (= 1 (length keywords)))
+           (message "listp&len1")
+           (message "value: %S" (alist-get (car keywords) settings))
+           (alist-get (car keywords) settings))
+
+          ;; Recurse into settings a level.
+          ((listp keywords)
+           (let ((keyword (pop keywords)))
+             (message "listp; recurse @ %S" keyword)
+             (int<path>:uniquify:settings/get keywords
+                                              (alist-get keyword settings))))
+
+          ;; ???
+          (t
+           (nub:error
+               :innit
+               func/name
+             '("Cannot get value in settings; don't know what to do with keywords! "
+               "keywords: %S, settings: %S")
+             keywords
+             settings)))))
+
+
+(defun path:uniquify:settings/get (keywords buffer)
+  "Get KEYWORDS value from the local variable `path:uniquify:settings/local'.
+
+BUFFER should be a buffer object.
+
+KEYWORDS should be:
+  - a keyword: `:project'
+  - a list of keywords: `(:path :filepath)'"
   (with-current-buffer buffer
-    (alist-get keyword path:uniquify:settings/local)))
+    (int<path>:uniquify:settings/get keywords path:uniquify:settings/local)))
+;; path:uniquify:settings/local
+;; (path:uniquify:settings/get '(:path :parent) (current-buffer))
 
 
-(defun path:uniquify:settings/set (keyword value buffer)
-  "Set KEYWORD to VALUE in the local variable `path:uniquify:settings/local'.
+(defun int<path>:uniquify:settings/set (keywords value settings)
+  "Set KEYWORDS to VALUE in the local variable `path:uniquify:settings/local'.
 
-BUFFER should be a buffer object."
+KEYWORDS should be:
+  - a keyword: `:project'
+  - a list of keywords: `(:path :filepath)'
+
+SETTINGS should be `path:uniquify:settings/local' or a sub-alist.
+
+NOTE: Must be call in context of buffer that owns SETTINGS."
+  (let ((func/name "int<path>:uniquify:settings/set"))
+    (cond ((null keywords)
+           (nub:error
+               :innit
+               func/name
+             '("Cannot set value in settings; no keyword? "
+               "keywords: %S, value: %S, settings: %S")
+             keywords
+             value
+             settings))
+
+          ;; Actually set the value.
+          ((keywordp keywords)
+           ;; Return this level of settings.
+           (setf (alist-get keywords settings)
+                 value))
+
+          ((and (listp keywords)
+                (= 1 (length keywords)))
+           (setf (alist-get (car keywords) settings)
+                 value))
+
+          ;; Recurse into settings a level.
+          ((listp keywords)
+           (let ((keyword (pop keywords)))
+             (setf (alist-get keyword settings)
+                   ;; Recurse into w/ rest of keywords to update/set value.
+                   (int<path>:uniquify:settings/set keywords
+                                                    value
+                                                    (alist-get keyword settings)))
+
+             ))
+
+          ;; ???
+          (t
+           (nub:error
+               :innit
+               func/name
+             '("Cannot set value in settings; don't know what to do with keywords! "
+               "keywords: %S, value: %S, settings: %S")
+             keywords
+             value
+             settings)))
+
+    ;; Return this level of settings.
+    settings))
+;; path:uniquify:settings/local
+
+
+(defun path:uniquify:settings/set (keywords value buffer)
+  "Set KEYWORDS to VALUE in the local variable `path:uniquify:settings/local'.
+
+BUFFER should be a buffer object.
+
+KEYWORDS should be:
+  - a keyword: `:project'
+  - a list of keywords: `(:path :filepath)'"
   (with-current-buffer buffer
-    (setf (alist-get keyword path:uniquify:settings/local)
-          value)))
+    (int<path>:uniquify:settings/set keywords value path:uniquify:settings/local)))
+;; (path:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
+;; (pp path:uniquify:settings/local)
+;; (path:uniquify:settings/get '(:path :filename) (current-buffer))
+;; (path:uniquify:settings/set '(:path :filename) "jeff" (current-buffer))
 
 
 ;;--------------------------------------------------------------------------------
