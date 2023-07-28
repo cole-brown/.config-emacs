@@ -135,13 +135,16 @@ Some buffers have no variable `buffer-file-name', but do have a
 (defvar-local path:uniquify:settings/local nil
   "Non-nil if the name of this buffer is managed by `path:uniquify'.
 
-Value should be an alist of keys:
-  - `:path/parent'      - string: absolute path to parent directory
-  - `:path'             - string: absolute path to file(/directory) itself
-  - `:project'          - alist:  return value of `path:project:current/alist'
-  - `:name/requested'   - string: desired/proposed buffer name from Emacs
-  - `:name'             - string: actual buffer name decided by us
-  - `:name/propertized' - string: propertized NAME string")
+Value should be an alist-tree of keywords:
+  - `:path'    - alist
+    - `:parent'   - string: absolute path to parent directory
+    - `:filepath' - string: absolute path to file(/directory) itself
+    - `:filename' - string: basename of `:filepath' (with extension)
+  - `:project' - alist: return value of `path:project:current/alist'
+  - `:name'    - alist
+    - `:requested'          - string: desired/proposed buffer name from Emacs
+    - `:buffer'             - string: actual buffer name decided by us
+    - `:buffer/propertized' - string: propertized NAME string")
 (put 'path:uniquify:settings/local 'permanent-local t) ; Always a buffer-local variable.
 ;; (get 'path:uniquify:settings/local 'permanent-local)
 
@@ -263,9 +266,6 @@ KEYWORDS should be:
 
 SETTINGS should be `path:uniquify:settings/local' or a sub-alist thereof."
   (let ((func/name "int<path>:uniquify:settings/get"))
-    (message "keywords: %S" keywords)
-    (message "settings: %S" settings)
-
     (cond ((null keywords)
            (nub:error
                :innit
@@ -278,20 +278,15 @@ SETTINGS should be `path:uniquify:settings/local' or a sub-alist thereof."
 
           ;; Actually get the value.
           ((keywordp keywords)
-           (message "keywordp")
-           (message "value: %S" (alist-get keywords settings))
            (alist-get keywords settings))
 
           ((and (listp keywords)
                 (= 1 (length keywords)))
-           (message "listp&len1")
-           (message "value: %S" (alist-get (car keywords) settings))
            (alist-get (car keywords) settings))
 
           ;; Recurse into settings a level.
           ((listp keywords)
            (let ((keyword (pop keywords)))
-             (message "listp; recurse @ %S" keyword)
              (int<path>:uniquify:settings/get keywords
                                               (alist-get keyword settings))))
 
@@ -435,7 +430,7 @@ BUFFER should be a buffer object.
 `path:uniquify:settings/local' should be up-to-date."
   (with-current-buffer buffer
     (let ((func/name "path:uniquify:buffer:name/set")
-          (name (path:uniquify:settings/get :name buffer)))
+          (name (path:uniquify:settings/get '(:name :buffer) buffer)))
       ;;------------------------------
       ;; Error Checks
       ;;------------------------------
@@ -501,7 +496,7 @@ Other buffers return nil."
     ;; Say what we're already doing:
     (cond ((path:uniquify:buffer/managed? buffer)
            (message "Buffer is managed; name: %S"
-                    (path:uniquify:settings/get :name buffer)))
+                    (path:uniquify:settings/get '(:name :buffer) buffer)))
 
           ;; Say why we wouldn't do anything.
           ((not (path:uniquify:buffer/should-manage? buffer))
@@ -524,7 +519,7 @@ Other buffers return nil."
            (let ((settings (int<path>:uniquify:settings/create (path:parent (path:current:file))
                                                                (file:name (path:current:file)))))
              (message "Would name buffer: %S"
-                      (alist-get :name settings))))))
+                      (int<path>:uniquify:settings/get '(:name :buffer) settings))))))
   nil)
 ;; (path:cmd:uniquify:buffer/test)
 
@@ -538,16 +533,16 @@ Other buffers return nil."
 ;;------------------------------
 
 (defun path:uniquify:get:name/requested ()
-  "Return `path:uniquify' saved `:name/requested' setting for this buffer.
+  "Return `path:uniquify' saved `:name :requested' setting for this buffer.
 
 Indended as alias for `uniquify-buffer-base-name'."
     ;; Return something if we have something, nil otherwise.
     (and (path:uniquify:buffer/managed? (current-buffer))
-         (path:uniquify:settings/get :name/base (current-buffer))))
+         (path:uniquify:settings/get '(:name :requested) (current-buffer))))
 
 
 (defun path:advice:uniquify:uniquify-buffer-base-name (func &rest args)
-  "Return `path:uniquify' saved `:name/requested' setting for this buffer.
+  "Return `path:uniquify' saved `:name :requested' setting for this buffer.
 
 Indended as `:around' advice for FUNC `rename-buffer'. Prefer returning
 `uniquify-buffer-base-name' result; return ours if they have nothing.
@@ -714,10 +709,10 @@ signalled.  If NOERROR, the non-loop parts of the chain is returned."
       ;;------------------------------
       ;; Gather a list of buffers to revert from all buffers.
       (dolist (buffer (buffer-list))
-        (set-buffer buffer)
-        (when (path:uniquify:buffer/managed? (current-buffer))
-          (push (cons buffer (path:uniquify:settings/get :name/requested buffer))
-                buffers/managed)))
+        (with-current-buffer buffer
+          (when (path:uniquify:buffer/managed? buffer)
+            (push (cons buffer (path:uniquify:settings/get '(:name :requested) buffer))
+                  buffers/managed))))
 
       ;;------------------------------
       ;; Clean-Up
@@ -735,105 +730,16 @@ signalled.  If NOERROR, the non-loop parts of the chain is returned."
       (advice-remove 'uniquify-buffer-base-name #'path:advice:uniquify:uniquify-buffer-base-name)
 
       ;; Revert all the buffers we renamed to their original/desired name.
-      (dolist (buffer buffers/managed)
-        (set-buffer (car buffer))
-        (rename-buffer (cdr buffer) t))))
+      (dolist (managed buffers/managed)
+        (with-current-buffer (car managed)
+          (rename-buffer (cdr managed) t)))
+
+      ;; Clear settings in separate step in case we're having bugs.
+      (dolist (managed buffers/managed)
+        (path:uniquify:settings/clear (car managed)))))
 
   nil)
 ;; (path:uniquify:tear-down)
-
-
-;;------------------------------------------------------------------------------
-;; `Uniquify': Project Path Function for `uniquify-buffer-name-style'
-;;------------------------------------------------------------------------------
-;;
-;; NOTE: Failed attempt to use `uniquify' with a function as `uniquify-buffer-name-style'...
-;; But `base' and `extra-strings' just didn't give us enough info about the file.
-;;
-;; (defun path:project:uniquify (base extra-strings)
-;;   "`uniquify-buffer-name-style' function for unique-by-project-path buffer names.
-;;
-;; BASE should be a string.
-;; EXTRA-STRINGS should be a string.
-;;
-;; Return a string that `uniquify' should use to name the buffer.
-;;
-;; NOTE: Cannot use a lot of very useful functions here, as the buffer is likely
-;; nascent and doesn't have things like variable `buffer-file-name' or `major-mode'
-;; defined yet."
-;;   (cond
-;;    ;;------------------------------
-;;    ;; Special Modes
-;;    ;;------------------------------
-;;    ;; NOTE: Cannot use e.g. `major-mode' as it's not been set yet... :|
-;;
-;;    ;; Magit already does a lot to uniquify its buffer names.
-;;    ((string-match-p (rx-to-string '(sequence string-start
-;;                                              "magit"
-;;                                              (optional "-"
-;;                                                        (one-or-more alphanumeric))
-;;                                              ": "
-;;                                              (one-or-more printing)
-;;                                              string-end)
-;;                                   :no-group)
-;;                     base)
-;;     ;; Just use the base name.
-;;     base)
-;;
-;;    ;;------------------------------
-;;    ;; File-Visiting Buffers
-;;    ;;------------------------------
-;;    ;; Do the full buffer naming shenanigans... if possible, else skip down to fallback.
-;;    ((when-let* ((path (cond
-;;                        ;; If we have no BASE, um... assume it's just a dir maybe? IDK.
-;;                        ;; When does this come up? It's a check in the `uniquify' source code...
-;;                        ;; I think it's when it's a directory? See help for `uniquify-get-proposed-name'.
-;;                        ((or (not (stringp base))
-;;                             (string-empty-p base))
-;;                         default-directory)
-;;
-;;                        ;; `uniquify' has been set up to notify us about dirs? Perfect!
-;;                        ((and path:uniquify:directory/end-in-slash?
-;;                              (path:directory? base))
-;;                         ;; Have a directory... just use `default-directory'.
-;;                         default-directory)
-;;
-;;                        ((and path:uniquify:directory/end-in-slash?
-;;                              (not (path:directory? base)))
-;;                         (path:join default-directory base))
-;;
-;;                        ;; Not our problem; goto to the `cond' fallback.
-;;                        (t
-;;                         nil)))
-;;                 (project      (path:project:current/alist path))
-;;                 (project/root (alist-get :project/name project))
-;;                 (project/path (alist-get :path         project)))
-;;       ;; Return the fancy/pretty version, or just the relative path string?
-;;       (concat (propertize project/root 'face 'underline)
-;;               path:vc/git:rooted
-;;               project/path)))
-;;
-;;    ;;------------------------------
-;;    ;; Default/Fallback
-;;    ;;------------------------------
-;;    (t
-;;     ;;---
-;;     ;; Default
-;;     ;;---
-;;     ;; No simple fallback for using `uniquify' itself... So just do something
-;;     ;; dumb and simple?
-;;     (concat (mapconcat #'identity extra-strings "/") "/" base)
-;;
-;;     ;;---
-;;     ;; Alternatives:
-;;     ;;---
-;;     ;; Do something similar to `uniquify-buffer-name-style' `post-forward'?
-;;     ;;     (concat base ":" (mapconcat #'identity extra-strings "/"))
-;;
-;;     ;; Just use the base? IDK?
-;;     ;; base
-;;     )))
-;; ;; (path:project:uniquify "base.txt" '("path" "to"))
 
 
 ;;------------------------------------------------------------------------------
