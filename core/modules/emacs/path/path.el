@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2023-06-23
+;; Timestamp:  2023-07-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -1076,7 +1076,8 @@ Raises an error signal if it cannot find a file path."
    ((stringp (car-safe current-load-list))
     (car current-load-list))
 
-   (buffer-file-name)
+   ;; Opened (direct & indirect) buffers.
+   ((buffer-file-name (buffer-base-buffer)))
 
    ;;------------------------------
    ;; Error: Didn't find anything valid.
