@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-03-16
-;; Timestamp:  2023-07-18
+;; Timestamp:  2023-08-01
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -86,9 +86,17 @@ Then runs COMMAND interactively with ARGS."
   (defun mode:org/journal:file-header (time)
     "Custom function to create a new journal file's header.
 
-TIME is current time suitable for `format-time-string'."
-    (let* ((date/month/1st
-            ;; Note: Not sure what TIME is passed in... I assume "now"? So backdate to start of the month?
+TIME is... nil?!
+TIME is supposed to be \"a time value.\"
+TIME was expected to be a current time suitable for `format-time-string'.
+But TIME is just nil."
+    ;; TIME is supposed to be "a time value" according to
+    ;; `org-journal-file-header' docstr, but I only get nil.
+    ;; So make sure TIME is some sort of time value.
+    (let* ((time (or time
+                     (datetime:now)))
+           (date/month/1st
+            ;; NOTE: Not sure what TIME is passed in... I assume "now"? So backdate to start of the month?
             (datetime:replace time
                               :day    1
                               :hour   0
