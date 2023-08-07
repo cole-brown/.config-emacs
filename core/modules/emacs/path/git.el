@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-07-27
+;; Timestamp:  2023-08-04
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -212,69 +212,6 @@ If FILEPATH is not in the `current-project' path, return nil."
           (cons :path         path/relative))))
 ;; (path:project:current/alist (path:buffer))
 ;; (path:project:current/alist "/tmp")
-
-
-(cl-defun path:project:buffer/name:propertize (&key project/name
-                                                    project/path
-                                                    buffer
-                                                    truncate
-                                                    modeline?)
-  "Return a buffer name string based off of params.
-
-Keyword Parameters:
-  - BUFFER     - Buffer object, buffer name string, or nil for `current-buffer'.
-  - conses:
-    - PROJECT/NAME - (string . properties)
-    - PROJECT/PATH - (string . properties)
-  - Flags / Options:
-    - TRUNCATE   - integer > 0: Truncate name if its length would be more than this value.
-                 - `path':      Always truncate the path part of the name.
-    - MODELINE   - nil/non-nil: Add modeline properties to returned name string."
-  (let ((buffer (if buffer
-                    (get-buffer buffer)
-                  (current-buffer)))
-        name)
-    (with-current-buffer buffer
-      ;;------------------------------
-      ;; Propertize Buffer Name
-      ;;------------------------------
-      ;; Project
-      (setq name (concat (apply #'str:propertize (car project/name) (cdr project/name))
-                         path:vc/git:rooted))
-      ;; Path
-      (cond ((eq truncate 'path)
-             (setq name (concat name
-                                (apply #'str:propertize
-                                       (path:join path:name:truncate (file:name (car project/path)))
-                                       (cdr project/path)))))
-            ;; Currently no other truncates...
-            (t
-             (setq name (concat name
-                                (apply #'str:propertize
-                                       (car project/path)
-                                       (cdr project/path))))))
-
-      ;;------------------------------
-      ;; Propertize for Modeline?
-      ;;------------------------------
-      (when modeline?
-        ;; Shouldn't overwrite any propertize, as these are non-dispaly properties for modeline help.
-        (setq name (str:propertize name
-                                   'mouse-face 'mode-line-highlight
-                                   'help-echo (concat buffer-file-truename
-                                                      (unless (string= (file-name-nondirectory buffer-file-truename)
-                                                                       (buffer-name))
-                                                        (concat "\n" (buffer-name)))
-                                                      "\nmouse-1: Previous buffer\nmouse-3: Next buffer")
-                                   'local-map mode-line-buffer-identification-keymap)))
-
-      ;;------------------------------
-      ;; Done; here's your buffer name:
-      ;;------------------------------
-      name)))
-;; (path:project:buffer/name:propertize :project/name '("hello"  face underline) :project/path '("path/to/file.txt". nil))
-;; (path:project:buffer/name:propertize :project/name '("hello"  face underline) :project/path '("path/to/file.txt". nil) :truncate 'path)
-;; (path:project:buffer/name:propertize :project/name '("hello"  face underline) :project/path '("path/to/file.txt". nil) :modeline? t)
 
 
 ;;------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-07-28
+;; Timestamp:  2023-08-04
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -193,25 +193,32 @@ parent directory."
       (when project
         (setq name/buffer/naked
               ;; Create the buffer name from the project settings.
-              (path:project:buffer/name:propertize
+              (int<path>:uniquify:name:propertize
                :buffer       buffer
                ;; Do not provide any text properteries in these!
-               :project/name (list (alist-get :project/name project))
-               :project/path (list (alist-get :path project))))
+               :project (list (alist-get :project/name project))
+               :filepath (list (file:name (alist-get :path project)))
+               :truncated? t))
 
         (setq name/buffer/propertized
               ;; Create the buffer name from the project settings.
-              (path:project:buffer/name:propertize
+              (int<path>:uniquify:name:propertize
                :buffer       buffer
                ;; Do propertize these as desired.
                :project/name (list (alist-get :project/name project)
                                    'face 'underline)
-               :project/path (list (alist-get :path project)))))
+               :filepath (list (file:name (alist-get :path project)))
+               :truncated? t)))
 
       ;;------------------------------
       ;; Create our settings (alist tree structure).
       ;;------------------------------
-      (list (list :path
+      (list (list :managed?
+                  ;; We only create the settings; someone else should set their flag when they set the name.
+                  (cons :buffer   nil)  ;; Name in `buffer-name'.
+                  (cons :modeline nil)  ;; Name in `mode-line-format' or `doom-modeline'.
+                  (cons :title    nil)) ;; Name in `frame-title-format'.
+            (list :path
                   (cons :parent    path/absolute/directory)
                   (cons :filepath  path/absolute/file)
                   (cons :filename  (file:name path/absolute/file)))
@@ -222,10 +229,9 @@ parent directory."
                   ;; And the actual `buffer-name'.
                   (cons :buffer             name/buffer/naked)
                   (cons :buffer/propertized name/buffer/propertized)
-                  ;; TODO: these?
-                  ;; ;; And stuff for the modeline:
-                  ;; (cons :modeline                "TODO: foo")
-                  ;; (cons :modeline/propertized    "TODO: foo")
+                  ;; These will be set when created.
+                  ;; (cons :modeline                "...")
+                  ;; (cons :modeline/propertized    "...")
                   )))))
 ;; (int<path>:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
 
@@ -388,20 +394,103 @@ KEYWORDS should be:
 ;; (pp path:uniquify:settings/local)
 ;; (path:uniquify:settings/get '(:path :filename) (current-buffer))
 ;; (path:uniquify:settings/set '(:path :filename) "jeff" (current-buffer))
+;; (path:uniquify:settings/set '(:managed? :buffer) t (current-buffer))
+
+
+;;--------------------------------------------------------------------------------
+;; Naming
+;;--------------------------------------------------------------------------------
+
+(defun path:uniquify:set:name/buffer (name buffer)
+  "Rename BUFFER to NAME and mark BUFFER as managed for buffer name."
+  ;; Use non-nil UNIQUE arg in order to avoid infinite loop recursion
+  ;; due to our advising of `rename-buffer'.
+  (rename-buffer name :unique)
+  ;; Mark buffer's name as managed.
+  (path:uniquify:buffer/manage buffer :buffer t))
+
+
+(defun path:uniquify:set:name/modeline (buffer path/unique truncated?)
+  "Set BUFFER's modeline name and mark BUFFER as managed for modeline.
+
+Use PATH/UNIQUE for the path & filename part of BUFFER's name."
+  (with-current-buffer buffer
+    ;; Do we already have settings or do we need to create them?
+    (unless path:uniquify:settings/local
+      (path:uniquify:settings/create (path:parent (path:current:file))
+                                     ;; TODO: Where does the uniqueness for indirect buffers come from?
+                                     (file:name (path:current:file))
+                                     buffer))
+
+    (let ((project/alist (path:uniquify:settings/get :project buffer)))
+      ;; No func or anything to set the modeline name; just save to settings for
+      ;; `doom-modeline' or whoever to use.
+
+      ;; No properties supplied.
+      (path:uniquify:settings/set
+       '(:name :modeline)
+       (int<path>:uniquify:name:propertize :buffer buffer
+                                           :project/name (list (alist-get :project/name project/alist))
+                                           :project/path (list path/unique)
+                                           :truncated? truncated?
+                                           :modeline? nil) ;; Don't add modeline properties.
+       buffer)
+
+      ;; Yes properties supplied.
+      (path:uniquify:settings/set
+       '(:name :modeline/propertized)
+       (int<path>:uniquify:name:propertize :buffer buffer
+                                           :project/name (list (alist-get :project/name project/alist)
+                                                               'face 'underline)
+                                           :project/path (list path/unique)
+                                           :truncated? truncated?
+                                           :modeline? t) ;; Do add modeline properties.
+       buffer)
+
+      ;; Mark modeline's name as managed.
+      (path:uniquify:buffer/manage buffer :modeline t))))
+
 
 
 ;;--------------------------------------------------------------------------------
 ;; Buffers
 ;;--------------------------------------------------------------------------------
 
-(defun path:uniquify:buffer/managed? (buffer)
-  "Is the name of BUFFER already managed by `path:uniquify'?
+(defun path:uniquify:buffer/managed? (buffer type)
+  "Is the TYPE name of BUFFER already managed by `path:uniquify'?
+
+TYPE should be:
+  - `:buffer'
+  - `:modeline'
+  - `:title'
+  - `:any'
 
 Return nil/non-nil."
   (with-current-buffer buffer
-    ;; If our local var is non-nil, we are managing this buffer's name.
-    path:uniquify:settings/local))
-;; (path:uniquify:buffer/managed? (current-buffer))
+    ;; If our local var is non-nil, we are probably managing something about this buffer...
+    (and path:uniquify:settings/local
+         ;; TEMP! Check if new `:managed?' is in settings.
+         (or (null (path:uniquify:settings/get '(:managed?) buffer))
+             ;; Check if TYPE is being managed in this buffer.
+             (if (eq type :any)
+                 (or (path:uniquify:settings/get '(:managed? :buffer)   buffer)
+                     (path:uniquify:settings/get '(:managed? :modeline) buffer)
+                     (path:uniquify:settings/get '(:managed? :title)    buffer))
+               (path:uniquify:settings/get (list :managed? type) buffer))))))
+;; (path:uniquify:buffer/managed? (current-buffer) :buffer)
+;; (path:uniquify:buffer/managed? (current-buffer) :modeline)
+;; (path:uniquify:buffer/managed? (current-buffer) :title)
+;; (path:uniquify:buffer/managed? (current-buffer) :any)
+
+
+(defun path:uniquify:buffer/manage (buffer type managed?)
+  "Update BUFFER's `:managed?' settings for TYPE to MANAGED?."
+  (path:uniquify:settings/set (list :managed? type)
+                              ;; cast to bool
+                              (not (null managed?))
+                              buffer))
+;; (path:uniquify:buffer/manage (current-buffer) :modeline t)
+;; (path:uniquify:buffer/manage (current-buffer) :modeline nil)
 
 
 (defun path:uniquify:buffer/should-manage? (buffer)
@@ -438,22 +527,22 @@ BUFFER should be a buffer object.
              ;; Error for now so we can work on hunting this down.
              ;; Ideally no erroring? Maybe?
              (nub:error
-                 :innit
-                 func/name
-               '(:line:each
-                 "Cannot name this buffer; no name in settings?!"
-                 "`%s': %S")
-               (symbol-name 'path:uniquify:settings/local)
-               path:uniquify:settings/local))
+              :innit
+              func/name
+              '(:line:each
+                "Cannot name this buffer; no name in settings?!"
+                "`%s': %S")
+              (symbol-name 'path:uniquify:settings/local)
+              path:uniquify:settings/local))
             ((not (stringp name))
              (nub:error
-                 :innit
-                 func/name
-               '(:line:each
-                 "Cannot name this buffer; no name in settings?!"
-                 "`%s': %S")
-               (symbol-name 'path:uniquify:settings/local)
-               path:uniquify:settings/local))
+              :innit
+              func/name
+              '(:line:each
+                "Cannot name this buffer; no name in settings?!"
+                "`%s': %S")
+              (symbol-name 'path:uniquify:settings/local)
+              path:uniquify:settings/local))
             ;;------------------------------
             ;; Buffer Naming (Or Not)
             ;;------------------------------
@@ -463,7 +552,9 @@ BUFFER should be a buffer object.
             (t
              ;; Use non-nil UNIQUE arg in order to avoid infinite loop recursion
              ;; due to our advising of `rename-buffer'.
-             (rename-buffer name :unique))))))
+             (rename-buffer name :unique)
+             ;; Mark buffer's name as managed.
+             (path:uniquify:buffer/manage buffer :buffer t))))))
 
 
 (defun path:uniquify:buffer:path/absolute/directory (buffer)
@@ -485,6 +576,174 @@ Other buffers return nil."
 
 
 ;;--------------------------------------------------------------------------------
+;; Buffers - Uniquify Management
+;;--------------------------------------------------------------------------------
+
+(defun int<path>:uniquify:buffers/refresh (type)
+  "Refresh all buffer name TYPEs managed by `path:uniquify'.
+
+TYPE should be:
+  - `:buffer'
+  - `:modeline'
+  - `:title'
+  - `:any'
+
+Update any that need extra uniquification in e.g. modeline buffer name."
+  (let ((func/name "int<path>:uniquify:buffers/refresh")
+        (type/valid '(:buffer :modeline :title :any))
+        ;; managed/all is an alist-tree:
+        ;;   '(("project-dir-name" . (("filename.el" (<buffer> <buffer>))))
+        managed/all)
+    ;;------------------------------
+    ;; Error Checks
+    ;;------------------------------
+    (unless (memq type type/valid)
+      (nub:error
+          :innit
+          func/name
+        "Unknown TYPE! Got `%S', expected one of: %S"
+        type
+        type/valid))
+
+    ;;------------------------------
+    ;; Look For Naming Conflicts
+    ;;------------------------------
+    ;; Build alist-tree of managed buffers ("project-dir-name" -> "filename.el" -> buffers).
+    (dolist (buffer (buffer-list))
+      (when (path:uniquify:buffer/managed? buffer type)
+        ;; Add this buffer to the alist.
+        (push buffer (alist-get (path:uniquify:settings/get '(:path :filename) buffer)
+                                (alist-get (path:uniquify:settings/get '(:project :project/name) buffer)
+                                           managed/all
+                                           nil nil #'string=)
+                                nil nil #'string=))))
+
+    (dolist (managed/project managed/all)
+      (dolist (managed/filename managed/project)
+        (let ((buffers (cdr managed/filename)))
+          ;;------------------------------
+          ;; Resolve Conflicts
+          ;;------------------------------
+          (when (> (length buffers) 1)
+            ;; Found some buffers that have the same project & filename.
+            ;; Need to uniquify their display name for the TYPE.
+
+            ;; Get the common path of all these buffers. Unique bit will be "the rest".
+            (let ((path/common (apply #'path:ancestor/common
+                                      ;; Need list of buffer's filepaths from the list of buffers.
+                                      (seq-map (lambda (buffer) (path:uniquify:settings/get '(:path :filepath) buffer)) buffers))))
+              (dolist (buffer buffers)
+                (with-current-buffer buffer
+                  ;; Uniquify by removing common parts of path.
+                  (let ((path/unique (path:relative (path:uniquify:settings/get '(:path :filepath) buffer)
+                                                    path/common)))
+                    ;; Set whatever TYPE says to.
+                    (pcase type
+                      (:modeline
+                       (path:uniquify:set:name/modeline buffer
+                                                        path/unique
+                                                        (path:equal? path/unique
+                                                                     (path:uniquify:settings/get '(:project :path) buffer))))
+
+                      (:buffer
+                       ;; TODO: `:buffer' uniquity.
+                       (nub:error
+                           :innit
+                           func/name
+                         "TYPE `%S' not implemented yet..."
+                         type))
+
+                      (:title
+                       ;; TODO: `:title' uniquity.
+                       (nub:error
+                           :innit
+                           func/name
+                         "TYPE `%S' not implemented yet..."
+                         type))
+
+                      (:any
+                       ;; Do all three.
+                       ;; TODO: `:buffer' uniquity.
+                       ;; TODO: `:title' uniquity.
+                       (nub:error
+                           :innit
+                           func/name
+                         "TYPE `%S' not implemented yet..."
+                         type)
+
+                       ;; `:modeline'
+                       (path:uniquify:set:name/modeline buffer
+                                                        path/unique
+                                                        (path:equal? path/unique
+                                                                     (path:uniquify:settings/get '(:project :path) buffer))))
+
+                      (_
+                       (nub:error
+                           :innit
+                           func/name
+                         "TYPE `%S' not understood?"
+                         type)))))))))))))
+;; (int<path>:uniquify:buffers/refresh)
+
+
+(cl-defun int<path>:uniquify:name:propertize (&key buffer
+                                                   project
+                                                   filepath
+                                                   truncated?
+                                                   modeline?)
+  "Return a buffer name string based off of params.
+
+Keyword Parameters:
+  - BUFFER - Buffer object, buffer name string, or nil for `current-buffer'.
+  - conses:
+    - PROJECT  - (string . properties) - (list \".emacs.d\" 'face 'underline)
+    - FILEPATH - (string . properties) - (list \"path/to/file.el\")
+  - Flags / Options:
+    - TRUNCATED? - nil     - FILEPATH is relative to PROJECT dir.
+                 - non-nil - FILEPATH has been truncated.
+    - MODELINE?  - nil     - Do nothing.
+                 - non-nil - Add modeline properties to returned name string."
+  (let ((buffer (if buffer
+                    (get-buffer buffer)
+                  (current-buffer)))
+        name)
+    (with-current-buffer buffer
+      ;;------------------------------
+      ;; Propertize Buffer Name
+      ;;------------------------------
+      ;; Project
+      (setq name (concat (apply #'str:propertize (car project) (cdr project))
+                         path:vc/git:rooted
+                         ;; Truncation Indicator?
+                         (when truncated?
+                           (path:dir path:name:truncate))
+                         ;; Filepath
+                         (apply #'str:propertize
+                                ;; FILEPATH has been truncated
+                                (car filepath)
+                                (cdr filepath))))
+
+      ;;------------------------------
+      ;; Propertize for Modeline?
+      ;;------------------------------
+      (if modeline?
+        ;; Shouldn't overwrite any propertize, as these are non-dispaly properties for modeline help.
+          (str:propertize name
+                          'mouse-face 'mode-line-highlight
+                          'help-echo (concat buffer-file-truename
+                                             (unless (string= (file-name-nondirectory buffer-file-truename)
+                                                              (buffer-name))
+                                               (concat "\n" (buffer-name)))
+                                             "\nmouse-1: Previous buffer\nmouse-3: Next buffer")
+                          'local-map mode-line-buffer-identification-keymap)
+        ;; No modeline properties.
+        name))))
+;; (int<path>:uniquify:name:propertize :project '("hello" face underline) :filepath '("path/to/file.txt"))
+;; (int<path>:uniquify:name:propertize :project '("hello" face underline) :filepath '(     "to/file.txt") :truncated? t)
+;; (int<path>:uniquify:name:propertize :project '("hello" face underline) :filepath '("path/to/file.txt") :modeline? t)
+
+
+;;--------------------------------------------------------------------------------
 ;; Commands
 ;;--------------------------------------------------------------------------------
 
@@ -494,7 +753,7 @@ Other buffers return nil."
   (let* ((buffer (current-buffer))
          (name (buffer-name buffer)))
     ;; Say what we're already doing:
-    (cond ((path:uniquify:buffer/managed? buffer)
+    (cond ((path:uniquify:buffer/managed? buffer :any)
            (message "Buffer is managed; name: %S"
                     (path:uniquify:settings/get '(:name :buffer) buffer)))
 
@@ -537,7 +796,7 @@ Other buffers return nil."
 
 Indended as alias for `uniquify-buffer-base-name'."
     ;; Return something if we have something, nil otherwise.
-    (and (path:uniquify:buffer/managed? (current-buffer))
+    (and (path:uniquify:buffer/managed? (current-buffer) :any)
          (path:uniquify:settings/get '(:name :requested) (current-buffer))))
 
 
@@ -646,6 +905,53 @@ Return the buffer created by `create-file-buffer'."
     buffer))
 
 
+;;------------------------------
+;; Modeline
+;;------------------------------
+
+(defun path:advice:uniquify:doom-modeline-buffer-file-name (&rest _)
+  "Create advice for package `doom-modeline' so it can this style buffer name.
+
+Propertize file name based on `doom-modeline-buffer-file-name-style'.
+
+Check `doom-modeline-buffer-file-name-style' for custom styles; pass on to
+original function if not custom.
+
+Given:
+  1. A project root of `~/Projects/FOSS/emacs/'.
+  2. Another buffer open to `~/Projects/FOSS/emacs/lisp/comint-hacks/comint.el'.
+  3. \"This\" buffer open to `~/Projects/FOSS/emacs/lisp/comint/comint.el'.
+
+Custom styles for `doom-modeline-buffer-file-name-style' are:
+  `path:uniquify:project/truncate-to-file'   => emacs:/…/comint.el
+  `path:uniquify:project/truncate-to-unique' => emacs:/…/comint/comint.el"
+  (pcase doom-modeline-buffer-file-name-style
+    ;;------------------------------
+    ;; Custom Style?
+    ;;------------------------------
+    ('path:uniquify:project/truncate-to-file
+     ;; Name this buffer; no need to uniquify.
+     (path:uniquify:set:name/modeline (current-buffer)
+                                      (file:name (path:current:file))
+                                      t))
+
+    ('path:uniquify:project/truncate-to-unique
+     ;; First name it, assuming it's already unique.
+     (path:uniquify:set:name/modeline (current-buffer)
+                                      (file:name (path:current:file))
+                                      t)
+
+     ;; Now we can uniquify all buffers.
+     (int<path>:uniquify:buffers/refresh))
+
+    ;;------------------------------
+    ;; Standard Style?
+    ;;------------------------------
+    ;; Otherwise dunno what that style is; pass through to original function.
+    (_
+     (apply fn args))))
+
+
 ;;--------------------------------------------------------------------------------
 ;; Set-Up
 ;;--------------------------------------------------------------------------------
@@ -710,7 +1016,7 @@ signalled.  If NOERROR, the non-loop parts of the chain is returned."
       ;; Gather a list of buffers to revert from all buffers.
       (dolist (buffer (buffer-list))
         (with-current-buffer buffer
-          (when (path:uniquify:buffer/managed? buffer)
+          (when (path:uniquify:buffer/managed? buffer :any)
             (push (cons buffer (path:uniquify:settings/get '(:name :requested) buffer))
                   buffers/managed))))
 
