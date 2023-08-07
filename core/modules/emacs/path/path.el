@@ -1055,6 +1055,37 @@ Raises an error if ROOT is not nil and not a string."
 (defalias 'path:rel                'path:canonicalize:relative)
 
 
+(defun path:ancestor/common (&rest paths)
+  "Return canonicalized common path between PATHS strings."
+  ;; Normalize & split paths.
+  (let ((paths (seq-map (lambda (path) (path:split (path:canonicalize:file path)))
+                        paths)))
+    ;; Finally, combine the common ancestor path segments back together again.
+    (path:join
+     (seq-reduce
+      ;; Find common ancestor path of ACCUM and PATH.
+      ;; PATH is a list of path segments to compare against ACCUM.
+      ;; ACCUM is our common path segments (so far)."
+      (lambda (accum path)
+        ;; Compare path lists ACCUM and PATH, root-first. Stop when we
+        ;; don't have a matching path segment between them.
+        (seq-take-while (lambda (segment)
+                          ;; If we have a common path (ACCUM), and if the (current)
+                          ;; frontest piece (dir) of ACCUM matches this segment, take this
+                          ;; segment as common between ACCUM and PATH.
+                          (and accum
+                               (equal (pop accum) segment)))
+                        path))
+      ;; Run rest of the paths through to find actual common ancestor.
+      (seq-drop paths 1)
+      ;; Start with first path as the presumed common ancestor.
+      (pop paths)))))
+;; (path:ancestor/common "~/foo/bar/baz"
+;;                       "~/foo/bar/qux"
+;;                       "~/foo/bazola/ztesch"
+;;                       "~/foo/basket/case")
+
+
 ;;------------------------------------------------------------------------------
 ;; Current Paths
 ;;------------------------------------------------------------------------------
