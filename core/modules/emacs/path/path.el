@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2023-07-28
+;; Timestamp:  2023-08-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -729,9 +729,16 @@ Filter out nil."
 
 (defun path:split (&rest path)
   "Split all PATH strings by directory separators, return one list."
-  (split-string (apply #'path:join path)
-                "[/\\]"
-                :omit-nulls))
+  (let* ((path (apply #'path:join path))
+         (split (split-string path
+                              "[/\\]"
+                              :omit-nulls)))
+
+    ;; Unix rooted paths should keep "/" as the root directory.
+    (if (string-prefix-p "/" path)
+        (cons "/" split)
+      ;; Relative paths and Windows drive-letter rooted paths don't need to do that.
+      split)))
 ;; (path:split "/foo/bar" "/baz")
 ;; (path:split "c:/foo/bar" "/baz")
 ;; (path:split "c:\\foo\\bar" "\\baz")
