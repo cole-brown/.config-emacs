@@ -397,21 +397,52 @@ KEYWORDS should be:
 ;; (path:uniquify:settings/set '(:path :filename) "jeff" (current-buffer))
 ;; (path:uniquify:settings/set '(:managed? :buffer) t (current-buffer))
 
+(defun path:uniquify:settings/set:name/buffer (buffer)
+  "Update BUFFER's name with data from `path:uniquify:settings/local'.
 
-;;--------------------------------------------------------------------------------
-;; Naming
-;;--------------------------------------------------------------------------------
+BUFFER should be a buffer object.
+`path:uniquify:settings/local' should be up-to-date."
+  (with-current-buffer buffer
+    (let ((func/name "path:uniquify:settings/set:name/buffer")
+          (name (path:uniquify:settings/get '(:name :buffer) buffer)))
+      ;;------------------------------
+      ;; Error Checks
+      ;;------------------------------
+      (cond ((null name)
+             ;; Error for now so we can work on hunting this down.
+             ;; Ideally no erroring? Maybe?
+             (nub:error
+              :innit
+              func/name
+              '(:line:each
+                "Cannot name this buffer; no name in settings?!"
+                "`%s': %S")
+              (symbol-name 'path:uniquify:settings/local)
+              path:uniquify:settings/local))
+            ((not (stringp name))
+             (nub:error
+              :innit
+              func/name
+              '(:line:each
+                "Cannot name this buffer; no name in settings?!"
+                "`%s': %S")
+              (symbol-name 'path:uniquify:settings/local)
+              path:uniquify:settings/local))
+            ;;------------------------------
+            ;; Buffer Naming (Or Not)
+            ;;------------------------------
+            ((string= name (buffer-name buffer))
+             ;; Nothing to do; name already set?
+             nil)
+            (t
+             ;; Use non-nil UNIQUE arg in order to avoid infinite loop recursion
+             ;; due to our advising of `rename-buffer'.
+             (rename-buffer name :unique)
+             ;; Mark buffer's name as managed.
+             (path:uniquify:buffer/manage buffer :buffer t))))))
 
-(defun path:uniquify:set:name/buffer (name buffer)
-  "Rename BUFFER to NAME and mark BUFFER as managed for buffer name."
-  ;; Use non-nil UNIQUE arg in order to avoid infinite loop recursion
-  ;; due to our advising of `rename-buffer'.
-  (rename-buffer name :unique)
-  ;; Mark buffer's name as managed.
-  (path:uniquify:buffer/manage buffer :buffer t))
 
-
-(defun path:uniquify:set:name/modeline (buffer path/unique truncated?)
+(defun path:uniquify:settings/set:name/modeline (buffer path/unique truncated?)
   "Set BUFFER's modeline name and mark BUFFER as managed for modeline.
 
 Use PATH/UNIQUE for the path & filename part of BUFFER's name."
@@ -513,51 +544,6 @@ Will check settings:
 ;; (path:uniquify:buffer/should-manage? (current-buffer))
 
 
-(defun path:uniquify:buffer:name/set (buffer)
-  "Update BUFFER's name with data from `path:uniquify:settings/local'.
-
-BUFFER should be a buffer object.
-`path:uniquify:settings/local' should be up-to-date."
-  (with-current-buffer buffer
-    (let ((func/name "path:uniquify:buffer:name/set")
-          (name (path:uniquify:settings/get '(:name :buffer) buffer)))
-      ;;------------------------------
-      ;; Error Checks
-      ;;------------------------------
-      (cond ((null name)
-             ;; Error for now so we can work on hunting this down.
-             ;; Ideally no erroring? Maybe?
-             (nub:error
-              :innit
-              func/name
-              '(:line:each
-                "Cannot name this buffer; no name in settings?!"
-                "`%s': %S")
-              (symbol-name 'path:uniquify:settings/local)
-              path:uniquify:settings/local))
-            ((not (stringp name))
-             (nub:error
-              :innit
-              func/name
-              '(:line:each
-                "Cannot name this buffer; no name in settings?!"
-                "`%s': %S")
-              (symbol-name 'path:uniquify:settings/local)
-              path:uniquify:settings/local))
-            ;;------------------------------
-            ;; Buffer Naming (Or Not)
-            ;;------------------------------
-            ((string= name (buffer-name buffer))
-             ;; Nothing to do; name already set?
-             nil)
-            (t
-             ;; Use non-nil UNIQUE arg in order to avoid infinite loop recursion
-             ;; due to our advising of `rename-buffer'.
-             (rename-buffer name :unique)
-             ;; Mark buffer's name as managed.
-             (path:uniquify:buffer/manage buffer :buffer t))))))
-
-
 (defun path:uniquify:buffer:path/absolute/directory (buffer)
   "Return path of the parent directory that BUFFER is visiting, or nil if none.
 
@@ -641,7 +627,7 @@ Update any that need extra uniquification in e.g. modeline buffer name."
                     ;; Set whatever TYPE says to.
                     (pcase type
                       (:modeline
-                       (path:uniquify:set:name/modeline buffer
+                       (path:uniquify:settings/set:name/modeline buffer
                                                         path/unique
                                                         (path:equal? path/unique
                                                                      (path:uniquify:settings/get '(:project :path) buffer))))
@@ -673,7 +659,7 @@ Update any that need extra uniquification in e.g. modeline buffer name."
                          type)
 
                        ;; `:modeline'
-                       (path:uniquify:set:name/modeline buffer
+                       (path:uniquify:settings/set:name/modeline buffer
                                                         path/unique
                                                         (path:equal? path/unique
                                                                      (path:uniquify:settings/get '(:project :path) buffer))))
@@ -849,7 +835,7 @@ Return a string of the name actually given to the buffer."
                                          buffer)
 
           ;; Actually set the buffer's new name.
-          (path:uniquify:buffer:name/set buffer)
+          (path:uniquify:settings/set:name/buffer buffer)
           (setq name/actual (buffer-name buffer)))
 
       ;;------------------------------
@@ -892,7 +878,7 @@ Return the buffer created by `create-file-buffer'."
                                          buffer)
 
           ;; Actually set the buffer's new name (& return it).
-          (path:uniquify:buffer:name/set buffer))
+          (path:uniquify:settings/set:name/buffer buffer))
 
       ;;------------------------------
       ;; Ignore This Buffer
@@ -932,13 +918,13 @@ Custom styles for `doom-modeline-buffer-file-name-style' are:
     ;;------------------------------
     ('path:uniquify:project/truncate-to-file
      ;; Name this buffer; no need to uniquify.
-     (path:uniquify:set:name/modeline (current-buffer)
+     (path:uniquify:settings/set:name/modeline (current-buffer)
                                       (file:name (path:current:file))
                                       t))
 
     ('path:uniquify:project/truncate-to-unique
      ;; First name it, assuming it's already unique.
-     (path:uniquify:set:name/modeline (current-buffer)
+     (path:uniquify:settings/set:name/modeline (current-buffer)
                                       (file:name (path:current:file))
                                       t)
 
