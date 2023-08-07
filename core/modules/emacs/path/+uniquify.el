@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-08-04
+;; Timestamp:  2023-08-07
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -205,8 +205,8 @@ parent directory."
               (int<path>:uniquify:name:propertize
                :buffer       buffer
                ;; Do propertize these as desired.
-               :project/name (list (alist-get :project/name project)
-                                   'face 'underline)
+               :project (list (alist-get :project/name project)
+                              'face 'underline)
                :filepath (list (file:name (alist-get :path project)))
                :truncated? t)))
 
@@ -233,6 +233,7 @@ parent directory."
                   ;; (cons :modeline                "...")
                   ;; (cons :modeline/propertized    "...")
                   )))))
+;; path:uniquify:settings/local
 ;; (int<path>:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
 
 
@@ -429,22 +430,22 @@ Use PATH/UNIQUE for the path & filename part of BUFFER's name."
       ;; No properties supplied.
       (path:uniquify:settings/set
        '(:name :modeline)
-       (int<path>:uniquify:name:propertize :buffer buffer
-                                           :project/name (list (alist-get :project/name project/alist))
-                                           :project/path (list path/unique)
+       (int<path>:uniquify:name:propertize :buffer     buffer
+                                           :project    (list (alist-get :project/name project/alist))
+                                           :filepath   (list path/unique)
                                            :truncated? truncated?
-                                           :modeline? nil) ;; Don't add modeline properties.
+                                           :modeline?  nil) ;; Don't add modeline properties.
        buffer)
 
       ;; Yes properties supplied.
       (path:uniquify:settings/set
        '(:name :modeline/propertized)
-       (int<path>:uniquify:name:propertize :buffer buffer
-                                           :project/name (list (alist-get :project/name project/alist)
-                                                               'face 'underline)
-                                           :project/path (list path/unique)
+       (int<path>:uniquify:name:propertize :buffer     buffer
+                                           :project    (list (alist-get :project/name project/alist)
+                                                                  'face 'underline)
+                                           :filepath   (list path/unique)
                                            :truncated? truncated?
-                                           :modeline? t) ;; Do add modeline properties.
+                                           :modeline?  t) ;; Do add modeline properties.
        buffer)
 
       ;; Mark modeline's name as managed.
