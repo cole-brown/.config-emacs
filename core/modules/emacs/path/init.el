@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-22
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-08-11
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -76,6 +76,13 @@
 
   ;; End load timing.
   )
+
+
+;;--------------------------------------------------------------------------------
+;; Init
+;;--------------------------------------------------------------------------------
+
+(int<path>:uniquify:nub:init)
 
 
 ;;------------------------------------------------------------------------------
