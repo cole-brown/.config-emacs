@@ -116,6 +116,34 @@ E.g. `+layout/dvorak' -> `:dvorak'."
 ;; (int<nub>:normalize->keyword nil)
 
 
+;;--------------------------------------------------------------------------------
+;; Paths
+;;--------------------------------------------------------------------------------
+
+(defun int<nub>:caller-or-path (caller)
+  "Return CALLER if valid, else return a path string.
+
+CALLER must be a string or nil.
+
+If CALLER is a string:
+  - Return as-is.
+
+Else:
+  - If inside `user-emacs-directory', return a path relative to it.
+  - If inside a project, return a path relative to the project root."
+  ;; Return CALLER as-is?
+  (cond ((stringp caller)
+         caller)
+
+        ;; Return relative path if it is indeed relative.
+        ((not (filename-absolute-p (imp:path:current:file/relative 'project)))
+         (imp:path:current:file/relative 'project))
+
+        (t
+         nil)))
+
+
+
 ;;------------------------------------------------------------------------------
 ;; The End
 ;;------------------------------------------------------------------------------
