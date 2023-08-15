@@ -24,7 +24,6 @@
 
 
 (require 'seq)
-(require 'project)
 
 
 ;;------------------------------------------------------------------------------
@@ -613,11 +612,8 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\")
          nil)
         ((keywordp feature-or-root)
          nil)
-        ((and (symbolp feature-or-root)
-              (eq feature-or-root 'project))
-         nil)
         ((and (stringp feature-or-root)
-              (not (filename-absolute-p feature-or-root)))
+              (not (file-name-absolute-p feature-or-root)))
          (int<imp>:error "imp:path:current:file/relative"
                          "FEATURE-OR-ROOT must be an absolute path if a string! Got: '%s'"
                          feature-or-root))
@@ -632,9 +628,6 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\")
                                               (int<imp>:path:root/dir feature-or-root))
                                              ((stringp feature-or-root)
                                               feature-or-root)
-                                             ((and (symbolp feature-or-root)
-                                                   (eq feature-or-root 'project))
-                                              (project-root (project-current)))
                                              (t
                                               user-emacs-directory)))))
          (path/here (imp:path:current:file))
