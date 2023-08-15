@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-08-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,6 +24,7 @@
 
 
 (require 'seq)
+(require 'project)
 
 
 ;;------------------------------------------------------------------------------
@@ -581,29 +582,61 @@ a directory path.
 ;; (imp:path:current:file)
 
 
-(defun imp:path:current:file/relative (&optional feature/base)
+(defun imp:path:current:file/relative (&optional feature-or-root)
   "Return the relative path of the file this function is called from.
 
-Path will be relative to FEATURE/BASE. If FEATURE/BASE is nil, use
-`user-emacs-directory' as the base path.
-
-Will raise an error if non-nil FEATURE/BASE does not have a path root.
+FEATURE-OR-ROOT should be:
+  - keyword - the `imp' feature's keyword
+    - Returned path will be relative to the root directory of the keyword.
+    - Will raise an error if the feature does not have a path root.
+  - string  - an absolute path
+    - Returned path will be relative to this absolute path.
+  - `project'
+    - Return path will be relative to `(project-root (project-current))'.
+  - nil
+    - Returned path will be relative to `user-emacs-directory'.
 
 Will raise an error if `imp:path:current:file' (i.e. the absolute path)
-has no relation to FEATURE/BASE's root path.
+has no relation to the determined root path.
 
-Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
+Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
   ~/.config/emacs/foo/bar.el:
     (imp:path:current:file)
       -> \"/home/<username>/.config/emacs/foo/bar.el\"
+    (imp:path:current:file/relative)
+      -> \"foo/bar.el\"
     (imp:path:current:file/relative :dot-emacs)
       -> \"foo/bar.el\"
-    (imp:path:current:file/relative)
-      -> \"foo/bar.el\""
+    (imp:path:current:file/relative \"/home/<username>/.config/emacs/foo\")
+      -> \"bar.el\""
+  (cond ((null feature-or-root)
+         nil)
+        ((keywordp feature-or-root)
+         nil)
+        ((and (symbolp feature-or-root)
+              (eq feature-or-root 'project))
+         nil)
+        ((and (stringp feature-or-root)
+              (not (filename-absolute-p feature-or-root)))
+         (int<imp>:error "imp:path:current:file/relative"
+                         "FEATURE-OR-ROOT must be an absolute path if a string! Got: '%s'"
+                         feature-or-root))
+        (t
+         (int<imp>:error "imp:path:current:file/relative"
+                         "Don't know how to handle FEATURE-OR-ROOT! Not a keyword, a string, `project', or nil. Got a '%S': %S"
+                         (type-of feature-or-root)
+                         feature-or-root)))
+
   (let* ((path/root (file-name-as-directory
-                     (expand-file-name (if feature/base
-                                           (int<imp>:path:root/dir feature/base)
-                                         user-emacs-directory))))
+                     (expand-file-name (cond ((keywordp feature-or-root)
+                                              (int<imp>:path:root/dir feature-or-root))
+                                             ((stringp feature-or-root)
+                                              feature-or-root)
+                                             ((and (symbolp feature-or-root)
+                                                   (eq feature-or-root 'project))
+                                              (project-root (project-current)))
+                                             (t
+                                              user-emacs-directory)))))
          (path/here (imp:path:current:file))
          ;; Don't like `file-relative-name' as it can return wierd things when it
          ;; goes off looking for actual directories and files...
@@ -614,15 +647,15 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
                          path/here
                          :fixedcase
                          :literal)))
-    ;; End up with the same thing? Not a relative path - signal error.
+    ;; End up with the same thing? Not a relative path - signal error (unless no FEATURE-OR-ROOT).
     (when (string= path/relative path/here)
       (int<imp>:error "imp:path:current:file/relative"
-                      '("Current directory is not relative to FEATURE/BASE!\n"
-                        "  FEATURE/BASE: %S\n"
+                      '("Current directory is not relative to FEATURE-OR-ROOT!\n"
+                        "  FEATURE-OR-ROOT: %S\n"
                         "  root path:    %s\n"
                         "  curr path:    %s\n"
                         "---> result:    %s")
-                      feature/base
+                      feature-or-root
                       path/root
                       path/here
                       path/relative))
@@ -631,6 +664,7 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
 ;; (imp:path:current:file/relative)
 ;; (imp:path:root/set :test (imp:path:current:dir))
 ;; (imp:path:current:file/relative :test)
+;; (imp:path:current:file/relative 'project)
 
 
 (defun imp:file:current ()
