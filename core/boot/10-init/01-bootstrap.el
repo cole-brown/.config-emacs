@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-03-25
-;; Timestamp:  2023-06-20
+;; Timestamp:  2023-08-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -79,11 +79,18 @@
     (add-to-list 'recentf-exclude no-littering-etc-directory)
     (add-to-list 'recentf-exclude no-littering-var-directory))
 
-  ;; Auto-saves should go in the `no-littering' directory.
-  (setq auto-save-file-name-transforms
-        `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+  ;; Auto-saves, `undo-tree' history, etc. should go in the `no-littering' directory.
+  ;;
+  ;; [2022-03-25] Old Way:
+  ;; (setq auto-save-file-name-transforms
+  ;;       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+  ;;
+  ;; [2023-08-15] New Way: "Theme" the backups. Cuz "theme" ain't an overloaded term.
+  ;; Just zenburn all my backups and histories please. /s
+  (no-littering-theme-backups)
 
-  ;; Native Compliation (Emacs 28+):
+
+  ;; Native Compliation (Emacs 29+):
   (when (fboundp 'startup-redirect-eln-cache)
     (startup-redirect-eln-cache
      (convert-standard-filename
