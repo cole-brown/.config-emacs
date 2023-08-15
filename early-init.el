@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-03-23
-;; Timestamp:  2023-06-20
+;; Timestamp:  2023-08-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -55,12 +55,12 @@
               :path     (imp:path:join path-core-modules "emacs" "alist")
               :filename "init")
 
-    (imp:load :feature  '(:path)
-              :path     (imp:path:join path-core-modules "emacs" "path")
-              :filename "init")
-
     (imp:load :feature  '(:nub)
               :path     (imp:path:join path-core-modules "output" "nub")
+              :filename "init")
+
+    (imp:load :feature  '(:path)
+              :path     (imp:path:join path-core-modules "emacs" "path")
               :filename "init")
 
     (imp:load :feature  '(:innit)
