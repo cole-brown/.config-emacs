@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-06-07
-;; Timestamp:  2023-06-26
+;; Timestamp:  2023-08-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,7 +17,6 @@
 ;;; Code:
 
 
-(imp:require :path)
 (imp:require :nub 'output)
 
 
@@ -33,7 +32,7 @@ the message with FORMATTING and ARGS to the correct place according to the
 current verbosity of `:info' (e.g. `info', by default).
 
 If CALLER is nil, uses relative path from `user-emacs-directory' to
-the caller's file (using `path:current:file' and `path:relative').
+the caller's file.
   Examples:
     - \"init.el\"
     - \"core/modules/output/nub/foo.el\"
@@ -45,8 +44,7 @@ ARGS should be the `message' arguments."
   (declare (indent 2))
 
   (let* ((caller (or caller
-                     (path:relative (path:current:file)
-                                    user-emacs-directory)))
+                     (imp:path:current:file/relative)))
          (func/name (nub:format:callers "nub:info" caller)))
 
     (int<nub>:user:exists? func/name user :info)

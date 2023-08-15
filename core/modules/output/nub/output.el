@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-06-03
-;; Timestamp:  2023-06-26
+;; Timestamp:  2023-08-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -194,7 +194,7 @@ LEVEL/SINK should be a level keyword for determining what sink function to use,
 or the function itself.
 
 If CALLER is nil, uses relative path from `user-emacs-directory' to
-the caller's file (using `path:current:file' and `path:relative').
+the caller's file.
   Examples:
     - \"init.el\"
     - \"core/modules/output/nub/foo.el\"
@@ -211,8 +211,7 @@ ARGS should be a list (or nil)."
 
   (let ((func/name "int<nub>:output")
         (caller (or caller
-                    (path:relative (path:current:file)
-                                   user-emacs-directory))))
+                    (imp:path:current:file/relative))))
     ;;------------------------------
     ;; Validate Inputs
     ;;------------------------------
@@ -323,7 +322,7 @@ current verbosity (e.g. #'error for `:error' verbosity normally).
 For valid levels, see `nub:output:levels' keywords.
 
 If CALLER is nil, uses relative path from `user-emacs-directory' to
-the caller's file (using `path:current:file' and `path:relative').
+the caller's file.
   Examples:
     - \"init.el\"
     - \"core/modules/output/nub/foo.el\"

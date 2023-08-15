@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-25
-;; Timestamp:  2023-06-26
+;; Timestamp:  2023-08-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -25,7 +25,6 @@
 ;;; Code:
 
 
-(imp:require :path)
 (imp:require :nub 'output)
 
 
@@ -41,7 +40,7 @@ the message with FORMATTING and ARGS to the correct place according to the
 current verbosity of `:error' (e.g. `error', by default).
 
 If CALLER is nil, uses relative path from `user-emacs-directory' to
-the caller's file (using `path:current:file' and `path:relative').
+the caller's file.
   Examples:
     - \"init.el\"
     - \"core/modules/output/nub/foo.el\"
@@ -53,8 +52,7 @@ ARGS should be the `message' arguments."
   (declare (indent 2))
 
   (let* ((caller (or caller
-                     (path:relative (path:current:file)
-                                    user-emacs-directory)))
+                     (imp:path:current:file/relative)))
          (func/name (nub:format:callers "nub:error" caller)))
 
     (int<nub>:user:exists? func/name user :error)
@@ -81,7 +79,7 @@ Format MSG with ARG, then output the formatted error message to
 the default of raising an error signal via `error' sink.
 
 If CALLER is nil, use relative path from `user-emacs-directory' to
-the caller's file (using `path:current:file' and `path:relative').
+the caller's file.
   Examples:
     - \"init.el\"
     - \"core/modules/output/nub/foo.el\"
@@ -95,8 +93,7 @@ SINK should be the 'nub' level, or the function, to use for outputting."
   (declare (indent 3))
 
   (let* ((caller (or caller
-                     (path:relative (path:current:file)
-                                    user-emacs-directory)))
+                     (imp:path:current:file/relative)))
          (func/name (nub:format:callers "nub:error" caller)))
 
     (int<nub>:user:exists? func/name user :error)

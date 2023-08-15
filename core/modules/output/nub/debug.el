@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-06-24
-;; Timestamp:  2023-06-26
+;; Timestamp:  2023-08-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -32,7 +32,6 @@
 (imp:require :nub 'utils)
 (imp:require :nub 'variables)
 (imp:require :nub 'output)
-(imp:require :path)
 
 
 ;;------------------------------------------------------------------------------
@@ -684,7 +683,7 @@ matches USER's active debugging tags (`int<nub>:var:debug:tags').
 
 CALLER (string) should be the calling function's name or calling file's path.
 If CALLER is nil, uses relative path from `user-emacs-directory' to
-the caller's file (using `path:current:file' and `path:relative').
+the caller's file.
   Examples:
     - \"foo-function\"
     - nil
@@ -699,8 +698,7 @@ ARGS should be the `message' arguments."
 
   `(let* ((int<nub>:macro:user      ,user)
           (int<nub>:macro:caller    ,(or caller
-                                         (path:relative (path:current:file)
-                                                        user-emacs-directory)))
+                                         (imp:path:current:file/relative)))
           (int<nub>:macro:tags      ,tags)
           (int<nub>:macro:func/name (nub:format:callers "nub:debug"
                                                         int<nub>:macro:caller)))
