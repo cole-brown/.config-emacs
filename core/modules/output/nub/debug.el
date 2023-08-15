@@ -697,7 +697,7 @@ ARGS should be the `message' arguments."
   (declare (indent 3))
 
   `(let* ((int<nub>:macro:user      ,user)
-          (int<nub>:macro:caller    ,(int<nub>:caller-or-path caller))
+          (int<nub>:macro:caller    ,(int<nub>:caller-or-path user caller))
           (int<nub>:macro:tags      ,tags)
           (int<nub>:macro:func/name (nub:format:callers "nub:debug"
                                                         int<nub>:macro:caller)))

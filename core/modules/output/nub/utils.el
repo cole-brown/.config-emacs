@@ -120,8 +120,80 @@ E.g. `+layout/dvorak' -> `:dvorak'."
 ;; Paths
 ;;--------------------------------------------------------------------------------
 
-(defun int<nub>:caller-or-path (caller)
-  "Return CALLER if valid, else return a path string.
+(defun int<nub>:path:current:file ()
+  "Return the path of the file this function is called from."
+  (cond
+   ;;------------------------------
+   ;; Look for a valid "current file" variable.
+   ;;------------------------------
+   ((bound-and-true-p byte-compile-current-file))
+
+   ((bound-and-true-p load-file-name))
+
+   ((stringp (car-safe current-load-list))
+    (car current-load-list))
+
+   ;; Indirect buffers don't have a `buffer-file-name'; you need to get their
+   ;; base buffer first. But direct buffers have a `nil' base buffer, so... this
+   ;; works for both direct and indirect buffers:
+   ((buffer-file-name (buffer-base-buffer)))
+
+   ;;------------------------------
+   ;; Failure Case!
+   ;;------------------------------
+   ;; Never gonna:
+   ;;   - Error out.
+   (t
+    nil)))
+;; (int<nub>:path:current:file)
+
+
+(defun int<nub>:path:current:file/relative (user)
+  "Return the relative path of the file this function is called from.
+
+Path will be relative to `nub' USER's root directory."
+  ;; TODO: Have `:nub' use init stuff here to get a relative path.
+  ;; TODO: Like, add a root-dir param to init if we don't have one already?
+  (condition-case _
+      (let* ((path/root (file-name-as-directory
+                         ;; TODO: Get that root for USER here.
+                         (expand-file-name user-emacs-directory)))
+             (path/here (int<nub>:path:current:file))
+             ;; Don't like `file-relative-name' as it can return wierd things when it
+             ;; goes off looking for actual directories and files...
+             (path/relative (replace-regexp-in-string
+                             ;; Make sure root dir has ending slash.
+                             path/root ;; Look for root directory path...
+                             ""        ;; Replace with nothing to get a relative path.
+                             path/here
+                             :fixedcase
+                             :literal)))
+
+        ;; TODO: Do we care if it's not really relative?
+        ;; ;; End up with the same thing? Not a relative path - signal error (unless no FEATURE-OR-ROOT).
+        ;; (when (string= path/relative path/here)
+        ;;   (int<imp>:error "int<nub>:path:current:file/relative"
+        ;;                   '("Current directory is not relative to FEATURE-OR-ROOT!\n"
+        ;;                     "  FEATURE-OR-ROOT: %S\n"
+        ;;                     "  root path:    %s\n"
+        ;;                     "  curr path:    %s\n"
+        ;;                     "---> result:    %s")
+        ;;                   feature-or-root
+        ;;                   path/root
+        ;;                   path/here
+        ;;                   path/relative))
+
+        ;; Return relative path.
+        path/relative)
+
+    ;; Error Handling: Don't error out of the debug/error/whatever message being created.
+    (error nil)))
+
+
+(defun int<nub>:caller-or-path (user caller)
+  "Return CALLER if valid, else return a path string relative to USER's root.
+
+USER must be the `nub' user's keyword.
 
 CALLER must be a string or nil.
 
@@ -131,17 +203,26 @@ If CALLER is a string:
 Else:
   - If inside `user-emacs-directory', return a path relative to it.
   - If inside a project, return a path relative to the project root."
-  ;; Return CALLER as-is?
+  ;; Use CALLER as-is?
   (cond ((stringp caller)
          caller)
+        ;; Can we find a relative path?
+        ((int<nub>:path:current:file/relative user))
+        ;; Can we find any path?
+        ((int<nub>:path:current:file))
 
-        ;; Return relative path if it is indeed relative.
-        ((not (filename-absolute-p (imp:path:current:file/relative 'project)))
-         (imp:path:current:file/relative 'project))
-
+        ;;------------------------------
+        ;; Failure Case!
+        ;;------------------------------
+        ;; Never gonna:
+        ;;   - Error out.
+        ;;   - Return nil.
+        ;;   - Turn around and desert you.
+        ;; Gonna just:
+        ;;   - Give up instead?
+        ;;   - Hope someone else sorts it out.
         (t
-         nil)))
-
+         "<unknown>")))
 
 
 ;;------------------------------------------------------------------------------

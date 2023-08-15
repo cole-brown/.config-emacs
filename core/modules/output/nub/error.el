@@ -51,7 +51,7 @@ MSG should be the `message' formatting string.
 ARGS should be the `message' arguments."
   (declare (indent 2))
 
-  (let* ((caller (int<nub>:caller-or-path caller))
+  (let* ((caller (int<nub>:caller-or-path user caller))
          (func/name (nub:format:callers "nub:error" caller)))
 
     (int<nub>:user:exists? func/name user :error)
@@ -91,7 +91,7 @@ ARGS should be the `message' arguments.
 SINK should be the 'nub' level, or the function, to use for outputting."
   (declare (indent 3))
 
-  (let* ((caller (int<nub>:caller-or-path caller))
+  (let* ((caller (int<nub>:caller-or-path user caller))
          (func/name (nub:format:callers "nub:error" caller)))
 
     (int<nub>:user:exists? func/name user :error)

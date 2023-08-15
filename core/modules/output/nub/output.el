@@ -210,7 +210,7 @@ ARGS should be a list (or nil)."
   ;; so it can be fixed.
 
   (let ((func/name "int<nub>:output")
-        (caller (int<nub>:caller-or-path caller)))
+        (caller (int<nub>:caller-or-path user caller)))
     ;;------------------------------
     ;; Validate Inputs
     ;;------------------------------
