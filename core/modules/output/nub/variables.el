@@ -129,9 +129,45 @@ USER should be the nub user keyword."
 ;; Paths
 ;;--------------------------------------------------------------------------------
 
-(defvar int<nub>:var:paths
+(defvar int<nub>:var:path
   (list (cons int<nub>:var:user:fallback user-emacs-directory))
   "Alist of `nub' user to root path for the user.")
+
+
+(defun int<nub>:var:path (user &optional no-fallback?)
+  "Get USER's root path.
+
+Return value from `int<nub>:var:user:fallback' user if USER's root path is not
+found. If NO-FALLBACK? is non-nil, return `:does-not-exist' when a path is not
+found."
+  (let ((func/name "int<nub>:var:path")
+        value)
+    ;; Assert USER.
+    (int<nub>:user:exists? func/name user :error)
+
+    ;; Try to get the path for USER...
+    (setq value (int<nub>:alist:get/value user
+                                          int<nub>:var:path
+                                          :does-not-exist))
+
+    ;; Do we need to get the fallback/default value?
+    (when (and (null no-fallback?)
+               (eq value :does-not-exist))
+      (setq value (int<nub>:alist:get/value int<nub>:var:user:fallback
+                                            int<nub>:var:path
+                                            :does-not-exist))
+      ;; If it's still not found then we should error, probably?
+      (when (eq value :does-not-exist)
+        (int<nub>:error func/name
+                        "User `%S' has no root path and neither does fallback/default user `%S'?!"
+                        user
+                        int<nub>:var:user:fallback)))
+
+    ;; Done; return the value.
+    value))
+;; (int<nub>:var:path :default)
+;; (int<nub>:var:path :secret)
+;; (int<nub>:var:path :dne :no-fallback)
 
 
 (defun int<nub>:init:path (user path:root)
@@ -169,12 +205,12 @@ Used mainly for creating relative paths to files if no CALLER param is supplied.
   ;; Save PATH:ROOT
   ;;------------------------------
   (int<nub>:alist:update user
-                         ;; Canonicalize to abbreviated absolute path ("~/foo/bar/baz.qux").
-                         (abbreviate-file-name path:root)
-                         int<nub>:var:paths))
+                         ;; Canonicalize to abbreviated absolute directory path ("~/foo/bar/baz.qux/").
+                         (abbreviate-file-name (file-name-as-directory path:root))
+                         int<nub>:var:path))
 ;; (int<nub>:init:path :test (path:current:dir))
 ;; (int<nub>:init:path :test nil)
-;; int<nub>:var:paths
+;; int<nub>:var:path
 
 
 ;;------------------------------------------------------------------------------
@@ -873,28 +909,32 @@ default user instead."
 ;;------------------------------------------------------------------------------
 
 ;; TODO: A `nub:register' function? Maybe just rename this?
-(defun nub:vars:init (user &optional path:root list:debug:tags/common alist:prefixes alist:enabled? alist:sinks)
+(cl-defun nub:vars:init (user &key path:root list:debug:tags/common alist:prefixes alist:enabled? alist:sinks)
   "Register USER at PATH:ROOT and set their default settings for output levels.
 
 USER should be a keyword.
 
-LIST:DEBUG:TAGS/COMMON should be a list of debugging keyword tags.
-It is used for prompting end-users for debug tags to toggle.
+Optional Keyword Params:
+  - PATH:ROOT - Root directory for the USER's code or whatever.
+    - Default to `user-emacs-directory' if nil.
 
-ALIST:PREFIXES should be an alist of verbosity level to strings.
+  - LIST:DEBUG:TAGS/COMMON - a list of debugging keyword tags.
+    - Used for prompting for what debug tags to toggle.
 
-ALIST:ENABLED? should be an alist of verbosity level to t/nil.
+  - ALIST:PREFIXES - an alist of verbosity level to strings.
 
-ALIST:SINKS should be an alist of verbosity level to
-t/nil/function/list-of-functions.
+  - ALIST:ENABLED? - an alist of verbosity level to t/nil.
+
+  - ALIST:SINKS - an alist of verbosity level to:
+                  t, nil, a function, or a list-of-functions.
 
 Alists should have all output levels in them; for valid levels, see
 `nub:output:levels'.
 If an alist is nil, the default/fallback will be used instead.
 
 Sets both current and backup values (backups generally only used for tests)."
-  (int<nub>:init:user      user)
-  (int<nub>:init:path:root user path:root)
+  (int<nub>:init:user user)
+  (int<nub>:init:path user path:root)
 
   (when alist:enabled?
     (int<nub>:init:enabled? user alist:enabled?))
@@ -980,7 +1020,7 @@ Sets both current and backup values (backups generally only used for tests)."
   ;; Final step: Delete the actual user.
   ;;---
   (int<nub>:alist:delete user
-                         int<nub>:var:paths)
+                         int<nub>:var:path)
   (int<nub>:terminate:user user)
 
   nil)
@@ -1065,14 +1105,14 @@ Sets both current and backup values (backups generally only used for tests)."
   ;;---
   ;; Final step: Delete the actual users.
   ;;---
-  (message "  `int<nub>:var:paths'")
-  (dolist (user-assoc int<nub>:var:paths)
+  (message "  `int<nub>:var:path'")
+  (dolist (user-assoc int<nub>:var:path)
     (let ((user (car user-assoc))
           (path (cdr user-assoc)))
       (unless (eq user int<nub>:var:user:fallback)
         (message "    - %S @ '%S'" user path)
         (int<nub>:alist:delete user
-                               int<nub>:var:paths))))
+                               int<nub>:var:path))))
 
   (message "  `int<nub>:var:users'")
   (dolist (user int<nub>:var:users)
