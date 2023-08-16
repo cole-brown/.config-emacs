@@ -1038,7 +1038,7 @@ Raises an error if ROOT is not nil and not a string."
   ;; And canonicalize our paths.
   (let ((root (or (path:canonicalize:dir root) ""))
         (path (path:canonicalize:file path)))
-    ;; Don't like `file-relative-name' as it can return wierd things when it
+    ;; Don't like `file-relative-name' as it can return weird things when it
     ;; goes off looking for actual directories and files...
     (replace-regexp-in-string
      root ;; Look for ROOT directory path...

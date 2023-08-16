@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-03-09
-;; Timestamp:  2023-06-26
+;; Timestamp:  2023-08-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -26,7 +26,6 @@
 
 (defun int<system/multiplexer>:nub:init ()
   "Initialize nub user & settings for multiplexer."
-  ;; Defaults for all the settings.
   (nub:vars:init :system/multiplexer))
 
 

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-10-21
-;; Timestamp:  2023-06-26
+;; Timestamp:  2023-08-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -262,14 +262,14 @@ into `test<nub>:output:debug' list instead."
 
 Can also allow the normal output based on `test<nub>:redirect/output:type'"
   (nub:vars:init test<nub>:user
-                 nil ;; List: Common tags.
-                 nil ;; Alist: Message prefixes.
-                 nil ;; Alist: Enabled per level.
-
+                 :path:root              nil ; String or nil ("this directory")
+                 :list:debug:tags/common nil ; List: Common tags.
+                 :alist:prefixes         nil ; Alist: Message prefixes.
+                 :alist:enabled?         nil ; Alist: Enabled per level.
                  ;; Alist: Sinks.
                  ;;   - Decide based on `test<nub>:redirect/output:type'.
-                 (alist-get test<nub>:redirect/output:type
-                            test<nub>:redirect/output:sinks)))
+                 :alist:sinks (alist-get test<nub>:redirect/output:type
+                                         test<nub>:redirect/output:sinks)))
 
 
 (defun test<nub>:redirect/output:teardown ()

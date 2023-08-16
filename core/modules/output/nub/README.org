@@ -1,4 +1,4 @@
-#+title: Readme
+#+title: README
 
 
 * Redirecting Output per Output Level
@@ -91,18 +91,14 @@ You can set up more:
 For example, if you want to only use the example output sinks from above:
 #+begin_src emacs-lisp
 (nub:vars:init example:nub:user
-               nil
-               nil
-               (alist-get :quiet
-                          test<nub>:redirect/output:sinks))
+               :alist:enabled? (alist-get :quiet
+                                          test<nub>:redirect/output:sinks))
 #+end_src
 
 Or if you don't need that alist and always want the same sinks:
 #+begin_src emacs-lisp
 (nub:vars:init example:nub:user
-               nil
-               nil
-               '((:error   . example:redirect/output:error)
-                 (:warning . example:redirect/output:warning)
-                 (:debug   . example:redirect/output:debug)))
+               :alist:enabled? '((:error   . example:redirect/output:error)
+                                 (:warning . example:redirect/output:warning)
+                                 (:debug   . example:redirect/output:debug)))
 #+end_src

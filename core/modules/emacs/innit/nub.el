@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-13
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-08-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -107,11 +107,12 @@ nil means use nub's defaults."
 
 (defun innit:nub:init ()
   "Initialize `innit' user & settings in `nub'."
-  (nub:vars:init :innit
-                 innit:nub:debug-tags:interactive ; common debug tags (for interactive toggling auto-complete help)
-                 innit:nub:levels:prefixes ; output message prefixes
-                 innit:nub:levels:enabled  ; default enabled/disabled per output levels
-                 innit:nub:sinks)) ; output sinks by level
+  (nub:vars:init
+   :innit
+   :list:debug:tags/common innit:nub:debug-tags:interactive ; common debug tags (for interactive toggling auto-complete help)
+   :alist:prefixes         innit:nub:levels:prefixes        ; output message prefixes
+   :alist:enabled?         innit:nub:levels:enabled         ; default enabled/disabled per output levels
+   :alist:sinks            innit:nub:sinks))                ; output sinks by level
 ;; (innit:nub:init)
 
 

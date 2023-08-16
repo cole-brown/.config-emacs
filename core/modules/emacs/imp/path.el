@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2023-08-15
+;; Timestamp:  2023-08-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -631,7 +631,7 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\")
                                              (t
                                               user-emacs-directory)))))
          (path/here (imp:path:current:file))
-         ;; Don't like `file-relative-name' as it can return wierd things when it
+         ;; Don't like `file-relative-name' as it can return weird things when it
          ;; goes off looking for actual directories and files...
          (path/relative (replace-regexp-in-string
                          ;; Make sure root dir has ending slash.
@@ -697,7 +697,7 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\":
                                            (int<imp>:path:root/dir feature/base)
                                          user-emacs-directory))))
          (path/here (file-name-as-directory (imp:path:current:dir)))
-         ;; Don't like `file-relative-name' as it can return wierd things when it
+         ;; Don't like `file-relative-name' as it can return weird things when it
          ;; goes off looking for actual directories and files...
          (path/relative (replace-regexp-in-string
                          ;; Make sure root dir has ending slash.

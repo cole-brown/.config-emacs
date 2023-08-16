@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-10-05
-;; Timestamp:  2023-06-21
+;; Timestamp:  2023-08-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -28,13 +28,11 @@
   "Initialize dlv debugging."
   ;; Defaults for all the settings except for the levels/enabled setting.
   (nub:vars:init :dlv
-                 nil
-                 nil
-                 (list (cons :error   t)
-                       (cons :warning t)
-                       (cons :info    (imp:flag? :dlv +debug))
-                       (cons :debug   (imp:flag? :dlv +debug)))
-                 nil))
+                 :alist:enabled? (list (cons :error   t)
+                                       (cons :warning t)
+                                       (cons :info    (imp:flag? :dlv +debug))
+                                       (cons :debug   (imp:flag? :dlv +debug)))))
+
 
 
 
