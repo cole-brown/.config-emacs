@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2023-08-02
+;; Timestamp:  2023-08-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -1109,7 +1109,7 @@ Raises an error signal if it cannot find a file path."
    ;;------------------------------
    ((bound-and-true-p byte-compile-current-file))
 
-   (load-file-name)
+   ((bound-and-true-p load-file-name))
 
    ((stringp (car-safe current-load-list))
     (car current-load-list))

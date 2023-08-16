@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-10-22
-;; Timestamp:  2023-08-15
+;; Timestamp:  2023-08-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -141,11 +141,16 @@ E.g. `+layout/dvorak' -> `:dvorak'."
    ;;------------------------------
    ;; Failure Case!
    ;;------------------------------
-   ;; Never gonna:
-   ;;   - Error out.
    (t
+    ;; Do not error. We need to log the message more than we need to complain about this.
     nil)))
 ;; (int<nub>:path:current:file)
+
+
+(defun int<nub>:path:current:dir ()
+  "Return the directory path of the file this is called from."
+  (when-let (path (int<nub>:path:current:file))
+    (directory-file-name (file-name-directory path))))
 
 
 (defun int<nub>:path:current:file/relative (user)
