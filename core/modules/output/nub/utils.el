@@ -157,14 +157,10 @@ E.g. `+layout/dvorak' -> `:dvorak'."
   "Return the relative path of the file this function is called from.
 
 Path will be relative to `nub' USER's root directory."
-  ;; TODO: Have `:nub' use init stuff here to get a relative path.
-  ;; TODO: Like, add a root-dir param to init if we don't have one already?
   (condition-case _
-      (let* ((path/root (file-name-as-directory
-                         ;; TODO: Get that root for USER here.
-                         (expand-file-name user-emacs-directory)))
+      (let* ((path/root (int<nub>:var:path user))
              (path/here (int<nub>:path:current:file))
-             ;; Don't like `file-relative-name' as it can return wierd things when it
+             ;; Don't like `file-relative-name' as it can return weird things when it
              ;; goes off looking for actual directories and files...
              (path/relative (replace-regexp-in-string
                              ;; Make sure root dir has ending slash.
@@ -174,8 +170,9 @@ Path will be relative to `nub' USER's root directory."
                              :fixedcase
                              :literal)))
 
-        ;; TODO: Do we care if it's not really relative?
-        ;; ;; End up with the same thing? Not a relative path - signal error (unless no FEATURE-OR-ROOT).
+        ;; Do we care if it's not really relative?
+        ;; It'd be nice to care, but we cannot error out during the messaging
+        ;; functions (`nub:error', `nub:debug', etc).
         ;; (when (string= path/relative path/here)
         ;;   (int<imp>:error "int<nub>:path:current:file/relative"
         ;;                   '("Current directory is not relative to FEATURE-OR-ROOT!\n"
@@ -188,7 +185,7 @@ Path will be relative to `nub' USER's root directory."
         ;;                   path/here
         ;;                   path/relative))
 
-        ;; Return relative path.
+        ;; Return (hopefully) relative path.
         path/relative)
 
     ;; Error Handling: Don't error out of the debug/error/whatever message being created.
