@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-12-01
-;; Timestamp:  2023-06-26
+;; Timestamp:  2023-08-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -111,12 +111,70 @@ USER should be the nub user keyword."
 
 (defun int<nub>:init:user (user)
   "Add USER as a registered `nub' user."
+  (unless (keywordp user)
+    (int<nub>:error "int<nub>:init:user"
+                    "USER should be a keyword! Got '%S': '%S'"
+                    (type-of user)
+                    user))
+
   (push user int<nub>:var:users))
 
 
 (defun int<nub>:terminate:user (user)
   "Add USER as a registered `nub' user."
   (setq int<nub>:var:users (remove user int<nub>:var:users)))
+
+
+;;--------------------------------------------------------------------------------
+;; Paths
+;;--------------------------------------------------------------------------------
+
+(defvar int<nub>:var:paths
+  (list (cons int<nub>:var:user:fallback user-emacs-directory))
+  "Alist of `nub' user to root path for the user.")
+
+
+(defun int<nub>:init:path (user path:root)
+  "Add PATH:ROOT as USER's root path.
+
+PATH:ROOT should be one of:
+  - string - An absolute path string to an existing directory.
+  - nil    - \"Figure out what directory we're in now and use that, please.\"
+
+Used mainly for creating relative paths to files if no CALLER param is supplied."
+  ;;------------------------------
+  ;; Default Path?
+  ;;------------------------------
+  (when (null path:root)
+    (setq path:root (int<nub>:path:current:dir)))
+
+  ;;------------------------------
+  ;; Error Checking
+  ;;------------------------------
+  (unless (stringp path:root)
+    (int<nub>:error "int<nub>:init:path"
+                    "PATH:ROOT should be a string! Got '%S': '%S'"
+                    (type-of path:root)
+                    path:root))
+  (unless (file-name-absolute-p path:root)
+    (int<nub>:error "int<nub>:init:path:root"
+                    "PATH:ROOT should be an absolute path! Got: '%S'"
+                    path:root))
+  (unless (file-directory-p path:root)
+    (int<nub>:error "int<nub>:init:path:root"
+                    "PATH:ROOT should be an existing directory! Doesn't exist or not a directory: '%S'"
+                    path:root))
+
+  ;;------------------------------
+  ;; Save PATH:ROOT
+  ;;------------------------------
+  (int<nub>:alist:update user
+                         ;; Canonicalize to abbreviated absolute path ("~/foo/bar/baz.qux").
+                         (abbreviate-file-name path:root)
+                         int<nub>:var:paths))
+;; (int<nub>:init:path :test (path:current:dir))
+;; (int<nub>:init:path :test nil)
+;; int<nub>:var:paths
 
 
 ;;------------------------------------------------------------------------------
@@ -815,8 +873,10 @@ default user instead."
 ;;------------------------------------------------------------------------------
 
 ;; TODO: A `nub:register' function? Maybe just rename this?
-(defun nub:vars:init (user &optional list:debug:tags/common alist:prefixes alist:enabled? alist:sinks)
-  "Register USER and set their default settings for output levels.
+(defun nub:vars:init (user &optional path:root list:debug:tags/common alist:prefixes alist:enabled? alist:sinks)
+  "Register USER at PATH:ROOT and set their default settings for output levels.
+
+USER should be a keyword.
 
 LIST:DEBUG:TAGS/COMMON should be a list of debugging keyword tags.
 It is used for prompting end-users for debug tags to toggle.
@@ -833,7 +893,8 @@ Alists should have all output levels in them; for valid levels, see
 If an alist is nil, the default/fallback will be used instead.
 
 Sets both current and backup values (backups generally only used for tests)."
-  (int<nub>:init:user user)
+  (int<nub>:init:user      user)
+  (int<nub>:init:path:root user path:root)
 
   (when alist:enabled?
     (int<nub>:init:enabled? user alist:enabled?))
@@ -918,6 +979,8 @@ Sets both current and backup values (backups generally only used for tests)."
   ;;---
   ;; Final step: Delete the actual user.
   ;;---
+  (int<nub>:alist:delete user
+                         int<nub>:var:paths)
   (int<nub>:terminate:user user)
 
   nil)
@@ -1002,6 +1065,15 @@ Sets both current and backup values (backups generally only used for tests)."
   ;;---
   ;; Final step: Delete the actual users.
   ;;---
+  (message "  `int<nub>:var:paths'")
+  (dolist (user-assoc int<nub>:var:paths)
+    (let ((user (car user-assoc))
+          (path (cdr user-assoc)))
+      (unless (eq user int<nub>:var:user:fallback)
+        (message "    - %S @ '%S'" user path)
+        (int<nub>:alist:delete user
+                               int<nub>:var:paths))))
+
   (message "  `int<nub>:var:users'")
   (dolist (user int<nub>:var:users)
     (message "    - %S" user))
