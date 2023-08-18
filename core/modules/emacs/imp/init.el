@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-08-18
 ;; Version:    1.1.20220413
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -76,6 +76,7 @@
 ;;------------------------------
 (int<imp>:init:load "debug")
 (int<imp>:debug:init)
+
 
 ;;------------------------------
 ;; Order matters.

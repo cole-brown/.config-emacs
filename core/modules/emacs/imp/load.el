@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-08-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -697,6 +697,9 @@ Return nil for failure, non-nil for success."
            (when (int<imp>:debug:enabled?)
              (message "[imp:debug] %s: '%s'"
                       macro:func/name
+                      ;; Don't love expanded path, but it does match what Emacs outputs:
+                      ;; Emacs: "Loading /home/work/.config/emacs-sn004/core/modules/emacs/imp/init.el (source)... done"
+                      ;; imp:   "[imp:debug] imp:load: ’/home/work/.config/emacs-sn004/core/modules/elisp/utils/init’"
                       macro:path:load))
            ;; Actually do the load.
            (setq load-result
