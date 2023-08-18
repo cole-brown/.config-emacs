@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-06-24
-;; Timestamp:  2023-08-15
+;; Timestamp:  2023-08-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -697,7 +697,7 @@ ARGS should be the `message' arguments."
   (declare (indent 3))
 
   `(let* ((int<nub>:macro:user      ,user)
-          (int<nub>:macro:caller    ,(int<nub>:caller-or-path user caller))
+          (int<nub>:macro:caller    (int<nub>:caller-or-path int<nub>:macro:user ,caller))
           (int<nub>:macro:tags      ,tags)
           (int<nub>:macro:func/name (nub:format:callers "nub:debug"
                                                         int<nub>:macro:caller)))
@@ -718,6 +718,7 @@ ARGS should be the `message' arguments."
                    int<nub>:macro:caller
                    ,msg
                    ,@args))))
+;; (nub:debug :default "test-func" '(:jeff) (message "test"))
 ;; Make sure it only evals args when debugging:
 ;; (nub:debug :default "test-func" nil (message "test"))
 ;; (nub:debug :default "test-func" '(:derive) (message "test"))
