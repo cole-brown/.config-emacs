@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2023-08-16
+;; Timestamp:  2023-08-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -194,6 +194,8 @@ If PATH is relative, canonicalize to be under `default-directory'.
 (imp:path:join \"/foo/bar/\" \"jeff\" \"jill.el\" \"..\")
   ->\"/foo/bar/jeff\""
   (imp:path:canonical (apply #'imp:path:join path)))
+;; (imp:path:join:canonical "foo" "bar")
+;; (imp:path:join:canonical nil)
 
 
 (defun imp:path:abbreviate (&rest path)
@@ -201,6 +203,132 @@ If PATH is relative, canonicalize to be under `default-directory'.
 
 Return an absolute path."
   (abbreviate-file-name (imp:path:canonical (apply #'imp:path:join path))))
+
+
+(defun int<imp>:path:relative (feature-or-root path &optional error?)
+  "Get PATH, relative to FEATURE-OR-ROOT.
+
+FEATURE-OR-ROOT should be:
+  - keyword - the `imp' feature's keyword
+    - Returned path will be relative to the root directory of the keyword.
+    - Will raise an error if the feature does not have a path root.
+  - string  - an absolute path
+    - Returned path will be relative to this absolute path.
+  - nil
+    - Returned path will be relative to `user-emacs-directory'.
+
+PATH should be an absolute path string.
+
+If PATH has no relation to the determined root path from FEATURE-OR-ROOT:
+  - If ERROR? is nil, just return (canonicalized) PATH.
+  - If ERROR? is non-nil, signal an error.
+
+Example (given `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
+  ~/.config/emacs/foo/bar.el:
+    (imp:path:relative :dot-emacs \"~/.config/emacs/foo/bar.el\")
+      -> \"foo/bar.el\"
+    (imp:path:relative :dot-emacs
+                       \"/home/<username>\" \".config\" \"emacs/foo/bar.el\")
+      -> \"foo/bar.el\""
+  (let ((func/name "int<imp>:path:relative"))
+    ;;------------------------------
+    ;; Error Checking
+    ;;------------------------------
+    (cond ((null feature-or-root)
+           nil)
+          ((keywordp feature-or-root)
+           nil)
+          ((and (stringp feature-or-root)
+                (not (file-name-absolute-p feature-or-root)))
+           (int<imp>:error/if error?
+                              func/name
+                              "FEATURE-OR-ROOT must be an absolute path if a string! Got: '%s'"
+                              feature-or-root)
+           (setq feature-or-root 'error))
+          (t
+           (int<imp>:error/if error?
+                              func/name
+                              "Don't know how to handle FEATURE-OR-ROOT! Not a keyword, a string, or nil. Got a '%S': %S"
+                              (type-of feature-or-root)
+                              feature-or-root)
+           (setq feature-or-root 'error)))
+
+    (unless (stringp path)
+      (int<imp>:error/if error?
+                         func/name
+                         "PATH must be a string! Got '%S': '%S'"
+                         (type-of path)
+                         path)
+           (setq path 'error))
+
+    ;;------------------------------
+    ;; Get Relative Path
+    ;;------------------------------
+    (let* ((path/root (if (eq feature-or-root 'error)
+                          ;; Don't have a valid FEATURE-OR-ROOT but don't want to error out.
+                          ;; So do something that'll end up returning absolute PATH.
+                          ""
+                        ;; canonical directory path
+                        (file-name-as-directory
+                         (expand-file-name (cond ((keywordp feature-or-root)
+                                                  (int<imp>:path:root/dir feature-or-root))
+                                                 ((stringp feature-or-root)
+                                                  feature-or-root)
+                                                 (t
+                                                  user-emacs-directory))))))
+           ;; Don't like `file-relative-name' as it can return weird things when it
+           ;; goes off looking for actual directories and files...
+           (path/relative (replace-regexp-in-string
+                           ;; Make sure root dir has ending slash.
+                           path/root ;; Look for root directory path...
+                           ""        ;; Replace with nothing to get a relative path.
+                           path
+                           :fixedcase
+                           :literal)))
+
+      ;; End up with the same thing? Not a relative path - signal error?
+      (when (and error?
+                 (string= path/relative path))
+        (int<imp>:error func/name
+                        '("Current directory is not relative to FEATURE-OR-ROOT!\n"
+                          "  FEATURE-OR-ROOT: %S\n"
+                          "  root path:    %s\n"
+                          "  curr path:    %s\n"
+                          "---> result:    %s")
+                        feature-or-root
+                        path/root
+                        path/here
+                        path/relative))
+
+      ;; Return relative path.
+      path/relative)))
+
+
+(defun imp:path:relative (feature-or-root &rest path)
+  "Join & canonicalize PATH, then make relative to FEATURE-OR-ROOT.
+
+FEATURE-OR-ROOT should be:
+  - keyword - the `imp' feature's keyword
+    - Returned path will be relative to the root directory of the keyword.
+    - Will raise an error if the feature does not have a path root.
+  - string  - an absolute path
+    - Returned path will be relative to this absolute path.
+  - nil
+    - Returned path will be relative to `user-emacs-directory'.
+
+Will raise an error if `imp:path:current:file' (i.e. the absolute path)
+has no relation to the determined root path.
+
+Example (given `:dot-emacs' has root path initialized as \"~/.config/emacs\"):
+  ~/.config/emacs/foo/bar.el:
+    (imp:path:relative :dot-emacs \"~/.config/emacs/foo/bar.el\")
+      -> \"foo/bar.el\"
+    (imp:path:relative :dot-emacs
+                       \"/home/<username>\" \".config\" \"emacs/foo/bar.el\")
+      -> \"foo/bar.el\""
+  (int<imp>:path:relative feature-or-root
+                          (apply #'imp:path:join:canonical path)
+                          :error))
 
 
 ;;------------------------------------------------------------------------------
@@ -590,8 +718,6 @@ FEATURE-OR-ROOT should be:
     - Will raise an error if the feature does not have a path root.
   - string  - an absolute path
     - Returned path will be relative to this absolute path.
-  - `project'
-    - Return path will be relative to `(project-root (project-current))'.
   - nil
     - Returned path will be relative to `user-emacs-directory'.
 
@@ -608,56 +734,12 @@ Example (assuming `:dot-emacs' has root path initialized as \"~/.config/emacs\")
       -> \"foo/bar.el\"
     (imp:path:current:file/relative \"/home/<username>/.config/emacs/foo\")
       -> \"bar.el\""
-  (cond ((null feature-or-root)
-         nil)
-        ((keywordp feature-or-root)
-         nil)
-        ((and (stringp feature-or-root)
-              (not (file-name-absolute-p feature-or-root)))
-         (int<imp>:error "imp:path:current:file/relative"
-                         "FEATURE-OR-ROOT must be an absolute path if a string! Got: '%s'"
-                         feature-or-root))
-        (t
-         (int<imp>:error "imp:path:current:file/relative"
-                         "Don't know how to handle FEATURE-OR-ROOT! Not a keyword, a string, `project', or nil. Got a '%S': %S"
-                         (type-of feature-or-root)
-                         feature-or-root)))
-
-  (let* ((path/root (file-name-as-directory
-                     (expand-file-name (cond ((keywordp feature-or-root)
-                                              (int<imp>:path:root/dir feature-or-root))
-                                             ((stringp feature-or-root)
-                                              feature-or-root)
-                                             (t
-                                              user-emacs-directory)))))
-         (path/here (imp:path:current:file))
-         ;; Don't like `file-relative-name' as it can return weird things when it
-         ;; goes off looking for actual directories and files...
-         (path/relative (replace-regexp-in-string
-                         ;; Make sure root dir has ending slash.
-                         path/root ;; Look for root directory path...
-                         ""        ;; Replace with nothing to get a relative path.
-                         path/here
-                         :fixedcase
-                         :literal)))
-    ;; End up with the same thing? Not a relative path - signal error (unless no FEATURE-OR-ROOT).
-    (when (string= path/relative path/here)
-      (int<imp>:error "imp:path:current:file/relative"
-                      '("Current directory is not relative to FEATURE-OR-ROOT!\n"
-                        "  FEATURE-OR-ROOT: %S\n"
-                        "  root path:    %s\n"
-                        "  curr path:    %s\n"
-                        "---> result:    %s")
-                      feature-or-root
-                      path/root
-                      path/here
-                      path/relative))
-    ;; Return relative path.
-    path/relative))
+  (int<imp>:path:relative feature-or-root
+                          (imp:path:current:file)
+                          :error))
 ;; (imp:path:current:file/relative)
 ;; (imp:path:root/set :test (imp:path:current:dir))
 ;; (imp:path:current:file/relative :test)
-;; (imp:path:current:file/relative 'project)
 
 
 (defun imp:file:current ()

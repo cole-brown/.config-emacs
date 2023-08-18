@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-22
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-08-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -185,6 +185,21 @@ ARGS should be a list of args for formatting the STRING."
 ;; (int<imp>:error "test:func" "True == %s" "False")
 ;; (let ((imp:error:function nil)) (int<imp>:error "test:func" "True == %s" "False"))
 ;; (let ((imp:error:function #'message)) (int<imp>:error "test:func" "True == %s" "False"))
+
+
+(defun int<imp>:error/if (error? caller string &rest args)
+  "If ERROR? is non-nil, format STRING & ARGS and raise an error signal.
+
+Uses `:error' level settings in `imp:output:level'.
+
+STRING should be a string, which can have formatting info in it (see `format'),
+and will be printed as the debug message.
+
+ARGS should be a list of args for formatting the STRING."
+  (when error?
+    (int<imp>:error caller
+                    string
+                    args)))
 
 
 (defun int<imp>:error:user (caller string &rest args)
