@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-13
-;; Timestamp:  2023-07-25
+;; Timestamp:  2023-08-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -43,6 +43,8 @@
             :filename "debug")
   (imp:load :feature  '(:innit nub)
             :filename "nub")
+  (imp:load :feature  '(:innit os)
+            :filename "os")
   (imp:load :feature  '(:innit time)
             :filename "time")
   (imp:load :feature  '(:innit optimize)

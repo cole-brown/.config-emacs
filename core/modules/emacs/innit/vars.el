@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-13
-;; Timestamp:  2023-07-18
+;; Timestamp:  2023-08-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -54,12 +54,6 @@
 ;; TODO: If none of these used, get rid of (or move to somewhere later/more appropriate).
 ;; (defconst innit:emacs:28+  (> emacs-major-version 27))
 ;; (defconst innit:emacs:29+  (> emacs-major-version 28))
-
-
-(defconst innit:os:linux?   (eq system-type 'gnu/linux))
-(defconst innit:os:mac?     (eq system-type 'darwin))
-(defconst innit:os:windows? (memq system-type '(cygwin windows-nt ms-dos)))
-(defconst innit:os:bsd?     (or innit:os:mac? (eq system-type 'berkeley-unix)))
 
 
 ;;------------------------------------------------------------------------------
