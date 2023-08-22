@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-03-16
-;; Timestamp:  2023-08-01
+;; Timestamp:  2023-08-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -102,10 +102,10 @@ But TIME is just nil."
                               :hour   0
                               :minute 0
                               :second 0))
-            (timestamp/month/1st
-             (datetime:format
-              'rfc-3339 'date
-              :time (datetime:convert date/month/1st :lisp:time))))
+           (timestamp/month/1st
+            (datetime:format
+             'rfc-3339 'date
+             :time (datetime:convert date/month/1st :lisp:time))))
       (str:format/newline
        '("#+TITLE:       %s"
          "#+DESCRIPTION: TODO: A quip for today."
@@ -234,46 +234,44 @@ LETTER must be a 1-character string."
     (if (not (jerky:namespace:has namespace))
         ;; TODO: Raise `innit:error:???' instead of warn?
         (nub:warning
-         :innit
-         (imp:path:join (imp:path:current:dir/relative :mantle)
-                        (imp:path:current:file))
-         "No `%1$S' namespace in Jerky; cannot set up `%2$S' keybinds for `%1$S'."
-         namespace
-         'org-journal)
+            :innit
+            (imp:path:current:file/relative :mantle)
+          "No `%1$S' namespace in Jerky; cannot set up `%2$S' keybinds for `%1$S'."
+          namespace
+          'org-journal)
       (if (not (jerky:get 'path 'org 'journal :namespace namespace))
           ;; TODO: Raise `innit:error:???' instead of warn?
           (nub:warning
-           :innit
-           (imp:path:join (imp:path:current:dir/relative :mantle)
-                          (imp:path:current:file))
-           "No `%1$S' key in `%2$S' namespace in Jerky; cannot set up `%3$S' keybinds for `%2$S'."
-           (jerky:key:string 'path 'org 'journal)
-           namespace
-           'org-journal)
+              :innit
+              (imp:path:current:file/relative :mantle)
+            "No `%1$S' key in `%2$S' namespace in Jerky; cannot set up `%3$S' keybinds for `%2$S'."
+            (jerky:key:string 'path 'org 'journal)
+            namespace
+            'org-journal)
 
         ;; Ok; make our NAMESPACE keybinds!
         (keybind:leader/global:def
-         :infix (keybind:infix "n" "j" letter) ;; notes -> journal -> NAMESPACE journal
-         "" (list nil :which-key (format "Journal: `%S'..." namespace)) ;; Infix Title
+          :infix (keybind:infix "n" "j" letter) ;; notes -> journal -> NAMESPACE journal
+          "" (list nil :which-key (format "Journal: `%S'..." namespace)) ;; Infix Title
 
-         letter (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                              #'org-journal-new-entry
-                                                              current-prefix-arg))
-                      :which-key (format "`%S' - New Entry" namespace))
+          letter (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                               #'org-journal-new-entry
+                                                               current-prefix-arg))
+                       :which-key (format "`%S' - New Entry" namespace))
 
-         "J" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-new-scheduled-entry
-                                                           current-prefix-arg))
-                   :which-key (format "`%S' - New Scheduled Entry" namespace))
+          "J" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                            #'org-journal-new-scheduled-entry
+                                                            current-prefix-arg))
+                    :which-key (format "`%S' - New Scheduled Entry" namespace))
 
-         "v" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-open-current-journal-file))
-                   :which-key (format "`%S' - Visit Journal" namespace))
+          "v" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                            #'org-journal-open-current-journal-file))
+                    :which-key (format "`%S' - Visit Journal" namespace))
 
-         "s" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-search-forever
-                                                           nil))
-                   :which-key (format "`%S' - Search Journal" namespace))))))
+          "s" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                            #'org-journal-search-forever
+                                                            nil))
+                    :which-key (format "`%S' - Search Journal" namespace))))))
 
 
   (defun mantle:meow/keybind/general:journal ()
@@ -458,10 +456,10 @@ LETTER must be a 1-character string."
 (imp:use-package org-journal
   :when  (imp:flag? :keybinds +evil)
   :after (:and (:keybinds user general)
-               evil
-               evil-collection
-               org
-               evil-org)
+          evil
+          evil-collection
+          org
+          evil-org)
 
   ;;------------------------------
   :init
@@ -476,50 +474,48 @@ LETTER must be a 1-character string."
     (if (not (jerky:namespace:has namespace))
         ;; TODO: Raise `innit:error:???' instead of warn?
         (nub:warning
-         :innit
-         (imp:path:join (imp:path:current:dir/relative :mantle)
-                        (imp:path:current:file))
-         "No `%1$S' namespace in Jerky; cannot set up `%2$S' keybinds for `%1$S'."
-         namespace
-         'org-journal)
+            :innit
+            (imp:path:current:file/relative :mantle)
+          "No `%1$S' namespace in Jerky; cannot set up `%2$S' keybinds for `%1$S'."
+          namespace
+          'org-journal)
       (if (not (jerky:get 'path 'org 'journal :namespace namespace))
           ;; TODO: Raise `innit:error:???' instead of warn?
           (nub:warning
-           :innit
-           (imp:path:join (imp:path:current:dir/relative :mantle)
-                          (imp:path:current:file))
-           "No `%1$S' key in `%2$S' namespace in Jerky; cannot set up `%3$S' keybinds for `%2$S'."
-           (jerky:key:string 'path 'org 'journal)
-           namespace
-           'org-journal)
+              :innit
+            (imp:path:current:file/relative :mantle)
+            "No `%1$S' key in `%2$S' namespace in Jerky; cannot set up `%3$S' keybinds for `%2$S'."
+            (jerky:key:string 'path 'org 'journal)
+            namespace
+            'org-journal)
 
         ;; Ok; make our NAMESPACE keybinds!
         (keybind:leader/global:def
-         :infix (keybind:infix "n" letter) ;; notes -> NAMESPACE journal
-         "" (list nil :which-key (format "Journal: `%S'..." namespace)) ;; Infix Title
+          :infix (keybind:infix "n" letter) ;; notes -> NAMESPACE journal
+          "" (list nil :which-key (format "Journal: `%S'..." namespace)) ;; Infix Title
 
-         letter (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                              #'org-journal-new-entry
-                                                              current-prefix-arg))
-                      :which-key (format "`%S' - New Entry" namespace))
-         "j" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-new-entry
-                                                           current-prefix-arg))
-                   :which-key (format "`%S' - New Entry" namespace))
+          letter (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                               #'org-journal-new-entry
+                                                               current-prefix-arg))
+                       :which-key (format "`%S' - New Entry" namespace))
+          "j" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                            #'org-journal-new-entry
+                                                            current-prefix-arg))
+                    :which-key (format "`%S' - New Entry" namespace))
 
-         "J" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-new-scheduled-entry
-                                                           current-prefix-arg))
-                   :which-key (format "`%S' - New Scheduled Entry" namespace))
+          "J" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                            #'org-journal-new-scheduled-entry
+                                                            current-prefix-arg))
+                    :which-key (format "`%S' - New Scheduled Entry" namespace))
 
-         "v" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-open-current-journal-file))
-                   :which-key (format "`%S' - Visit Journal" namespace))
+          "v" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                            #'org-journal-open-current-journal-file))
+                    :which-key (format "`%S' - Visit Journal" namespace))
 
-         "s" (list (elisp:cmd (mode:org/journal:namespaced namespace
-                                                           #'org-journal-search-forever
-                                                           nil))
-                   :which-key (format "`%S' - Search Journal" namespace))))))
+          "s" (list (elisp:cmd (mode:org/journal:namespaced namespace
+                                                            #'org-journal-search-forever
+                                                            nil))
+                    :which-key (format "`%S' - Search Journal" namespace))))))
 
 
   ;;------------------------------

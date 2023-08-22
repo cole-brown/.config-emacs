@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-05
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-08-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -25,8 +25,7 @@
 (unless (executable-find "node")
   (nub:warning
       :innit
-      (imp:path:join (imp:path:current:dir/relative :mantle)
-                     (imp:path:current:file))
+      (imp:path:current:file/relative :mantle)
     '("Could not find `node' executable. Is it installed? "
       "JavaScript config wants it.")))
 
@@ -34,8 +33,7 @@
 (unless (executable-find "npm")
   (nub:warning
       :innit
-      (imp:path:join (imp:path:current:dir/relative :mantle)
-                     (imp:path:current:file))
+      (imp:path:current:file/relative :mantle)
     '("Could not find `npm' executable. Is it installed? "
       "JavaScript config wants it.")))
 
@@ -43,8 +41,7 @@
 (unless (executable-find "yarn")
   (nub:warning
       :innit
-      (imp:path:join (imp:path:current:dir/relative :mantle)
-                     (imp:path:current:file))
+      (imp:path:current:file/relative :mantle)
     '("Could not find `yarn' executable. Is it installed? "
       "JavaScript config wants it.")))
 
@@ -90,14 +87,14 @@
 
 
   (innit:hook:defun
-     (:name   'javascript:settings
-      :docstr "Settings for Javascript mode. Non-LSP stuff.")
+      (:name   'javascript:settings
+       :docstr "Settings for Javascript mode. Non-LSP stuff.")
 
-   ;; Nothing currently, I guess?
+    ;; Nothing currently, I guess?
 
-   ;; Separate camel-case into separate words?
-   ;; (subword-mode t)
-   )
+    ;; Separate camel-case into separate words?
+    ;; (subword-mode t)
+    )
 
 
   ;;------------------------------
@@ -239,27 +236,27 @@
       (:name   'typescript:settings
        :docstr "Settings for Typescript mode. Non-LSP stuff.")
 
-     ;; 'wide' is a decent default, probably?
-     (setq fill-column (jerky:get 'fill-column 'wide))
+    ;; 'wide' is a decent default, probably?
+    (setq fill-column (jerky:get 'fill-column 'wide))
 
-     (setq tab-width (jerky:get 'code 'tab 'standard))
+    (setq tab-width (jerky:get 'code 'tab 'standard))
 
     ;; Separate camel-case into separate words?
     ;; (subword-mode t)
 
-     ;; NOTE: Delete this if the line brakes act fucky.
-     (setq comment-line-break-function #'js2-line-break)
+    ;; NOTE: Delete this if the line brakes act fucky.
+    (setq comment-line-break-function #'js2-line-break)
 
-     ;; Most projects use either eslint, prettier, .editorconfig, or tsf in order
-     ;; to specify indent level and formatting. In the event that no
-     ;; project-level config is specified (very rarely these days), the community
-     ;; default is 2, not 4. However, respect what is in tsfmt.json if it is
-     ;; present in the project
-     (setq typescript-indent-level (or (and (bound-and-true-p tide-mode)
-                                      (plist-get (tide-tsfmt-options) :indentSize))
-                                 typescript-indent-level))
+    ;; Most projects use either eslint, prettier, .editorconfig, or tsf in order
+    ;; to specify indent level and formatting. In the event that no
+    ;; project-level config is specified (very rarely these days), the community
+    ;; default is 2, not 4. However, respect what is in tsfmt.json if it is
+    ;; present in the project
+    (setq typescript-indent-level (or (and (bound-and-true-p tide-mode)
+                                           (plist-get (tide-tsfmt-options) :indentSize))
+                                      typescript-indent-level))
 
-     ;; Doom Fix #5556: expand .x to className="x" instead of class="x", if
+    ;; Doom Fix #5556: expand .x to className="x" instead of class="x", if
     ;; `emmet-mode' is used.
     (setq emmet-expand-jsx-className? t))
 
@@ -283,7 +280,7 @@
   ;;     (after! lsp-mode
   ;;       (add-to-list 'lsp--formatting-indent-alist '(typescript-tsx-mode . typescript-indent-level)))))
 
-    ;; HACK Fixes comment continuation on newline
+  ;; HACK Fixes comment continuation on newline
   (autoload 'js2-line-break "js2-mode" nil t))
 
 

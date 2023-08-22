@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-03
-;; Timestamp:  2023-07-26
+;; Timestamp:  2023-08-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -38,8 +38,7 @@
 (unless (executable-find "terraform")
   (nub:warning
       :innit
-      (imp:path:join (imp:path:current:dir/relative :mantle)
-                     (imp:path:current:file))
+      (imp:path:current:file/relative :mantle)
     '("Could not find 'terraform' executable. Is it installed? "
       "My helpers around `terraform-mode' want it (`mantle:terraform:runner'). "
       "NOTE: `terragrunt' could be needed too, depending on if you need it or not...")))
@@ -247,10 +246,10 @@ Return a string:
   :general ; evil
   ;;------------------------------
   (keybind:leader/local:def
-    :map terraform-mode-map
-    "a" (list (elisp:cmd (mantle:terraform:run "apply")) :which-key "terraform apply")  ; (mantle:terraform:command "apply"))
-    "i" (list (elisp:cmd (mantle:terraform:run "init"))  :which-key "terraform init")   ; (mantle:terraform:command "init"))
-    "p" (list (elisp:cmd (mantle:terraform:run "plan"))  :which-key "terraform plan"))) ; (mantle:terraform:command "plan"))))
+   :map terraform-mode-map
+   "a" (list (elisp:cmd (mantle:terraform:run "apply")) :which-key "terraform apply")  ; (mantle:terraform:command "apply"))
+   "i" (list (elisp:cmd (mantle:terraform:run "init"))  :which-key "terraform init")   ; (mantle:terraform:command "init"))
+   "p" (list (elisp:cmd (mantle:terraform:run "plan"))  :which-key "terraform plan"))) ; (mantle:terraform:command "plan"))))
 
 
 ;;------------------------------------------------------------------------------

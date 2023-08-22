@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-21
-;; Timestamp:  2023-07-18
+;; Timestamp:  2023-08-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -142,36 +142,36 @@
   ;; Put Magit Leader under the Global Leader
   ;;---
   (keybind:leader/global:def
-   :infix  "g"
+    :infix  "g"
 
-   ;;---
-   ;; Magit Keybinds
-   ;;---
-   "g" (list #'magit-status                  :which-key "Status")
-   "q" (list #'mantle:user:magit:buffer:kill :which-key "Kill All 'magit' Buffers")
+    ;;---
+    ;; Magit Keybinds
+    ;;---
+    "g" (list #'magit-status                  :which-key "Status")
+    "q" (list #'mantle:user:magit:buffer:kill :which-key "Kill All 'magit' Buffers")
 
-   ;; TODO: More keybinds!
-   ;; TODO: And use `:repeat' / `:jump'?
-   ;;   https://github.com/noctuid/general.el#evil-command-properties
-   ;;   https://github.com/noctuid/evil-guide#command-properties
-   ;;
-   ;; (general-define-key
-   ;;  :keymaps 'normal
-   ;;  :prefix "SPC"
-   ;;  "gj" '(git-gutter:next-hunk :properties (:repeat t :jump t))
-   ;;  "gk" '(git-gutter:previous-hunk :repeat t :jump t))
-   ;;
-   ;; ;; they also work globally
-   ;; (general-define-key
-   ;;  :keymaps 'normal
-   ;;  :prefix "SPC"
-   ;;  :properties '(:repeat t :jump t)
-   ;;  ;; or
-   ;;  :repeat t
-   ;;  :jump t
-   ;;  "gj" 'git-gutter:next-hunk
-   ;;  "gk" 'git-gutter:previous-hunk)
-   ))
+    ;; TODO: More keybinds!
+    ;; TODO: And use `:repeat' / `:jump'?
+    ;;   https://github.com/noctuid/general.el#evil-command-properties
+    ;;   https://github.com/noctuid/evil-guide#command-properties
+    ;;
+    ;; (general-define-key
+    ;;  :keymaps 'normal
+    ;;  :prefix "SPC"
+    ;;  "gj" '(git-gutter:next-hunk :properties (:repeat t :jump t))
+    ;;  "gk" '(git-gutter:previous-hunk :repeat t :jump t))
+    ;;
+    ;; ;; they also work globally
+    ;; (general-define-key
+    ;;  :keymaps 'normal
+    ;;  :prefix "SPC"
+    ;;  :properties '(:repeat t :jump t)
+    ;;  ;; or
+    ;;  :repeat t
+    ;;  :jump t
+    ;;  "gj" 'git-gutter:next-hunk
+    ;;  "gk" 'git-gutter:previous-hunk)
+    ))
 
 
 ;;------------------------------------------------------------------------------
@@ -227,8 +227,7 @@
 (unless (executable-find "rg")
   (nub:warning
       :innit
-      (imp:path:join (imp:path:current:dir/relative :mantle)
-                     (imp:path:current:file))
+      (imp:path:current:file/relative :mantle)
     '("Could not find 'ripgrep' (`rg') executable. Is it installed? "
       "`magit-todos' wants it.")))
 
@@ -317,11 +316,11 @@
   :general ; evil
   ;;------------------------------
   (keybind:leader/global:def
-   :infix  "g"
-   ;;---
-   ;; Magit-Todos Keybinds
-   ;;---
-   "t" '(magit-todos-list :which-key "Magit TODOs list buffer")))
+    :infix  "g"
+    ;;---
+    ;; Magit-Todos Keybinds
+    ;;---
+    "t" '(magit-todos-list :which-key "Magit TODOs list buffer")))
 
 
 ;;------------------------------------------------------------------------------
@@ -403,7 +402,7 @@
   ;; Docker's ignore file is basically the same format as .gitignore, so use the
   ;; `gitignore-mode' for it.
   (add-to-list 'auto-mode-alist
-             (cons "/.dockerignore\\'" 'gitignore-mode)))
+               (cons "/.dockerignore\\'" 'gitignore-mode)))
 
 
 ;;------------------------------------------------------------------------------
