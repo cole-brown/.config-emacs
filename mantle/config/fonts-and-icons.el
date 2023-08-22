@@ -1,10 +1,10 @@
-;;; mantle/config/all-the-icons.el --- Icon Fonts -*- lexical-binding: t; -*-
+;;; mantle/config/fonts-and-icons.el --- Icon Fonts -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-13
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-08-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -12,15 +12,139 @@
 ;;
 ;;; Commentary:
 ;;
+;; All the Icons: Wingdings 3.0
+;; Nerd Icons:    ...All the Icons 2.0?
+;;
+;;; Code:
+
+
+;; ┌──────────────────────────────────═══───────────────────────────────────┐
+;; │                                 ═════                                  │
+;; │                               Nerd Icons                               │
+;; │                                 ═════                                  │
+;; └──────────────────────────────────═══───────────────────────────────────┘
+
+;; TODO:fonts:icons: Move the `mantle:user:icon/*' functions to use `nerd-icons' instead of `all-the-icons'?
+
+(imp:use-package nerd-icons
+
+  ;;------------------------------------------------------------------------------
+  :init
+  ;;------------------------------------------------------------------------------
+
+  (defun mantle:nerd-icons:install-fonts/auto ()
+    "Automatically install `all-the-icon' fonts if needed.
+
+NOTE [2023-08-21]: `nerd-icons' doesn't have an easy font-family name to
+check like `all-the-icons' does..."
+    (let ((func/name "mantle:all-the-icons:install-fonts/auto")
+          (font-name
+           ;;------------------------------
+           ;; Linux
+           ;;------------------------------
+           (cond (innit:os:linux?
+                  ;; ...well what kind of Linux?
+                  (pcase (innit:os:linux/distro)
+                    ;; [2023-08-22]: Ubuntu 20.04.6 LTS
+                    (`"ubuntu"
+                     ;; Don't remember if I installed this one myself or if
+                     ;; `nerd-icons' installed it for me, but this is what I have:
+                     "UbuntuMono Nerd Font")
+
+                    ;; Else no idea; warn and don't auto-install?
+                    (_
+                     (nub:warning
+                         :innit
+                         func/name
+                       '(:line:each
+                         "Linux & Nerd Fonts: Don't know what font to look for in order to do auto-install checks."
+                         "Install manually:"
+                         "  1. Run for comparing after install: (font-family-list)"
+                         "  2. Install the `nerd-font': `M-x nerd-icons-install-fonts`"
+                         "  3. Run again: (font-family-list)"
+                         "  4. Diff the two font lists and find the newly installed Nerd Font."
+                         "  5. Add your distro & font to this `pcase'.")))))
+
+                 ;;------------------------------
+                 ;; Windows
+                 ;;------------------------------
+                 ;; TODO: Stuff for Windows systems here!
+                 (innit:os:windows?
+                  (nub:warning
+                      :innit
+                      func/name
+                    '(:line:each
+                      "Windows & Nerd Fonts: Don't know what font to look for in order to do auto-install checks."
+                      "Install manually:"
+                      "  1. Run for comparing after install: (font-family-list)"
+                      "  2. Install the `nerd-font': `M-x nerd-icons-install-fonts`"
+                      "  3. Run again: (font-family-list)"
+                      "  4. Diff the two font lists and find the newly installed Nerd Font."
+                      "  5. Add font to this `cond' case.")))
+
+                 ;;------------------------------
+                 ;; Others
+                 ;;------------------------------
+                 ;; Ain't got any computer systems that use any other OS, at the moment.
+                 (t
+                  (nub:warning
+                      :innit
+                      func/name
+                    '(:line:each
+                      "%S & Nerd Fonts: Don't know what font to look for in order to do auto-install checks."
+                      "Install manually:"
+                      "  1. Run for comparing after install: (font-family-list)"
+                      "  2. Install the `nerd-font': `M-x nerd-icons-install-fonts`"
+                      "  3. Run again: (font-family-list)"
+                      "  4. Diff the two font lists and find the newly installed Nerd Font."
+                      "  5. Add OS type (%S) & font to this `cond' as a new case.")
+                    (innit:os:type)
+                    (innit:os:type))))))
+
+      ;;------------------------------
+      ;; Check for font & install if missing.
+      ;;------------------------------
+      ;; NOTE [2023-08-21]: `all-the-icons' has to delay its font search
+      ;; until after start-up, so we'll assume `nerd-fonts' has the same
+      ;; problem, since this search is using the same functions.
+      ;;
+      ;; The Problem being: these always return nil if run in the
+      ;; `:config' section of `all-the-icons' `use-package' block.
+      ;;   (member \"all-the-icons\" (font-family-list))
+      ;;   (find-font (font-spec :name \"all-the-icons\"))
+      (run-with-idle-timer 1   ; Run when Emacs is idle for 1 second.
+                           nil ; Do not repeat.
+                           (lambda ()
+                             ;; Try to automatically install the fonts if they're not present.
+                             ;; Closest I can get for now is this, I think.
+                             ;; See: https://github.com/domtronn/all-the-icons.el/issues/120
+                             (unless (find-font (font-spec :name font-name))
+                               (nerd-icons-install-fonts :confirm))))))
+
+
+  ;; ;;------------------------------------------------------------------------------
+  ;; :custom
+  ;; ;;------------------------------------------------------------------------------
+
+  ;; ;; If you want to use a Nerd Font (https://www.nerdfonts.com/) other than the
+  ;; ;; default of "Symbols Nerd Font Mono", set:
+  ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+
+
+  ;;------------------------------------------------------------------------------
+  :config
+  ;;------------------------------------------------------------------------------
+
+  ;; Auto-install font only if not already installed.
+  (mantle:nerd-icons:install-fonts/auto))
+
+
 ;; ┌──────────────────────────────────═══───────────────────────────────────┐
 ;; │                                 ═════                                  │
 ;; │                             All The Icons                              │
 ;; │                            (Wingdings 3.0)                             │
 ;; │                                 ═════                                  │
 ;; └──────────────────────────────────═══───────────────────────────────────┘
-;;
-;;; Code:
-
 
 ;; TODO:all-the-icons: [2023-05-02]: Can't figure out how to say, like, "I'd
 ;; really rather `all-the-icons' exist when these are called but if it can't
@@ -237,6 +361,28 @@
   ;;------------------------------------------------------------------------------
   :init
   ;;------------------------------------------------------------------------------
+
+  ;;--------------------------------------------------------------------------------
+  ;; Auto-Install Fonts?
+  ;;--------------------------------------------------------------------------------
+
+  (defun mantle:all-the-icons:install-fonts/auto ()
+    "Automatically install `all-the-icon' fonts if needed.
+
+NOTE [2023-08-21]: This used to work in the `use-package' `:config' section, but
+lately it's just installing fonts every startup because these two checks both
+now return nil during `:config'.
+  (member \"all-the-icons\" (font-family-list)))
+  (find-font (font-spec :name \"all-the-icons\")))"
+    (run-with-idle-timer 1   ; Run when Emacs is idle for 1 second.
+                         nil ; Do not repeat.
+                         (lambda ()
+                           ;; Try to automatically install the fonts if they're not present.
+                           ;; Closest I can get for now is this, I think.
+                           ;; See: https://github.com/domtronn/all-the-icons.el/issues/120
+                           (unless (find-font (font-spec :name "all-the-icons"))
+                             (all-the-icons-install-fonts :confirm)))))
+
 
   ;;------------------------------------------------------------------------------
   ;; Helper Functions, Actual
@@ -495,16 +641,24 @@ HELP-ECHO should be a string and will be put in the `help-echo' property.
   ;; Configuration
   ;;------------------------------------------------------------------------------
 
-  ;; Try to automatically install the fonts if they're not present.
-  ;; Closest I can get for now is this, I think.
-  ;; See: https://github.com/domtronn/all-the-icons.el/issues/120
-  (unless (find-font (font-spec :name "all-the-icons"))
-    ;; Alternate check for the fonts if that doesn't work right:
-    ;;   (unless (member "all-the-icons" (font-family-list))
-    (all-the-icons-install-fonts :confirm)))
+  ;; ??? :confused: ???
+  ;; NOTE [2023-08-21]: This used to work, but lately it's just installing fonts
+  ;; every startup. And these two checks both now return nil right here.
+  ;;     (member "all-the-icons" (font-family-list)))
+  ;;     (find-font (font-spec :name "all-the-icons")))
+  ;; ;; Try to automatically install the fonts if they're not present.
+  ;; ;; Closest I can get for now is this, I think.
+  ;; ;; See: https://github.com/domtronn/all-the-icons.el/issues/120
+  ;; (unless (find-font (font-spec :name "all-the-icons"))
+  ;;   ;; Alternate check for the fonts if that doesn't work right:
+  ;;   ;;   (unless (member "all-the-icons" (font-family-list)) ...)
+  ;;   (all-the-icons-install-fonts :confirm))
+  ;;
+  ;; Soo... try running the check/install on an idle timer?
+  (mantle:all-the-icons:install-fonts/auto))
 
 
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :mantle 'config 'all-the-icons)
+(imp:provide :mantle 'config 'fonts-and-icons)
