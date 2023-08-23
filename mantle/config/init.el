@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-26
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-08-21
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -31,9 +31,9 @@
           :path     (imp:path:current:dir/relative :mantle)
           :filename "help")
 
-(imp:load :feature  '(:mantle config all-the-icons)
+(imp:load :feature  '(:mantle config fonts-and-icons)
           :path     (imp:path:current:dir/relative :mantle)
-          :filename "all-the-icons")
+          :filename "fonts-and-icons")
 
 
 ;;------------------------------------------------------------------------------
