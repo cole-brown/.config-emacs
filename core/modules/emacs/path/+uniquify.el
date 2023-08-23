@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-08-11
+;; Timestamp:  2023-08-23
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -311,22 +311,31 @@ parent directory."
   "Clear `path:uniquify:settings/local' by setting it to nil.
 
 BUFFER should be a buffer object."
-  (with-current-buffer buffer
-    (nub:debug
-        :path:uniquify
-        "path:uniquify:settings/clear"
-        '(:settings)
-      "before clear: %S"
-      path:uniquify:settings/local)
+  (let ((special? (string-match-p
+                    ;; Special buffers start with "*", optionally with leading space.
+                    (rx (optional " ")
+                        "*" ;; literal asterisk
+                        (one-or-more printing)
+                        "*")
+                    (buffer-name buffer))))
+    (with-current-buffer buffer
+      (unless special?
+        (nub:debug
+            :path:uniquify
+            "path:uniquify:settings/clear"
+            '(:settings)
+          "before clear: %S"
+          path:uniquify:settings/local))
 
-    (setq path:uniquify:settings/local nil)
+        (setq path:uniquify:settings/local nil)
 
-    (nub:debug
-        :path:uniquify
-        "path:uniquify:settings/clear"
-        '(:settings)
-      "after clear: %S"
-      path:uniquify:settings/local)))
+        (unless special?
+          (nub:debug
+              :path:uniquify
+              "path:uniquify:settings/clear"
+              '(:settings)
+            "after clear: %S"
+            path:uniquify:settings/local)))))
 
 
 (defun int<path>:uniquify:settings/get (keywords settings)
@@ -517,9 +526,14 @@ BUFFER should be a buffer object.
              ;; Nothing to do; name already set?
              nil)
             (t
+             (nub:debug
+                 :path:uniquify
+                 func/name
+                 func/tags
+               "Set buffer name via `rename-buffer'.")
              ;; Use non-nil UNIQUE arg in order to avoid infinite loop recursion
              ;; due to our advising of `rename-buffer'.
-             (rename-buffer name :unique)
+             (rename-buffer name :path:uniquify)
              ;; Mark buffer's name as managed.
              (path:uniquify:buffer/manage buffer :buffer t))))))
 ;; (path:uniquify:settings/set:name/buffer (current-buffer))
@@ -551,7 +565,7 @@ PATH/UNIQUE."
       (unless path:uniquify:settings/local
         (nub:error
             :path:uniquify
-            "path:uniquify:settings/set:name/modeline"
+            func/name
           "Buffer has no `path:uniquify:settings/local'! Cannot set modeline name."))
 
       ;;------------------------------
@@ -957,7 +971,7 @@ Update any that need extra uniquification in e.g. modeline buffer name."
         :path:uniquify
         func/name
         func/tags
-      ;; TODO: Do I need any values?
+      ;; TODO:nub: Make `nub:debug:func/end' not print "  <--[RETURN]--" when we don't supply anything to it here.
       )))
 ;; (path:uniquify:settings/set:name/modeline (current-buffer) "a/+uniquify.el" t)
 ;; (path:uniquify:settings/set:name/modeline (get-buffer "+uniquify.el") "b/+uniquify.el" t)
@@ -985,6 +999,21 @@ Keyword Parameters:
                     (get-buffer buffer)
                   (current-buffer)))
         name)
+    (nub:debug:func/start
+        :path:uniquify
+        "int<path>:uniquify:name:propertize"
+        '(:settings)
+      (cons 'buffer                       buffer)
+      (cons 'project                      project)
+      (cons 'filepath                     filepath)
+      (cons 'truncated?                   truncated?)
+      (cons 'modeline?                    modeline?)
+      (cons '-----                        "-----")
+      (cons 'NOTE                         "I need a replacement for `buffer-file-truename' here... Any absolute paths to this file?")
+      (cons 'path:uniquify:settings/local path:uniquify:settings/local)
+      (cons 'buffer-file-truename         buffer-file-truename)
+      (cons 'buffer-file-name             buffer-file-name))
+
     (with-current-buffer buffer
       ;;------------------------------
       ;; Propertize Buffer Name
@@ -1117,82 +1146,155 @@ UNIQUE should be nil/non-nil.
 ARGS are just for future-proofing call to `rename-buffer'.
 
 Return a string of the name actually given to the buffer."
-  (let ((func/name "path:advice:uniquify:rename-buffer")
-        (func/tags '(:advice))
-        ;; Find out what Emacs wants to call this buffer.
-        (name/proposed (apply func name/requested unique? args))
-        (buffer (current-buffer))
-        name/actual)
+  (let* ((func/name "path:advice:uniquify:rename-buffer")
+         (func/tags '(:advice))
+         ;; Find out what Emacs wants to call this buffer.
+         (name/proposed (apply func name/requested unique? args))
+         (buffer (current-buffer))
+         ;; TODO: Use `buffer:special?'? I don't want to rely on too many
+         ;; things, but `:buffer' is available to `:path'...
+         (special? (string-match-p
+                    ;; Special buffers start with "*", optionally with leading space.
+                    (rx (optional " ")
+                        "*" ;; literal asterisk
+                        (one-or-more printing)
+                        "*")
+                    (buffer-name buffer)))
+         name/actual)
     (with-current-buffer buffer
-      (nub:debug:func/start
-          :path:uniquify
-          func/name
-          func/tags
-        (cons 'func           func)
-        (cons 'name/requested name/requested)
-        (cons 'unique?        unique?)
-        (cons 'args           args)
-        (cons '-----          "-----")
-        (cons 'name/proposed  name/proposed)
-        (cons 'buffer         buffer)
-        (cons 'path:uniquify:settings/local path:uniquify:settings/local))
+      ;; Don't do the debug message for special buffers.
+      (unless special?
+        (nub:debug:func/start
+            :path:uniquify
+            func/name
+            func/tags
+          (cons 'func           func)
+          (cons 'name/requested name/requested)
+          (cons 'unique?        unique?)
+          (cons 'args           args)
+          (cons '-----          "-----")
+          (cons 'name/proposed  name/proposed)
+          (cons 'buffer         buffer)
+          (cons 'path:uniquify:settings/local path:uniquify:settings/local)))
 
-      ;; Tweak this buffer's (re)name?
-      (if (and (not unique?)
-               (path:uniquify:buffer/should-manage? buffer))
-          (progn
-            ;;------------------------------
-            ;; Tweak Buffer (Re)Name
-            ;;------------------------------
-            ;; Clear any old settings.
-            (path:uniquify:settings/clear buffer)
+      ;;------------------------------
+      ;; Do we do anything or..?
+      ;;------------------------------
+      (cond
+       ;;------------------------------
+       ;; Do Not Uniquify
+       ;;------------------------------
+       (unique?
+        (unless special?
+          (nub:debug
+              :path:uniquify
+              func/name
+              func/tags
+            "Do nothing; leave settings alone.")
 
-            ;; Figure (& save) out /our/ name for this buffer.
-            ;; NOTE: `path:current:file' is ok here since this is a buffer rename and the buffer
-            ;; definitely already exists.
-            (path:uniquify:settings/create (path:parent (path:current:file))
-                                           name/proposed
-                                           buffer)
+          (nub:debug
+              :path:uniquify
+              func/name
+              func/tags
+            "path:uniquify:settings/local: %S"
+            path:uniquify:settings/local))
 
-            ;; Actually set the buffer's new name.
-            (path:uniquify:settings/set:name/buffer buffer)
-            (setq name/actual (buffer-name buffer))
+        ;; Just ignore the buffer rename this time; could be we already
+        ;; renamed it in e.g. `path:advice:uniquify:create-file-buffer'.
+        (setq name/actual name/proposed)
 
-            (nub:debug
-                :path:uniquify
-                func/name
-                func/tags
-              "path:uniquify:settings/local: %S"
-              path:uniquify:settings/local)
-            (nub:debug
-                :path:uniquify
-                func/name
-                func/tags
-              "settings->filepath: %S"
-              (path:uniquify:settings/get '(:path :filepath) buffer))
+        (unless special?
+          (nub:debug
+              :path:uniquify
+              func/name
+              func/tags
+            "name (proposed & actual): %S"
+            name/proposed)))
 
-            ;; Should we be doing anything else for this buffer?
-            ;; Manage its modeline name separate from buffer name maybe?
-            (path:uniquify:modeline:doom-modeline
-             buffer
-             (path:uniquify:settings/get '(:path :filepath) buffer)))
+       ((not (path:uniquify:buffer/should-manage? buffer))
+        (unless special?
+          (nub:debug
+              :path:uniquify
+              func/name
+              func/tags
+            "Do nothing & clear settings!")
 
-        ;;------------------------------
-        ;; Ignore Buffer
-        ;;------------------------------
+          (nub:debug
+              :path:uniquify
+              func/name
+              func/tags
+            "path:uniquify:settings/local: %S"
+            path:uniquify:settings/local))
+
         ;; Don't mess with it; mark this buffer as not-named-by-us and leave its name alone.
         (path:uniquify:settings/clear buffer)
-        (setq name/actual name/proposed))
+        (setq name/actual name/proposed)
+
+        (unless special?
+          (nub:debug
+              :path:uniquify
+              func/name
+              func/tags
+            "name (proposed & actual): %S"
+            name/proposed)))
+
+       ;;------------------------------
+       ;; Uniquify Buffer Name
+       ;;------------------------------
+      (t
+        (nub:debug
+            :path:uniquify
+            func/name
+            func/tags
+          "Uniquify buffer name!")
+
+        ;; Clear any old settings.
+        (path:uniquify:settings/clear buffer)
+
+        ;; Figure (& save) out /our/ name for this buffer.
+        ;; NOTE: `path:current:file' is ok here since this is a buffer rename and the buffer
+        ;; definitely already exists.
+        (path:uniquify:settings/create (path:parent (path:current:file))
+                                       name/proposed
+                                       buffer)
+
+        ;; Actually set the buffer's new name.
+        ;; NOTE: This "recurses" back into `rename-buffer', which will call this
+        ;; advice, which we ignore because UNIQUE? is non-nil.
+        (path:uniquify:settings/set:name/buffer buffer)
+        (setq name/actual (buffer-name buffer))
+
+        (nub:debug
+            :path:uniquify
+            func/name
+            func/tags
+          "path:uniquify:settings/local: %S"
+          path:uniquify:settings/local)
+        (nub:debug
+            :path:uniquify
+            func/name
+            func/tags
+          "settings->filepath: %S"
+          (path:uniquify:settings/get '(:path :filepath) buffer))
+
+        ;; Should we be doing anything else for this buffer?
+        ;; Manage its modeline name separate from buffer name maybe?
+        (path:uniquify:modeline:doom-modeline
+         buffer
+         (path:uniquify:settings/get '(:path :filepath) buffer))))
 
       ;;------------------------------
       ;; Return Name
       ;;------------------------------
-      (nub:debug:func/return
-          :path:uniquify
-          func/name
-          func/tags
-        ;; Returned value:
-        name/actual))))
+      ;; Ignore debugging for special buffers.
+      (if special?
+          name/actual
+        (nub:debug:func/return
+            :path:uniquify
+            func/name
+            func/tags
+          ;; Returned value:
+          name/actual)))))
 
 
 ;;------------------------------
@@ -1236,6 +1338,7 @@ Return the buffer created by `create-file-buffer'."
                                            buffer)
 
             ;; Actually set the buffer's new name (& return it).
+            ;; TODO: Do we want `rename-buffer' to get involved here?
             (path:uniquify:settings/set:name/buffer buffer)
 
             ;; Should we be doing anything else for this buffer?
