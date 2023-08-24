@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-08-23
+;; Timestamp:  2023-08-24
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -240,21 +240,23 @@ parent directory."
           (setq name/buffer/naked
                 ;; Create the buffer name from the project settings.
                 (int<path>:uniquify:name:propertize
-                 :buffer       buffer
+                 :buffer         buffer
+                 :filepath-abs   path/absolute/file
                  ;; Do not provide any text properteries in these!
-                 :project (list (alist-get :project/name project))
-                 :filepath (list (file:name (alist-get :path project)))
-                 :truncated? t))
+                 :project-props  (list (alist-get :project/name project))
+                 :filepath-props (list (file:name (alist-get :path project)))
+                 :truncated?     t))
 
           (setq name/buffer/propertized
                 ;; Create the buffer name from the project settings.
                 (int<path>:uniquify:name:propertize
-                 :buffer       buffer
+                 :buffer         buffer
+                 :filepath-abs   path/absolute/file
                  ;; Do propertize these as desired.
-                 :project (list (alist-get :project/name project)
-                                'face 'underline)
-                 :filepath (list (file:name (alist-get :path project)))
-                 :truncated? t)))
+                 :project-props  (list (alist-get :project/name project)
+                                       'face 'underline)
+                 :filepath-props (list (file:name (alist-get :path project)))
+                 :truncated?     t)))
 
         ;;------------------------------
         ;; Create our settings (alist tree structure).
@@ -495,6 +497,7 @@ BUFFER should be a buffer object.
 `path:uniquify:settings/local' should be up-to-date."
   (with-current-buffer buffer
     (let ((func/name "path:uniquify:settings/set:name/buffer")
+          (func/tags '(:settings))
           (name (path:uniquify:settings/get '(:name :buffer) buffer)))
       ;;------------------------------
       ;; Error Checks
@@ -571,29 +574,32 @@ PATH/UNIQUE."
       ;;------------------------------
       ;; Set the modeline settings.
       ;;------------------------------
-      (let ((project/alist (path:uniquify:settings/get :project buffer)))
+      (let ((project/alist (path:uniquify:settings/get :project buffer))
+            (filepath      (path:uniquify:settings/get '(:path :filepath) buffer)))
         ;; No func or anything to set the modeline name; just save to settings for
         ;; `doom-modeline' or whoever to use.
 
         ;; No properties supplied.
         (path:uniquify:settings/set
          '(:name :modeline)
-         (int<path>:uniquify:name:propertize :buffer     buffer
-                                             :project    (list (alist-get :project/name project/alist))
-                                             :filepath   (list path/unique)
-                                             :truncated? truncated?
-                                             :modeline?  nil) ;; Don't add modeline properties.
+         (int<path>:uniquify:name:propertize :buffer         buffer
+                                             :filepath-abs   filepath
+                                             :project-props  (list (alist-get :project/name project/alist))
+                                             :filepath-props (list path/unique)
+                                             :truncated?     truncated?
+                                             :modeline?      nil) ;; Don't add modeline properties.
          buffer)
 
         ;; Yes properties supplied.
         (path:uniquify:settings/set
          '(:name :modeline/propertized)
-         (int<path>:uniquify:name:propertize :buffer     buffer
-                                             :project    (list (alist-get :project/name project/alist)
-                                                               'face 'underline)
-                                             :filepath   (list path/unique)
-                                             :truncated? truncated?
-                                             :modeline?  t) ;; Do add modeline properties.
+         (int<path>:uniquify:name:propertize :buffer         buffer
+                                             :filepath-abs   filepath
+                                             :project-props  (list (alist-get :project/name project/alist)
+                                                                   'face 'underline)
+                                             :filepath-props (list path/unique)
+                                             :truncated?     truncated?
+                                             :modeline?      t) ;; Do add modeline properties.
          buffer)
 
         ;; Mark modeline's name as managed.
@@ -979,87 +985,95 @@ Update any that need extra uniquification in e.g. modeline buffer name."
 
 
 (cl-defun int<path>:uniquify:name:propertize (&key buffer
-                                                   project
-                                                   filepath
+                                                   filepath-abs
+                                                   project-props
+                                                   filepath-props
                                                    truncated?
                                                    modeline?)
   "Return a buffer name string based off of params.
 
 Keyword Parameters:
   - BUFFER - Buffer object, buffer name string, or nil for `current-buffer'.
-  - conses:
-    - PROJECT  - (string . properties) - (list \".emacs.d\" 'face 'underline)
-    - FILEPATH - (string . properties) - (list \"path/to/file.el\")
+  - conses - (string . properties):
+    - PROJECT-PROPS  - project name and properties
+                     - e.g. (list \".emacs.d\" 'face 'underline)
+    - FILEPATH-PROPS - relative path from PROJECT and properties
+                     - e.g. (list \"path/to/file.el\")
+  - FILEPATH-ABS - absolute path to file
+                 - like `buffer-file-truename' which can't always be used here
   - Flags / Options:
     - TRUNCATED? - nil     - FILEPATH is relative to PROJECT dir.
                  - non-nil - FILEPATH has been truncated.
     - MODELINE?  - nil     - Do nothing.
                  - non-nil - Add modeline properties to returned name string."
-  (let ((buffer (if buffer
+  (let ((func/name "int<path>:uniquify:name:propertize")
+        (func/tags '(:settings))
+        (buffer (if buffer
                     (get-buffer buffer)
                   (current-buffer)))
         name)
     (nub:debug:func/start
         :path:uniquify
-        "int<path>:uniquify:name:propertize"
-        '(:settings)
+        func/name
+        func/tags
       (cons 'buffer                       buffer)
-      (cons 'project                      project)
-      (cons 'filepath                     filepath)
+      (cons 'filepath-abs                 filepath-abs)
+      (cons 'project-props                project-props)
+      (cons 'filepath-props               filepath-props)
       (cons 'truncated?                   truncated?)
-      (cons 'modeline?                    modeline?)
-      (cons '-----                        "-----")
-      (cons 'NOTE                         "I need a replacement for `buffer-file-truename' here... Any absolute paths to this file?")
-      (cons 'path:uniquify:settings/local path:uniquify:settings/local)
-      (cons 'buffer-file-truename         buffer-file-truename)
-      (cons 'buffer-file-name             buffer-file-name))
+      (cons 'modeline?                    modeline?))
 
     (with-current-buffer buffer
       ;;------------------------------
       ;; Propertize Buffer Name
       ;;------------------------------
       ;; Project
-      (setq name (concat (apply #'str:propertize (car project) (cdr project))
+      (setq name (concat (apply #'str:propertize (car project-props) (cdr project-props))
                          path:vc/git:rooted
                          ;; Truncation Indicator?
                          (when truncated?
                            (path:dir path:name:truncate))
                          ;; Filepath
                          (apply #'str:propertize
-                                ;; FILEPATH has been truncated
-                                (car filepath)
-                                (cdr filepath))))
+                                (car filepath-props)
+                                (cdr filepath-props))))
 
       ;;------------------------------
       ;; Propertize for Modeline?
       ;;------------------------------
-      (if modeline?
-        ;; Shouldn't overwrite any propertize, as these are non-dispaly properties for modeline help.
-          (apply #'str:propertize
-                 name
-                 ;; Smush list of property pair lists into just a list of properties.
-                 (flatten-list
-                  ;; Keep all non-nil property pairs.
-                  (seq-filter (lambda (x) (not (null x)))
-                              (list
-                               ;; (Required): Add the usual modeline extras.
-                               (list 'mouse-face 'mode-line-highlight)
-                               (list 'help-echo (concat buffer-file-truename
-                                                        (unless (string= (file-name-nondirectory buffer-file-truename)
-                                                                         (buffer-name))
-                                                          (concat "\n" (buffer-name)))
-                                                        "\nmouse-1: Previous buffer\nmouse-3: Next buffer"))
-                               (list 'local-map mode-line-buffer-identification-keymap)
+      (nub:debug:func/return
+          :path:uniquify
+          func/name
+          func/tags
+        ;; Returned value:
+        (if modeline?
+            (let ((filepath (path:abbreviate:file filepath-abs)))
+              ;; Shouldn't overwrite any propertize, as these are non-dispaly properties for modeline help.
+              (apply #'str:propertize
+                     name
+                     ;; Smush list of property pair lists into just a list of properties.
+                     (flatten-list
+                      ;; Keep all non-nil property pairs.
+                      (seq-filter (lambda (x) (not (null x)))
+                                  (list
+                                   ;; (Required): Add the usual modeline extras.
+                                   (list 'mouse-face 'mode-line-highlight)
+                                   (list 'help-echo (concat filepath
+                                                            (unless (string= (file-name-nondirectory filepath)
+                                                                             (buffer-name buffer))
+                                                              (concat "\n" (buffer-name buffer)))
+                                                            "\nmouse-1: Previous buffer\nmouse-3: Next buffer"))
+                                   (list 'local-map mode-line-buffer-identification-keymap)
 
-                               ;; (Optional): Add stuff that would be responsibility of `doom-modeline-buffer-file-name'?
-                               (when (path:uniquify:doom-modeline/style?)
-                                 (list 'face 'doom-modeline-buffer-file))))))
+                                   ;; (Optional): Add stuff that would be responsibility of `doom-modeline-buffer-file-name'?
+                                   (when (path:uniquify:doom-modeline/style?)
+                                     (list 'face 'doom-modeline-buffer-file)))))))
 
-        ;; No modeline properties.
-        name))))
-;; (int<path>:uniquify:name:propertize :project '("hello" face underline) :filepath '("path/to/file.txt"))
-;; (int<path>:uniquify:name:propertize :project '("hello" face underline) :filepath '(     "to/file.txt") :truncated? t)
-;; (int<path>:uniquify:name:propertize :project '("hello" face underline) :filepath '("path/to/file.txt") :modeline? t)
+              ;; No modeline properties.
+              name)))))
+;; (int<path>:uniquify:name:propertize :filepath-abs "/projects/hello/path/to/file.txt" :project-props '("hello" face underline) :filepath-props '("path/to/file.txt"))
+;; (int<path>:uniquify:name:propertize :filepath-abs "/projects/hello/path/to/file.txt" :project-props '("hello" face underline) :filepath-props '(     "to/file.txt") :truncated? t)
+;; (int<path>:uniquify:name:propertize :filepath-abs "/projects/hello/path/to/file.txt" :project-props '("hello" face underline) :filepath-props '("path/to/file.txt") :modeline? t)
 
 
 ;;--------------------------------------------------------------------------------
@@ -1168,7 +1182,7 @@ Return a string of the name actually given to the buffer."
             :path:uniquify
             func/name
             func/tags
-          (cons 'func           func)
+          ;; (cons 'func           func)
           (cons 'name/requested name/requested)
           (cons 'unique?        unique?)
           (cons 'args           args)
