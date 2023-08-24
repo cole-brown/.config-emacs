@@ -699,9 +699,6 @@ Other buffers return nil."
 ;; Buffers - Uniquify Management
 ;;--------------------------------------------------------------------------------
 
-(defvar path:uniquify:modeline:temp-disable t
-  "TODO DELETE ME!!!")
-
 (defun path:uniquify:modeline:doom-modeline (buffer filepath)
   "Set BUFFER modeline name based on `doom-modeline-buffer-file-name-style'.
 
@@ -731,92 +728,87 @@ In order for this to actually do anything:
      example:
      (setq doom-modeline-buffer-file-name-style
            'path:uniquify:project/truncate-to-unique)"
-  ;; TODO DELETE ME!!!
-  (if path:uniquify:modeline:temp-disable
-      ;; TODO DELETE ME!!!
-      nil
+  (let ((func/name "path:uniquify:modeline:doom-modeline")
+        (func/tags '(:settings :modeline :doom-modeline)))
+    (with-current-buffer buffer
+      (nub:debug:func/start
+          :path:uniquify
+          func/name
+          func/tags
+        (cons 'buffer   buffer)
+        (cons 'filepath filepath)
+        (cons 'path:uniquify:settings/local         path:uniquify:settings/local)
+        (cons 'doom-modeline-buffer-file-name-style doom-modeline-buffer-file-name-style))
 
-    (let ((func/name "path:uniquify:modeline:doom-modeline")
-          (func/tags '(:settings :modeline :doom-modeline)))
-      (with-current-buffer buffer
-        (nub:debug:func/start
+      ;; Only do something if `doom-modeline' exists and we should be styling it.
+      (when (path:uniquify:doom-modeline/style?)
+        ;;------------------------------
+        ;; Error Checks
+        ;;------------------------------
+        ;; Settings should already be created.
+        (unless path:uniquify:settings/local
+          (nub:error
+              :path:uniquify
+              "path:uniquify:modeline:doom-modeline"
+            "Buffer has no `path:uniquify:settings/local'! Cannot set modeline name."))
+
+        ;;------------------------------
+        ;; Set Buffer's Name for Modeline
+        ;;------------------------------
+        (pcase doom-modeline-buffer-file-name-style
+          ;;------------------------------
+          ;; Custom Style?
+          ;;------------------------------
+          ('path:uniquify:project/truncate-to-file
+           ;; Name this buffer; no need to uniquify.
+           (path:uniquify:settings/set:name/modeline
+            buffer
+            (file:name filepath)
+            t))
+
+          ('path:uniquify:project/truncate-to-unique
+           ;; First name it, assuming it's already unique.
+           (nub:debug
+               :path:uniquify
+               func/name
+               func/tags
+             "truncate to unique")
+
+           (path:uniquify:settings/set:name/modeline buffer
+                                                     (file:name filepath)
+                                                     t)
+
+           (nub:debug
+               :path:uniquify
+               func/name
+               func/tags
+             "modeline name set to: %S"
+             (path:uniquify:settings/get '(:name :modeline) buffer))
+
+           ;; Now we can uniquify all buffers.
+           (int<path>:uniquify:buffers/refresh :modeline)
+
+           (nub:debug
+               :path:uniquify
+               func/name
+               func/tags
+             "modeline name refreshed to: %S"
+             (path:uniquify:settings/get '(:name :modeline) buffer)))
+
+          ;;------------------------------
+          ;; Standard Style?
+          ;;------------------------------
+          ;; Otherwise dunno what that style is.
+          (_
+           ;; Unset `(:managed? :modeline)' flag if set.
+           (when (path:uniquify:buffer/managed? buffer :modeline)
+             (path:uniquify:buffer/manage buffer :modeline nil))))
+
+        (nub:debug:func/end
             :path:uniquify
             func/name
             func/tags
-          (cons 'buffer   buffer)
-          (cons 'filepath filepath)
-          (cons 'path:uniquify:settings/local         path:uniquify:settings/local)
-          (cons 'doom-modeline-buffer-file-name-style doom-modeline-buffer-file-name-style))
-
-        ;; Only do something if `doom-modeline' exists and we should be styling it.
-        (when (path:uniquify:doom-modeline/style?)
-          ;;------------------------------
-          ;; Error Checks
-          ;;------------------------------
-          ;; Settings should already be created.
-          (unless path:uniquify:settings/local
-            (nub:error
-                :path:uniquify
-                "path:uniquify:modeline:doom-modeline"
-              "Buffer has no `path:uniquify:settings/local'! Cannot set modeline name."))
-
-          ;;------------------------------
-          ;; Set Buffer's Name for Modeline
-          ;;------------------------------
-          (pcase doom-modeline-buffer-file-name-style
-            ;;------------------------------
-            ;; Custom Style?
-            ;;------------------------------
-            ('path:uniquify:project/truncate-to-file
-             ;; Name this buffer; no need to uniquify.
-             (path:uniquify:settings/set:name/modeline
-              buffer
-              (file:name filepath)
-              t))
-
-            ('path:uniquify:project/truncate-to-unique
-             ;; First name it, assuming it's already unique.
-             (nub:debug
-                 :path:uniquify
-                 func/name
-                 func/tags
-               "truncate to unique")
-
-             (path:uniquify:settings/set:name/modeline buffer
-                                                       (file:name filepath)
-                                                       t)
-
-             (nub:debug
-                 :path:uniquify
-                 func/name
-                 func/tags
-               "modeline name set to: %S"
-               (path:uniquify:settings/get '(:name :modeline) buffer))
-
-             ;; Now we can uniquify all buffers.
-             (int<path>:uniquify:buffers/refresh :modeline)
-
-             (nub:debug
-                 :path:uniquify
-                 func/name
-                 func/tags
-               "modeline name refreshed to: %S"
-               (path:uniquify:settings/get '(:name :modeline) buffer)))
-
-            ;;------------------------------
-            ;; Standard Style?
-            ;;------------------------------
-            ;; Otherwise dunno what that style is.
-            (_
-             ;; Unset `(:managed? :modeline)' flag if set.
-             (when (path:uniquify:buffer/managed? buffer :modeline)
-               (path:uniquify:buffer/manage buffer :modeline nil))))
-
-          (nub:debug:func/end
-              :path:uniquify
-              func/name
-              func/tags
-            (cons 'path:uniquify:settings/local path:uniquify:settings/local)))))))
+          (cons 'path:uniquify:settings/local path:uniquify:settings/local))))))
 ;; path:uniquify:settings/local
 ;; (path:uniquify:modeline:doom-modeline (current-buffer))
 
