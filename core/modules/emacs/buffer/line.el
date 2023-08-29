@@ -57,15 +57,15 @@
 ;;   :bind ; meow
 ;;   ;;------------------------------
 ;;
-;;   ;; Remap C-a to `buffer:cmd:line/smart:move-beginning/logical'
-;;   (([remap move-beginning-of-line] . buffer:cmd:line/smart:move-beginning/logical)
+;;   ;; Remap to smarter BOL function for logical lines.
+;;   (([remap move-beginning-of-line] . buffer:cmd:line/smart:move-beginning/logical/select)
 ;;
-;;    ;; Remap C-a to `buffer:cmd:line/smart:move-beginning/visual' in visual-line-mode-map
+;;    ;; Remap to smarter BOL/EOL function for visual lines (in `visual-line-mode-map').
 ;;    :map visual-line-mode-map
-;;    ([remap beginning-of-visual-line] . buffer:cmd:line/smart:move-beginning/visual)
-;;    ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning/visual)
-;;    ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end/visual)
-;;    ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end/visual)))
+;;    ([remap beginning-of-visual-line] . buffer:cmd:line/smart:move-beginning/visual/select)
+;;    ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning/visual/select)
+;;    ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end/visual/select)
+;;    ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end/visual/select)))
 ;;
 ;;
 ;; ------------------------------
@@ -121,13 +121,12 @@
 (defun buffer:cmd:line/smart:move-beginning/logical (arg)
   "Move point to beginning of line, or indentation.
 
-Move point to the beginning of the line. If point is already
-there, move to the first non-whitespace character on this line.
-Effectively toggle between the beginning of the line and the
-first non-whitespace character.
+Move point to the beginning of the line. If point is already there, move to the
+first non-whitespace character on this line. Effectively toggle between the
+beginning of the line and the first non-whitespace character.
 
-If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there."
+If ARG is not nil or 1, move forward ARG - 1 lines first. If point reaches the
+beginning or end of the buffer, stop there."
   (interactive "^p")
   (setq arg (or arg 1))
 
@@ -148,6 +147,38 @@ point reaches the beginning or end of the buffer, stop there."
       (back-to-indentation))))
 
 
+(defun buffer:cmd:line/smart:move-beginning/logical/select (arg)
+  "Move point to beginning of line, or indentation.
+
+For use with Meow, which wants to almost always have an active region. Will
+start mark at point before moving if a region is not active.
+
+Move point to the beginning of the line. If point is already there, move to the
+first non-whitespace character on this line. Effectively toggle between the
+beginning of the line and the first non-whitespace character.
+
+If ARG is not nil or 1, move forward ARG - 1 lines first. If point reaches the
+beginning or end of the buffer, stop there."
+  (interactive "^p")
+  (setq arg (or arg 1))
+
+  (let ((point/before (point))
+        point/after)
+    ;; Begin a selection region.
+    (unless (region-active-p)
+      (push-mark-command nil :no-message))
+
+    (buffer:cmd:line/smart:move-beginning/logical arg)
+    (setq point/after (point))
+
+    ;; Retcon the selection region if you end up with nothing?
+    (when (= (buffer:region:start) (buffer:region:end))
+      ;; Select from wherever we started to BOL.
+      (goto-char point/before)
+      (push-mark-command nil :no-message)
+      (goto-char point/after))))
+
+
 ;;------------------------------------------------------------------------------
 ;; Lines, Visual
 ;;------------------------------------------------------------------------------
@@ -155,15 +186,14 @@ point reaches the beginning or end of the buffer, stop there."
 (defun buffer:cmd:line/smart:move-beginning/visual (arg)
   "Move point to beginning of visual line, or actual line, or indentation.
 
-Move point to the beginning of the (visual) line. If point is
-already there, move point to the beginning of the (actual/logical) line.
-If point is already there, move to the first non-whitespace
-character on this line. Effectively toggle between the beginning
-of the visual line, logical line, and the first non-whitespace
-character.
+Move point to the beginning of the (visual) line. If point is already there,
+move point to the beginning of the (actual/logical) line. If point is already
+there, move to the first non-whitespace character on this line. Effectively
+toggle between the beginning of the visual line, logical line, and the first
+non-whitespace character.
 
-If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there."
+If ARG is not nil or 1, move forward ARG - 1 lines first. If point reaches the
+beginning or end of the buffer, stop there."
   (interactive "^p")
   (setq arg (or arg 1))
 
@@ -184,13 +214,12 @@ point reaches the beginning or end of the buffer, stop there."
 (defun buffer:cmd:line/smart:move-end/visual (arg)
   "Move point to end of visual line, or actual line.
 
-Move point to the end of the (visual) line. If point is already
-there, move point to the end of the (actual/logical) line.
-Effectively toggle between the end of the visual line and
-logical line.
+Move point to the end of the (visual) line. If point is already there, move
+point to the end of the (actual/logical) line. Effectively toggle between the
+end of the visual line and logical line.
 
-If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there."
+If ARG is not nil or 1, move forward ARG - 1 lines first. If point reaches the
+beginning or end of the buffer, stop there."
   (interactive "^p")
   (setq arg (or arg 1))
 
@@ -213,15 +242,14 @@ point reaches the beginning or end of the buffer, stop there."
 For use with Meow, which wants to almost always have an active region. Will
 start mark at point before moving if a region is not active.
 
-Move point to the beginning of the (visual) line. If point is
-already there, move point to the beginning of the (actual/logical) line.
-If point is already there, move to the first non-whitespace
-character on this line. Effectively toggle between the beginning
-of the visual line, logical line, and the first non-whitespace
-character.
+Move point to the beginning of the (visual) line. If point is already there,
+move point to the beginning of the (actual/logical) line. If point is already
+there, move to the first non-whitespace character on this line. Effectively
+toggle between the beginning of the visual line, logical line, and the first
+non-whitespace character.
 
-If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there."
+If ARG is not nil or 1, move forward ARG - 1 lines first. If point reaches the
+beginning or end of the buffer, stop there."
   (interactive "^p")
   (setq arg (or arg 1))
 
@@ -245,13 +273,12 @@ point reaches the beginning or end of the buffer, stop there."
 (defun buffer:cmd:line/smart:move-end/visual/select (arg)
   "Move point to end of visual line, or actual line.
 
-Move point to the end of the (visual) line. If point is already
-there, move point to the end of the (actual/logical) line.
-Effectively toggle between the end of the visual line and
-logical line.
+Move point to the end of the (visual) line. If point is already there, move
+point to the end of the (actual/logical) line. Effectively toggle between the
+end of the visual line and logical line.
 
-If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there."
+If ARG is not nil or 1, move forward ARG - 1 lines first. If point reaches the
+beginning or end of the buffer, stop there."
   (interactive "^p")
   (setq arg (or arg 1))
 
