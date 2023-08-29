@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-12
-;; Timestamp:  2023-08-28
+;; Timestamp:  2023-08-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -39,6 +39,20 @@
 
 (imp:use-package meow
   :when  (imp:flag? :keybinds +meow)
+
+  ;;------------------------------
+  :bind ; meow
+  ;;------------------------------
+
+  ;; Remap to smarter BOL function for logical lines.
+  (([remap move-beginning-of-line] . buffer:cmd:line/smart:move-beginning/logical/select)
+
+   ;; Remap to smarter BOL/EOL function for visual lines (in `visual-line-mode-map').
+   :map visual-line-mode-map
+   ([remap beginning-of-visual-line] . buffer:cmd:line/smart:move-beginning/visual/select)
+   ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning/visual/select)
+   ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end/visual/select)
+   ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end/visual/select)))
 
   ;;------------------------------
   :config
