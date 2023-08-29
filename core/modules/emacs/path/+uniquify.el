@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-10-20
-;; Timestamp:  2023-08-24
+;; Timestamp:  2023-08-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -202,7 +202,7 @@ Value should be an alist-tree of keywords:
 ;; (setq path:uniquify:directory/end-in-slash? t)
 
 
-(defun int<path>:uniquify:settings/create (path/absolute/directory
+(defun int<path>:uniquify:settings/build (path/absolute/directory
                                            name/requested
                                            buffer)
   "Create and return settings alist from args.
@@ -287,7 +287,7 @@ parent directory."
                       ;; (cons :modeline/propertized    "...")
                       )))))))
 ;; path:uniquify:settings/local
-;; (int<path>:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
+;; (int<path>:uniquify:settings/build (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
 
 
 (defun int<path>:uniquify:settings/create (path/absolute/directory
@@ -302,9 +302,9 @@ PATH/ABSOLUTE/DIRECTORY should be a string of the absolute path to the file's
 parent directory."
   (with-current-buffer buffer
     (setq path:uniquify:settings/local
-          (int<path>:uniquify:settings/create path/absolute/directory
-                                              name/requested
-                                              buffer))))
+          (int<path>:uniquify:settings/build path/absolute/directory
+                                             name/requested
+                                             buffer))))
 ;; (int<path>:uniquify:settings/create (path:parent (path:current:file)) (file:name (path:current:file)) (current-buffer))
 ;; path:uniquify:settings/local
 
@@ -660,23 +660,36 @@ Return nil/non-nil."
 ;; (int<path>:uniquify:buffer/manage (current-buffer) :title nil)
 
 
-(defun int<path>:uniquify:buffer/should-manage? (buffer)
+(defun int<path>:uniquify:buffer/should-manage? (buffer filepath)
   "Should we be managing BUFFER's name?
 
 BUFFER should be a buffer object.
+FILEPATH should be the absolute path to the file.
 
 Will check settings:
   - `path:uniquify:ignore/buffer:name/rx'
   - `path:uniquify:ignore/buffer:mode/major'"
-  ;; Our settings are of the "ignore this?" variety, so there's not a small number of nots.
-  (and (not
-        ;; Should we ignore due to buffer name regexes?
-        (and path:uniquify:ignore/buffer:name/rx
-             (string-match (path:uniquify:ignore/buffer:name/rx) (buffer-name buffer))))
-       (not
-        ;; Should we ignore due to buffer's mode?
-        (memq major-mode path:uniquify:ignore/buffer:mode/major))))
-;; (int<path>:uniquify:buffer/should-manage? (current-buffer))
+  (or
+   ;;------------------------------
+   ;; Unable to manage this buffer?
+   ;;------------------------------
+   ;; Nothing we can do for non-file buffers.
+   (not filepath)
+   ;; No project? Can't figure out a name given current project-based naming schemes.
+   (not (path:project:current/alist filepath))
+
+   ;;------------------------------
+   ;; Ignore this buffer?
+   ;;------------------------------
+   ;; Our settings are of the "ignore this?" variety, so figure out "should we
+   ;; ignore this?", then invert for "should we manage this?".
+   (not (or
+         ;; Should we ignore due to buffer name regexes?
+         (and path:uniquify:ignore/buffer:name/rx
+              (string-match (path:uniquify:ignore/buffer:name/rx) (buffer-name buffer)))
+         ;; Should we ignore due to buffer's mode?
+         (memq major-mode path:uniquify:ignore/buffer:mode/major)))))
+;; (int<path>:uniquify:buffer/should-manage? (current-buffer) (path:current:file))
 
 
 ;;--------------------------------------------------------------------------------
@@ -1067,7 +1080,8 @@ Keyword Parameters:
                     (path:uniquify:settings/get '(:name :buffer) buffer)))
 
           ;; Say why we wouldn't do anything.
-          ((not (int<path>:uniquify:buffer/should-manage? buffer))
+          ((not (int<path>:uniquify:buffer/should-manage? buffer
+                                                          (buffer-file-name (buffer-base-buffer buffer))))
            ;; Ignored due to buffer name regexes?
            (cond ((and path:uniquify:ignore/buffer:name/rx
                        (string-match (path:uniquify:ignore/buffer:name/rx) name))
@@ -1200,7 +1214,11 @@ Return a string of the name actually given to the buffer."
             "name (proposed & actual): %S"
             name/proposed)))
 
-       ((not (int<path>:uniquify:buffer/should-manage? buffer))
+       ;; NOTE: `path:current:file' is ok here since this is a buffer rename and
+       ;; the buffer definitely already exists. Just don't let it error out; it
+       ;; errors when it can't find a file name and that happens (e.g. special
+       ;; buffers).
+       ((not (int<path>:uniquify:buffer/should-manage? buffer (path:current:file :no-error)))
         (unless special?
           (nub:debug
               :path:uniquify
@@ -1241,8 +1259,8 @@ Return a string of the name actually given to the buffer."
         (int<path>:uniquify:settings/clear buffer)
 
         ;; Figure (& save) out /our/ name for this buffer.
-        ;; NOTE: `path:current:file' is ok here since this is a buffer rename and the buffer
-        ;; definitely already exists.
+        ;; NOTE: `path:current:file' is ok here since this is a buffer rename
+        ;; and the buffer definitely already exists.
         (int<path>:uniquify:settings/create (path:parent (path:current:file))
                                             name/proposed
                                             buffer)
@@ -1316,7 +1334,7 @@ Return the buffer created by `create-file-buffer'."
         ;; Should be nil right now?
         (cons 'path:uniquify:settings/local path:uniquify:settings/local))
 
-      (if (int<path>:uniquify:buffer/should-manage? buffer)
+      (if (int<path>:uniquify:buffer/should-manage? buffer filepath)
           ;;------------------------------
           ;; Tweak Buffer Name
           ;;------------------------------

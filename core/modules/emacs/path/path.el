@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-10-28
-;; Timestamp:  2023-08-16
+;; Timestamp:  2023-08-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -1090,7 +1090,7 @@ Raises an error if ROOT is not nil and not a string."
 ;; Current Paths
 ;;------------------------------------------------------------------------------
 
-(defun path:current:file ()
+(defun path:current:file (&optional no-error?)
   "Return the Emacs Lisp file this function is called from.
 
 Works when:
@@ -1102,7 +1102,8 @@ Works when:
   - visiting/evaluating
     - function `buffer-file-name'
 
-Raises an error signal if it cannot find a file path."
+Raises an error signal if it cannot find a file path.
+If NO-ERROR? is non-nil, just return nil instead of raising an error signal."
   (cond
    ;;------------------------------
    ;; Look for a valid "current file" variable.
@@ -1120,6 +1121,7 @@ Raises an error signal if it cannot find a file path."
    ;;------------------------------
    ;; Error: Didn't find anything valid.
    ;;------------------------------
+   (no-error? nil)
    ((error "path:current:file: Cannot get the current file's path"))))
 ;; (path:current:file)
 
