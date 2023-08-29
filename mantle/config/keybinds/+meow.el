@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-12
-;; Timestamp:  2023-06-28
+;; Timestamp:  2023-08-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -328,14 +328,15 @@
    '("I" . meow-end-of-thing)
 
    ;; lines
-   '("C-o" . meow-join) ; beginning of line (effectively)
-   '("C-u" . meow-line) ; end of line (effectively)
-   ;; TODO: (smart) beginning/end of lines?
+   '("C-o" . buffer:cmd:line/smart:move-beginning/visual/select)
+   '("C-u" . buffer:cmd:line/smart:move-end/visual/select)
+   ;; '("C-o" . meow-join) ; beginning of line... well not really but closest `meow' has?
+   ;; '("C-u" . meow-line) ; end of line (effectively)
 
    ;; region / selection...
    '("m"  . meow-mark-word)
    '("M"  . meow-mark-symbol)
-   '(";"  . mantle:meow-reverse:dwim) ; meow-reverse)
+   '(";"  . mantle:meow-reverse:dwim) ; was: meow-reverse
    '("g"  . meow-cancel-selection)
    '("z"  . meow-pop-selection) ; aka "undo selection"
    ;; I guess "d" is some meow command menu?
