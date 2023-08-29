@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-06-21
+;; Timestamp:  2023-08-29
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -60,8 +60,6 @@
             :filename "delete")
   (imp:load :feature  '(:buffer eval)
             :filename "eval")
-  (imp:load :feature  '(:buffer line)
-            :filename "line")
   (imp:load :feature  '(:buffer manage)
             :filename "manage")
   (imp:load :feature  '(:buffer name)
@@ -70,6 +68,8 @@
             :filename "point")
   (imp:load :feature  '(:buffer region)
             :filename "region")
+  (imp:load :feature  '(:buffer line)
+            :filename "line")
   (imp:load :feature  '(:buffer search)
             :filename "search")
 
