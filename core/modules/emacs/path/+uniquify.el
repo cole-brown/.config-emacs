@@ -669,26 +669,30 @@ FILEPATH should be the absolute path to the file.
 Will check settings:
   - `path:uniquify:ignore/buffer:name/rx'
   - `path:uniquify:ignore/buffer:mode/major'"
-  (or
-   ;;------------------------------
-   ;; Unable to manage this buffer?
-   ;;------------------------------
-   ;; Nothing we can do for non-file buffers.
-   (not filepath)
-   ;; No project? Can't figure out a name given current project-based naming schemes.
-   (not (path:project:current/alist filepath))
+  ;;------------------------------
+  ;; Unable to manage this buffer?
+  ;;------------------------------
+  ;; Want to short-circuit out for nil filepaths & projects.
 
-   ;;------------------------------
-   ;; Ignore this buffer?
-   ;;------------------------------
-   ;; Our settings are of the "ignore this?" variety, so figure out "should we
-   ;; ignore this?", then invert for "should we manage this?".
-   (not (or
-         ;; Should we ignore due to buffer name regexes?
-         (and path:uniquify:ignore/buffer:name/rx
-              (string-match (path:uniquify:ignore/buffer:name/rx) (buffer-name buffer)))
-         ;; Should we ignore due to buffer's mode?
-         (memq major-mode path:uniquify:ignore/buffer:mode/major)))))
+  ;; Nothing we can do for non-file buffers.
+  (cond ((not filepath) ; nil -> should not manage
+         nil)
+
+        ;; No project? Can't figure out a name given current project-based naming schemes.
+        ((not (path:project:current/alist filepath)) ; nil -> should not manage
+         nil)
+
+        ;;------------------------------
+        ;; Ignore this buffer?
+        ;;------------------------------
+        ;; Our settings are of the "ignore this?" variety, so figure out "should we
+        ;; ignore this?", then invert for "should we manage this?".
+        ((not (or
+                ;; Should we ignore due to buffer name regexes?
+                (and path:uniquify:ignore/buffer:name/rx
+                     (string-match (path:uniquify:ignore/buffer:name/rx) (buffer-name buffer)))
+                ;; Should we ignore due to buffer's mode?
+                (memq major-mode path:uniquify:ignore/buffer:mode/major))))))
 ;; (int<path>:uniquify:buffer/should-manage? (current-buffer) (path:current:file))
 
 
@@ -1259,8 +1263,14 @@ Return a string of the name actually given to the buffer."
         (int<path>:uniquify:settings/clear buffer)
 
         ;; Figure (& save) out /our/ name for this buffer.
+        ;;---
         ;; NOTE: `path:current:file' is ok here since this is a buffer rename
         ;; and the buffer definitely already exists.
+        ;;---
+        ;; NOTE: If `path:current:file' is erroring here due to no file path,
+        ;; then _probably_ it's a buffer that /should/ be caught by
+        ;; `int<path>:uniquify:buffer/should-manage?' in the `cond` case above
+        ;; and /should not/ get into this `cond` case.
         (int<path>:uniquify:settings/create (path:parent (path:current:file))
                                             name/proposed
                                             buffer)
