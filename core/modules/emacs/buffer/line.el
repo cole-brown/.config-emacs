@@ -231,9 +231,21 @@ beginning or end of the buffer, stop there."
   ;; Move in the line now.
   (let ((orig-point (point)))
     (end-of-visual-line 1)
-    ;; If that did nothing, jump to end of actual/logical line.
-    (when (= orig-point (point))
-      (move-end-of-line 1))))
+    ;; If that did (absolutely) nothing, jump to end of actual/logical line.
+    (cond ((= orig-point (point))
+           (move-end-of-line 1))
+
+          ;; If that did /close to/ nothing, jump to end of actual/logical line?
+          ;;---
+          ;; NOTE: Used to only check if point didn't change at all, but that only works in
+          ;; `visual-line-mode' where the logical lines are wrapped. For non-wrapped
+          ;; lines that go past the buffer width, you can get stuck jumping to the new
+          ;; visual EOL a few char at a time. This is not "smart". So compare movement
+          ;; to make sure it's moved some actually useful amount.
+          ((and (not visual-line-mode)
+                (< (abs (- orig-point (point)))
+                   10))
+           (move-end-of-line 1)))))
 
 
 (defun buffer:cmd:line/smart:move-beginning/visual/select (arg)
