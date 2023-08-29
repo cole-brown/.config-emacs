@@ -314,7 +314,7 @@ parent directory."
 
 BUFFER should be a buffer object."
   (let ((func/name "int<path>:uniquify:settings/clear")
-        (func/tags '(settings))
+        (func/tags '(:settings))
         (special? (string-match-p
                    ;; Special buffers start with "*", optionally with leading space.
                    (rx (optional " ")
