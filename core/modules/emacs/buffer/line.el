@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-08-29
+;; Timestamp:  2023-08-30
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -109,6 +109,53 @@
 
 
 (imp:require :buffer 'region)
+
+
+;;--------------------------------------------------------------------------------
+;; Comments
+;;--------------------------------------------------------------------------------
+
+(defun buffer:line/smart:use-comments? (buffer)
+  "Should we care about comments in BUFFER for BOL/EOL movement?"
+  (with-current-buffer buffer
+    ;; Buffer must be a mode we're not ignoring.
+    (and (not (memq major-mode '(org-mode)))
+         ;; Buffer's mode must have comment chars of some sort registered with Emacs.
+         comment-start)))
+
+
+(defun buffer:line/smart:comment/current/beginning ()
+  "Return position of the beginning of the current comment.
+Return nil, if not inside a comment.
+
+\"Beginning of current comment\" means just before the comment character(s).
+
+From `mwim': `mwim-current-comment-beginning'
+https://github.com/alezost/mwim.el"
+  (let ((syn (syntax-ppss)))
+    (and (nth 4 syn)
+         (nth 8 syn))))
+
+
+(defun buffer:line/smart:comment:end-of-code ()
+  "Go back to before the comment - to the end of the code.
+
+Does nothing if `buffer:line/smart:use-comments?' returns nil for
+`current-buffer'.
+Does nothing if not inside a comment."
+  (when (and (buffer:line/smart:use-comments? (current-buffer))
+             (buffer:line/smart:comment/current/beginning))
+    (condition-case nil
+        (let ((line/start (line-beginning-position 1))
+              (line/end   (line-end-position       1)))
+          ;; This will error if it can't find a comment on this line.
+          (comment-search-forward line/end)
+          ;; This won't even get called unless `comment-search-forward' found & went into a comment.
+          (goto-char (max (buffer:line/smart:comment/current/beginning)
+                          line/start))
+          ;; And then go back before whitespace.
+          (skip-syntax-backward " " line/start))
+      (error nil))))
 
 
 ;;------------------------------------------------------------------------------
@@ -229,10 +276,17 @@ beginning or end of the buffer, stop there."
       (forward-line (1- arg))))
 
   ;; Move in the line now.
-  (let ((orig-point (point)))
+  (let ((point/orig (point)))
+    ;;------------------------------
+    ;; Visual Line?
+    ;;------------------------------
     (end-of-visual-line 1)
+
+    ;;------------------------------
+    ;; Logical Line?
+    ;;------------------------------
     ;; If that did (absolutely) nothing, jump to end of actual/logical line.
-    (cond ((= orig-point (point))
+    (cond ((= point/orig (point))
            (move-end-of-line 1))
 
           ;; If that did /close to/ nothing, jump to end of actual/logical line?
@@ -243,7 +297,7 @@ beginning or end of the buffer, stop there."
           ;; visual EOL a few char at a time. This is not "smart". So compare movement
           ;; to make sure it's moved some actually useful amount.
           ((and (not visual-line-mode)
-                (< (abs (- orig-point (point)))
+                (< (abs (- point/orig (point)))
                    10))
            (move-end-of-line 1)))))
 
