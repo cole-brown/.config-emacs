@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-21
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-08-31
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -79,6 +79,15 @@
 ;;  (imp:load :feature  '(:mantle config keybinds emacs)
 ;;            :path     (imp:path:join (imp:path:current:dir/relative :mantle) "emacs")
 ;;            :filename "init"))
+
+
+;;--------------------------------------------------------------------------------
+;; Keybind Packages
+;;--------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config keybinds mwim)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "mwim")
 
 
 ;;------------------------------------------------------------------------------
