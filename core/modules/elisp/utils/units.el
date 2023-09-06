@@ -35,6 +35,61 @@
   (get symbol int<unit>:symbol:property))
 
 
+(defmacro int<unit>:convert (caller value unit dictionary)
+  "Convert VALUE of UNIT into an amount of base units given DICTIONARY.
+
+VALUE should be a `numberp' (float or int number).
+
+UNIT should be a symbol (and a key from DICTIONARY).
+
+DICTIONARY should be an alist of cons: (unit-symbol . amount-of-base-units)
+e.g.: See variables `int<units>:bytes' and `int<units>:seconds'.
+
+CALLER should be a string of calling function's name.
+
+Example:
+  (int<unit>:convert \"example\" 1   'h  int<units>:seconds)
+    -> 3600.0
+  (int<unit>:convert \"example\" 0.5 'kb int<units>:bytes)
+    -> 500.0"
+  (declare (pure t) (side-effect-free t))
+  (let ((macro:dictionary/name (format "%s" dictionary))) ; for more helpful error message.
+    `(let* ((macro:func/name       ,caller)
+            (macro:value           ,value)
+            (macro:unit            ,unit)
+            (macro:dictionary      ,dictionary)
+            (macro:unit/multiplier (alist-get macro:unit macro:dictionary)))
+       ;;------------------------------
+       ;; Error Checks
+       ;;------------------------------
+       (unless macro:unit/multiplier
+         (nub:error
+             :innit
+             macro:func/name
+           "Unknown unit name '%S'! See `%s' for allowed units."
+           macro:unit
+           ,macro:dictionary/name))
+
+       ;; Allow floats as well as ints for e.g.: (unit:second 0.5 'gb)
+       (unless (numberp macro:value)
+         (nub:error
+             :innit
+             macro:func/name
+           "VALUE should be a number (int or float). Got %S: %S"
+           (type-of macro:value)
+           macro:value))
+
+       ;;------------------------------
+       ;; Unit Conversion
+       ;;------------------------------
+       ;; Calculate & return as float value; caller can cast to int w/ `floor' if needed.
+       (* (float macro:value)
+          macro:unit/multiplier))))
+;; (int<unit>:convert "example" 0.5 'kb int<units>:bytes)
+;; Errors w/ "example" caller name?
+;;   (int<unit>:convert "example" 0.5 'kb nil)
+
+
 ;;------------------------------------------------------------------------------
 ;; Bytes
 ;;------------------------------------------------------------------------------
@@ -141,31 +196,10 @@ Example:
   (unit:byte 2 'kib)
     -> 2048"
   (declare (pure t) (side-effect-free t))
-  (let ((func/name "unit:byte")
-        (unit/multiplier (alist-get unit int<units>:bytes)))
-    ;;------------------------------
-    ;; Error Checks
-    ;;------------------------------
-    (unless unit/multiplier
-      (nub:error
-          :innit
-          func/name
-        "Unknown unit name '%S'! See `int<units>:bytes' for allowed units."
-        unit))
-    ;; Allow floats as well as ints for e.g.: (unit:byte 0.5 'gb)
-    (unless (numberp value)
-      (nub:error
-          :innit
-          func/name
-        "VALUE should be a number (int or float). Got %S: %S"
-        (type-of value)
-        value))
-
-    ;;------------------------------
-    ;; Unit Conversion
-    ;;------------------------------
-    ;; Allowing floats, so we need to convert to int for actual bytes.
-    (floor (* value unit/multiplier))))
+  (int<unit>:convert "unit:byte"
+                     value
+                     unit
+                     int<units>:bytes))
 ;; (unit:byte 100 'kb)
 ;; (unit:byte 0.5 'kb)
 
@@ -180,6 +214,80 @@ Example:
 ;; Example:
 ;;   (unit:byte:human 10822759 'b)
 ;;     -> (10.822759 . 'megabytes)"
+;;
+;;   )
+
+
+;;--------------------------------------------------------------------------------
+;; Time
+;;--------------------------------------------------------------------------------
+
+(defconst int<units>:seconds
+  (list
+   (cons 's       1)
+   (cons 'sec     1)
+   (cons 'secs    1)
+   (cons 'second  1)
+   (cons 'seconds 1)
+
+   (cons 'm       60)
+   (cons 'min     60)
+   (cons 'mins    60)
+   (cons 'minute  60)
+   (cons 'minutes 60)
+
+   (cons 'h     (* 60 60))
+   (cons 'hr    (* 60 60))
+   (cons 'hrs   (* 60 60))
+   (cons 'hour  (* 60 60))
+   (cons 'hours (* 60 60))
+
+   (cons 'day  (* 60 60 24))
+   (cons 'days (* 60 60 24))
+
+   (cons 'week  (* 60 60 24 7))
+   (cons 'weeks (* 60 60 24 7))
+
+   (cons 'month  (* 60 60 24 (/ 365.0 12))) ; ~30.42 days in a month, on average.
+   (cons 'months (* 60 60 24 (/ 365.0 12)))
+
+   (cons 'year  (* 60 60 24 365)) ; ...ignoring leap days, seconds.
+   (cons 'years (* 60 60 24 365)))
+
+  "Alist of time units in terms of how many seconds they are.")
+
+
+(defun unit:second (value unit)
+  "Return float number of seconds for VALUE of UNITS bytes.
+
+VALUE should be a `numberp' (float or int number).
+
+UNIT should be a symbol (and a key from alist `int<units>:seconds').
+
+Example:
+  (unit:second 1 'h)
+    -> 3600.0
+  (unit:second 0.5 'm)
+    -> 30.0"
+  (declare (pure t) (side-effect-free t))
+  (int<unit>:convert "unit:second"
+                     value
+                     unit
+                     int<units>:seconds))
+;; (unit:second 1 'h)
+;; (unit:second 0.5 'm)
+
+
+;; TODO:units: Convert unit to human-readable value:
+;; (defun unit:second:human (value unit)
+;;   "Convert VALUE of UNIT seconds to a pretty, human-readable value/unit.
+;;
+;; Return cons: (float . symbol)
+;;   - float will be new value
+;;   - symbol will be new unit
+;; Example:
+;;   (unit:second:human 365 'days)
+;;     -> (1 . 'year)"
 ;;
 ;;   )
 
