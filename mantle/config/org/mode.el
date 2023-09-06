@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-06-02
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-06
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -214,9 +214,87 @@
   ;;---
   ;; Extra Aliases for Org-Mode Source Blocks
   ;;---
-  ;; (push '("shell" . sh) org-src-lang-modes) ; There's already a `shell-mode'; which is different from `sh-mode'.
-  (push '("C#"           . csharp)      org-src-lang-modes)
-  ;; Various "Not a real language/mode but..." aliases:
+  ;; NOTE: These are the only ones that auto-complete with my current `src'
+  ;; snippet (via `mantle:yas:choose/options'). Well, these plus the that were
+  ;; already in `org-src-lang-modes'...
+  ;;   `org-src-lang-modes' Original Value:
+  ;;     (("asymptote" . asy)
+  ;;      ("bash" . sh)
+  ;;      ("beamer" . latex)
+  ;;      ("calc" . fundamental)
+  ;;      ("C" . c)
+  ;;      ("C++" . c++)
+  ;;      ("cpp" . c++)
+  ;;      ("ditaa" . artist)
+  ;;      ("dot" . fundamental)
+  ;;      ("elisp" . emacs-lisp)
+  ;;      ("ocaml" . tuareg)
+  ;;      ("screen" . shell-script)
+  ;;      ("shell" . sh)
+  ;;      ("sqlite" . sql))
+  ;;---
+  ;; NOTE: Auto-complete is very nice, so... put basically everything you
+  ;; (often) use in here.
+
+  ;; TODO: Move to their various language config files? Or leave centralized here?
+
+  ;;---
+  ;; Professionally Used:
+  ;;---
+  (push '("C#"                      . csharp)     org-src-lang-modes) ; dotnet
+  (push '("csharp"                  . csharp)     org-src-lang-modes)
+
+  (push '("hcl"                     . hcl)        org-src-lang-modes) ; HashiCorp Configuration Language
+  (push '("terraform"               . hcl)        org-src-lang-modes)
+
+  (push '("sql"                     . sql)        org-src-lang-modes)
+  ;; TODO:sql: Is there a `t-sql' mode/package I should be using?
+  (push '("ms-sql"                  . sql)        org-src-lang-modes)
+  (push '("t-sql"                   . sql)        org-src-lang-modes)
+
+  (push '("kusto"                   . kusto)      org-src-lang-modes) ; Azure App Insights log query language.
+  (push '("azure-log-query"         . kusto)      org-src-lang-modes)
+  (push '("azure-app-insight-query" . kusto)      org-src-lang-modes)
+
+  ;; NOTE: Some very few packages add themselves to this variable; e.g.
+  ;; `markdown' must add itself as "md" since I certainly don't.
+  ;; (push '("md"                   . markdown)   org-src-lang-modes)
+  (push '("markdown"                . markdown)   org-src-lang-modes)
+
+  (push '("python"                  . python)     org-src-lang-modes)
+
+  (push '("js"                      . js)         org-src-lang-modes)
+  (push '("javascript"              . js)         org-src-lang-modes)
+
+  (push '("npm"                     . npm)        org-src-lang-modes)
+  (push '("ts"                      . typescript) org-src-lang-modes)
+  (push '("typescript"              . typescript) org-src-lang-modes)
+
+  (push '("css"                     . css)        org-src-lang-modes)
+  (push '("web"                     . web)        org-src-lang-modes)
+  ;; NOTE: `web-mode' has a lot more files extensions assigned to it, but to try to not overfill, keep to the basics that I actually use:
+  (push '("html"                    . web)        org-src-lang-modes)
+
+  (push '("json"                    . json)       org-src-lang-modes)
+  (push '("yaml"                    . yaml)       org-src-lang-modes)
+  (push '("toml"                    . toml)       org-src-lang-modes)
+  (push '("jinja2"                  . web)        org-src-lang-modes)
+
+  (push '("just"                    . just)       org-src-lang-modes) ; `just' recipe runner: https://github.com/casey/just
+
+  ;; (push '("shell"                . sh)         org-src-lang-modes)
+  (push '("bash"                    . sh)         org-src-lang-modes)
+  (push '("powershell"              . powershell) org-src-lang-modes)
+
+  ;;---
+  ;; Often Used:
+  ;;---
+  ;; (push '("elisp"   . emacs-lisp) org-src-lang-modes)
+  (push '("emacs-lisp" . emacs-lisp) org-src-lang-modes)
+
+  ;;---
+  ;; Various "Not a real language/mode but...":
+  ;;---
   (push '("console"      . fundamental) org-src-lang-modes) ; shell/console output (not input!)
   (push '("browser"      . fundamental) org-src-lang-modes) ; Browser web page output
   (push '("output"       . fundamental) org-src-lang-modes)
