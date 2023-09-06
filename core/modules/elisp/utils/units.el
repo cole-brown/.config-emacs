@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2023-02-24
-;; Timestamp:  2023-06-21
+;; Timestamp:  2023-09-06
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -15,6 +15,24 @@
 ;; Kilobytes, hogsheads, nautical miles...
 ;;
 ;;; Code:
+
+
+;;--------------------------------------------------------------------------------
+;; Units in Symbol Properties
+;;--------------------------------------------------------------------------------
+
+(defconst int<unit>:symbol:property 'unit
+  "Symbol Property name for units.")
+
+
+(defun unit:set (symbol unit)
+  "Store UNIT in SYMBOL's properties."
+  (put symbol int<unit>:symbol:property unit))
+
+
+(defun unit:get (symbol)
+  "Get UNIT from SYMBOL's properties."
+  (get symbol int<unit>:symbol:property))
 
 
 ;;------------------------------------------------------------------------------
@@ -164,24 +182,6 @@ Example:
 ;;     -> (10.822759 . 'megabytes)"
 ;;
 ;;   )
-
-
-;;--------------------------------------------------------------------------------
-;; Units in Symbol Properties
-;;--------------------------------------------------------------------------------
-
-(defconst int<unit>:symbol:property 'unit
-  "Symbol Property name for units.")
-
-
-(defun unit:set (symbol unit)
-  "Store UNIT in SYMBOL's properties."
-  (put symbol int<unit>:symbol:property unit))
-
-
-(defun unit:get (symbol)
-  "Get UNIT from SYMBOL's properties."
-  (get symbol int<unit>:symbol:property))
 
 
 ;;------------------------------------------------------------------------------
