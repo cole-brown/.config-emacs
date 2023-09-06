@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-06
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -148,14 +148,39 @@ Return \"Choose: \" when PROMPT is not a string."
     "History of recently chosen choices in `int<mantle>:yas:choose/no-match'.")
 
 
-  (defun mantle:yas:choose/no-match (prompt &rest possibilities)
+  (defvar mantle:yas:choose/no-match/history:src nil
+    "History of recently chosen choices for `org-mode' snippet `src'.")
+
+
+  (defun mantle:yas:choose/no-match/history (history &optional fallback)
+    "Most recent choice from HISTORY.
+
+If HISTORY is `:default', use default variable `mantle:yas:choose/no-match/history'
+
+If FALLBACK is non-nil, return FALLBACK instead of nil."
+    (or (car (if (eq history :default)
+             int<mantle>:yas:choose/no-match/history
+             history))
+        fallback))
+  ;; (mantle:yas:choose/no-match/history :default)
+  ;; (mantle:yas:choose/no-match/history mantle:yas:choose/no-match/history:src)
+  ;; (mantle:yas:choose/no-match/history mantle:yas:choose/no-match/history:src :dne)
+
+
+  (defun mantle:yas:choose/no-match (prompt history &rest possibilities)
     "Prompt for a string in POSSIBILITIES and return it.
 
 The last element of POSSIBILITIES may be a list of strings.
 
-Like `yas-choose-value' except does not require a match."
+Like `yas-choose-value' except does not require a match.
+
+If HISTORY is a symbol name, use that for the prompt's history.
+Else use `int<mantle>:yas:choose/no-match/history'."
     (unless (or yas-moving-away-p
                 yas-modified-p)
+      ;; TODO:yasnippet: are `last-link' and/or `last-elem' important? Are they
+      ;; `yasnippet' vars or something? Why is this here? Why is there no
+      ;; comment?!
       (let* ((last-link (last possibilities))
              (last-elem (car last-link)))
         (when (listp last-elem)
@@ -167,7 +192,9 @@ Like `yas-choose-value' except does not require a match."
                        ;; TODO: `confirm' if `confirm-after-completion' is meh.
                        'confirm-after-completion
                        nil
-                       int<mantle>:yas:choose/no-match/history)))
+                       (if (symbolp history)
+                           history
+                         'int<mantle>:yas:choose/no-match/history))))
 
 
   (defun mantle:yas:trim/lines (string)
