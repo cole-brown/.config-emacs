@@ -287,10 +287,11 @@
   (push '("powershell"              . powershell) org-src-lang-modes)
 
   ;;---
-  ;; Often Used:
+  ;; Unprofessionally Used:
   ;;---
   ;; (push '("elisp"   . emacs-lisp) org-src-lang-modes)
   (push '("emacs-lisp" . emacs-lisp) org-src-lang-modes)
+  (push '("yasnippet"  . snippet)    org-src-lang-modes)
 
   ;;---
   ;; Various "Not a real language/mode but...":
