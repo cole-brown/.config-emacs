@@ -4,7 +4,6 @@
 # name: /sec//: section <width>: prog-mode comment header section w/ settable width
 # key: /sec//
 # --
-
 ${1:$(mis :buffer 'current (mis:comment :width width (mis:line "-")))}
 `(mis :buffer 'current (mis:comment ""))` ${1:`yas-selected-text`}
 ${1:$(mis :buffer 'current (mis:comment :width width (mis:line "-")))}$0

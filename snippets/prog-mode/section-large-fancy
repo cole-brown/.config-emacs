@@ -3,7 +3,6 @@
 # name: /sec/fancy: section fancy: fancy prog-mode comment header section
 # key: /sec/fancy
 # --
-
 ${1:Will do its thing on exit.$(when yas/moving-away-p
   (if yas-text
       (mis :buffer 'current
