@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2023-09-06
+;; Timestamp:  2023-09-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -118,9 +118,9 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
   :init
   ;;------------------------------
 
-  ;;---
+  ;;------------------------------
   ;; Snippet Helpers
-  ;;---
+  ;;------------------------------
 
   (defun int<mantle>:yas:prompt/format (prompt)
     "Format PROMPT into a prompt string.
@@ -222,6 +222,112 @@ Intended for `yas-selected-text' and `mantle:yas:choose/options'."
     nil)
 
 
+  (defvar-local mantle:yas:interaction/type ; aka `yas--interaction-type' in yas parlance.
+    nil
+    "How did the user first start interacting with this snippet?
+
+Valid values:
+  - nil     - no interaction yet
+  - :insert - `yas-insert-snippet' or similar style
+  - :expand - `yas-expand-from-trigger-key' or similar style")
+(put 'path:uniquify:settings/local 'permanent-local t) ; Always a buffer-local variable.
+;; (get 'path:uniquify:settings/local 'permanent-local)
+
+
+  (defun mantle:yas:choose/options:interaction/insert (options)
+    "Force choice to be saved text in `mantle:yas:text/saved'?
+
+If `mantle:yas:interaction/type' is `:insert' and OPTIONS includes `:saved:preferred',
+force choice to be text saved to `mantle:yas:text/saved'.
+Else return nil."
+    (when (and (eq mantle:yas:interaction/type :insert)
+               (or (memq :saved:preferred options)
+                   (memq 'saved:preferred options)))
+      ;; Return whatever's saved; nil is a whatever- who cares? Maybe caller. ¯\_(ツ)_/¯
+      mantle:yas:text/saved))
+  ;; (let ((mantle:yas:interaction/type :insert)
+  ;;       (mantle:yas:text/saved "foo"))
+  ;;   (mantle:yas:choose/options:interaction/insert '(:expand :saved)))
+
+
+  (defun mantle:yas:choose/option:string-or-nil (string)
+    "Return STRING if a non-empty string, else nil."
+    (when (and (stringp string)
+               (not (string-empty-p string)))
+      string))
+
+
+  (defun mantle:yas:choose/options:default (&rest options)
+    "From OPTIONS, choose first non-empty (or priority) string and return it.
+
+If you want `yas-selected-text', use `:saved' and at some previous point in the
+snippet, do:
+  `(mantle:yas:text/save yas-selected-text)`
+
+OPTIONS:
+  - `:saved'           - Consider `mantle:yas:text/saved'
+  - `:saved:preferred' - Return `mantle:yas:text/saved' if non-nil.
+  - `:clipboard'       - Consider clipboard's text.
+  - `:yank'            - Consider kill ring's text.
+  - `:none'            - Consider empty text.
+  - `:selected'        - Consider active region in current buffer."
+    ;;------------------------------
+    ;; Force a "choice" based on interaction type?
+    ;;------------------------------
+    (if-let ((forced-choice (mantle:yas:choose/options:interaction/insert options)))
+        ;;------------------------------
+        ;; Return forced choice.
+        ;;------------------------------
+        ;; Trim leading/trailing newlines.
+        (mantle:yas:trim/lines forced-choice)
+
+      ;;------------------------------
+      ;; Choose first actual string from OPTIONS.
+      ;;------------------------------
+      (let (first-choice
+            empty-choice?)
+        (while options
+          (when-let ((option (car options))
+                     (choice
+                      ;; TODO: share a helper function with `mantle:yas:choose/options' for this pcase?
+                      (pcase (pop options)
+                        ((or :saved 'saved)
+                         (mantle:yas:choose/option:string-or-nil
+                          mantle:yas:text/saved))
+
+                        ((or :selected 'selected)
+                         (when (buffer:region:active?)
+                           (buffer:region:get)))
+
+                        ((or :clipboard 'clipboard)
+                         (mantle:yas:choose/option:string-or-nil
+                          ;; `let' values stolen from `clipboard-yank':
+                          (let ((select-enable-clipboard t)
+                                ;; Ensure that we defeat the DWIM login in `gui-selection-value'.
+                                (gui--last-selected-text-clipboard nil))
+                            (current-kill 0 'do-not-move))))
+
+                        ((or :yank 'yank)
+                         (mantle:yas:choose/option:string-or-nil
+                          (current-kill 0 'do-not-move)))
+
+                        ((or :none 'none)
+                         (setq empty-choice? t)
+                         ;; `none'/empty-string should be a fallback, at best, so don't choose it now.
+                         :not-a-string-yet))))
+            (when (stringp choice)
+              (setq first-choice choice  ; Choose this string...
+                    options      nil)))) ; ...and we're done here.
+        ;; Return whatever was picked.
+        (cond ((stringp first-choice)
+               first-choice)
+              (empty-choice?
+               "")
+              (t
+               nil)))))
+  ;; (mantle:yas:choose/options:default :none :yank)
+
+
   (defun mantle:yas:choose/options (prompt &rest options)
     "Give keyword OPTIONS for what to use/choose from.
 
@@ -230,66 +336,87 @@ snippet, do:
   `(mantle:yas:text/save yas-selected-text)`
 
 OPTIONS:
-  - `:saved'     - Use `mantle:yas:text/saved'.
-  - `:clipboard' - Use clipboard's text.
-  - `:yank'      - Use kill ring's text.
-  - `:none'      - I choose... none of the above; nothing; go away.
+  - `:saved'           - Add `mantle:yas:text/saved' to list presented.
+  - `:saved:preferred' - Return `mantle:yas:text/saved' if non-nil.
+  - `:clipboard'       - Add clipboard's text to list presented.
+  - `:yank'            - Add kill ring's text to list presented.
+  - `:none'            - Add empty text to list presented.
+  - `:selected'        - Add active region in current buffer to list presented.
 
-NOTE: Text of options will be deduplicated before being used."
+Build list of text choices and present to user (unless e.g. `:saved:preferred'
+in which case maybe shortcut out). Return what user enters/selects.
+
+NOTE: Text of options will be deduplicated before being presented."
     (unless (or yas-moving-away-p
                 yas-modified-p)
-      (let (choices
-            null-choice?)
-        (dolist (option options)
+      ;;------------------------------
+      ;; Force a "choice" based on interaction type?
+      ;;------------------------------
+      (if-let ((forced-choice (mantle:yas:choose/options:interaction/insert options)))
+          ;;------------------------------
+          ;; Return forced choice.
+          ;;------------------------------
           ;; Trim leading/trailing newlines.
-          (push (mantle:yas:trim/lines
-                 ;; Get text from wherever it is.
-                 (pcase option
-                   ((or :saved 'saved)
-                    mantle:yas:text/saved
-                    ;; (when (buffer:region:active?)
-                    ;;   (buffer:region:get))
-                    )
+          (mantle:yas:trim/lines forced-choice)
 
-                   ((or :clipboard 'clipboard)
-                    ;; `let' values stolen from `clipboard-yank':
-                    (let ((select-enable-clipboard t)
-                          ;; Ensure that we defeat the DWIM login in `gui-selection-value'.
-                          (gui--last-selected-text-clipboard nil))
-                      (current-kill 0 'do-not-move)))
+        ;;------------------------------
+        ;; Actually let user choose based on available text from OPTIONS.
+        ;;------------------------------
+        (let (choices)
+          (dolist (option (nreverse options))
+            ;; Trim leading/trailing newlines.
+            (push (mantle:yas:trim/lines ; Returns nil for non-strings, which is used.
+                   ;; Get text from wherever it is.
+                   ;; TODO: share a helper function with `mantle:yas:choose/options' for this pcase?
+                   (pcase option
+                     ((or :saved 'saved)
+                      (mantle:yas:choose/option:string-or-nil
+                       mantle:yas:text/saved))
 
-                   ((or :yank 'yank)
-                    (current-kill 0 'do-not-move))
+                     ((or :selected 'selected)
+                      (when (buffer:region:active?)
+                        (buffer:region:get)))
 
-                   ((or :none 'none)
-                    (setq null-choice? t))))
-                choices))
+                     ((or :clipboard 'clipboard)
+                      (mantle:yas:choose/option:string-or-nil
+                       ;; `let' values stolen from `clipboard-yank':
+                       (let ((select-enable-clipboard t)
+                             ;; Ensure that we defeat the DWIM login in `gui-selection-value'.
+                             (gui--last-selected-text-clipboard nil))
+                         (current-kill 0 'do-not-move))))
 
-        ;; Remove empties and deduplicate.
-        (setq choices (seq-uniq (seq-filter (lambda (str)
-                                              (and (stringp str)
-                                                   (not (string-empty-p str))))
-                                            choices)
-                                #'string=))
+                     ((or :yank 'yank)
+                      (mantle:yas:choose/option:string-or-nil
+                       (current-kill 0 'do-not-move)))
 
-        ;; Intentionally add an empty?
-        (when null-choice?
-          (push "" choices))
+                     ((or :none 'none)
+                      ;; `none' should be an empty string; don't use `mantle:yas:choose/option:string-or-nil'.
+                      "")))
+                  choices))
 
-        ;; Prompt user for choice.
-        (let* ((last-link (last choices))
-               (last-elem (car last-link)))
-          (when (listp last-elem)
-            (setcar last-link (car last-elem))
-            (setcdr last-link (cdr last-elem))))
-        (completing-read (int<mantle>:yas:prompt/format prompt)
-                         choices))))
-  ;; (mantle:yas:choose/options "prompt" :selected :clipboard :yank :none)
+          ;; Remove invalids and deduplicate.
+          (setq choices (seq-uniq (seq-filter #'stringp choices) #'string=))
+
+          ;; Prompt user for choice.
+          (let* ((last-link (last choices))
+                 (last-elem (car last-link)))
+            (when (listp last-elem)
+              (setcar last-link (car last-elem))
+              (setcdr last-link (cdr last-elem))))
+          (completing-read (int<mantle>:yas:prompt/format prompt)
+                           (nreverse choices))))))
+  ;; (mantle:yas:choose/options "prompt" :saved :selected :clipboard :yank :none)
+  ;; (let ((mantle:yas:interaction/type :expand)
+  ;;       (mantle:yas:text/saved "required choice"))
+  ;;   (mantle:yas:choose/options "prompt" :saved:preferred :none))
+  ;; (let ((mantle:yas:interaction/type :expand)
+  ;;       (mantle:yas:text/saved nil))
+  ;;   (mantle:yas:choose/options "prompt" :saved:preferred :none))
 
 
-  ;;---
+  ;;------------------------------
   ;; Default Snippets Location
-  ;;---
+  ;;------------------------------
 
   ;; Don't override if it was set in e.g. secrets init or system init or something.
   (when (null (jerky:get 'path 'dev-env 'snippets))
@@ -297,24 +424,39 @@ NOTE: Text of options will be deduplicated before being used."
                :value (path:abs:dir user-emacs-directory "snippets")
                :docstr "Default path to snippets in `user-emacs-directory'."))
 
-  ;;---
+  ;;------------------------------
   ;; Hooks
-  ;;---
+  ;;------------------------------
 
   (innit:hook:defun
       (:name    "yasnippet"
        :docstr  "Hook for yasnippet editting."
        :squelch t)
+    ;; Clean up interaction/type if needed.
+    (setq mantle:yas:interaction/type nil)
+
     ;; Normally we want a final newline in all files, so `require-final-newline'
     ;; is set to t. However, in yasnippet files, that means all snippets will
     ;; insert a "\n", and that's not desired.
     (setq require-final-newline nil))
 
 
+  (innit:hook:defun
+      (:name    "yasnippet:mode/exit"
+       :docstr  "Hook for cleaning up when leaving yasnippet minor mode."
+       :squelch t)
+    ;; Only run on exit, because that is our name.
+    (unless snippet-mode
+      ;; Clean up interaction/type.
+      (setq mantle:yas:interaction/type nil)))
+  ;; (add-hook 'snippet-mode-hook #' mantle:hook:yasnippet:mode/exit)
+
+
   ;;------------------------------
   :hook
   ;;------------------------------
-  (snippet-mode-hook . mantle:hook:yasnippet) ;; (innit:hook:func/name:symbol "yasnippet" nil)
+  ((snippet-mode-hook . mantle:hook:yasnippet) ; (innit:hook:func/name:symbol "yasnippet" nil)
+   (snippet-mode-hook . mantle:hook:yasnippet:mode/exit))
 
 
   ;;------------------------------
@@ -329,14 +471,12 @@ NOTE: Text of options will be deduplicated before being used."
   ;;---
   ;; `fixed': Indent the snippet to the current column;
   ;; `auto': Indent each line of the snippet with indent-according-to-mode
-  (yas-indent-line                 'auto)
-  ;; Set these to true if `yas-indent-line' is non-nil.
-  (yas-also-auto-indent-first-line (if yas-indent-line
-                                       t
-                                     yas-also-auto-indent-first-line))
-  (yas-also-indent-empty-lines     (if yas-indent-line
-                                       t
-                                     yas-also-indent-empty-lines))
+  (yas-indent-line 'auto)
+
+  ;; These require `yas-indent-line' == `auto' to do anything.
+  ;; TODO: Do I want either of these in prog modes? Don't /think/ I want in `org-mode'; see `src' indent issues.
+  (yas-also-auto-indent-first-line nil)
+  (yas-also-indent-empty-lines nil)
 
   ;; This modifies how yas looks for matching keys to expand into templates.
   ;;   - https://emacs.stackexchange.com/a/35603
@@ -349,6 +489,34 @@ NOTE: Text of options will be deduplicated before being used."
 
   ;;------------------------------
   :config
+  ;;------------------------------
+
+  ;;------------------------------
+  ;; Advice
+  ;;------------------------------
+
+  (define-advice yas-insert-snippet (:before (&rest _) mantle:yas:interaction/type/insert)
+    "Advice to set `mantle:yas:interaction/type' to `:insert'."
+      (unless mantle:yas:interaction/type
+        (setq mantle:yas:interaction/type :insert)))
+
+
+  ;; This is also called when tabbing between fields in a snippet. Maybe only
+  ;; because I have recursive snippets enabled? Anyway: beware.
+  (define-advice yas-expand-from-trigger-key (:before (&rest _) mantle:yas:interaction/type/expand)
+    "Advice to set `mantle:yas:interaction/type' to `:expand'."
+    (unless mantle:yas:interaction/type
+      (setq mantle:yas:interaction/type :expand)))
+
+  ;; Dunno when this is called...
+  (define-advice yas-expand-from-keymap (:before (&rest _) mantle:yas:interaction/type/expand)
+    "Advice to set `mantle:yas:interaction/type' to `:expand'."
+    (unless mantle:yas:interaction/type
+      (setq mantle:yas:interaction/type :expand)))
+  ;; (advice-remove 'yas-expand-from-keymap #'yas-expand-from-keymap@mantle:yas:interaction/type/expand)
+
+  ;;------------------------------
+  ;; Configuration
   ;;------------------------------
 
   ;; Suppress a warning about backquote behavior:
