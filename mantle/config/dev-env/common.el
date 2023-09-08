@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,19 +24,21 @@
 ;; Keybinds : Meow
 ;;--------------------------------------------------------------------------------
 
-(imp:use-package emacs
-  :when  (imp:flag? :keybinds +meow)
-  :after (:and meow
-               (:keybinds user general meow))
-
-  ;;------------------------------
-  :init
-  ;;------------------------------
-
-  ;; Create the Dev-Env/DevOps/etc keybinds menu in `general' for `meow'."
-  (keybind:leader/global:def
-    :infix (keybind:infix "d")                                    ; "dev-env"? "devops"?
-    "" '(nil :which-key "Dev-Env, DevOps & Version Control..."))) ; infix title
+;; (imp:use-package emacs
+;;   :when  (imp:flag? :keybinds +meow)
+;;   :after (:and meow
+;;                (:keybinds user general meow))
+;;
+;;   ;;------------------------------
+;;   :init
+;;   ;;------------------------------
+;;
+;;   ;; NOTE: this is created in "mantle/init/keybinds/general/+meow.el" now.
+;;   ;; ;; Create the Dev-Env/DevOps/etc keybinds menu in `general' for `meow'."
+;;   ;; (keybind:leader/global:def
+;;   ;;   :infix (keybind:infix "d")                                   ; "dev-env"? "devops"?
+;;   ;;   "" '(nil :which-key "Dev-Env, DevOps & Version Control...")) ; infix title
+;;   )
 
 
 ;;------------------------------------------------------------------------------

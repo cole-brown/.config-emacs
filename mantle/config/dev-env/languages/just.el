@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-03
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -65,20 +65,26 @@
 ;;   - `justl-exec-recipe'
 ;;   - Possibly more; docs aren't great...
 ;;
-;; ;;------------------------------
-;; ;; Keybinds : Meow
-;; ;;------------------------------
-;;
-;; (use-package justl
-;;   :when  (imp:flag? :keybinds +meow)
-;;   :after meow
-;;
-;;   ;;------------------------------
-;;   :config
-;;   ;;------------------------------
-;;
-;;   (map! :n "e" 'justl-exec-recipe)
-;;   )
+;;------------------------------
+;; Keybinds : Meow
+;;------------------------------
+
+(use-package justl
+  :when  (imp:flag? :keybinds +meow)
+  :after meow
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  (keybind:leader/global:def
+    :infix (keybind:infix "d j") ; "dev-env" -> "just"
+    "" '(nil :which-key "Just Recipe Runner...") ; infix title
+
+    "j" (list #'justl-exec-recipe-in-dir :which-key "Just run a recipe...")
+    "o" (list #'justl                    :which-key "Open `just` buffer...")
+    "r" (list #'justl-recompile          :which-key "Rerun last `just` recipe")))
+
 
 
 ;;------------------------------------------------------------------------------
