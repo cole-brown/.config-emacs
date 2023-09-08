@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-07-11
-;; Timestamp:  2023-07-12
+;; Timestamp:  2023-09-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -13,6 +13,10 @@
 ;;; Commentary:
 ;;
 ;; Datetime Conversions
+;;
+;; NOTE: For unit conversions, see "core/modules/elisp/utils/units.el" for e.g.
+;; `unit:second`. Example:
+;;   (unit:second 3.2 'hours)
 ;;
 ;;; Code:
 

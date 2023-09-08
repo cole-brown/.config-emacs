@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-24
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,6 +24,7 @@
 (imp:require :buffer 'type)
 (imp:provide :innit 'vars)
 (imp:require :path 'buffer)
+(imp:require :elisp 'utils 'units)
 
 
 ;;------------------------------------------------------------------------------
@@ -185,7 +186,7 @@
   ;; Cursor / Point
   ;;------------------------------
 
-  (blink-cursor-interval 0.75) ; default is 0.5 seconds
+  (blink-cursor-interval (unit:second 0.75 'sec)) ; default is 0.5 seconds
   (blink-matching-paren  nil)
 
   ;; Don't stretch the cursor to fit wide characters; it is disorienting,

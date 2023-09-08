@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-15
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -18,6 +18,7 @@
 
 
 (imp:require :window)
+(imp:require :elisp 'utils 'units)
 
 
 ;;------------------------------------------------------------------------------
@@ -62,8 +63,8 @@
   (which-key-sort-order           'which-key-key-order-alpha)
   (which-key-sort-uppercase-first nil)
 
-  ;; (which-key-side-window-max-width 0.333) ; Default: 0.333
-  (which-key-idle-delay 0.5)                 ; Default: 1.0 seconds
+  ;; (which-key-side-window-max-width 0.333)    ; Default: 0.333
+  (which-key-idle-delay (unit:second 0.5 'sec)) ; Default: 1.0 seconds
 
   ;; Which-Key & Evil:
   ;;   https://github.com/justbur/emacs-which-key#evil-operators

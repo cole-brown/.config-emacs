@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-04-28
-;; Timestamp:  2023-07-18
+;; Timestamp:  2023-09-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -15,6 +15,9 @@
 ;;  Configure Smudge, which is a Spotify controller.
 ;;
 ;;; Code:
+
+
+(imp:require :elisp 'utils 'units)
 
 
 ;;------------------------------------------------------------------------------
@@ -450,7 +453,7 @@ Always returns nil."
   (smudge-oauth2-client-secret (plist-get secret:key:spotify :secret))
 
   ;; This has to make an API call every time, so... don't overdo it and throttle yourself.
-  (smudge-player-status-refresh-interval 10) ; Refresh rate in seconds.
+  (smudge-player-status-refresh-interval (unit:second 10 'sec)) ; Refresh rate in seconds.
 
   ;;---
   ;; Display

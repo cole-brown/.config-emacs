@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -27,9 +27,9 @@
 (require 'org-element)
 
 (imp:require :dlv)
-
 (imp:require :nub)
 (imp:require :taskspace 'group)
+(imp:require :elisp 'utils 'units)
 
 
 ;;------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ Return date requested by ARG, or nil."
 
     (unless (eq day nil)
       (let* ((now (current-time)) ;; right now
-             (now-adjust-secs (* day 24 60 60)) ;; day arg to seconds
+             (now-adjust-secs (floor (unit:second day 'days))) ;; day arg to seconds
              (target (time-add now now-adjust-secs))) ;; actually when we want
         ;; format to spec and return
         (format-time-string (int<taskspace>:config group :format/datetime)

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-13
-;; Timestamp:  2023-08-22
+;; Timestamp:  2023-09-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -16,6 +16,9 @@
 ;; Nerd Icons:    ...All the Icons 2.0?
 ;;
 ;;; Code:
+
+
+(imp:require :elisp 'utils 'units)
 
 
 ;; ┌──────────────────────────────────═══───────────────────────────────────┐
@@ -112,8 +115,8 @@ check like `all-the-icons' does..."
       ;; `:config' section of `all-the-icons' `use-package' block.
       ;;   (member \"all-the-icons\" (font-family-list))
       ;;   (find-font (font-spec :name \"all-the-icons\"))
-      (run-with-idle-timer 1   ; Run when Emacs is idle for 1 second.
-                           nil ; Do not repeat.
+      (run-with-idle-timer (unit:second 1 'sec) ; Run when Emacs is idle for 1 second.
+                           nil                  ; Do not repeat.
                            (lambda ()
                              ;; Try to automatically install the fonts if they're not present.
                              ;; Closest I can get for now is this, I think.
@@ -374,8 +377,8 @@ lately it's just installing fonts every startup because these two checks both
 now return nil during `:config'.
   (member \"all-the-icons\" (font-family-list)))
   (find-font (font-spec :name \"all-the-icons\")))"
-    (run-with-idle-timer 1   ; Run when Emacs is idle for 1 second.
-                         nil ; Do not repeat.
+    (run-with-idle-timer (unit:second 1 'sec) ; Run when Emacs is idle for 1 second.
+                         nil                  ; Do not repeat.
                          (lambda ()
                            ;; Try to automatically install the fonts if they're not present.
                            ;; Closest I can get for now is this, I think.

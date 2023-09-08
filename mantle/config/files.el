@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-29
-;; Timestamp:  2023-07-18
+;; Timestamp:  2023-09-08
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -19,6 +19,7 @@
 
 (imp:require :datetime)
 (imp:require :buffer)
+(imp:require :elisp 'utils 'units)
 
 
 ;;------------------------------------------------------------------------------
@@ -101,8 +102,8 @@
 
   ;; Periodically save the list of recent files: https://www.emacswiki.org/emacs/RecentFiles#toc1
   ;; Otherwise they're only saved during a graceful shutdown.
-  (run-with-timer (* 30 60) ;; Wait 30 mins to run.
-                  (* 30 60) ;; Repeat every 30 mins.
+  (run-with-timer (unit:second 30 'mins) ;; Wait 30 mins to run.
+                  (unit:second 30 'mins) ;; Repeat every 30 mins.
                   'recentf-save-list)
 
   ;; Recentf and TRAMP need some peace-keeping to get along.
