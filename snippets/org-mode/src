@@ -4,7 +4,8 @@
 # key: src
 # notes: Block of source code with syntax highlighting, etc.
 # --
+
 #+begin_src ${1:`(mantle:yas:choose/no-match/history mantle:yas:choose/no-match/history:src "shell")`$(mantle:yas:choose/no-match "Language" 'mantle:yas:choose/no-match/history:src org-src-lang-modes)}
-${2:$$(mantle:yas:choose/options "Source" :none :saved :clipboard :yank)}
+${2:`(mantle:yas:choose/options:default :none :clipboard :yank :saved:preferred)`$(mantle:yas:choose/options "Source" :none :clipboard :yank :saved:preferred)}
 #+end_src
 `(mantle:yas:text/save yas-selected-text)`$0
