@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-29
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-11
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -60,9 +60,7 @@
       (:name    "persp:perspective:replace-nil"
        :docstr  (concat "The default perspective that 'persp-mode' creates is special and doesn't "
                         "represent a real persp object, so buffers can't really be assigned to "
-                        "it, among other quirks, so... replace it with a \"main\" perspective.")
-       ;; :squelch t ;; TODO: Do I need to squelch?
-       )
+                        "it, among other quirks, so... replace it with a \"main\" perspective."))
     (when persp-mode
       (dolist (frame (frame-list))
         (when (string= (safe-persp-name (get-current-persp frame)) persp-nil-name)
@@ -73,9 +71,7 @@
 
   (innit:hook:defun
       (:name    "persp:perspective:init-first"
-       :docstr  (concat "Ensure a main perspective exists.")
-       ;; :squelch t ;; TODO: Do I need to squelch?
-       )
+       :docstr  (concat "Ensure a main perspective exists."))
     (when persp-mode
       (let (persp-before-switch-functions)
         ;; Try our best to hide the nil perspective...
@@ -95,9 +91,7 @@
 
   (innit:hook:defun
       (:name    "persp:uniquify:init-hack"
-       :docstr "Hack around `uniquify' buffer renaming to keep `persp-mode' working."
-       ;; :squelch t ;; TODO: Do I need to squelch?
-       )
+       :docstr "Hack around `uniquify' buffer renaming to keep `persp-mode' working.")
     ;; `uniquify' breaks persp-mode. It renames old buffers, which causes errors
     ;; when switching between perspective (their buffers are serialized by name
     ;; and persp-mode expects them to have the same name when restored).
@@ -119,9 +113,7 @@
 
   (innit:hook:defun
       (:name    "persp:winner:data/save"
-       :docstr "Save `winner' perspective data?"
-       ;; :squelch t ;; TODO: Do I need to squelch?
-       )
+       :docstr "Save `winner' perspective data?")
     (when (and (bound-and-true-p winner-mode)
                (get-current-persp))
       (set-persp-parameter 'winner-ring (list winner-currents
@@ -130,9 +122,7 @@
 
   (innit:hook:defun
       (:name    "persp:winner:data/load"
-       :docstr "Load `winner' perspective data?"
-       ;; :squelch t ;; TODO: Do I need to squelch?
-       )
+       :docstr "Load `winner' perspective data?")
     (when (bound-and-true-p winner-mode)
       (cl-destructuring-bind
           (currents alist pending-undo-ring)
@@ -144,9 +134,7 @@
 
   (innit:hook:defun
       (:name    "persp:buffer:add-current"
-       :docstr "Add current buffer to focused perspective."
-       ;; :squelch t ;; TODO: Do I need to squelch?
-       )
+       :docstr "Add current buffer to focused perspective.")
     (or (not (bound-and-true-p persp-mode))
         (persp-buffer-filtered-out-p
          (or (buffer-base-buffer (current-buffer))
@@ -154,23 +142,17 @@
          persp-add-buffer-on-after-change-major-mode-filter-functions)
         (persp-add-buffer (current-buffer) (get-current-persp) nil nil)))
 
-
   (innit:hook:defun
       (:name     "persp:buffer:ignore/dead"
        :argslist (buffer)
-       :docstr   "Don't try to persist dead buffers. They cause errors."
-       ;; :squelch  t ;; TODO: Do I need to squelch?
-       )
+       :docstr   "Don't try to persist dead buffers. They cause errors.")
       ;; Fix bug: Ignore dead buffers in `persp-mode' buffer list
     (not (buffer-live-p buffer)))
-
 
   (innit:hook:defun
       (:name     "persp:buffer:ignore/remote"
        :argslist (buffer)
-       :docstr   "Don't try to persist remote buffers. They are super slow."
-       ;; :squelch  t ;; TODO: Do I need to squelch?
-       )
+       :docstr   "Don't try to persist remote buffers. They are super slow.")
       ;; Don't save TRAMP buffers; they're super slow to restore.
       (let ((dir (buffer-local-value 'default-directory buffer)))
         (ignore-errors (file-remote-p dir))))
