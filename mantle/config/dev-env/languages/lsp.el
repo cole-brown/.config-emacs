@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-09-27
-;; Timestamp:  2023-06-28
+;; Timestamp:  2023-09-12
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -249,8 +249,23 @@ Borrowed from Doom's `+lsp-optimization-mode' in \"modules/tools/lsp/config.el\"
   ;; Make breadcrumbs opt-in; they're redundant with the modeline and imenu
   (lsp-headerline-breadcrumb-enable nil)
 
+  ;; "With semantic token support you get more contextual information via different faces."
+  ;;   https://emacs-lsp.github.io/lsp-mode/page/lsp-terraform-ls/#semantic-token-support
+  ;; "Make sure to enable these two variables to ensure that you have semantic token support for terraform mode."
+  ;;   https://emacs-lsp.github.io/lsp-mode/page/lsp-terraform-ls/#semantic-token-support
+  (lsp-semantic-tokens-enable t)
+  (lsp-semantic-tokens-honor-refresh-requests t)
+
+  ;;------------------------------
+  ;; Keybinds
+  ;;------------------------------
+
   ;; TODO-meow: Bind the lsp keymap ourselves?
   (lsp-keymap-prefix nil)
+
+  ;; Link to Documentation?
+  ;; default keybinds: M-RET & middle mouse click.
+  ;; (lsp-enable-links t) ; default: t
 
 
   ;;------------------------------

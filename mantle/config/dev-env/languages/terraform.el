@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-03
-;; Timestamp:  2023-08-22
+;; Timestamp:  2023-09-12
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -75,8 +75,8 @@ Return a string:
       ;;------------------------------
 
       ;; NOTE:
-      ;;   a) `path' should no longer be null.
-      ;;   b) Use `path/input' for feedback to user.
+      ;;   a. `path' should no longer be null.
+      ;;   b. Use `path/input' for feedback to user.
       (cond ((null path)
              (error "%s: `path' is unexpectedly null..? Supplied PATH: %S => `path': %S"
                     func/name
@@ -138,8 +138,7 @@ Return a string:
   ;;------------------------------
   :hook
   ;;------------------------------
-  ((terraform-mode-hook . mantle:hook:json:settings)
-   (terraform-mode-hook . mantle:hook:lsp:enable)))
+  ((terraform-mode-hook . mantle:hook:json:settings)))
 
 
 ;;--------------------------------------------------------------------------------
@@ -233,7 +232,6 @@ Return a string:
     (mantle:meow/keybind/transient:terraform)))
 
 
-
 ;;--------------------------------------------------------------------------------
 ;; Keybinds : Evil
 ;;--------------------------------------------------------------------------------
@@ -250,6 +248,59 @@ Return a string:
    "a" (list (elisp:cmd (mantle:terraform:run "apply")) :which-key "terraform apply")  ; (mantle:terraform:command "apply"))
    "i" (list (elisp:cmd (mantle:terraform:run "init"))  :which-key "terraform init")   ; (mantle:terraform:command "init"))
    "p" (list (elisp:cmd (mantle:terraform:run "plan"))  :which-key "terraform plan"))) ; (mantle:terraform:command "plan"))))
+
+
+;;------------------------------------------------------------------------------
+;; Terraform LSP
+;;------------------------------------------------------------------------------
+
+;; NOTE [2023-09-12]:
+;;   1. Requires manual install of a Terraform LSP server.
+;;   2. Currently using `terraform-ls' by HashiCorp.
+;; https://emacs-lsp.github.io/lsp-mode/page/lsp-terraform-ls/
+(imp:use-package terraform-mode
+  :after lsp-mode
+  :when (and (executable-find "terraform")
+             (executable-find "terraform-ls"))
+
+  ;;------------------------------
+  :hook
+  ;;------------------------------
+  ;; NOTE [2023-09-12]:
+  ;;   1. Requires manual install of a Terraform LSP server.
+  ;;   2. Currently using `terraform-ls' by HashiCorp.
+  ;; https://emacs-lsp.github.io/lsp-mode/page/lsp-terraform-ls/
+  ((terraform-mode-hook . mantle:hook:lsp:enable))
+
+  ;;------------------------------
+  :custom
+  ;;------------------------------
+  ;; See: https://emacs-lsp.github.io/lsp-mode/page/lsp-terraform-ls/
+  ;; NOTE [2023-09-12]: This (Code Lens) is an "Experimental Feature".
+  (lsp-terraform-ls-enable-show-reference t)
+
+  ;; Put all default fields in a (resource) block when it's created.
+  (lsp-terraform-ls-prefill-required-fields t)
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; Disable other Terraform LSPs.
+  ;; Set these in `:config' instead of `:custom' so we can try to not step on
+  ;; other languages' LSP settings.
+  (add-to-list 'lsp-disabled-clients 'tfls)       ; The other Terraform LSP: https://emacs-lsp.github.io/lsp-mode/page/lsp-terraform/
+  (add-to-list 'lsp-disabled-clients 'semgrep-ls) ; IDK; a non-free option?
+
+  ;;------------------------------
+  ;; Terraform LSP Config
+  ;;------------------------------
+  ;; Commands:
+  ;;   - `lsp-terraform-ls-validate' : Run `terraform validate' on project root.
+  ;;   - `lsp-terraform-ls-init'     : Run `terraform init' on project root.
+  ;;   - `lsp-terraform-ls-version'  : Get current & required Terraform version.
+  )
 
 
 ;;------------------------------------------------------------------------------
@@ -291,23 +342,6 @@ Return a string:
 ;;   :after terraform-mode
 ;;   :config
 ;;   (set-company-backend! 'terraform-mode 'company-terraform))
-
-
-;; ;;------------------------------------------------------------------------------
-;; ;; Language Server
-;; ;;------------------------------------------------------------------------------
-;;
-;; https://github.com/juliosueiras/terraform-lsp/blob/master/docs/editors/emacs.md
-;; TODO-lsp: terraform lsp?
-;; Doom does this, but just use what the 'emacs.md' doc says instead?
-;; (when (modulep! +lsp)
-;;   (add-hook 'terraform-mode-local-vars-hook #'lsp! 'append))
-;;
-;; ;; Don't bother unless `terraform` is actually installed?
-;; (when (executable-find "terraform")
-
-;;   ;; https://github.com/TxGVNN/terraform-doc
-;;   (imp:use-package terraform-doc)
 
 
 ;;------------------------------------------------------------------------------
