@@ -52,7 +52,7 @@
    ([remap beginning-of-visual-line] . buffer:cmd:line/smart:move-beginning/visual/select)
    ([remap move-beginning-of-line]   . buffer:cmd:line/smart:move-beginning/visual/select)
    ([remap end-of-visual-line]       . buffer:cmd:line/smart:move-end/visual/select)
-   ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end/visual/select)))
+   ([remap move-end-of-line]         . buffer:cmd:line/smart:move-end/visual/select))
 
   ;;------------------------------
   :config
@@ -110,7 +110,7 @@
     ;; 'SPC u' makes a lot of sense for taking over from 'C-u', but "u" is a premium home-row
     ;; key in Dvorak. So try something else.
     ;; '("u" . universal-argument)
-    ;; "u" (list #'universal-argument :which-key "Prefix Arg"))
+    ;; "u" (list #'universal-argument :which-key "Prefix Arg")
     "p" (list #'universal-argument :which-key "Prefix Arg"))
 
 
