@@ -95,10 +95,7 @@ Originally stolen from Doom's `set-yas-minor-mode!' in
                   ,hook-var
                   (:name    ,macro<yasnippet>:hook/name
                    :file    ,macro<yasnippet>:path/this
-                   :docstr  ,macro<yasnippet>:docstr
-                   ;; TODO: should I squelch this or no? If no, remove:
-                   ;; :squelch t
-                   )
+                   :docstr  ,macro<yasnippet>:docstr)
                 ;; ...All that for this:
                 (yas-activate-extra-mode ,mode)))))))
 ;; (mantle:user:yasnippet:minor-mode/add test-mode)
