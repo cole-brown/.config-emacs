@@ -50,6 +50,9 @@
 ;; Org-Mode Set-Up
 ;;------------------------------
 (imp:use-package org
+  ;; Use `org' from GNU ELPA, not MELPA.
+  :pin gnu
+
   ;;------------------------------
   :init
   ;;------------------------------
@@ -348,6 +351,8 @@
 ;;------------------------------
 
 (imp:use-package org
+  ;; Use `org' from GNU ELPA, not MELPA.
+  :pin gnu
   :when  (imp:flag? :keybinds +meow)
   :after meow
 
@@ -489,6 +494,8 @@
 ;;------------------------------
 
 (imp:use-package org
+  ;; Use `org' from GNU ELPA, not MELPA.
+  :pin gnu
   :when  (imp:flag? :keybinds +evil)
   :after (:and (:keybinds user general evil)
                evil evil-collection evil-org)
@@ -544,6 +551,8 @@
 ;; Org-Mode Hacks
 ;;------------------------------
 (imp:use-package org
+  ;; Use `org' from GNU ELPA, not MELPA.
+  :pin gnu
 
   ;;------------------------------
   :init

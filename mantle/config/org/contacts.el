@@ -23,6 +23,8 @@
 
 ;; TODO-org: Get org-contacts actually working like it never really was on vanilla?
 ;; (imp:use-package org-contacts
+;;   ;; Use `org-contacts' from GNU ELPA, not MELPA.
+;;   :pin gnu
 ;;   :after org
 ;;   :disabled   ; is this making things slow?
 ;;   :ensure nil ; auto-install?
