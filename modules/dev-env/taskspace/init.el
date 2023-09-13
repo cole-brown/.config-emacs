@@ -4,8 +4,11 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2019-04-24
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-13
 ;; Version:    2.3
+;;
+;; TODO: Requirements: cl-lib, seq, dash, org,
+;; TODO: Requirements (imp):  nub, dlv, elisp:util:units,
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.

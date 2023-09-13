@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-06
-;; Timestamp:  2023-07-21
+;; Timestamp:  2023-09-13
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -21,13 +21,9 @@
 ;;--                   Simple Taskspace / Task Management                     --
 ;;------------------------------------------------------------------------------
 
-(require 'cl-lib) ;; for `some'
-(require 'seq) ;; for `seq-contains'
-(require 'dash)
-(require 'org-element)
+(require 'cl-lib)
 
 (imp:require :dlv)
-
 (imp:require :nub)
 (imp:require :taskspace 'group)
 (imp:require :taskspace 'naming)
