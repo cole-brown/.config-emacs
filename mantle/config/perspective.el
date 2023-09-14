@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-29
-;; Timestamp:  2023-09-11
+;; Timestamp:  2023-09-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -51,8 +51,9 @@
   ;;------------------------------
 
   ;;---
-  ;; Create Main Perspective
+  ;; Hooks
   ;;---
+
   ;; The default perspective persp-mode creates is special and doesn't represent
   ;; a real persp object, so buffers can't really be assigned to it, among other
   ;; quirks, so... replace it with a "main" perspective.
@@ -158,6 +159,43 @@
         (ignore-errors (file-remote-p dir))))
 
 
+  ;;---
+  ;; Filters
+  ;;---
+
+  (innit:hook:defun
+      (:name     "persp:buffer/filter:on-major-mode-change"
+       :argslist (buffer-or-name)
+       :docstr   (mapconcat #'identity
+                            '("Do _not_ add BUFFER to current perspective?"
+                              ""
+                              "In the `use-package' `:hook':"
+                              "  (persp-add-buffer-on-after-change-major-mode-filter-functions . mantle:persp/major-mode-hook:add-buffer-filter)")
+                            "\n"))
+    ;; NOTE: Filtering _out_ buffers so:
+    ;;   - nil     = Want.
+    ;;   - non-nil = Do not want.
+    (cond
+     ;;------------------------------
+     ;; "Real" buffers are fine...
+     ;;------------------------------
+     ((buffer:type:real? buffer-or-name)
+      nil) ; Do add buffer to persp.
+
+     ;;------------------------------
+     ;; "Unreal" buffers are usually not desired.
+     ;;------------------------------
+     ;; Major-Mode Exceptions:
+     ((memq major-mode '(deadgrep-mode
+                         magit-status-mode
+                         helpful-mode))
+      nil) ; Do add buffer to persp.
+
+     ;; Any other unreal buffer: don't want.
+     (t)))
+  ;; (setq persp-add-buffer-on-after-change-major-mode-filter-functions '(mantle:hook:persp:buffer/filter:on-major-mode-change))
+
+
   ;;------------------------------
   :hook
   ;;------------------------------
@@ -171,7 +209,7 @@
    ;; server, so also include `server-visit-hook'.
    ((window-buffer-change-functions server-visit-hook) . mantle:hook:persp:buffer:add-current)
    ;; Do *not* add buffer to perspective if function returns non-nil.
-   (persp-add-buffer-on-after-change-major-mode-filter-functions . buffer:type:unreal?)
+   (persp-add-buffer-on-after-change-major-mode-filter-functions . mantle:hook:persp:buffer/filter:on-major-mode-change)
    ;; Fix bug: Visual selection surviving perspective changes.
    (persp-before-deactivate-functions . deactivate-mark)
    (persp-filter-save-buffers-functions . (mantle:hook:persp:buffer:ignore/dead mantle:hook:persp:buffer:ignore/remote))

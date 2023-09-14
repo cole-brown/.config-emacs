@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-12-01
-;; Timestamp:  2023-06-21
+;; Timestamp:  2023-09-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -176,7 +176,7 @@ Via Doom's `doom-special-buffer-p' in \"core/autoload/buffers.el\"."
 
 ;;;###autoload
 (defun buffer:type:temp? (buffer)
-  "Returns non-nil if BUFFER is temporary.
+  "Return non-nil if BUFFER is temporary.
 
 Via Doom's `doom-temp-buffer-p' in \"core/autoload/buffers.el\"."
   (equal (substring (buffer-name buffer) 0 1) " "))
@@ -222,10 +222,13 @@ perspective/tabs/whatever for your next Emacs session). Real buffers should get
 special treatment, because we will be spending most of our time in them. Unreal
 ones should be low-profile and easy to cast aside, so we can focus on real ones.
 
-A \"real buffer\" must be one of (in order of priority):
-  1. A non-nil value for the buffer-local variable `buffer:type:real?' variable.
-  2. Any function in `buffer:type:functions/real' returns non-nil
-  3. Any function in `buffer:type:functions/unreal' returns nil.
+A \"real buffer\" must:
+  1. Be a live (not killed) buffer.
+  2. Not be a temp buffer (see function `buffer:type:temp?').
+  3. Pass one of these tests (in order of priority):
+     1. A non-nil value for the buffer-local variable `buffer:type:real?' variable.
+     2. Any function in `buffer:type:functions/real' returns non-nil
+     3. Any function in `buffer:type:functions/unreal' returns nil.
 
 If BUFFER-OR-NAME is omitted or nil, the current buffer is tested.
 
