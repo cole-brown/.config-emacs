@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-13
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -18,6 +18,10 @@
 ;;       ...if you're using both this and that, obviously...
 ;;
 ;;; Code:
+
+
+(imp:require :elisp 'utils 'units)
+(imp:require :window 'manage)
 
 
 ;;------------------------------------------------------------------------------
@@ -43,16 +47,44 @@
 
   (undo-tree-visualizer-diff t)
   (undo-tree-auto-save-history t)
-  (undo-tree-enable-undo-in-region t)
+  ;; [2023-09-14] I hardly ever want undo-in-region... why not try having it turned off?
+  (undo-tree-enable-undo-in-region nil)
 
   ;; Increase undo limits to avoid emacs prematurely truncating the undo
-  ;; history and corrupting the tree. Think big.. `undo-tree' history trees
+  ;; history and corrupting the tree. Think big... `undo-tree' history trees
   ;; consume exponentially more space than linear undo histories, and then
-  ;; some when `undo-tree-enable-undo-in-region' is involved. See
-  ;; syl20bnr/spacemacs#12110
-  (undo-limit        (*  16 1024 1024)) ;  16mb (default is 160kb)
-  (undo-strong-limit (*  64 1024 1024)) ;  64mb (default is 240kb)
-  (undo-outer-limit  (* 256 1024 1024)) ; 256mb (default is 24mb)
+  ;; some when `undo-tree-enable-undo-in-region' is involved.
+  ;; See: syl20bnr/spacemacs#12110
+  (undo-limit        (min undo-limit        (unit:byte  16 'mb))) ; (default is 160kb)
+  (undo-strong-limit (min undo-strong-limit (unit:byte  64 'mb))) ; (default is 240kb)
+  (undo-outer-limit  (min undo-outer-limit  (unit:byte 256 'mb))) ; (default is 24mb)
+
+
+  ;;------------------------------
+  :bind
+  ;;------------------------------
+
+  ;;---
+  ;; BUG [2023-09-15]: "Error reading undo-tree history [...]"
+  ;;---
+  ;; `undo-tree-visualizer-mode' has a bug where if you leave
+  ;; it by just killing the buffer (e.g. `kill-buffer'), the `undo-tree' history
+  ;; file becomes corrupted with a dead marker or dead overlay, and then you get
+  ;; this complaint when opening the file next time:
+  ;;   > Error reading undo-tree history from "/home/user/.emacs/var/undo-tree-hist/.!home!user!file.ext.~undo-tree~.zst"
+  ;;
+  ;; See: https://www.reddit.com/r/emacs/comments/cn5rdy/comment/ew8e2db/?context=3
+  ;; Note: That post & reply is from around 2019, so I doubt `undo-tree' will
+  ;; fix it any time soon?
+  ;;
+  ;; Solution?: Just try to not be able to kill/quit that buffer except by it's
+  ;; own kill/quit-and-cleanup functions?
+  ;;   - `undo-tree-visualizer-quit'  - quit
+  ;;   - `undo-tree-visualizer-abort' - quit & discard changes made while in visualizer
+  (:map undo-tree-visualizer-mode-map
+   ([remap kill-buffer]         . #'undo-tree-visualizer-quit)
+   ([remap window:kill-or-quit] . #'undo-tree-visualizer-quit)
+   ([remap window:quit-or-kill] . #'undo-tree-visualizer-quit))
 
 
   ;;------------------------------
@@ -87,7 +119,6 @@
   ;; Strip text properties from undo-tree data to stave off bloat. File size
   ;; isn't the concern here; undo cache files bloat easily, which can cause
   ;; freezing, crashes, GC-induced stuttering or delays when opening files.
-  ;; TODO: Does `nil' for LAMBDA-LIST work for function without params?
   (define-advice undo-list-transfer-to-tree (:before nil mantle:advice:strip-text-props)
     (dolist (item buffer-undo-list)
       (and (consp item)
