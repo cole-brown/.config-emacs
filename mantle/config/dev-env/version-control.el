@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-21
-;; Timestamp:  2023-08-22
+;; Timestamp:  2023-09-15
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -202,125 +202,141 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Magit Todos
+;; Magit TODOs
 ;;------------------------------------------------------------------------------
 ;; https://github.com/alphapapa/magit-todos
-
-;;---
-;; External Tool Prereqs:
-;;---
-;; > One of the following external scanners is required:
-;; >   - 'ripgrep'
-;; >   - 'git grep' (built with PCRE support)
-;; >   - 'GNU grep' (built with PCRE support)
-;; >
-;; > Most Linux systems should have the latter two by default, but some
-;; > non-standard systems may not. For example, on MacOS you may use Homebrew to
-;; > install ripgrep, or git with PCRE support, like: brew reinstall --with-pcre2
-;; > git.
 ;;
-;; I have installed 'ripgrep', so we're triple good on Linux.
-;;---
-
-;; Lodge a complaint if 'ripgrep' isn't installed on the system. But don't skip
-;; the `use-package', since it can use 'git grep' or 'GNU grep'.
-(unless (executable-find "rg")
-  (nub:warning
-      :innit
-      (imp:path:current:file/relative :mantle)
-    '("Could not find 'ripgrep' (`rg') executable. Is it installed? "
-      "`magit-todos' wants it.")))
-
-
-(imp:use-package magit-todos
-  :after magit
-
-  ;;------------------------------
-  :custom
-  ;;------------------------------
-
-  ;; Global glob patterns to ignore:
-  (magit-todos-exclude-globs '(".git/"
-                               ;; Web: Ignore source maps and minified Javascript & CSS.
-                               "*.js.map"
-                               "*.css.map"
-                               "*.min.js"
-                               "*.min.css"
-                               ))
-  ;; https://github.com/alphapapa/magit-todos/#tips
-  ;; They suggest to use `magit-todos-exclude-globs' as a dir local var for
-  ;; per-repository settings, but let's ignore some globally too.
-
-
-  ;;------------------------------
-  :config
-  ;;------------------------------
-  (magit-todos-mode +1))
-
-
-;;------------------------------------------------------------------------------
-;; Magit-Todos Keybinds: meow
-;;------------------------------------------------------------------------------
-
-(imp:use-package magit-todos
-  :when  (imp:flag? :keybinds +meow)
-  :after (:and magit meow)
-
-  ;;------------------------------
-  :config
-  ;;------------------------------
-
-  ;;------------------------------
-  ;; `General'
-  ;;------------------------------
-
-  (defun mantle:meow/keybind/general:magit-todo ()
-    "Create the \"Magit TODOs...\" keybinds in `general' for `meow'."
-    (keybind:leader/global:def
-      :infix (keybind:infix "d") ; "dev-env"
-      "t" '(magit-todos-list :which-key "magit: List TODOs")))
-
-
-  ;;------------------------------
-  ;; `Transient'
-  ;;------------------------------
-
-  (defun mantle:meow/keybind/transient:magit-todo ()
-    "Create the \"Magit TODOs...\" keybinds in `transient' for `meow'."
-    (transient-append-suffix 'mantle:meow/transient:dev-env:version-control
-      '(0 0 -1)
-      '("t" "magit: List TOODs" magit-todos-list))
-    ;; (mantle:meow/transient:dev-env:version-control)
-    )
-
-
-  ;;------------------------------
-  ;; Actually Create Keybinds:
-  ;;------------------------------
-
-  (if (imp:provided? :keybinds 'general 'meow)
-      (mantle:meow/keybind/general:magit-todo)
-    (mantle:meow/keybind/transient:magit-todo)))
-
-
-
-;;------------------------------------------------------------------------------
-;; Magit-Todos Keybinds: evil
-;;------------------------------------------------------------------------------
-
-(imp:use-package magit-todos
-  :when  (imp:flag? :keybinds +evil)
-  :after (:and magit evil evil-collection)
-
-  ;;------------------------------
-  :general ; evil
-  ;;------------------------------
-  (keybind:leader/global:def
-    :infix  "g"
-    ;;---
-    ;; Magit-Todos Keybinds
-    ;;---
-    "t" '(magit-todos-list :which-key "Magit TODOs list buffer")))
+;; ;;------------------------------
+;; ;; NOTE [2023-09-15]: DISABLED
+;; ;;------------------------------
+;; ;; Last couple of versions of `magit', `magit-todos', and friends has been
+;; ;; trouble... Guess that's the problem with using MELPA instead of MELPA Stable?
+;; ;;
+;; ;; Anyways:
+;; ;;   1. I haven't really been using Magit TODOs. It's just been a neat thing to
+;; ;;      have in case I do ever want to use it.
+;; ;;   2. It may or may not be making Magit slow for the big repos at work.
+;; ;;
+;; ;; So, for now, disable it.
+;;
+;;
+;; ;;------------------------------
+;; ;; External Tool Prereqs:
+;; ;;------------------------------
+;; ;; > One of the following external scanners is required:
+;; ;; >   - 'ripgrep'
+;; ;; >   - 'git grep' (built with PCRE support)
+;; ;; >   - 'GNU grep' (built with PCRE support)
+;; ;; >
+;; ;; > Most Linux systems should have the latter two by default, but some
+;; ;; > non-standard systems may not. For example, on MacOS you may use Homebrew to
+;; ;; > install ripgrep, or git with PCRE support, like: brew reinstall --with-pcre2
+;; ;; > git.
+;; ;;
+;; ;; I have installed 'ripgrep', so we're triple good on Linux.
+;; ;;---
+;;
+;; ;; Lodge a complaint if 'ripgrep' isn't installed on the system. But don't skip
+;; ;; the `use-package', since it can use 'git grep' or 'GNU grep'.
+;; (unless (executable-find "rg")
+;;   (nub:warning
+;;       :innit
+;;       (imp:path:current:file/relative :mantle)
+;;     '("Could not find 'ripgrep' (`rg') executable. Is it installed? "
+;;       "`magit-todos' wants it.")))
+;;
+;;
+;; ;;------------------------------
+;; ;; `magit-todos' Package
+;; ;;------------------------------
+;; (imp:use-package magit-todos
+;;   :after magit
+;;
+;;   ;;------------------------------
+;;   :custom
+;;   ;;------------------------------
+;;
+;;   ;; Global glob patterns to ignore:
+;;   (magit-todos-exclude-globs '(".git/"
+;;                                ;; Web: Ignore source maps and minified Javascript & CSS.
+;;                                "*.js.map"
+;;                                "*.css.map"
+;;                                "*.min.js"
+;;                                "*.min.css"
+;;                                ))
+;;   ;; https://github.com/alphapapa/magit-todos/#tips
+;;   ;; They suggest to use `magit-todos-exclude-globs' as a dir local var for
+;;   ;; per-repository settings, but let's ignore some globally too.
+;;
+;;
+;;   ;;------------------------------
+;;   :config
+;;   ;;------------------------------
+;;   (magit-todos-mode +1))
+;;
+;;
+;; ;;------------------------------------------------------------------------------
+;; ;; Magit-Todos Keybinds: meow
+;; ;;------------------------------------------------------------------------------
+;;
+;; (imp:use-package magit-todos
+;;   :when  (imp:flag? :keybinds +meow)
+;;   :after (:and magit meow)
+;;
+;;   ;;------------------------------
+;;   :config
+;;   ;;------------------------------
+;;
+;;   ;;------------------------------
+;;   ;; `General'
+;;   ;;------------------------------
+;;
+;;   (defun mantle:meow/keybind/general:magit-todo ()
+;;     "Create the \"Magit TODOs...\" keybinds in `general' for `meow'."
+;;     (keybind:leader/global:def
+;;       :infix (keybind:infix "d") ; "dev-env"
+;;       "t" '(magit-todos-list :which-key "magit: List TODOs")))
+;;
+;;
+;;   ;;------------------------------
+;;   ;; `Transient'
+;;   ;;------------------------------
+;;
+;;   (defun mantle:meow/keybind/transient:magit-todo ()
+;;     "Create the \"Magit TODOs...\" keybinds in `transient' for `meow'."
+;;     (transient-append-suffix 'mantle:meow/transient:dev-env:version-control
+;;       '(0 0 -1)
+;;       '("t" "magit: List TOODs" magit-todos-list))
+;;     ;; (mantle:meow/transient:dev-env:version-control)
+;;     )
+;;
+;;
+;;   ;;------------------------------
+;;   ;; Actually Create Keybinds:
+;;   ;;------------------------------
+;;
+;;   (if (imp:provided? :keybinds 'general 'meow)
+;;       (mantle:meow/keybind/general:magit-todo)
+;;     (mantle:meow/keybind/transient:magit-todo)))
+;;
+;;
+;; ;;------------------------------------------------------------------------------
+;; ;; Magit-Todos Keybinds: evil
+;; ;;------------------------------------------------------------------------------
+;;
+;; (imp:use-package magit-todos
+;;   :when  (imp:flag? :keybinds +evil)
+;;   :after (:and magit evil evil-collection)
+;;
+;;   ;;------------------------------
+;;   :general ; evil
+;;   ;;------------------------------
+;;   (keybind:leader/global:def
+;;     :infix  "g"
+;;     ;;---
+;;     ;; Magit-Todos Keybinds
+;;     ;;---
+;;     "t" '(magit-todos-list :which-key "Magit TODOs list buffer")))
 
 
 ;;------------------------------------------------------------------------------
