@@ -3,7 +3,7 @@
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; Created:    2023-02-24
-;; Timestamp:  2023-09-06
+;; Timestamp:  2023-09-15
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -196,10 +196,11 @@ Example:
   (unit:byte 2 'kib)
     -> 2048"
   (declare (pure t) (side-effect-free t))
-  (int<unit>:convert "unit:byte"
-                     value
-                     unit
-                     int<units>:bytes))
+  (floor ; No fractional bytes; cast to int.
+   (int<unit>:convert "unit:byte"
+                      value
+                      unit
+                      int<units>:bytes)))
 ;; (unit:byte 100 'kb)
 ;; (unit:byte 0.5 'kb)
 
