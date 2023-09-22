@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-11
-;; Timestamp:  2023-06-20
+;; Timestamp:  2023-09-22
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -223,6 +223,32 @@
 ;; Don't want popups for "help text". Put it in the echo area instead.
 (when (bound-and-true-p tooltip-mode)
   (tooltip-mode -1))
+
+
+;;--------------------------------------------------------------------------------
+;; Font
+;;--------------------------------------------------------------------------------
+
+;;------------------------------
+;; Dell U2713HM 27" @ 1920x1080:
+;;------------------------------
+;; (set-face-attribute 'default
+;;                     nil
+;;                     :font "Cascadia Code PL"
+;;                     ;; integers -> absolute font height in 1/10th font point (pt) units.
+;;                     :height 110)
+
+
+;;------------------------------
+;; Gigabyte M28U 28" @ 4k (3840x2160):
+;;------------------------------
+;; 1. Set font family.
+;; 2. Increase default font size for 4k monitor.
+(set-face-attribute 'default
+                    nil
+                    :font "Cascadia Code PL"
+                    ;; integers -> absolute font height in 1/10th font point (pt) units.
+                    :height 200)
 
 
 ;;------------------------------------------------------------------------------
