@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-06-02
-;; Timestamp:  2023-09-06
+;; Timestamp:  2023-09-18
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -434,8 +434,13 @@
         'org-mode-map
       "t" #'org-todo
       "c" #'org-toggle-checkbox ; TODO:org: Could do `org-ctrl-c-ctrl-c' here instead?
-      "u" (list #'org-metaright :which-key "Indent/Demote")
-      "o" (list #'org-metaleft  :which-key "Outdent/Promote")
+
+      "o" (list #'org-open-at-point :which-key "Open")
+      "C-o" (list (elisp:cmd/prefix #'org-open-at-point :prefix/always) :which-key "Open in Emacs")
+
+      ;; These are too far away from the actual movement keys to be useful.
+      ;; "u" (list #'org-metaright :which-key "Indent/Demote")
+      ;; "o" (list #'org-metaleft  :which-key "Outdent/Promote")
       ;; TODO:org: More?
       )
 
