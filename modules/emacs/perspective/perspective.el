@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-19
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -22,7 +22,7 @@
 (require 'cl-lib)
 
 
-(imp:require :window)
+(imp:require :chrome)
 (imp:require :buffer)
 
 

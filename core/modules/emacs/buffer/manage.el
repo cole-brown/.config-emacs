@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-02-24
-;; Timestamp:  2023-06-21
+;; Timestamp:  2023-09-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -28,7 +28,7 @@
 ;;------------------------------------------------------------------------------
 ;; Kill Functions
 ;;------------------------------------------------------------------------------
-;; See `:window:manage' for similar functions.
+;; See `:chrome:window' for similar functions.
 ;;   git-root://core/modules/emacs/window/manage.el
 
 ;; Like `kill-buffer-ask' but no confirmation for unmodified buffers.

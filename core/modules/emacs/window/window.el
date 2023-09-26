@@ -1,16 +1,18 @@
-;;; manage.el --- Manage windows: kill, quit, etc. -*- lexical-binding: t; -*-
+;;; core/modules/emacs/chrome/window.el --- Emacs 'Window' Functions -*- lexical-binding: t; -*-
 ;;
 ;; Author:     Cole Brown <http://github/cole-brown>
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-15
-;; Timestamp:  2023-06-26
+;; Timestamp:  2023-09-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
 ;; Move along.
 ;;
 ;;; Commentary:
+;;
+;; Emacs 'window' (as opposed to OS 'window') functions.
 ;;
 ;; Manage windows: kill, quit, etc..
 ;;
@@ -70,4 +72,4 @@ If WINDOW-LIST is nil, use function `window-list' instead."
 ;;------------------------------------------------------------------------------
 ;; The End.
 ;;------------------------------------------------------------------------------
-(imp:provide :window 'manage)
+(imp:provide :chrome 'window)

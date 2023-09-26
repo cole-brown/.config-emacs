@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-13
-;; Timestamp:  2023-09-15
+;; Timestamp:  2023-09-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -21,7 +21,7 @@
 
 
 (imp:require :elisp 'utils 'units)
-(imp:require :window 'manage)
+(imp:require :chrome 'window)
 
 
 ;;------------------------------------------------------------------------------
