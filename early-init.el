@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-03-23
-;; Timestamp:  2023-08-15
+;; Timestamp:  2023-09-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -47,8 +47,8 @@
               :path     (imp:path:join path-core-modules "emacs" "buffer")
               :filename "init")
 
-    (imp:load :feature  '(:window)
-              :path     (imp:path:join path-core-modules "emacs" "window")
+    (imp:load :feature  '(:chrome)
+              :path     (imp:path:join path-core-modules "emacs" "chrome")
               :filename "init")
 
     (imp:load :feature  '(:alist)
