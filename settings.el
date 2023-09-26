@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-11
-;; Timestamp:  2023-09-22
+;; Timestamp:  2023-09-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -232,6 +232,9 @@
 ;;------------------------------
 ;; Dell U2713HM 27" @ 1920x1080:
 ;;------------------------------
+;; Was just using the default OS font & size, which is set in Gnome Tweaks on
+;; Ubuntu 20.04, and is:
+;;   > Monospace Text: Cascadia Code PL Regular 8 pt
 ;; (set-face-attribute 'default
 ;;                     nil
 ;;                     :font "Cascadia Code PL"
@@ -243,12 +246,19 @@
 ;; Gigabyte M28U 28" @ 4k (3840x2160):
 ;;------------------------------
 ;; 1. Set font family.
-;; 2. Increase default font size for 4k monitor.
+;; 2. Increase default font size for 4k monitor?
+;;
+;; NOTE: 150% "fractional scaling" in the display settings makes these font
+;; sizes a bit weird after reboot... Setting to "110 height" aka "11 pt" make it
+;; bigger than it is, and makes it about the size it used to be before the 4k
+;; monitor joined the mix and before "fractional scaling" was enabled, but
+;; according to Gnome Tweaks, the default monospaced font size is 8 pt, not 11
+;; pt? ¯\_(ツ)_/¯
 (set-face-attribute 'default
                     nil
                     :font "Cascadia Code PL"
                     ;; integers -> absolute font height in 1/10th font point (pt) units.
-                    :height 200)
+                    :height 110)
 
 
 ;;------------------------------------------------------------------------------
