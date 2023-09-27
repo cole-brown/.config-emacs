@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-26
-;; Timestamp:  2023-08-21
+;; Timestamp:  2023-09-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -20,6 +20,15 @@
 ;; `use-package' or other package loading/config should be like 90% here.
 ;;
 ;;; Code:
+
+
+;;------------------------------------------------------------------------------
+;; Secrets (Consts, Vars, Etc.)
+;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config secret)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "secret")
 
 
 ;;------------------------------------------------------------------------------
@@ -105,15 +114,6 @@
 (imp:load :feature  '(:mantle config completion)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "completion")
-
-
-;;------------------------------------------------------------------------------
-;; Secrets (Consts, Vars, Etc.)
-;;------------------------------------------------------------------------------
-
-(imp:load :feature  '(:mantle config secret)
-          :path     (imp:path:current:dir/relative :mantle)
-          :filename "secret")
 
 
 ;;------------------------------------------------------------------------------

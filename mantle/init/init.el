@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-03-25
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -30,36 +30,8 @@
 
 
 ;;------------------------------------------------------------------------------
-;; Init: Input
-;;------------------------------------------------------------------------------
-
-;; Get the `:input' root set up.
-(imp:load :feature  '(:input)
-          :path     (imp:path:join innit:path:module "input")
-          :filename "init")
-
-
-;;------------------------------
-;; General, Evil, Meow, etc...
-;;------------------------------
-(imp:load :feature  '(:mantle init keybinds)
-          :path     (imp:path:join (imp:path:current:dir/relative :mantle)
-                                   "keybinds")
-          :filename "init")
-
-
-;;------------------------------------------------------------------------------
 ;; Init: Systems & Secrets?
 ;;------------------------------------------------------------------------------
-
-;;------------------------------
-;; Prereq Modules
-;;------------------------------
-
-(imp:load :feature  '(:taskspace)
-          :path     (imp:path:join innit:path:module "dev-env" "taskspace")
-          :filename "init") ; Needed by ':mantle/theme/init'.
-
 
 ;;------------------------------
 ;; User / Identity
@@ -104,8 +76,31 @@
 
 
 ;;------------------------------------------------------------------------------
+;; Init: Input
+;;------------------------------------------------------------------------------
+
+;; Get the `:input' root set up.
+(imp:load :feature  '(:input)
+          :path     (imp:path:join innit:path:module "input")
+          :filename "init")
+
+
+;;------------------------------
+;; General, Evil, Meow, etc...
+;;------------------------------
+(imp:load :feature  '(:mantle init keybinds)
+          :path     (imp:path:join (imp:path:current:dir/relative :mantle)
+                                   "keybinds")
+          :filename "init")
+
+
+;;------------------------------------------------------------------------------
 ;; Init: Modules
 ;;------------------------------------------------------------------------------
+
+(imp:load :feature  '(:taskspace)
+          :path     (imp:path:join innit:path:module "dev-env" "taskspace")
+          :filename "init") ; Needed by ':mantle/theme/init'.
 
 (imp:load :feature  '(:mode org)
           :path     (imp:path:join innit:path:module "mode" "org")
