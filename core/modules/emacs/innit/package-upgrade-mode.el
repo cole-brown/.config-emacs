@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-07-19
-;; Timestamp:  2023-07-25
+;; Timestamp:  2023-09-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -24,18 +24,30 @@
 ;; Settings
 ;;--------------------------------------------------------------------------------
 
-(defface int<innit>:package/mode:face:separator
-  (zenburn-with-color-variables
-    (list (cons
-           ;; display type
-           t
-           ;; attributes
-           ;; (list
-           ;;  :inherit 'org-done)
-           (list :background zenburn-bg-05
-                 :foreground zenburn-bg+3))))
-  "Face spec for empty/null/spacer keyword in todo sequence."
-  :group 'innit:group:theme)
+(defcustom innit:package/upgrade:timestamp/rx
+  (rx-to-string
+   ;; yyyy-mm-dd
+   `(sequence
+     (= 4 digit)
+     "-"
+     (= 2 digit)
+     "-"
+     (= 2 digit)
+     ;; date/time separator
+     " "
+     ;; HH:MM:SS
+     (= 2 digit)
+     ":"
+     (= 2 digit)
+     ":"
+     (= 2 digit))
+   :no-group)
+  "Regex to match timestamp strings.
+
+Must match strings formatted using `format-time-string' and
+`innit:package/upgrade:timestamp/format'."
+  :group 'innit:group
+  :type 'string)
 
 
 ;;--------------------------------------------------------------------------------
@@ -159,12 +171,12 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
 ;;   '(;; matcher
 ;;     "\\\\\\=<anchor\\\\\\=>"
 ;;     ;; pre-match-form
-;;     (0 anchor-face) ;; (subexp facename)? == match-hilight?
+;;     (0 anchor-face) ;; (subexp facename)? == match-highlight?
 ;;     ;; post-match-form
 ;;     (\"\\\\\\=<item\\\\\\=>\" ;; matcher
 ;;      nil ;; pre-match-form?
 ;;      nil ;; post-match-form?
-;;      (0 item-face) ;; match-hilight
+;;      (0 item-face) ;; match-highlight
 ;;      )
 ;;     )
 ;;   (cons
@@ -190,7 +202,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
 ;;           ;; (Optional) LAXMATCH Flag:
 ;;           ;; If LAXMATCH is non-nil, that means don't signal an error if there is no match for SUBEXP in MATCHER.
 ;;           (list laxmatch))))))))
-;; ;; (int<innit>:package/mode:font-lock-keywords:element/create "foo" 0 'font-lock-comment-face nil t)
+;; ;; (int<innit>:package/mode:font-lock-keywords:anchored/create "foo" 0 'font-lock-comment-face nil t)
 
 
 
@@ -301,7 +313,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Statuses
     ;;------------------------------
-    (push (int<innit>:package/mode:font-lock-keywords:element/create
+    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
            (rx-to-string `(or "[" ":" "]")
                          :no-group)
            0
@@ -310,7 +322,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
            nil)
           flk)
 
-    (push (int<innit>:package/mode:font-lock-keywords:element/create
+    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
            "OK"
            0
            ;; 'success ;; `success' face doesn't work? Just use a font-lock face?
@@ -318,7 +330,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
            t
            t)
           flk)
-    (push (int<innit>:package/mode:font-lock-keywords:element/create
+    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
            (rx-to-string `(or "ERROR" "FAILURE")
                          :no-group)
            0
@@ -328,7 +340,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
           flk)
 
     ;; HIGHEST-PRIORITY STATUS!
-    (push (int<innit>:package/mode:font-lock-keywords:element/create
+    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
            "DRY"
            0
            'font-lock-warning-face
@@ -338,10 +350,9 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Unicode Box Drawing Characters
     ;;------------------------------
-    (push (int<innit>:package/mode:font-lock-keywords:element/create
+    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
            rx/unicode-box ; Match Regex
            0 ; Match's Group Number from Match Regex
-           ;; 'int<innit>:package/mode:face:separator
            'font-lock-comment-delimiter-face
            t
            t)
@@ -350,7 +361,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Lists
     ;;------------------------------
-    (push (int<innit>:package/mode:font-lock-keywords:element/create
+    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
            (rx-to-string `(and
                            line-start
                            (one-or-more " ")
@@ -368,7 +379,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Package Names
     ;;------------------------------
-    (push (int<innit>:package/mode:font-lock-keywords:element/create
+    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
            (rx-to-string `(and
                            "`"
                            (group (one-or-more
@@ -385,7 +396,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
            nil
            nil)
           flk)
-    (push (int<innit>:package/mode:font-lock-keywords:element/create
+    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
            (rx-to-string `(and
                            "`"
                            (group (one-or-more
@@ -406,14 +417,14 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Intro Lines
     ;;------------------------------
-    (push (int<innit>:package/mode:font-lock-keywords:element/create
+    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
            "Upgrade Installed Emacs Packages"
            0
            'font-lock-preprocessor-face
            nil
            nil)
           flk)
-    (push (int<innit>:package/mode:font-lock-keywords:element/create
+    (push (int<innit>:package/mode:font-lock-keywords:highlight/create
            innit:package/upgrade:timestamp/rx
            0
            'font-lock-preprocessor-face
@@ -426,7 +437,7 @@ don't signal an error if there is no match for SUBEXP in MATCHER."
     ;;------------------------------
     ;; Getting a bit too colored?
     ;; Also this didn't cover "[DRY] Upgrading Packages..."
-    ;; (push (int<innit>:package/mode:font-lock-keywords:element/create
+    ;; (push (int<innit>:package/mode:font-lock-keywords:highlight/create
     ;;        (rx-to-string `(and
     ;;                        line-start
     ;;                        (or "Refreshing package metadata..."
@@ -559,7 +570,7 @@ https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Major-Modes.html
   ;;------------------------------
 
   ;;---
-  ;; Fontification / Colorization / Syntax Hilighting
+  ;; Fontification / Colorization / Syntax Highlighting
   ;;---
   (setq font-lock-defaults int<innit>:package/mode:font-lock-defaults)
 

@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-04-13
-;; Timestamp:  2023-08-22
+;; Timestamp:  2023-09-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -53,10 +53,10 @@
 	    :filename "server")
   (imp:load :feature  '(:innit package)
             :filename "package")
-  (imp:load :feature  '(:innit package upgrade command)
-            :filename "package-upgrade-command")
   (imp:load :feature  '(:innit package upgrade mode)
             :filename "package-upgrade-mode")
+  (imp:load :feature  '(:innit package upgrade command)
+            :filename "package-upgrade-command")
   (imp:load :feature  '(:innit squelch)
             :filename "squelch")
   (imp:load :feature  '(:innit hook)

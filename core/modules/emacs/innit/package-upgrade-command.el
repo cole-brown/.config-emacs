@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-07-19
-;; Timestamp:  2023-07-26
+;; Timestamp:  2023-09-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -17,7 +17,7 @@
 ;;; Code:
 
 
-(imp:provide :innit 'package 'upgrade 'mode)
+(imp:require :innit 'package 'upgrade 'mode)
 
 (require 'rx)
 
@@ -68,31 +68,6 @@ Default is RFC-3339 datetime format, which outputs like:
 
 ISO-8601 format is: \"%Y-%m-%dT%T%z\", which outputs like:
   2001-02-03T14:15:16-0700"
-  :group 'innit:group
-  :type 'string)
-
-(defcustom innit:package/upgrade:timestamp/rx
-  (rx-to-string
-   ;; yyyy-mm-dd
-   `(sequence
-     (= 4 digit)
-     "-"
-     (= 2 digit)
-     "-"
-     (= 2 digit)
-     ;; date/time separator
-     " "
-     ;; HH:MM:SS
-     (= 2 digit)
-     ":"
-     (= 2 digit)
-     ":"
-     (= 2 digit))
-   :no-group)
-  "Regex to match timestamp strings.
-
-Must match strings formatted using `format-time-string' and
-`innit:package/upgrade:timestamp/format'."
   :group 'innit:group
   :type 'string)
 
