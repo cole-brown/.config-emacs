@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-07-14
-;; Timestamp:  2023-06-21
+;; Timestamp:  2023-09-27
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -26,9 +26,10 @@
 
 (defun int<jerky>:debug:init ()
   "Initialize jerky debugging."
-  ;; Just use defaults for all settings.
-  (nub:vars:init :jerky))
-
+  (nub:vars:init
+   :jerky
+   ;; default enabled/disabled per output levels
+   :alist:enabled? '((:debug . nil))))
 
 ;;------------------------------------------------------------------------------
 ;; Debugging Toggle
