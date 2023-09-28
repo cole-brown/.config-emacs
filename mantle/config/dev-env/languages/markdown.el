@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-03
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -446,6 +446,9 @@
 ;; whatever) file when/if it gets one? Or... Keep this one for markdown and make
 ;; another for HTML if needed?
 
+(defvar innit:path:package:impatient (path:join innit:path:packages:user "impatient-mode")
+  "`use-package' doesn't like having a function call for `:load-path', thus this.")
+
 ;; To get a live preview of a Markdown buffer:
 ;;   1. Enable the web server provided by simple-httpd:
 ;;      'M-x httpd-start'
@@ -461,6 +464,14 @@
 ;; https://github.com/skeeto/impatient-mode
 (imp:use-package impatient-mode
   :after markdown-mode
+  ;; 1/3: This is on MELPA, but I want to fix a bug in it...
+  ;; NOTE: Just edit files normally; `find-function' etc work as usual.
+  ;; https://github.com/radian-software/straight.el#edit-packages-locally
+  :straight (:type git
+             :host github
+             :repo "skeeto/impatient-mode"
+             :fork (:host github
+                    :repo "cole-brown/impatient-mode"))
 
   ;;------------------------------
   :init
@@ -522,11 +533,16 @@ You can then:
         (message "%s is not a `markdown-mode' buffer!"
                  (buffer-name))
 
-      (funcall-interactively #'httpd-start)
-      (impatient-mode +1)
       (imp-set-user-filter #'mantle:user:markdown->html)
-      (browse-url "http://localhost:8080/imp/")
-      (message "Select this buffer in the browser to see changes live!")))
+
+      ;; Manually configure things and then send user to the buffer list webpage.
+      ;; (funcall-interactively #'httpd-start)
+      ;; (impatient-mode +1)
+      ;; (browse-url "http://localhost:8080/imp/")
+      ;; (message "Select this buffer in the browser to see changes live!")
+
+      ;; This does the `httpd-start', `impatient-mode' enabling, etc.
+      (imp-visit-buffer)))
 
 
   (defun mantle:cmd:markdown:preview-live/stop ()
@@ -551,6 +567,14 @@ You can then:
 (imp:use-package impatient-mode
   :when  (imp:flag? :keybinds +meow)
   :after (:and markdown-mode meow)
+  ;; 2/3: This is on MELPA, but I want to fix a bug in it...
+  ;; NOTE: Just edit files normally; `find-function' etc work as usual.
+  ;; https://github.com/radian-software/straight.el#edit-packages-locally
+  :straight (:type git
+             :host github
+             :repo "skeeto/impatient-mode"
+             :fork (:host github
+                    :repo "cole-brown/impatient-mode"))
 
   ;;------------------------------
   :config
@@ -577,6 +601,14 @@ You can then:
 (imp:use-package impatient-mode
   :when  (imp:flag? :keybinds +evil)
   :after (:and markdown-mode evil evil-collection)
+  ;; 3/3: This is on MELPA, but I want to fix a bug in it...
+  ;; NOTE: Just edit files normally; `find-function' etc work as usual.
+  ;; https://github.com/radian-software/straight.el#edit-packages-locally
+  :straight (:type git
+             :host github
+             :repo "skeeto/impatient-mode"
+             :fork (:host github
+                    :repo "cole-brown/impatient-mode"))
 
   ;;------------------------------
   :general ; evil
