@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-05
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-09-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -286,7 +286,7 @@
   (defun mantle:meow/keybind/general:web ()
     "Create the `web' keybinds in `general' for `meow'."
     (keybind:meow:leader/local:bind-keys
-        'python-mode-map
+        'web-mode-map
       "i"   (list #'mantle:meow/transient:web/insert :which-key "Insert...")
       "b h" (list #'web-mode-reload                  :which-key "Rehighlight Buffer")
       "b i" (list #'web-mode-buffer-indent           :which-key "Indent Buffer")
