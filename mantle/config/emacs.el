@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-24
-;; Timestamp:  2023-09-08
+;; Timestamp:  2023-10-06
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -290,7 +290,12 @@
   ;; external) use it anyway, leading to a void-function error, so define a no-op
   ;; substitute to suppress them.
   (unless (fboundp 'define-fringe-bitmap)
-    (fset 'define-fringe-bitmap #'ignore)))
+    (fset 'define-fringe-bitmap #'ignore))
+
+  ;; Replace selection with typed, pasted, yanked, etc text.
+  ;; [2023-10-06]: Too annoying, especially with `meow'.
+  ;; (delete-selection-mode +1)
+  )
 
 
 ;;------------------------------------------------------------------------------
