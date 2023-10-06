@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2020-11-16
-;; Timestamp:  2023-08-29
+;; Timestamp:  2023-10-06
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -72,6 +72,8 @@
             :filename "line")
   (imp:load :feature  '(:buffer search)
             :filename "search")
+  (imp:load :feature  '(:buffer yank)
+            :filename "yank")
 
 
   ;;------------------------------
