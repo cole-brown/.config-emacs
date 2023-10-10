@@ -26,9 +26,8 @@
 
 If REQUIRE-ACTIVE? is non-nil, region must be active in order to be deleted."
   ;; Only delete region if we in fact have one.
-  (when (and (or (and require-active?
-                      (region-active-p))
-                 t)
+  (when (and (or (and require-active? (region-active-p))
+                 (not require-active?))
                (integerp start) ; `integerp' is true for points as well as integers
                (integerp end)
                (/= start end))
