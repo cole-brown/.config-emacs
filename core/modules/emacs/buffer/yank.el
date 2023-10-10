@@ -75,15 +75,19 @@ START should be the start of the region (int or point) or nil.
 END should be the end of the region (int or point) or nil."
   (interactive "*r")
 
-  ;; Using meow and have a region selected?
-  (if (and (bound-and-true-p meow-mode)
-           (region-active-p))
-      ;; Use meow's replace-with-yanked-text function.
-      ;; NOTE: Errors if no region selected, which is why we hide behind
-      ;; `region-active-p'.
-      (meow-replace)
+  ;; ;; Using meow and have a region selected?
+  ;; (if (and (bound-and-true-p meow-mode)
+  ;;          (region-active-p))
+  ;;       ;; Use meow's replace-with-yanked-text function.
+  ;;       ;; NOTE: Errors if no region selected, which is why we hide behind
+  ;;       ;; `region-active-p'.
+  ;;       (meow-replace)
+  ;;
+  ;;   (int<yank>:replace start end))
 
-    (int<yank>:replace start end)))
+  ;; Don't use `meow-replace' because that trims newlines and I don't know why
+  ;; you would want to trim newlines..?
+  (int<yank>:replace start end))
 
 
 (defun yank/pop:replace (&optional start end prefix)
