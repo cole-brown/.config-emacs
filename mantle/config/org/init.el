@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-03-16
-;; Timestamp:  2023-06-29
+;; Timestamp:  2023-10-11
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -59,6 +59,16 @@
 (imp:load :feature  '(:mantle config org version-control)
           :path     (imp:path:current:dir/relative :mantle)
           :filename "version-control")
+
+
+;;--------------------------------------------------------------------------------
+;; Integration with Apps / Services
+;;--------------------------------------------------------------------------------
+
+(imp:load :feature  '(:mantle config org toggl)
+          :path     (imp:path:current:dir/relative :mantle)
+          :filename "toggl")
+
 
 
 ;;------------------------------------------------------------------------------
