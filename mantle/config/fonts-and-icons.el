@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-07-13
-;; Timestamp:  2023-09-08
+;; Timestamp:  2023-10-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -19,6 +19,269 @@
 
 
 (imp:require :elisp 'utils 'units)
+
+;; ┌──────────────────────────────────═══───────────────────────────────────┐
+;; │                                 ═════                                  │
+;; │                                :emoji:                                 │
+;; │                                 ═════                                  │
+;; └──────────────────────────────────═══───────────────────────────────────┘
+
+(defconst mantle:emoji:types
+  '((:google
+     :font "Noto Color Emoji"
+     :url  "https://fonts.google.com/noto/specimen/Noto+Color+Emoji"
+     ;; NOTE: Downloading the font from that URL, putting in the font folder,
+     ;; and `fc-cache -f' didn't work. Just get blank/whitespace instead of a
+     ;; smiley. See: https://stackoverflow.com/a/75136296
+     :install "sudo apt install fonts-noto-color-emoji")
+    (:microsoft
+     :font "Segoe UI Emoji"
+     :url  "https://learn.microsoft.com/en-us/typography/font-list/segoe-ui-emoji")
+    (:apple
+     :font "Apple Emoji"
+     :url  nil))
+  "Info about emoji fonts that I know about.
+
+To install a font:
+  - Ubuntu 22:
+    1. Place font files in: '~/.local/share/fonts/'
+    2. Refresh font info cache in the terminal: `fc-cache -f'")
+
+
+(defvar mantle:emoji:font :google
+  "Desired emoji font.
+
+Should be one of:
+  - nil     - do not want emoji
+  - keyword - key from `mantle:emoji:types'
+  - string  - font family name to look for in `font-family-list'")
+
+
+(defun mantle:emoji:font/name (font)
+  "Normalize FONT to a font name string or nil.
+
+FONT should be one of:
+  - nil     - do not want emoji
+  - keyword - key from `mantle:emoji:types'
+  - string  - font family name to look for in `font-family-list'"
+  (cond ((null font)
+         nil)
+
+        ((stringp font)
+         ;; Use string as-is; assume it's a valid string for a font family.
+         font)
+
+        ((keywordp font)
+         ;; Check for actual font string in `mantle:emoji:types' alist.
+         (if-let ((type (alist-get font mantle:emoji:types)))
+             (if-let ((font (plist-get type :font)))
+                 ;; Ok; return the `:font' string from the settings alist.
+                 font
+               ;; ERROR: User wants an emoji font, probably, but it has no `:font' setting?
+               (nub:warning
+                   :innit
+                   (imp:path:current:file/relative :mantle)
+                 '("Invalid emoji font type! Keyword `%S' has no `:font' "
+                   "value in its `mantle:emoji:types' entry: %S")
+                 mantle:emoji:font
+                 type)
+         ;; ERROR: User wants an emoji font, probably, but has an invalid setting.
+         (nub:warning
+             :innit
+             (imp:path:current:file/relative :mantle)
+           '("Invalid emoji font setting! Keyword `%S' not found in `mantle:emoji:types'. "
+             "Valid keyword types are: %S")
+           mantle:emoji:font
+           (seq-map #'car mantle:emoji:types)))))
+
+        (t
+         ;; ???
+         (nub:warning
+             :innit
+             (imp:path:current:file/relative :mantle)
+           "Invalid emoji font setting! Expected keyword, string, or nil. Got '%s': %S"
+           (type-of font)
+           font))))
+;; (mantle:emoji:font/name :google)
+;; (font-spec :family (mantle:emoji:font/name :google))
+;; (member (mantle:emoji:font/name mantle:emoji:font) (font-family-list))
+
+;; (pp (font-family-list))
+;; (font-spec :family "FontAwesome")
+;; (member (mantle:emoji:font/name mantle:emoji:font) (font-family-list))
+
+;; https://emacs.stackexchange.com/a/62220
+;; (featurep 'cairo) ; should evaluate to t
+;; (frame-parameter (selected-frame) 'font-backend) ; should be a list starting with ftcrhb
+
+
+(defun mantle:emoji:font/url (font)
+  "Normalize FONT to a font URL string or nil.
+
+FONT should be one of:
+  - nil     - do not want emoji
+  - keyword - key from `mantle:emoji:types'
+  - string  - font family name to look for in `font-family-list'"
+  (cond ((null font)
+         nil)
+
+        ((stringp font)
+         ;; Use string as-is; assume it's a valid string for a font family.
+         font)
+
+        ((keywordp font)
+         ;; Check for actual font string in `mantle:emoji:types' alist.
+         (if-let ((type (alist-get font mantle:emoji:types)))
+             (if-let ((font (plist-get type :font)))
+                 ;; Ok; return the `:font' string from the settings alist.
+                 font
+               ;; ERROR: User wants an emoji font, probably, but it has no `:font' setting?
+               (nub:warning
+                   :innit
+                   (imp:path:current:file/relative :mantle)
+                 '("Invalid emoji font type! Keyword `%S' has no `:font' "
+                   "value in its `mantle:emoji:types' entry: %S")
+                 mantle:emoji:font
+                 type)
+         ;; ERROR: User wants an emoji font, probably, but has an invalid setting.
+         (nub:warning
+             :innit
+             (imp:path:current:file/relative :mantle)
+           '("Invalid emoji font setting! Keyword `%S' not found in `mantle:emoji:types'. "
+             "Valid keyword types are: %S")
+           mantle:emoji:font
+           (seq-map #'car mantle:emoji:types)))))
+
+        (t
+         ;; ???
+         (nub:warning
+             :innit
+             (imp:path:current:file/relative :mantle)
+           "Invalid emoji font setting! Expected keyword, string, or nil. Got '%s': %S"
+           (type-of font)
+           font))))
+;; (mantle:emoji:font/url mantle:emoji:font)
+
+
+;;--------------------------------------------------------------------------
+;; Emoji Font: Set up or no?
+;;--------------------------------------------------------------------------
+(cond
+ ;;------------------------------
+ ;; OK: No setting for emoji; do nothing.
+ ;;------------------------------
+ ((or (null mantle:emoji:font)                           ; No font setting at all.
+      (null (mantle:emoji:font/name mantle:emoji:font))) ; Font setting resolves to no font desired.
+  nil)
+
+ ;;------------------------------
+ ;; WARN: Complain that the setting is ill-defined.
+ ;;------------------------------
+ ((not (stringp (mantle:emoji:font/name mantle:emoji:font)))
+  (nub:warning
+       :innit
+       (imp:path:current:file/relative :mantle)
+     "Emoji font desired, but cannot figure out a font name for that setting! setting: '%s' -> font: '%s'"
+     mantle:emoji:font
+     (mantle:emoji:font/name mantle:emoji:font)))
+
+ ;;------------------------------
+ ;; WARN: Unknown/uninstalled font
+ ;;------------------------------
+ ((not (member (mantle:emoji:font/name mantle:emoji:font)
+               (font-family-list)))
+  ;; Complain that there are no emojis.
+  (nub:warning
+      :innit
+      (imp:path:current:file/relative :mantle)
+    "Emoji font desired, but font is not installed? setting: '%s' -> font: '%s'"
+    mantle:emoji:font
+    (mantle:emoji:font/name mantle:emoji:font)))
+
+ ;;------------------------------
+ ;; OK: EMOJIFY ME!
+ ;;------------------------------
+ (t
+  ;;--------------------------------------------------------------------------
+  ;; Set Up Emoji Font
+  ;;--------------------------------------------------------------------------
+
+  (set-fontset-font t ; default fontset
+                    ;; 'symbol ; fontset for... symbols? See `script-representative-chars'
+                    'emoji ; fontset for emoji. See `script-representative-chars'
+                    (font-spec :family (mantle:emoji:font/name mantle:emoji:font) ;font-name
+                               :weight 'normal
+                               :width  'normal
+                               :slant  'normal)
+                    nil ; nil == "selected frame"
+                    'prepend ; Prepend this font to any existing font spec for `symbol'.
+                    )
+
+  ;;--------------------------------------------------------------------------
+  ;; Emoji Package
+  ;;--------------------------------------------------------------------------
+
+  ;; https://github.com/iqbalansari/emacs-emojify
+  (imp:use-package emojify
+
+    ;;------------------------------
+    :hook
+    ;;------------------------------
+    (after-init . global-emojify-mode)
+
+    ;;------------------------------
+    :custom
+    ;;------------------------------
+
+    ;; NOTE [2023-10-16]: Cannot get ":smile:" to work reliably in `org-mode' buffers.
+    ;; Switch to unicode-only for now?
+    (emojify-emoji-styles '(unicode))  ; Display actual Unicode emoji codepoints.
+    ;; (emojify-emoji-styles '(unicode  ; Display actual Unicode emoji codepoints.
+    ;;                         ;; ascii ; Display old-school emoticons (":D") as emoji.
+    ;;                         github)) ; Display words-between-colons (":smile:") as emoji.
+
+    ;; Display emojis as:
+    ;;   `image' (default), `unicode', or `ascii'
+    (emojify-display-style 'unicode)
+
+    ;; No Emoji Allowed!
+    ;; (emojify-inhibit-major-modes '(???))
+    ;; (emojify-inhibit-in-buffer-functions '(???))
+    ;; (emojify-inhibit-functions '(???))
+
+    ;; Programming & Emoji: Where are emoji allow in programming modes?
+    ;; (emojify-prog-contexts '???) ; `comments', `string', `both' (default), `none'
+
+    ;; Behavoir of Emoji
+    ;; (emojify-point-entered-behaviour '???) ; `echo', `uncover', my-custom-function
+    ;; (emojify-show-help nil/t) ; Show a pop-up on mouse hover?
+
+    ;; Custom Emoji
+    ;; https://github.com/iqbalansari/emacs-emojify#custom-emojis
+    ;; (emojify-user-emojis '(...)) ; alist of: ("text" . alist-of-emoji-data)
+
+    )
+
+  ;;------------------------------
+  ;; Keybinds : Meow
+  ;;------------------------------
+
+  (imp:use-package emojify
+    :when  (imp:flag? :keybinds +meow)
+    :after meow
+
+    ;;------------------------------
+    :config
+    ;;------------------------------
+    (keybind:leader/global:def
+      :infix (keybind:infix "ie")        ; insert -> emoji
+      "" '(nil :which-key "Emoji...") ; infix title
+
+      "e" (list #'emojify-insert-emoji :which-key "Insert Emoji")
+      "s" (list #'emojify-apropos-emoji :which-key "Search Emoji")
+      "i" (list #'emojify-describe-emoji-at-point :which-key "Describe Emoji @ Point")
+      "d" (list #'emojify-describe-emoji :which-key "Describe Emoji")
+      "l" (list #'emojify-list-emojis :which-key "List Emoji")))))
 
 
 ;; ┌──────────────────────────────────═══───────────────────────────────────┐
