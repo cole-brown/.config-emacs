@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-09
-;; Timestamp:  2023-06-22
+;; Timestamp:  2023-10-24
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -150,7 +150,7 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
   ;; Try to eval inputs (at most) once.
   (let* ((macro<innit>:announce  (int<innit>:hook:option :announce options))
          (macro<innit>:squelch   (int<innit>:hook:option :squelch options))
-         (macro<innit>:transient (int<innit>:hook:option :transient options))
+         (macro<innit>:transient (elisp:list:flatten (int<innit>:hook:option :transient options)))
          (macro<innit>:arg/file  (or
                                   ;; Explicit arg in OPTIONS provided?
                                   (int<innit>:hook:option :file options)
@@ -194,11 +194,14 @@ Use this over `innit:hook:defun-and-add' only in cases where you aren't
               (concat " from '"
                       macro<innit>:file
                       "'"))))
+
          ;; And run the actual hook.
          ,@body
+
          ;; If a transient, remove hook now that it's run once.
-         (when (bound-and-true-p ,macro<innit>:transient)
-           (remove-hook ',macro<innit>:transient #',macro<innit>:hook-fn))))))
+         (dolist (macro<innit>:hook-var ',macro<innit>:transient)
+           (when (and (boundp macro<innit>:hook-var) macro<innit>:hook-var) ; `bound-and-true-p' doesn't work like I want here?
+             (remove-hook macro<innit>:hook-var #',macro<innit>:hook-fn)))))))
 ;; (setq test-hook nil)
 ;; (makunbound 'mantle:hook:test)
 ;; (fmakunbound 'mantle:hook:test)
@@ -284,17 +287,13 @@ OPTIONS is a plist of optional vars:
          (macro<innit>:depth     (int<innit>:hook:option :depth options))
          (macro<innit>:transient (int<innit>:hook:option :transient options)))
 
-    ;; Currently incompatible: `:transient' and multiple hook vars.
-    ;; TODO: Do we want the function to delete itself from all hooks after it's
-    ;; run from any of them for the first time? Or should it run once from each
-    ;; hook?
     (when (and macro<innit>:transient
-               (> (length macro<innit>:hooks) 1))
-      (nub:error
-         :innit
-         "innit:hook:defun-and-add"
-       '("Couldn't be bothered figuring out how to do `:transient' /and/ "
-         "multiple hooks. So now you have to...")))
+               (> (length macro<innit>:hooks) 1)
+               (not (listp macro<innit>:transient)))
+      ;; `innit:hook:defun' expects `:transient' to be a list of hook vars to
+      ;; delete the func from.
+      (setq macro<innit>:transient macro<innit>:hooks)
+      (plist-put macro<innit>:options :transient macro<innit>:transient))
 
     `(progn
       ;; Create the hook function.
@@ -313,6 +312,30 @@ OPTIONS is a plist of optional vars:
 ;; (innit:hook:defun-and-add test-hook (:announce t) (message "Test hook says hello."))
 ;; test-hook
 ;; (run-hooks 'test-hook)
+;;
+;; Multi-hook transient should go away from all after one is run.
+;; (progn
+;;   (setq test-hook-0 nil
+;;         test-hook-1 nil
+;;         test-string "Hello there.")
+;;   ;; (makunbound 'mantle:hook:test)
+;;   ;; (fmakunbound 'mantle:hook:test)
+;;   (innit:hook:defun-and-add
+;;       (test-hook-0
+;;        test-hook-1)
+;;       (:name test-hook
+;;        :announce t
+;;        :transient t)
+;;     (message "Hook says: %S" test-string))
+;;   (message "[RUN ] `test-hook-0'")
+;;   (message "  - Expecting: %s..." test-string)
+;;   (run-hooks 'test-hook-0)
+;;   (message "[DONE] `test-hook-0'")
+;;   (message "hook vars should be empty now: 0: %S, 1: %S" test-hook-0 test-hook-1)
+;;   (message "[RUN ] `test-hook-1'")
+;;   (message "  - Expecting nothing to run and output nothing...")
+;;   (run-hooks 'test-hook-1)
+;;   (message "[DONE] `test-hook-1'"))
 
 
 ;;------------------------------------------------------------------------------
