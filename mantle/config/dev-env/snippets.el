@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2023-09-15
+;; Timestamp:  2023-10-26
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -422,26 +422,26 @@ NOTE: Text of options will be deduplicated before being presented."
                :docstr "Default path to snippets in `user-emacs-directory'."))
 
 
-  ;;------------------------------
-  ;; Advice
-  ;;------------------------------
-
-  (defun mantle:yas:indent-according-to-mode/safe ()
-    "Call `indent-according-to-mode`, converting errors to messages."
-    (condition-case err
-        (indent-according-to-mode)
-      (error
-       (message "%s" (error-message-string err)))))
-
-
-  (define-advice yas--indent-region (:around (fn &rest args) mantle:yas:indent-according-to-mode/safe)
-    "Make `indent-according-to-mode' not raise errors.
-
-If a snippet gets an error during its expansion, `yas' just dies there and your
-snippet isn't useful - you don't get to fill in fields. Try to make it so that
-errors don't ruin everything."
-    (cl-letf (((symbol-function #'indent-according-to-mode) #'mantle:yas:indent-according-to-mode/safe))
-      (apply fn args)))
+;;   ;;------------------------------
+;;   ;; Advice
+;;   ;;------------------------------
+;;
+;;   (defun mantle:yas:indent-according-to-mode/safe ()
+;;     "Call `indent-according-to-mode`, converting errors to messages."
+;;     (condition-case err
+;;         (indent-according-to-mode)
+;;       (error
+;;        (message "%s" (error-message-string err)))))
+;;
+;;
+;;   (define-advice yas--indent-region (:around (fn &rest args) mantle:yas:indent-according-to-mode/safe)
+;;     "Make `indent-according-to-mode' not raise errors.
+;;
+;; If a snippet gets an error during its expansion, `yas' just dies there and your
+;; snippet isn't useful - you don't get to fill in fields. Try to make it so that
+;; errors don't ruin everything."
+;;     (cl-letf (((symbol-function #'indent-according-to-mode) #'mantle:yas:indent-according-to-mode/safe))
+;;       (apply fn args)))
 
 
   ;;------------------------------
@@ -528,12 +528,14 @@ errors don't ruin everything."
     (unless mantle:yas:interaction/type
       (setq mantle:yas:interaction/type :expand)))
 
+
   ;; Dunno when this is called...
   (define-advice yas-expand-from-keymap (:before (&rest _) mantle:yas:interaction/type/expand)
     "Advice to set `mantle:yas:interaction/type' to `:expand'."
     (unless mantle:yas:interaction/type
       (setq mantle:yas:interaction/type :expand)))
   ;; (advice-remove 'yas-expand-from-keymap #'yas-expand-from-keymap@mantle:yas:interaction/type/expand)
+
 
   ;;------------------------------
   ;; Configuration
@@ -580,7 +582,8 @@ errors don't ruin everything."
   ;;------------------------------
 
   ;; Bind something usable everywhere, like in meow insert mode.
-  ("C-=" . yas-expand)
+  (:map yas-minor-mode-map
+   ("C-=" . yas-expand))
 
 
   ;;------------------------------
