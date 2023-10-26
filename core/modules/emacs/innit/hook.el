@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-09
-;; Timestamp:  2023-10-24
+;; Timestamp:  2023-10-25
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -287,8 +287,8 @@ OPTIONS is a plist of optional vars:
          (macro<innit>:depth     (int<innit>:hook:option :depth options))
          (macro<innit>:transient (int<innit>:hook:option :transient options)))
 
+    ;; Normalize `:transient' plist option to list of hook vars.
     (when (and macro<innit>:transient
-               (> (length macro<innit>:hooks) 1)
                (not (listp macro<innit>:transient)))
       ;; `innit:hook:defun' expects `:transient' to be a list of hook vars to
       ;; delete the func from.
