@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2023-10-26
+;; Timestamp:  2023-11-14
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -219,6 +219,53 @@ Intended for `yas-selected-text' and `mantle:yas:choose/options'."
     nil)
 
 
+  (defun mantle:yas:text/trimmed (from)
+    "Trim a string based on FROM and return it.
+
+If you want `yas-selected-text', use `:saved' and at some earlier point in the
+snippet do:
+  `(mantle:yas:text/save yas-selected-text)`
+
+FROM should be one or more of the keywords:
+  - `:saved'           - Return `mantle:yas:text/saved'
+  - `:clipboard'       - Return clipboard's text.
+  - `:yank'            - Return kill ring's text.
+  - `:selected'        - Return active region in current buffer.
+  - `:none'            - Return an empty string.
+
+Return a string or nil."
+    (mantle:yas:trim/lines
+     (pcase from
+       ((or :saved 'saved)
+        (mantle:yas:choose/option:string-or-nil mantle:yas:text/saved))
+
+       ((or :selected 'selected)
+        (when (buffer:region:active?)
+          (buffer:region:get)))
+
+       ((or :clipboard 'clipboard)
+        (mantle:yas:choose/option:string-or-nil
+         ;; `let' values stolen from `clipboard-yank':
+         (let ((select-enable-clipboard t)
+               ;; Ensure that we defeat the DWIM login in `gui-selection-value'.
+               (gui--last-selected-text-clipboard nil))
+           (current-kill 0 'do-not-move))))
+
+       ((or :yank 'yank)
+        (mantle:yas:choose/option:string-or-nil
+         (current-kill 0 'do-not-move)))
+
+       ((or :none 'none)
+        "")
+
+       (_
+        nil))))
+  ;; Hello clipboard.
+  ;; (mantle:yas:text/trimmed :clipboard)
+  ;; (mantle:yas:text/trimmed :none)
+  ;; (mantle:yas:text/trimmed :jeff)
+
+
   (defvar-local mantle:yas:interaction/type ; aka `yas--interaction-type' in yas parlance.
     nil
     "How did the user first start interacting with this snippet?
@@ -285,33 +332,7 @@ OPTIONS:
             empty-choice?)
         (while options
           (when-let ((option (car options))
-                     (choice
-                      ;; TODO: share a helper function with `mantle:yas:choose/options' for this pcase?
-                      (pcase (pop options)
-                        ((or :saved 'saved)
-                         (mantle:yas:choose/option:string-or-nil
-                          mantle:yas:text/saved))
-
-                        ((or :selected 'selected)
-                         (when (buffer:region:active?)
-                           (buffer:region:get)))
-
-                        ((or :clipboard 'clipboard)
-                         (mantle:yas:choose/option:string-or-nil
-                          ;; `let' values stolen from `clipboard-yank':
-                          (let ((select-enable-clipboard t)
-                                ;; Ensure that we defeat the DWIM login in `gui-selection-value'.
-                                (gui--last-selected-text-clipboard nil))
-                            (current-kill 0 'do-not-move))))
-
-                        ((or :yank 'yank)
-                         (mantle:yas:choose/option:string-or-nil
-                          (current-kill 0 'do-not-move)))
-
-                        ((or :none 'none)
-                         (setq empty-choice? t)
-                         ;; `none'/empty-string should be a fallback, at best, so don't choose it now.
-                         :not-a-string-yet))))
+                     (choice (mantle:yas:text/trimmed (pop options))))
             (when (stringp choice)
               (setq first-choice choice  ; Choose this string...
                     options      nil)))) ; ...and we're done here.
@@ -361,34 +382,8 @@ NOTE: Text of options will be deduplicated before being presented."
         ;;------------------------------
         (let (choices)
           (dolist (option (nreverse options))
-            ;; Trim leading/trailing newlines.
-            (push (mantle:yas:trim/lines ; Returns nil for non-strings, which is used.
-                   ;; Get text from wherever it is.
-                   ;; TODO: share a helper function with `mantle:yas:choose/options' for this pcase?
-                   (pcase option
-                     ((or :saved 'saved)
-                      (mantle:yas:choose/option:string-or-nil
-                       mantle:yas:text/saved))
-
-                     ((or :selected 'selected)
-                      (when (buffer:region:active?)
-                        (buffer:region:get)))
-
-                     ((or :clipboard 'clipboard)
-                      (mantle:yas:choose/option:string-or-nil
-                       ;; `let' values stolen from `clipboard-yank':
-                       (let ((select-enable-clipboard t)
-                             ;; Ensure that we defeat the DWIM login in `gui-selection-value'.
-                             (gui--last-selected-text-clipboard nil))
-                         (current-kill 0 'do-not-move))))
-
-                     ((or :yank 'yank)
-                      (mantle:yas:choose/option:string-or-nil
-                       (current-kill 0 'do-not-move)))
-
-                     ((or :none 'none)
-                      ;; `none' should be an empty string; don't use `mantle:yas:choose/option:string-or-nil'.
-                      "")))
+            ;; Get text from wherever it is & trim leading/trailing newlines.
+            (push (mantle:yas:text/trimmed option)
                   choices))
 
           ;; Remove invalids and deduplicate.
