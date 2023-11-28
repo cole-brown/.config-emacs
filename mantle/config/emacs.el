@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-01-24
-;; Timestamp:  2023-10-06
+;; Timestamp:  2023-11-28
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -363,7 +363,7 @@ Only accurate when using `mantle:cmd:profiler:toggle'.")
   ;; Try to keep the cursor out of the read-only portions of the minibuffer.
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-  (define-advice completing-read-multiple (:filter-args (fn &rest args) mantle:minibuffer:completing-read-multiple:indicator)
+  (define-advice completing-read-multiple (:filter-args (args) mantle:minibuffer:completing-read-multiple:indicator)
     "Add a prompt indicator to `completing-read-multiple'.
 
 We display a prefix with the `crm-separator' in the prompt.
@@ -372,14 +372,27 @@ Assuming:
   2. The prompt is \"prompt❯ \"
 Example:
   ├CRM:,┤ prompt❯ _"
-    ;; Add prefix to PROMPT in ARGS.
-    (cons (format "├CRM:%s┤ %s" ; Unicode?
-                  ;; "[CRM:%s] %s" ; ASCII only
-                  (replace-regexp-in-string "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+    ;; Return list of args.
+    (cons
+     ;; Add prefix w/ `crm-separator' to PROMPT in ARGS.
+     (format "├CRM:%s┤ %s" ; Unicode?
+             ;; "[CRM:%s] %s" ; ASCII only
+             ;; `crm-separator' is a regex (default: "[ /t]*,[ /t]*")
+             ;; Trim that down to just the comma?
+             (replace-regexp-in-string (rx (or (group string-start
+                                                           "["
+                                                           (*? whitespace)
+                                                           "]*")
+                                                    (group "["
+                                                           (*? whitespace)
+                                                           "]*"
+                                                           string-end)))
+                                            ""
                                             crm-separator)
-                  (car args))
-          (cdr args)))
-
+             (car args))
+     ;; Rest of the args should be unmolested.
+     (cdr args)))
+  ;; (completing-read-multiple "prompt> " '("alice" "bob" "eve"))
 
   ;;------------------------------
   :custom
