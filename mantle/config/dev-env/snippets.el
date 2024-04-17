@@ -486,7 +486,9 @@ NOTE: Text of options will be deduplicated before being presented."
   ;;---
   ;; `fixed': Indent the snippet to the current column;
   ;; `auto': Indent each line of the snippet with indent-according-to-mode
-  (yas-indent-line 'auto)
+  ;; TRIAL [2023-11-14]: Does `fixed' make my snippets better or worse overall? It's better in `org-mode'.
+  (yas-indent-line 'fixed)
+  ;; (yas-indent-line 'auto)
 
   ;; These require `yas-indent-line' == `auto' to do anything.
   ;; TODO: Do I want either of these in prog modes? Don't /think/ I want in `org-mode'; see `src' indent issues.

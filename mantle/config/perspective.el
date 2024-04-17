@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-29
-;; Timestamp:  2023-09-14
+;; Timestamp:  2023-10-20
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -302,7 +302,7 @@ or on some buffer listing ops."
   (imp:eval:after posframe
     (innit:hook:defun-and-add
         persp-after-load-state-functions
-        (:name    "persp:state/load"
+        (:name   "persp:state/load"
          :docstr "Fix bug: Stop session persistence from restoring a broken posframe."
          ;; :squelch t ;; TODO: Do I need to squelch?
          )

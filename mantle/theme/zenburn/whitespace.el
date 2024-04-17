@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-05-16
-;; Timestamp:  2023-06-27
+;; Timestamp:  2023-12-19
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -52,7 +52,7 @@
      ;;---
      ;; "Good" Whitespace
      ;;---
-     (list 'whitespace-space :foreground zenburn-bg+2)
+     (list 'whitespace-space   :foreground zenburn-bg+2)
      (list 'whitespace-newline :foreground zenburn-bg+2)
      ;; whitespace-hspace - leave as-is?
      ;; whitespace-indentation - leave as-is?
