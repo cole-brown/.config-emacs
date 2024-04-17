@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-10-11
-;; Timestamp:  2023-10-11
+;; Timestamp:  2023-10-16
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -37,7 +37,9 @@
   ;; Not on a package repository so get it from GitHub:
   :straight (:type git
              :host github
-             :repo "mbork/org-toggl")
+             :repo "mbork/org-toggl"
+             :fork (:host github
+                    :repo "cole-brown/org-toggl"))
   :after org
 
   ;;------------------------------
