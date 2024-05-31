@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-08-05
-;; Timestamp:  2023-11-14
+;; Timestamp:  2024-05-31
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -486,9 +486,11 @@ NOTE: Text of options will be deduplicated before being presented."
   ;;---
   ;; `fixed': Indent the snippet to the current column;
   ;; `auto': Indent each line of the snippet with indent-according-to-mode
-  ;; TRIAL [2023-11-14]: Does `fixed' make my snippets better or worse overall? It's better in `org-mode'.
-  (yas-indent-line 'fixed)
-  ;; (yas-indent-line 'auto)
+  ;; [2023-11-14]: Does `fixed' make my snippets better or worse overall? It's better in `org-mode'.
+  ;; (yas-indent-line 'fixed)
+  ;; [2024-05-31]: Is `fixed' better in `org-mode'? Really? Cuz I'm still having trouble with `org-mode'...
+  ;; [2024-05-31]: Try `nothing'??
+  (yas-indent-line 'nothing)
 
   ;; These require `yas-indent-line' == `auto' to do anything.
   ;; TODO: Do I want either of these in prog modes? Don't /think/ I want in `org-mode'; see `src' indent issues.
