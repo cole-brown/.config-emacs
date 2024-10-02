@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2021-05-07
-;; Timestamp:  2023-08-18
+;; Timestamp:  2024-10-02
 ;; Version:    1.1.20220413
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
@@ -57,6 +57,7 @@
                    (buffer-file-name)
                    ((error "Cannot find filepath for filename '%s'"))))))
           nil
+          ;; NOTE: Commenting out this `nomessage' can help debug Emacs start-up.
           'nomessage)))
 
 

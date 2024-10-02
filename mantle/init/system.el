@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-06-09
-;; Timestamp:  2023-06-29
+;; Timestamp:  2024-10-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -94,7 +94,7 @@
                            :date "2021"
                            :type "lap"
                            :description "Dell XPS 13 laptop"
-                           :path/secret/root "~/.config/secret")
+                           :path/secret/root "~/ocean/vault/.config/secret")
 
 ;;---
 ;; work/2021/vm::d3dbd4-fa7934
