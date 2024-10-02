@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-06-22
-;; Timestamp:  2023-06-22
+;; Timestamp:  2024-10-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -21,9 +21,6 @@
 ;;                                 ──────────
 ;;
 ;;; Code:
-
-
-(require 'seq)
 
 
 ;;--------------------------------------------------------------------------------
