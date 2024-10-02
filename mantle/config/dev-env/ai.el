@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2023-05-02
-;; Timestamp:  2023-09-18
+;; Timestamp:  2024-10-02
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -36,6 +36,13 @@
        :docstr  "Settings for ChatGPT buffers.")
     (visual-line-mode +1))
 
+  (defvar mantle:gptel:directive/default-with-examples
+    (str:join
+     " "
+     "You are a large language model living in Emacs and a helpful assistant."
+     "Respond concisely and provide reference links or code examples.")
+    "For adding to alist `gptel-directives' and/or var `gptel--system-message'.")
+
 
   ;;------------------------------
   :hook
@@ -49,9 +56,25 @@
 
   (gptel-api-key (plist-get secret:key:openai :key))
 
+  ;; 4o is much better than 3.5 turbo.
+  (gptel-model "gpt-4o")
+
+  ;; `default' doesn't provide examples as often as I want.
+  (gptel--system-message mantle:gptel:directive/default-with-examples)
+
   ;; Default: `markdown-mode' if available, else `text-mode'
   ;; ...why would you ever not use org?
-  (gptel-default-mode 'org-mode))
+  (gptel-default-mode 'org-mode)
+
+
+  ;;------------------------------
+  :config
+  ;;------------------------------
+
+  ;; `default' doesn't provide examples as often as I want.
+  (push (cons 'mantle:gptel:directive/default-with-examples
+                                mantle:gptel:directive/default-with-examples)
+                          gptel-directives))
 
 
 ;;------------------------------------------------------------------------------
