@@ -4,7 +4,7 @@
 ;; Maintainer: Cole Brown <code@brown.dev>
 ;; URL:        https://github.com/cole-brown/.config-emacs
 ;; Created:    2022-11-28
-;; Timestamp:  2023-06-21
+;; Timestamp:  2024-10-03
 ;;
 ;; These are not the GNU Emacs droids you're looking for.
 ;; We can go about our business.
@@ -59,22 +59,35 @@ _O_: ?O?     _t_: ?t?"
     ;;------------------------------
     ;; Not Evil?
     ;;------------------------------
-    ;; Vanilla Emacs and/or Meow - just standard join lines.
+
+    (defun buffer:join-line/no-whitespace (&optional arg)
+      "Join this line to previous and delete whitespace at join.
+
+With prefix ARG, join this line to the following instead of previous."
+      (interactive "P")
+      (join-line arg)
+      (delete-horizontal-space))
+
 
     ;; Call `buffer:hydra:join-lines/body' to enter.
     (defhydra buffer:hydra:join-lines (:color red  ;; Allow & quit on non-hydra-heads.
                                        :hint none) ;; no hint - just docstr
       "
 Join Lines...
-_._: ?.?
-_e_: ?e?"
+_._: ?.?     _>_: ?>?
+_e_: ?e?     _E_: ?E?"
       ;;---
       ;; NOTE: Arrow Meanings:
       ;;---
       ;; ↑: Above line.
       ;; ↓: Below line.
-      ("." #'join-line               "↑ `join-line' (Trim)")
-      ("e" (elisp:cmd (join-line 1)) "↓ `join-line' (Trim)"))))
+
+      ;; `join-line' does a "smart" trim.
+      ("." #'join-line               "↑ `join-line' (\"Smart\" Trim)")
+      ("e" (elisp:cmd (join-line 1)) "↓ `join-line' (\"Smart\" Trim)")
+
+      (">" #'buffer:join-line/no-whitespace               "↑ `join-line' (No Whitespace)")
+      ("E" (elisp:cmd (buffer:join-line/no-whitespace 1)) "↓ `join-line' (No Whitespace)"))))
 ;; (buffer:hydra:join-lines/body)
 
 
